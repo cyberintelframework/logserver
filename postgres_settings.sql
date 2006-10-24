@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.01
+-- Version 1.04.02
 -- 24-10-2006
 --
 
 -- Version history
+-- 1.04.02 Added Nepenthes log-surfnet pgsql functions
 -- 1.04.01 Removed the tbl_ references
 -- 1.02.06 Added serverhash column to the login table
 -- 1.02.05 Initial 1.03 release
