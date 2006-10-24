@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.02.06
--- 20-07-2006
+-- Version 1.04.01
+-- 24-10-2006
 --
 
 -- Version history
+-- 1.04.01 Removed the tbl_ references
 -- 1.02.06 Added serverhash column to the login table
 -- 1.02.05 Initial 1.03 release
 
@@ -278,9 +279,6 @@ ALTER TABLE ONLY org_id
 ALTER TABLE ONLY organisations
     ADD CONSTRAINT primary_organisations PRIMARY KEY (id);
 
-ALTER TABLE ONLY tbl_preferences
-    ADD CONSTRAINT primary_preferences PRIMARY KEY (id);
-
 ALTER TABLE ONLY report
     ADD CONSTRAINT primary_report PRIMARY KEY (id);
 
@@ -289,12 +287,6 @@ ALTER TABLE ONLY report_content
 
 ALTER TABLE ONLY report_template_threshold
     ADD CONSTRAINT primary_report_template_threshold PRIMARY KEY (id);
-
-ALTER TABLE ONLY tbl_logs
-    ADD CONSTRAINT primary_rid PRIMARY KEY (rid);
-
-ALTER TABLE ONLY tbl_logs_extra
-    ADD CONSTRAINT primary_rid_extra PRIMARY KEY (rid);
 
 ALTER TABLE ONLY sensors
     ADD CONSTRAINT primary_sensors PRIMARY KEY (id);
