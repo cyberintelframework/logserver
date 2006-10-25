@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.02
--- 24-10-2006
+-- Version 1.04.03
+-- 25-10-2006
 --
 
 -- Version history
+-- 1.04.03 Switched source and dest in the Nepenthes function surfnet_attack_by_id
 -- 1.04.02 Added Nepenthes log-surfnet pgsql functions
 -- 1.04.01 Removed the tbl_ references
 -- 1.02.06 Added serverhash column to the login table
@@ -549,10 +550,10 @@ BEGIN
 	VALUES
 		(p_severity,
 		 extract(epoch from current_timestamp(0))::integer,
-		 p_attackerip,
-		 p_attackerport,
 	         p_decoyip,
 		 p_decoyport,
+		 p_attackerip,
+		 p_attackerport,
 		 p_sensorid,
 		 p_hwa);
 
