@@ -1,0 +1,23 @@
+Make sure you have the following installed:
+
+postgresql-8.1
+libclass-dbi-pg-perl
+perl
+php4
+libapache-mod-php4
+libfreetype6
+libpq3
+php4-common
+php4-gd
+php4-pgsql
+apache
+
+If you are installing the logging package as a single sensor setup (without
+the tunnel package) also install the following:
+
+rrdtool
+librrds-perl
+clamav
+
+After these packages are installed, start the installation of the logging package 
+by running install_log.pl.
