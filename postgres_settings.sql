@@ -3,7 +3,7 @@
 -- 30-10-2006
 
 -- Changelog
--- Removed the timeunit from table login
+-- 1.03.02 Removed the timeunit from table login
 -- 1.03.01 Initial release
 
 CREATE TABLE attacks (

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 ##########################
 # Variables
@@ -133,6 +133,11 @@ print "\n";
 # Setting up Postgresql
 ####################
 
+$confirm = "a";
+while ($confirm !~ /^(n|N|y|Y)$/) {
+  $confirm = &prompt("Is the database already installed? [y/n]: ");
+}
+
 $dbuser = "";
 while ($dbuser eq "") {
   $dbuser = &prompt("Enter the connecting database user [postgres]: ");
@@ -159,135 +164,160 @@ while ($webuser eq "") {
 
 print "\n";
 
-printmsg("Creating SURFnet IDS database:", "info");
-$err = 1;
-while ($err != 0) {
-  `sudo -u postgres createdb -q -U $dbuser -W -O $dbuser $dbname`;
-  printmsg("Creating SURFnet IDS database:", $?);
-  $err = $?;
-  if ($? != 0) {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
-    }
-    if ($confirm =~ /^(n|N)$/) {
-      $err = 0;
-    }
-  }
-}
-
-print "\n";
-
-printmsg("Creating webinterface database user:", "info");
-$err = 1;
-while ($err != 0) {
-  `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W $webuser`;
-  printmsg("Creating webinterface database user:", $?);
-  $err = $?;
-  if ($? != 0) {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
-    }
-    if ($confirm =~ /^(n|N)$/) {
-      $err = 0;
+if ($confirm =~ /^(n|N)$/) {
+  printmsg("Creating SURFnet IDS database:", "info");
+  $err = 1;
+  while ($err != 0) {
+    `sudo -u postgres createdb -q -U $dbuser -W -O $dbuser $dbname`;
+    printmsg("Creating SURFnet IDS database:", $?);
+    $err = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $err = 0;
+      }
     }
   }
-}
 
-print "\n";
+  print "\n";
 
-printmsg("Creating nepenthes database user:", "info");
-$err = 1;
-while ($err != 0) {
-  `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W nepenthes`;
-  printmsg("Creating nepenthes database user:", $?);
-  $err = $?;
-  if ($? != 0) {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
-    }
-    if ($confirm =~ /^(n|N)$/) {
-      $err = 0;
-    }
-  }
-}
-
-print "\n";
-
-printmsg("Creating p0f database user:", "info");
-$err = 1;
-while ($err != 0) {
-  `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W pofuser`;
-  printmsg("Creating p0f database user:", $?);
-  $err = $?;
-  if ($? != 0) {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
-    }
-    if ($confirm =~ /^(n|N)$/) {
-      $err = 0;
+  printmsg("Creating webinterface database user:", "info");
+  $err = 1;
+  while ($err != 0) {
+    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W $webuser`;
+    printmsg("Creating webinterface database user:", $?);
+    $err = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $err = 0;
+      }
     }
   }
-}
 
-print "\n";
+  print "\n";
 
-printmsg("Creating SURFnet IDS tables:", "info");
-$err = 1;
-while ($err != 0) {
-  `sudo -u postgres psql -q -f $targetdir/postgres_settings.sql -U $dbuser -W $dbname 2>/dev/null`;
-  printmsg("Creating SURFnet IDS tables:", $?);
-  $err = $?;
-  if ($? != 0) {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
-    }
-    if ($confirm =~ /^(n|N)$/) {
-      $err = 0;
-    }
-  }
-}
-
-print "\n";
-
-# Setting server hostname and configuring config files.
-$server = "";
-while ($server eq "") {
-  $server = &prompt("Server hostname.domainname or IP (example: test.domain.nl): ");
-  if ($server ne "") {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      printmsg("Server hostname/IP address:", "$server");
-      $confirm = &prompt("Is this correct? [y/n]: ");
-    }
-    if ($confirm =~ /^(n|N)$/) {
-      $server = "";
+  printmsg("Creating nepenthes database user:", "info");
+  $err = 1;
+  while ($err != 0) {
+    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W nepenthes`;
+    printmsg("Creating nepenthes database user:", $?);
+    $err = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $err = 0;
+      }
     }
   }
-}
 
-open(SQL, ">>$targetdir/postgres_insert.sql");
-print SQL "INSERT INTO servers (server) VALUES ('$server')";
-close(SQL);
+  print "\n";
 
-print "\n";
-
-$err = 1;
-while ($err != 0) {
-  `sudo -u postgres psql -q -f $targetdir/postgres_insert.sql -U $dbuser -W $dbname 2>/dev/null`;
-  printmsg("Adding necessary records to the database:", $?);
-  $err = $?;
-  if ($? != 0) {
-    $confirm = "a";
-    while ($confirm !~ /^(n|N|y|Y)$/) {
-      $confirm = &prompt("Insert query failed. Try again? [y/n]: ");
+  printmsg("Creating p0f database user:", "info");
+  $err = 1;
+  while ($err != 0) {
+    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W pofuser`;
+    printmsg("Creating p0f database user:", $?);
+    $err = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $err = 0;
+      }
     }
-    if ($confirm =~ /^(n|N)$/) {
-      $err = 0;
+  }
+
+  print "\n";
+
+  printmsg("Creating SURFnet IDS tables:", "info");
+  $err = 1;
+  while ($err != 0) {
+    `sudo -u postgres psql -q -f $targetdir/postgres_settings.sql -U $dbuser -W $dbname 2>/dev/null`;
+    printmsg("Creating SURFnet IDS tables:", $?);
+    $err = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $err = 0;
+      }
+    }
+  }
+
+  print "\n";
+
+  # Setting server hostname and configuring config files.
+  $server = "";
+  while ($server eq "") {
+    $server = &prompt("Server hostname.domainname or IP (example: test.domain.nl): ");
+    if ($server ne "") {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        printmsg("Server hostname/IP address:", "$server");
+        $confirm = &prompt("Is this correct? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $server = "";
+      }
+    }
+  }
+
+  open(SQL, ">>$targetdir/postgres_insert.sql");
+  print SQL "INSERT INTO servers (server) VALUES ('$server')";
+  close(SQL);
+
+  print "\n";
+
+  $err = 1;
+  while ($err != 0) {
+    `sudo -u postgres psql -q -f $targetdir/postgres_insert.sql -U $dbuser -W $dbname 2>/dev/null`;
+    printmsg("Adding necessary records to the database:", $?);
+    $err = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Insert query failed. Try again? [y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $err = 0;
+      }
+    }
+  }
+} elsif ($confirm =~ /^(Y|y)$/) {
+  $confirm = "a";
+  while ($confirm !~ /^(n|N|y|Y)$/) {
+    $confirm = &prompt("Upgrade database from 1.02 to 1.03? [y/n]: ");
+  }
+
+  if ($confirm =~ /^(Y|y)$/) {
+    $err = 1;
+    while ($err != 0) {
+      `sudo -u postgres psql -q -f changes102-103.sql -U $dbuser -W $dbname 2>/dev/null`;
+      printmsg("Upgrading the database from 1.02 to 1.03:", $?);
+      $err = $?;
+      if ($? != 0) {
+        $confirm = "a";
+        while ($confirm !~ /^(n|N|y|Y)$/) {
+          $confirm = &prompt("Upgrade failed. Try again? [y/n]: ");
+        }
+        if ($confirm =~ /^(n|N)$/) {
+          $err = 0;
+        }
+      }
     }
   }
 }
