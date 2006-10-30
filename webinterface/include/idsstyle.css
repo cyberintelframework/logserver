@@ -1,0 +1,380 @@
+/*
+####################################
+# SURFnet IDS                      #
+# Version 1.03.01                  #
+# 10-10-2006                       #
+# Jan van Lith & Kees Trippelvitz  #
+# Modified by Peter Arts           #
+####################################
+
+#############################################
+# Changelog:
+# 1.03.01 Released as part of the 1.03 package
+# 1.02.01 Initial release
+#############################################
+*/
+
+body
+{
+  margin: 		10px 0px 0px 0px;
+  text-align: 		center; 
+  font-size: 		8pt;
+}
+
+table
+{
+  font-size: 		10pt;
+}
+
+A
+{
+  text-decoration: 	none;
+  color: 		#0d2474;
+  font-weight: 		bold;
+}
+
+A:hover
+{
+  text-decoration: 	none;
+  color: 		#3366CC;
+  font-weight: 		bold;
+}
+
+select {
+  border: 		1px solid gray;
+  background-color: 	#f1f1f9;
+  color: 		#0d2474;
+}
+
+.sensorinput {
+  background-color:     #f1f1f9;  
+  font-size:		10px;
+  text-align:		center;
+}
+
+.banner {
+  margin:		5px auto 0px auto;
+  width:		1000px;
+  text-align:		center;
+}
+
+.filler {
+  clear:		all;
+}
+
+/*---------------------*/
+/* Tabbed Menu         */
+/*---------------------*/
+
+#submenu
+{
+//  border:		1px solid red;
+  height:		25px;
+}
+
+.tab
+{
+  background: 		url(../images/nav-menu.jpg);
+  border-top:		2px solid white;
+  border-left:		2px solid white;
+  border-bottom:	2px solid grey;
+  border-right:		2px solid grey;
+}
+
+.tabsel
+{
+  background: url(../images/nav-menu.jpg);
+  border-top:		2px solid grey;
+  border-left:		2px solid grey;
+  border-bottom:	2px solid white;
+  border-right:		2px solid white;
+}
+
+#mainarp
+{
+  height:		400px;
+  padding-top:		0px;
+}
+
+/*---------------------*/
+/* Navigation Menu     */
+/*---------------------*/
+.nav-menu
+{
+  margin-top:		5px;
+  margin-left:		auto;
+  margin-right:		auto;
+  width: 		1000px;
+  height:		25px;
+  text-align:		center;
+}
+
+.nav-menu ul
+{
+  width:		auto;
+  list-style: 		none;
+  margin-top:		0px;
+  padding-left:		7%;
+  text-align:		center;
+}
+
+.nav-menu li
+{
+  text-align:		center;
+  float: 		left;
+  margin-top: 		1px;
+  margin-bottom:	1px;
+  margin-left: 		1px;
+  margin-right: 	1px;
+}
+
+.nav-menu li a
+{
+  background: 		url(../images/nav-menu.jpg) #fff bottom left repeat-x;
+  line-height: 		2em;
+  width: 		90px;
+  display: 		block;
+  border: 		1px solid #dcdce9;
+  color: 		#0d2474;
+  text-decoration: 	none;
+  text-align: 		center;
+  font-style: 		normal;
+  font-weight: 		normal;
+}
+ 
+.nav-menu li a:hover
+{
+  font-weight: 		bold;
+}
+
+/*---------------------*/
+/* Navigation Sub Menu */
+/*---------------------*/
+.nav-sub-menu
+{
+  margin-top:		5px;
+  margin-left:		auto;
+  margin-right:		auto;
+  width: 		1000px;
+  height:		25px;
+  text-align:		center;
+}
+
+.nav-sub-menu ul
+{
+  width:		auto;
+  list-style: 		none;
+  margin-top:		0px;
+  padding-left:		18%;
+  text-align:		center;
+}
+
+.nav-sub-menu li
+{
+  text-align:		center;
+  float: 		left;
+  margin-top: 		1px;
+  margin-bottom:	1px;
+  margin-left: 		1px;
+  margin-right: 	1px;
+}
+
+.nav-sub-menu a
+{
+  margin-right:		1px;
+  float:		left;
+  background: 		url(../images/nav-menu.jpg) #fff bottom left repeat-x;
+  line-height: 		2em;
+  width: 		150px;
+  height:		20px;
+  display: 		block;
+  border: 		1px solid #dcdce9;
+  color: 		#0d2474;
+  text-decoration: 	none;
+  text-align: 		center;
+  font-style: 		normal;
+  font-weight: 		normal;
+}
+ 
+.nav-sub-menu a:hover
+{
+  font-weight: 		bold;
+}
+
+/*----------------*/
+/* Admin Menu     */
+/*----------------*/
+.admin-menu
+{
+  width:                1000px;
+  margin:               5px auto 0px auto;
+  padding-left:		80px;
+  text-align:           center;
+}
+
+.admin-menu ul
+{
+  list-style:           none;
+  text-align:		center;
+}
+
+.admin-menu li
+{
+  float:                left;
+  display:              block;
+  margin:               1px;
+  background:           url(../images/nav-menu.jpg) #fff bottom left repeat-x;
+  width:                150px;
+  height:               25px;
+  line-height:		25px;
+  border:               1px solid #dcdce9;
+  color:                #0d2474;
+  text-decoration:      none;
+  font-style:           normal;
+  font-weight:          bold;
+}
+
+.admin-menu li a
+{
+  text-decoration:      none;
+  font-style:           normal;
+  font-weight:          normal;
+  display:		block;
+}
+
+.admin-menu li a:hover
+{
+  color:                #0d2474;
+  text-decoration:      underline;
+  text-align:           center;
+  font-style:           normal;
+  font-weight:          normal;
+  display:		block;
+}
+
+/*---------------------*/
+/* Content             */
+/*---------------------*/
+
+.content
+{
+  position: 		relative;
+  width: 		990px;
+  margin: 		10px auto;
+  text-align: 		left;
+  border: 		1px dashed #333;
+  background-color: 	#f1f1f9;
+  padding: 		5px 5px;
+  font-size: 		10pt;
+}
+
+/*---------------------*/
+/* DataTable           */
+/*---------------------*/
+
+.datatable {
+  border:               1px solid gray;
+  font-size:            8pt;
+}
+.datatr {
+  font-size:		8pt;
+}
+.datatd {
+  border:               1px solid gray;
+}
+.virustd {
+  border: 		0px solid gray;
+  font-size:		8pt;
+  width:		150px;
+}
+.counttd {
+  border: 		0px solid gray;
+  font-size:		8pt;
+}
+.datatitle {
+  border:               1px solid gray;
+  font-size:            10pt;
+  font-weight:          bold;
+}
+.dataheader {
+  border: 		1px solid gray;
+  font-weight: 		bold;
+}
+
+/*---------------------*/
+/* Miscellaneous       */
+/*---------------------*/
+.button {
+  background: url(../images/nav-menu.jpg);
+}
+.loginput {
+  width:		150px;
+}
+.menustats {
+  font-size:		10px;
+  text-align:		right;
+  vertical-align:	bottom;
+}
+#footer {
+  width: 		1000px;
+  margin: 		50px auto;
+  border-top:           1px solid #ddd;
+  font-size: 		7pt;
+  font-style: 		oblique;
+  color: 		#666;
+  text-align: 		right;
+}
+PRE {
+  margin: 		2ex 10em 2ex 2em;
+  padding: 		8px;
+  background-color: 	#eee;
+  border: 		1px solid #999;
+  color: 		#000;
+  font-size: 		7pt;
+  font-family: 		monaco, courier, monospace;
+}
+#xml_idmef {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+#search_wait {
+  position: absolute;
+  left: 350px;
+  width: 290px;
+  height; 100px;
+  border: 1px solid black;
+  background-color: white;
+  padding: 10px;
+  z-index: 50;
+}
+#searchtemplate_form {
+  position: absolute;
+  width: 300px;
+  height: auto;
+  left: 500px;
+  top: 58px;
+  border: 1px solid gray;
+}
+#searchtemplate_form h3 {
+  position: absolute;
+  top: -40px;
+  margin: 0px;
+  padding: 0px;
+}
+a.searchtemplate_item {
+  display: block;
+  position: relative;
+  width: 290px;
+  height: 18px;
+  background-image: url('/images/nav-menu.jpg');
+  background-repeat: repeat-x;
+  background-position: 0% 100%;
+  background-color: white;
+  padding: 5px;
+}
+#personal_searchtemplate {
+  position: absolute;
+  right: 90px;
+  top: 20px;
+}
