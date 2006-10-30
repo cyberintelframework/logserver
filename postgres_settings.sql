@@ -1,6 +1,10 @@
 -- SURFnet IDS SQL settings
--- Version: 1.03.01
--- 10-10-2006
+-- Version: 1.03.02
+-- 30-10-2006
+
+-- Changelog
+-- Removed the timeunit from table login
+-- 1.03.01 Initial release
 
 CREATE TABLE attacks (
     id serial NOT NULL,
@@ -42,7 +46,6 @@ CREATE TABLE "login" (
     username character varying NOT NULL,
     "password" character varying NOT NULL,
     email character varying,
-    timeunit integer DEFAULT 0,
     lastlogin integer,
     organisation integer DEFAULT 0 NOT NULL,
     "access" character varying DEFAULT '000'::character varying NOT NULL,
