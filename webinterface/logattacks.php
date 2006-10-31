@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 10-10-2006                       #
+# Version 1.03.02                  #
+# 31-10-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 Fixed an organisation bug when selecting ALL orgs and ALL logs
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.13 Added intval() to session variables
 # 1.02.12 Fixed typo in intval() function
@@ -48,6 +49,8 @@ if ($s_access_search == 9) {
       add_db_table("sensors");
       $where[] = "sensors.organisation = $q_org";
       $querystring = $querystring . "&amp;org=$q_org";
+    } else {
+      $q_org = 0;
     }
   }
 } else {
