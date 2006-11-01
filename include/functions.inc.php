@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 25-10-2006                       #
+# Version 1.03.02                  #
+# 01-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 Changed getStartWeek() to correctly display the start of the week
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Added genpass and stripinput function
 # 1.02.08 Removed admin_header function and fixed prepare_sql bug
@@ -280,7 +281,7 @@ function matchCIDR($addr, $cidr) {
 # Function used to determine the start of a week. Returns timestamp in epoch format.
 function getStartWeek($day = '', $month = '', $year = '') {
   $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek;
+  $startofweek = $day - $dayofweek + 1;
   $stamp = mktime(0,0,0,$month,$startofweek,$year);
   return $stamp;
 }
