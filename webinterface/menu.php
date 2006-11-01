@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 10-10-2006                       #
+# Version 1.03.02                  #
+# 01-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 Replaced REQUEST_URI with SCRIPT_NAME for $url
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Added pg_close to footer()
 # 1.02.03 Moved the include directory to the surfnetids root dir
@@ -35,12 +36,12 @@ if ($file != "login.php") {
     $s_access_user = intval($s_access{2});
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
-      $url = basename($_SERVER['REQUEST_URI']);
+      $url = basename($_SERVER['SCRIPT_NAME']);
       header("location: ${address}login.php?url=$url");
       exit;
     }
   } else {
-    $url = basename($_SERVER['REQUEST_URI']);
+    $url = basename($_SERVER['SCRIPT_NAME']);
     header("location: ${address}login.php?url=$url");
     exit;
   }
