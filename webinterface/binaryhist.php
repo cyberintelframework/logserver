@@ -3,13 +3,16 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.02.06                 #
-# 09-08-2006                      #
+# Version 1.04.01                 #
+# 06-11-2006                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.01 Added debugging for $sql_filename
+# 1.03.02 Fixed a concatenation bug
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.06 added intval() to session variables + pattern match on show variable + record existancy check + pg_close
 # 1.02.05 Added input checks and removed includes
 # 1.02.04 Enhanced debugging
@@ -21,21 +24,19 @@ $err = 0;
 
 if ( isset($_GET['bin']) ){
   $bin = pg_escape_string(stripinput($_GET['bin']));
-}
-else {
+} else {
   $err = 1;
 }
 
 if (isset($_GET['show'])) {
   $show = $_GET['show'];
   $pattern = '/^(top|all)$/';
-  if (preg_match($pattern, $show) != 1) {
+  if (!preg_match($pattern, $show)) {
     $show = "top";
   } else {
     $show = stripinput($_GET['show']);
   }
-}
-else {
+} else {
   $show = "top";
 }
 
@@ -56,13 +57,19 @@ if ($err == 0) {
   $filesize = size_hum_read($filesize);
   $fileinfo = $row_bindetail['fileinfo'];
 
-  $sql_firstseen = "SELECT attacks.timestamp, details.* FROM attacks, details WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin' ORDER BY attacks.timestamp ASC LIMIT 1";
+  $sql_firstseen = "SELECT attacks.timestamp, details.* ";
+  $sql_firstseen .= "FROM attacks, details ";
+  $sql_firstseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin' ";
+  $sql_firstseen .= "ORDER BY attacks.timestamp ASC LIMIT 1";
   $result_firstseen = pg_query($pgconn, $sql_firstseen);
   $row_firstseen = pg_fetch_assoc($result_firstseen);
   $first_seen = $row_firstseen['timestamp'];
   $first_seen = date("d-m-Y H:i:s", $first_seen);
 
-  $sql_lastseen = "SELECT attacks.timestamp, details.* FROM attacks, details WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin' ORDER BY attacks.timestamp DESC LIMIT 1";
+  $sql_lastseen = "SELECT attacks.timestamp, details.* ";
+  $sql_lastseen .= "FROM attacks, details ";
+  $sql_lastseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin' ";
+  $sql_lastseen .= "ORDER BY attacks.timestamp DESC LIMIT 1";
   $result_lastseen = pg_query($pgconn, $sql_lastseen);
   $row_lastseen = pg_fetch_assoc($result_lastseen);
   $last_seen = $row_lastseen['timestamp'];
@@ -122,8 +129,7 @@ if ($err == 0) {
         $info = $row['info'];
         if ($info == "Suspicious" || $info == "Not scanned yet") {
           $virus_ar[$scanner] = $info;
-        }
-        else {
+        } else {
           $virus_ar[$scanner] = "<font color='red'>" .$info. "</font>";
         }
       }
@@ -139,12 +145,21 @@ if ($err == 0) {
   echo "</table>\n";
   echo "<br />\n";
   if ($show == "all") {
-    $sql_filename = "SELECT DISTINCT text FROM details WHERE details.type = 4 AND attackid IN (SELECT DISTINCT attackid FROM details WHERE text = '$bin')";
-  }
-  else {
-    $sql_filename = "SELECT DISTINCT text FROM details WHERE details.type = 4 AND attackid IN (SELECT DISTINCT attackid FROM details WHERE text = '$bin') LIMIT 10";
+    $sql_filename = "SELECT DISTINCT text ";
+    $sql_filename .= "FROM details ";
+    $sql_filename .= "WHERE details.type = 4 AND attackid IN (SELECT DISTINCT attackid FROM details WHERE text = '$bin')";
+  } else {
+    $sql_filename = "SELECT DISTINCT text ";
+    $sql_filename .= "FROM details ";
+    $sql_filename .= "WHERE details.type = 4 AND attackid IN (SELECT DISTINCT attackid FROM details WHERE text = '$bin') LIMIT 10";
   }
   $result_filename = pg_query($pgconn, $sql_filename);
+
+  if ($debug == 1) {
+    echo "<pre>";
+    echo "SQL_FILENAME: $sql_filename\n";
+    echo "</pre>\n";
+  }
 
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
@@ -170,8 +185,7 @@ if ($err == 0) {
       echo "<tr>\n";
         echo "<td><a href='binaryhist.php?bin=$bin&show=all'>Show full list</a></td>\n";
       echo "</tr>\n";
-    }
-    else {
+    } else {
       echo "<tr>\n";
         echo "<td><a href='binaryhist.php?bin=$bin&show=top'>Show top 10</a></td>\n";
       echo "</tr>\n";

@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.04                  #
-# 31-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.04 SQL injection fix
 # 1.02.03 Added some more input checks
 # 1.02.02 Removed old maillogging and email data
@@ -26,6 +27,7 @@ header("Cache-control: private");
 # Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   $address = getaddress($web_port);
+  pg_close($pgconn);
   header("location: ${address}login.php");
   exit;
 }
@@ -46,27 +48,23 @@ $f_access = $f_access_sensor . $f_access_search . $f_access_user;
 
 ### Password check
 if (empty($f_pass) || empty($f_confirm)) { 
-  $m = 91;
+  $m = 20;
   $err = 1;
-}
-elseif ($f_pass != $f_confirm) {
-  $m = 92;
+} elseif ($f_pass != $f_confirm) {
+  $m = 21;
   $err = 1;
-}
-elseif (empty($f_username)) {
-  $m = 93;
+} elseif (empty($f_username)) {
+  $m = 22;
   $err = 1;
-}
-elseif (empty($f_org) || $f_org == "none") {
-  $m = 94;
+} elseif (empty($f_org) || $f_org == "none") {
+  $m = 23;
   $err = 1;
 }
 
 if ($s_access_user < 2) {
-  $m = 96;
+  $m = 90;
   $err = 1;
-}
-elseif ($s_access_user == 2) {
+} elseif ($s_access_user == 2) {
   $f_org = $s_org;
 }
 
@@ -74,14 +72,14 @@ $sql = "SELECT username FROM login WHERE username = '$f_username'";
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
 if ($rows == 1) {
-  $m = 97;
+  $m = 27;
   $err = 1;
 }
 
 if ($err != 1) {
   $sql = "INSERT INTO login (username, password, organisation, access) VALUES ('$f_username', '$f_pass', '$f_org', '$f_access')";
   $execute = pg_query($pgconn, $sql);
-  $m = 90;
+  $m = 1;
 }
 pg_close($pgconn);
 header("location: useradmin.php?m=$m");

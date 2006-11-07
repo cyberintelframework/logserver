@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.02                  #
-# 11-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 pg_close added
 # 1.02.02 Added exit after failed preg_match
 # 1.02.01 Initial release
 #############################################
@@ -17,6 +18,7 @@
 if (isset($_GET['ip']) && $_GET['ip'] != '') {
   $ip = $_GET['ip'];
   if (!preg_match($ipregexp, $ip)) {
+    pg_close($pgconn);
     echo "<p><font color='red'>Invalid IP address</font></p>";
     $err = 1;
     exit;
@@ -30,8 +32,7 @@ if (isset($_GET['ip']) && $_GET['ip'] != '') {
     } else {
       $server = "whois." .$serv. ".net";
     }
-  }
-  else {
+  } else {
     $server = "whois.ripe.net";
   }
   echo "Other servers: <a href='whois.php?s=ripe&ip=$ip'>RIPE</a>&nbsp;|&nbsp;<a href='whois.php?s=arin&ip=$ip'>ARIN</a>&nbsp;|&nbsp;";
@@ -44,8 +45,7 @@ if (isset($_GET['ip']) && $_GET['ip'] != '') {
 
   echo "Connecting to $server:43...<br>\n";
   $fp=@fsockopen($server,43,&$errno,&$errstr,15);
-  if(!$fp || $err == 1)
-  {
+  if(!$fp || $err == 1) {
     echo "Connection to $server:43 could not be made.<br>\n";
     return false;
   } else {
@@ -58,8 +58,7 @@ if (isset($_GET['ip']) && $_GET['ip'] != '') {
     echo "Connection closed.<br>\n";
   }
   echo "</pre>\n";
-}
-else {
+} else {
   echo "No IP given to query.<br />\n";
   echo "<a href='logindex.php'>Logging Overview</a>\n";
 }

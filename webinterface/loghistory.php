@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.06                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Peter Arts & Kees Trippelvitz    #
 ####################################
 
 #################################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.07 Changed some access handling
 # 1.02.06 Removed includes
 # 1.02.05 Enhanced debugging
@@ -90,8 +91,7 @@ if ($err != 1) {
           $organisation = $row['organisation'];
           if (isset($_GET['org']) && $_GET['org'] == $org_id) {
             echo "<option value='$org_id' selected>$organisation</option>\n";
-          }
-          else {
+          } else {
             echo "<option value='$org_id'>$organisation</option>\n";
           }
         }
@@ -99,22 +99,29 @@ if ($err != 1) {
     }
     
     $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
-	$query = pg_query($sql);
-	echo "<select name='sensor' onChange='javascript: this.form.submit();'>\n";
-	while ($sensor_data = pg_fetch_assoc($query)) {
-		$sql_check = "SELECT * FROM stats_history WHERE sensorid = '" . intval($sensor_data["id"]) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "'";
-		$query_check = pg_query($sql_check);
-		if (pg_num_rows($query_check) > 0) echo printOption($sensor_data["id"], $sensor_data["keyname"], $s_sensor);
-	}
-	echo "</select>\n";
-        echo "<input type='button' value='Next' class='button' onClick=window.location='loghistory.php?m=$nextmonth&y=$nextyear&org=$s_org';>\n";
-	echo "</form>\n";
+    $query = pg_query($sql);
+    echo "<select name='sensor' onChange='javascript: this.form.submit();'>\n";
+    while ($sensor_data = pg_fetch_assoc($query)) {
+      $sql_check = "SELECT * FROM stats_history WHERE sensorid = '" . intval($sensor_data["id"]) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "'";
+      $query_check = pg_query($sql_check);
+      if (pg_num_rows($query_check) > 0) echo printOption($sensor_data["id"], $sensor_data["keyname"], $s_sensor);
+    }
+    echo "</select>\n";
+    echo "<input type='button' value='Next' class='button' onClick=window.location='loghistory.php?m=$nextmonth&y=$nextyear&org=$s_org';>\n";
+    echo "</form>\n";
 
 	$mts = mktime(0,0,0,$month,1,$year);
 	$monthname = date("F", $mts);
 	echo "<h4>History data for $monthname $year</h4>\n";
 	
 	$sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
+
+        if ($debug == 1) {
+          echo "<pre>";
+          echo "SQL: $sql";
+          echo "</pre>\n";
+        }
+        
 	$query = pg_query($sql);
 	if (pg_num_rows($query) == 0) {
 		echo "<p>No data present for this month.</p>\n";
@@ -254,72 +261,6 @@ if ($err != 1) {
 		
 		echo "</td></tr></table>\n";
 	}
-/*
-  $sql_history_org = "SELECT sensors.keyname, history.* FROM history, sensors WHERE month = $month AND year = $year AND sensors.organisation = '$s_org' AND history.sensorid = sensors.id ORDER BY sensors.keyname ASC";
-  $result_history_org = pg_query($pgconn, $sql_history_org);
-  $numrows_history_org = pg_num_rows($result_history_org);
-  $numfields_history_org = pg_num_fields($result_history_org) - 1;
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "$SQL_HISTORY_ORG: $sql_history_org";
-    echo "</pre>\n";
-  }
-
-  $colspan = $numrows_history_org + 1;
-  $mts = mktime(0,0,0,$month,1,$year);
-  $monthname = date("F", $mts);
-
-  echo "History data for $monthname $year<br /><br />\n";
-  echo "<table class='datatable'>\n";
-    echo "<tr>\n";
-      echo "<td class='dataheader' width='100'>&nbsp;</td>\n";
-      $sensor = 0;
-      while ($sensor != $numrows_history_org) {
-        $sensorname = pg_fetch_result($result_history_org, $sensor, 0);
-        echo "<td class='dataheader'>$sensorname</td>\n";
-        $sensor++;
-      }
-    echo "</tr>\n";
-    $field = 6;
-    while ($field != $numfields_history_org) {
-      echo "<tr>\n";
-        $fieldname = pg_field_name($result_history_org, $field);
-        echo "<td class='datatd'>$fieldname</td>\n";
-        $sensor = 0;
-        while ($sensor != $numrows_history_org) {
-          $possible = pg_fetch_result($result_history_org, $sensor, $field);
-          echo "<td class='datatd'>$possible</td>\n";
-          $sensor++;
-        }
-      echo "</tr>\n";
-      $field++;
-    }
-    echo "<tr>\n";
-      echo "<td class='datatd' valign='top'>Virus info<br>(ClamAV)</td>\n";
-      $sensor = 0;
-      while ($sensor != $numrows_history_org) {
-        $virus_string = pg_fetch_result($result_history_org, $sensor, 31);
-        $arg_ar = explode(";", $virus_string);
-        $virus_string = "";
-        foreach($arg_ar as $value) {
-          $key_ar = explode("*", $value);
-          $virus = $key_ar[0];
-          if ($virus == "OK") {
-            $virus = "Suspicious";
-          }
-          $count = $key_ar[1];
-          $virus_string = "$virus_string<tr><td class='virustd'>$virus</td><td class='counttd'>$count</td></tr>\n";
-        }
-        echo "<td class='datatd'><table>$virus_string</table></td>\n";
-        $virus_string = "";
-        $arg_ar = "";
-        $sensor++;
-      }
-    echo "</tr>\n";
-  echo "</table>\n";
-  */
 }
 pg_close($pgconn);
 ?>

@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.08                  #
-# 08-09-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.01 Released as 1.04.01
 # 1.02.08 $numrows_user == 1, intval() to $id and $db_org
 # 1.02.07 Changed the url redirection when $_GET['url'] is present
 # 1.02.06 Changed the location of the pg_close command
@@ -56,8 +57,7 @@ if ($numrows_user == 1) {
     if ($db_org_name == "ADMIN") {
       $_SESSION['s_admin'] = 1;
       $_SESSION['s_access'] = $access;
-    }
-    else {
+    } else {
       $_SESSION['s_admin'] = 0;
       $_SESSION['s_access'] = $access;
     }
@@ -103,7 +103,7 @@ if ($numrows_user == 1) {
       $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
     }
     if (isset($_GET['url'])) {
-      $url = $_GET['url'];
+      $url = stripinput($_GET['url']);
       pg_close($pgconn);
       $address = getaddress($web_port);
       header("location: $address$url");
@@ -111,14 +111,12 @@ if ($numrows_user == 1) {
       pg_close($pgconn);
       header("location: index.php");
     }
-  }
-  else {
+  } else {
     pg_close($pgconn);
-    header("location: login.php?e=1");
+    header("location: login.php?m=43");
   }
-}
-else {
+} else {
   pg_close($pgconn);
-  header("location: login.php?e=1");
+  header("location: login.php?m=43");
 }
 ?>

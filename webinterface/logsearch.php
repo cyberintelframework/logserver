@@ -1,14 +1,18 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.16                  #
-# 26-09-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
+# 1.02.19 Added personal searchtemplate button for charts
+# 1.02.18 Added some default values for ts_start
+# 1.02.17 Added source and destionation empty check
 # 1.02.16 Changed the way graphs are generated
 # 1.02.15 strip_tags("ts_start"), 
 # 1.02.14 Moved the libchart directory to the surfnetids root dir
@@ -25,28 +29,36 @@
 # 1.02.03 Query tuning
 #########################################################################
 
-if ($_GET['f_reptype'] == "idmef") {
+### Set report type.
+$valid_reptype = array("multi", "single", "chart_sensor", "chart_attack", "idmef", "pdf");
+if (in_array($_GET['f_reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['f_reptype']);
+else $rapport = "multi";
+
+$ar_non_headers = array("idmef", "pdf");
+if (in_array($_GET['f_reptype'], $ar_non_headers)) {
 	session_start();
 	if (intval(@strlen($_SESSION["s_user"])) == 0) {
 		// User not logged in
 		header("Location: /login.php");
 		exit;
 	}
-        include 'include/config.inc.php';
-        include 'include/connect.inc.php';
-        include 'include/functions.inc.php';
+        include '../include/config.inc.php';
+        include '../include/connect.inc.php';
+        include '../include/functions.inc.php';
 
-	header("Content-type: text/xml");
-  
-  	header("Cache-control: private");
-  	$fn = "SURFnet_IDMEF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".xml";
-  	header("Content-disposition: attachment; filename=$fn");
+    if ($_GET['f_reptype'] == "idmef") {
+		header("Content-type: text/xml");
+	  
+	  	header("Cache-control: private");
+	  	$fn = "SURFnet_IDMEF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".xml";
+	  	header("Content-disposition: attachment; filename=$fn");
+    }
 }
 else {
   include("menu.php");
   set_title("Search");
 }
-if (($_GET["f_reptype"] != "chart_sensor") && ($_GET["f_reptype"] != "chart_attack") && ($_GET["f_reptype"] != "idmef")) {
+if (($rapport != "chart_sensor") && ($rapport != "chart_attack") && (!in_array($rapport, $ar_non_headers))) {
 	echo "<div id=\"search_wait\">Search is being processed...<br /><br />Please be patient.</div>\n";
 }
 
@@ -71,11 +83,6 @@ if ($s_access_search == 9) {
 	if (isset($_GET['org'])) $q_org = intval($_GET['org']);
 }
 
-### Set report type.
-$valid_reptype = array("multi", "single", "chart_sensor", "chart_attack", "idmef");
-if (in_array($_GET['f_reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['f_reptype']);
-else $rapport = "multi";
-
 ### Checking for admin.
 if ($s_access_search < 9) $where[] = "sensors.organisation = '" . intval($s_org) . "'";
 elseif ($q_org > 0) $where[] = "sensors.organisation = '" . intval($q_org) . "'";
@@ -91,10 +98,14 @@ if (@is_array($_GET["sensorid"])) {
 
 $source_ip = $_GET["source_ip"];
 $full_source_ip = "";
-foreach ($source_ip as $key=>$val) {
+if (!empty($source_ip)) {
+  foreach ($source_ip as $key=>$val) {
 	$val = intval(trim($val));
 	if ($key > 0) $full_source_ip .= ".";
 	$full_source_ip .= $val;
+  }
+} else {
+  $full_source_ip = "0.0.0.0";
 }
 if ($full_source_ip == "0.0.0.0") $full_source_ip = -1;
 elseif (ip2long($full_source_ip) === -1) $full_source_ip = -2;
@@ -108,10 +119,14 @@ if ($_GET["s_radio"] == "A") {
 }
 $destination_ip = $_GET["destination_ip"];
 $full_destination_ip = "";
-foreach ($destination_ip as $key=>$val) {
+if (!empty($destination_ip)) {
+  foreach ($destination_ip as $key=>$val) {
 	$val = intval(trim($val));
 	if ($key > 0) $full_destination_ip .= ".";
 	$full_destination_ip .= $val;
+  }
+} else {
+  $full_destination_ip = "0.0.0.0";
 }
 if ($full_destination_ip == "0.0.0.0") $full_destination_ip = -1;
 elseif (ip2long($full_destination_ip) === -1) $full_destination_ip = -2;
@@ -123,8 +138,47 @@ if ($_GET["d_radio"] == "A") {
 	$destination_port = -1;
 	$destination_mask = intval($_GET["destination_mask"]);
 }
-$ts_start = trim(pg_escape_string(strip_tags($_GET["ts_start"])));
-$ts_end = trim(pg_escape_string(strip_tags($_GET["ts_end"])));
+$ts_select = trim($_GET["ts_select"]);
+$ar_valid_values = array("H", "D", "T", "W", "M", "Y");
+if (in_array($ts_select, $ar_valid_values)) {
+	$dt = time();
+	$date_min = 60;
+	$date_hour = 60 * $date_min;
+	$date_day = 24 * $date_hour;
+	$date_week = 7 * $date_day;
+	$date_month = 31 * $date_day;
+	$date_year = 365 * $date_day;
+	$dt_sub = 0;
+	// determine substitute value
+	//"H", "D", "T", "W", "M", "Y"
+	switch ($ts_select) {
+		case "Y":
+			$dt_sub = $date_year;
+			break;
+		case "M":
+			$dt_sub = $date_month;
+			break;
+		case "W":
+			$dt_sub = $date_week;
+			break;
+		case "D":
+			$dt_sub = $date_day;
+			break;
+		case "H":
+			$dt_sub = $date_hour;
+			break;
+		case "T":
+			// today
+			$dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
+			break;
+	}
+	if ($dt_sub > 0) $dt -= $dt_sub;
+	$ts_start = date("d-m-Y H:i:s", $dt);
+	$ts_end = date("d-m-Y H:i:s", time());
+} else {
+	$ts_start = trim(pg_escape_string(strip_tags($_GET["ts_start"])));
+	$ts_end = trim(pg_escape_string(strip_tags($_GET["ts_end"])));
+}
 if (isset($_GET["f_sev"])) {
 	$f_sev = intval($_GET["f_sev"]);
 	if ($f_sev < 0) unset($f_sev);
@@ -421,6 +475,105 @@ if ($rapport == "idmef") {
     exit;
 }
 
+if ($rapport == "pdf") {
+    prepare_sql();
+
+    $select = "SELECT * ";
+    ### Prepare final SQL query
+    $sql =  $select;
+    $sql .= " FROM $sql_from ";
+    $sql .= " $sql_where ";
+    $sql .= $group_by;
+    
+    $result = pg_query($sql);
+
+    flush();
+    include ('../include/class.ezpdf.php');
+
+    $pdf =& new Cezpdf();
+    $pdf->addJpegFromFile("images/logo.jpg", 20, 750, 200, 70);
+    $pdf->selectFont('../include/fonts/Helvetica.afm');
+    //$pdf->ezText(' ',20);
+    //$pdf->ezText(' ',20);
+    //$pdf->ezText(' ',20);
+    $space = '                                         ';
+    $pdf->ezText($space . 'SURFnet IDS PDF results',20);
+    $space = '                                                                                  ';
+    $pdf->ezText($space . 'Generated at ' . date("d-m-Y H:i:s") . ' by SURFnetIDS webinterface', 10);
+    $pdf->ezText('    ', 20);
+    $pdf->ezText('    ', 20);
+    $data = array();
+    while ($row = pg_fetch_assoc($result)) {
+      flush();
+      $id = intval($row['id']);
+      $keyname = $row['keyname'];
+      $timestamp = $row['timestamp'];
+      $source = $row['source'];
+      $sport = intval($row['sport']);
+      $dest = $row['dest'];
+      $dport = intval($row['dport']);
+      $sensorid = intval($row['sensorid']);
+      if ($sensorid > 0) {
+      	$query = pg_query("SELECT keyname FROM sensors WHERE id = '" . $sensorid . "'");
+      	$sensorname = pg_result($query, 0);
+      }
+      $sev = intval($row['severity']);
+      $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
+      $result_details = pg_query($pgconn, $sql_details);
+      $numrows_details = pg_num_rows($result_details);
+
+      $sql_sev = "SELECT txt FROM severity WHERE val = '$sev'";
+      $result_sev = pg_query($pgconn, $sql_sev);
+      $row_sev = pg_fetch_assoc($result_sev);
+      $sev_text = $row_sev['txt'];
+
+      if ($numrows_details != 0) {
+        if ($sev == 1) {
+          $dia_ar = array('attackid' => $id, 'type' => 1);
+          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+          $text = $dia_result_ar[0]['text'];
+          $attack = $attacks_ar[$text]["Attack"];
+        }
+        elseif ($sev == 16) {
+          $dia_ar = array('attackid' => $id);
+          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+          $text = $dia_result_ar[0]['text'];
+          $malware = basename($text);
+        }
+        elseif ($sev == 32) {
+          $dia_ar = array('attackid' => $id, 'type' => 8);
+          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+          $bin = $dia_result_ar[0]['text'];
+
+          $sql_getbin = "SELECT * FROM binaries WHERE bin = '$bin' AND scanner = 'ClamAV' ORDER BY timestamp DESC LIMIT 1";
+          $result_getbin = pg_query($sql_getbin);
+          $row_getbin = pg_fetch_assoc($result_getbin);
+          $clamav = $row_getbin['info'];
+        }
+      }
+      //ID 	Timestamp 	Severity 	Source 	Destination 	Sensor 	Additional Info
+      $ar = array();
+      $ar["ID"] = $id;
+      $ar["Timestamp"] = date("d-m-Y H:i:s", $timestamp);
+      $ar["Severity"] = $sev_text;
+      $ar["Source"] = $source . ":" . $sport;
+      $ar["Destination"] = $dest . ":" . $dport;
+      $ar["Sensor"] = $sensorname;
+      if ($sev == 1 && $attack != "") $ar["Additional_Info"] = $attack;
+      elseif ($sev == 16 && $malware != "") $ar["Additional_Info"] = $malware;
+      elseif ($sev == 32 && $clamav != "") $ar["Additional_Info"] = $clamav;
+      else $ar["Additional_Info"] = "";
+      $data[] = $ar;
+    }
+    $pdf->ezTable($data, '', '', array( 'fontSize' => 8));
+    $pdf->ezText('__________________________________________________________', 15);
+    $pdf->ezText($space . 'http://ids.surfnet.nl', 10);
+    $fn = "SURFnet_PDF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".pdf";
+    $ar = array('Content-Disposition'=>$fn);
+    $pdf->ezStream($ar);
+    exit;
+}
+
 if ($rapport == "chart_sensor") {
 	$type = abs(intval($_GET["f_chart_type"]));
 	if ($type > 2) $type = 0;
@@ -472,7 +625,9 @@ if ($rapport == "chart_sensor") {
 //        require_once("../libchart/libchart.php");
 //	$img = makeChart($type, $title, $sql, $chartorg);
 
-        echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;org=$chartorg' />\n";
+    echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;org=$chartorg' />\n";
+    // Personal search templates
+	echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
 	footer();
 	exit;
 }
@@ -506,6 +661,8 @@ if ($rapport == "chart_attack") {
 	
         $title = "Searchresults: $label";
         echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;org=$chartorg' />\n";
+        // Personal search templates
+		echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
 
 //        require_once("../libchart/libchart.php");
 //        $img = makeChart($type, $title, $sql, $chartorg);
@@ -618,21 +775,17 @@ if (intval(strpos($idmef_url, "f_reptype")) == 0) $idmef_url .= "&f_reptype=idme
 else $idmef_url = str_replace("f_reptype=" . $_GET["f_reptype"], "&f_reptype=idmef", $idmef_url);
 echo "<div id=\"xml_idmef\" <a href=\"$idmef_url\" title=\"Download these results as IDMEF format XML file\"><img src=\"./images/xml.png\" border=\"0\" width=\"48\" height=\"52\"></a><br>IDMEF</div>\n";
 
+// PDF button
+$pdf_url = $_SERVER['REQUEST_URI'];
+if (intval(strpos($pdf_url, "f_reptype")) == 0) $pdf_url.= "&f_reptype=pdf";
+else $pdf_url = str_replace("f_reptype=" . $_GET["f_reptype"], "&f_reptype=pdf", $pdf_url);
+echo "<div id=\"pdf_btn\" <a href=\"$pdf_url\" title=\"Download these results as PDF file\"><img src=\"./images/pdf.gif\" border=\"0\" width=\"48\" height=\"52\"></a><br>&nbsp;&nbsp; PDF</div>\n";
+
 // Personal search templates
-echo "<div id=\"personal_searchtemplate\" <a href=\"#TODO\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
+echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br>Search-<br>template</div>\n";
 
 flush();
 
-/*
-echo "Normal sql from: $sql_from<br>";
-// replace sql_from with optimized 'order by' method
-list($order_tbl, $order_field) = explode(".", $sql_order_by);
-$optimized = "(SELECT * FROM $order_tbl ORDER BY $order_field $asc_desc) AS $order_tbl";
-$sql_from = str_replace($order_tbl, $optimized, $sql_from);
-echo "Optimized sql from: $sql_from<br>";
-*/
-
-//$sql_from = str_replace("attacks", "attacks_source_asc", $sql_from);
 
 ### Prepare final SQL query
 $sql =  " SELECT DISTINCT attacks.id AS attacks_id, *";

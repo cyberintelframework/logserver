@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.03                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:                              
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.03 Added some more input checks + login check
 # 1.02.02 Fixed a bug with the server resetting
 # 1.02.01 Initial release                   
@@ -22,13 +23,14 @@ session_start();
 header("Cache-control: private");
 
 if (!isset($_SESSION['s_admin'])) {
+  pg_close($pgconn);
   $address = getaddress($web_port);
   header("location: ${address}login.php");
   exit;
 }
 
-$s_org = $_SESSION['s_org'];
-$s_admin = $_SESSION['s_admin'];
+$s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
 if ($s_admin != 1) {
@@ -38,7 +40,7 @@ if ($s_admin != 1) {
 
 if (!isset($_GET['serverid'])) {
   $err = 1;
-  $m = 92;
+  $m = 30;
 }
 
 $sql_check = "SELECT count(id) as total FROM servers";
@@ -47,7 +49,7 @@ $row_check = pg_fetch_assoc($result_check);
 $numrows_check = $row_check['total'];
 if ($numrows_check == 1) {
   $err = 1;
-  $m = 94;
+  $m = 32;
 }
 
 if ($err == 0) {
@@ -68,14 +70,13 @@ if ($err == 0) {
 
   $sql = "DELETE FROM servers WHERE id = $serverid";
   $execute = pg_query($pgconn, $sql);
-  $m = 11;
+  $m = 100;
 }
 
 pg_close($pgconn);
-if ($m == 11) {
+if ($m == 100) {
   header("location: serveradmin.php?m=$m&c=$numrows_check");
-}
-else {
+} else {
   header("location: serveradmin.php?m=$m");
 }
 ?>

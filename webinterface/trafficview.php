@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.03                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.03 Removed includes
 # 1.02.02 Added some more input checks
 # 1.02.01 Initial release
@@ -54,8 +55,7 @@ if (isset($_GET['label'])) {
       echo "</td>\n";
     echo "</tr>\n";
   echo "</table>\n";
-}
-else {
+} else {
   echo "<h2>No sensor given.</h2>";
 }
 pg_close($pgconn);

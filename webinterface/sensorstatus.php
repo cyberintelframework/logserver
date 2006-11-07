@@ -3,13 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.09                  #
-# 27-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Code layout
+# 1.02.10 Added VLAN support 
 # 1.02.09 Added some more input checks and removed includes
 # 1.02.08 Enhanced debugging
 # 1.02.07 Change the way SSH remote control is handled
@@ -17,17 +19,16 @@
 #############################################
 
 $orderby = "ORDER BY keyname ASC";
-$s_org = $_SESSION['s_org'];
-$s_admin = $_SESSION['s_admin'];
+$s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
-$s_access_sensor = $s_access{0};
+$s_access_sensor = intval($s_access{0});
 
 # Link tables tap and mac with the associated sensor
 if ($s_access_sensor < 9) {
   $where = "WHERE organisation = " . $s_org;
   $and = "AND";
-}
-else {
+} else {
   $where = "";
   $and = "WHERE";
 }
@@ -37,17 +38,13 @@ if (isset($_GET['sort'])) {
   $sort = stripinput(pg_escape_string($_GET['sort']));
   if ($sort == "tap") {
     $orderby = "ORDER BY tap ASC";
-  }
-  elseif ($sort == "lastupdate") {
+  } elseif ($sort == "lastupdate") {
     $orderby = "ORDER BY lastupdate ASC";
-  }
-  elseif ($sort == "laststart") {
+  } elseif ($sort == "laststart") {
     $orderby = "ORDER BY laststart ASC";
-  }
-  elseif ($sort == "sensor") {
+  } elseif ($sort == "sensor") {
     $orderby = "ORDER BY keyname ASC";
-  }
-  else {
+  } else {
     $sorterr = 1;
   }
 }
@@ -63,13 +60,15 @@ if (isset($_GET['m'])) {
     $key = stripinput($_GET['key']);
   }
 
-  if ($m == 1) { $m = "<p>Successfully updated status info!</p>"; }
-  elseif ($m == 90) { $m = "<p>This is a read-only account. Remote administration of the sensor is not possible!</p>"; }
-  elseif ($m == 91) { $m = "<p>IP address for $key is already in use. Changes not saved!</p>"; }
-  elseif ($m == 92) { $m = "<p>Incorrect IP address for $key. Changes not saved!</p>"; }
-
-#  echo "<font color='red'>" .$m. "</font>";
+  if ($m == 101) { $m = "<p>IP address for $key is already in use. Changes not saved!</p>"; }
+  elseif ($m == 102) { $m = "<p>Incorrect IP address for $key. Changes not saved!</p>"; }
+  else {
+    $m = intval($_GET['m']);
+    $m = stripinput($errors[$m]);
+    $m = "<p>$m</p>\n";
+  }
 }
+
 echo "<table width='100%'>\n";
   echo "<tr>\n";
     if (isset($_GET['m'])) {
@@ -100,19 +99,15 @@ echo "</table>\n";
 if ($sorterr == 0) {
   if ($selview == "0") {
     $sql_sensors = "SELECT * FROM sensors $where $orderby";
-  }
-  elseif ($selview == "1") {
+  } elseif ($selview == "1") {
     $sql_sensors = "SELECT * FROM sensors $where $and status = 0 $orderby";
-  }
-  elseif ($selview == "2") {
+  } elseif ($selview == "2") {
     $sql_sensors = "SELECT * FROM sensors $where $and status = 1 $orderby";
-  }
-  elseif ($selview == "3") {
+  } elseif ($selview == "3") {
     $now = time();
     $upd = $now - 3600;
     $sql_sensors = "SELECT * FROM sensors $where $and lastupdate < $upd AND NOT status = 0 $orderby";
-  }
-  else {
+  } else {
     $sql_sensors = "SELECT * FROM sensors $where $orderby";
   }
   $result_sensors = pg_query($pgconn, $sql_sensors);
@@ -124,9 +119,6 @@ if ($sorterr == 0) {
     echo "</pre>\n";
   }
 
-  if ($s_access_sensor > 0) {
-    echo "<form name='rebootform' method='post' action='updateaction.php?selview=$selview'>\n";
-  }
   echo "<table class='datatable' width='100%'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td class='dataheader'><a href='sensorstatus.php?sort=sensor'>Sensor</a></td>\n";
@@ -162,6 +154,7 @@ if ($sorterr == 0) {
     $uptime = $row['uptime'];
     $server = $row['server'];
     $netconf = $row['netconf'];
+    $vlanid = $row['vlanid'];
     $laststart = "";
     $lastupdate = "";
     $diffstart = 0;
@@ -185,6 +178,7 @@ if ($sorterr == 0) {
     }
 
     echo "<tr>\n";
+      echo "<form name='rebootform' method='post' action='updateaction.php?selview=$selview'>\n";
       echo "<td class='datatd' valign='top' style='padding-top: 10px;'><a href='trafficview.php?view=$sensor'>$sensor</a></td>\n";
       echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$remote</td>\n";
       echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$local</td>\n";
@@ -200,17 +194,31 @@ if ($sorterr == 0) {
       if ($netconf == "dhcp" || $netconf == "") {
         if (empty($tapip)) {
            echo "<td class='datatd' valign='top' style='padding-top: 10px;'>&nbsp;</td>\n";
+        } else {
+          echo "<td class='datatd' valign='top' style='padding-top: 10px;'><center>$tapip</center></td>\n";
         }
-        else {
-          echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$tapip</td>\n";
+      } elseif ($netconf == "vland") {
+        if (empty($tapip)) {
+           echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN DHCP<br />\n";
+           echo "&nbsp;\n";
+        } else {
+          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN DHCP<br />\n";
+          echo "$tapip\n";
         }
-      }
-      else {
+      } elseif ($netconf == "vlans") {
+        echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN static<br />\n";
+          if ($s_access_sensor == 0) {
+            echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
+	  } else {
+            echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' />\n";
+          }
+        echo "</td>\n";
+      } else {
         echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>static<br />\n";
           if ($s_access_sensor == 0) {
-            echo "<input type='text' name='tapip_$sensor' value='$tapip' size='14' class='sensorinput' disabled />\n";
+            echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
           } else {
-            echo "<input type='text' name='tapip_$sensor' value='$tapip' size='14' class='sensorinput' />\n";
+            echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' />\n";
           }
         echo "</td>\n";
       }
@@ -226,48 +234,39 @@ if ($sorterr == 0) {
       $uptime = $uptime % $onehour;
       $minutes = floor($uptime / 60);
       $seconds = $uptime % 60;
-#      if ($status != 1) {
-#        echo "<td class='datatd'>&nbsp;</td>\n";
-#      }
-#      else {
-        echo "<td class='datatd'>\n";
-          echo "<table width='100%' >\n";
-            echo "<tr class='datatr'>\n";
-              echo "<td class='datatd' width='40'>Uptime</td>\n";
-              echo "<td>${days}d ${hours}h ${minutes}m ${seconds}s</td>\n";
-              echo "<td align='right'><img id='time_${sensor}_img' src='${address}images/plus.gif' style='cursor:pointer;' title='Click to view/hide extra info.' onclick=\"changeId('time_$sensor');\" \></td>\n";
-            echo "</tr>\n";
-          echo "</table>\n";
-          echo "<table id='time_$sensor' style='display:none;'>\n";
-            echo "<tr class='datatr'>\n";
-              echo "<td class='datatd' width='40'>Start</td><td width='100%'>$laststart</td>\n";
-            echo "</tr>\n";
-            echo "<tr class='datatr'>\n";
-              echo "<td class='datatd'>Stop</td><td>$laststop</td>\n";
-            echo "</tr>\n";
-            echo "<tr class='datatr'>\n";
-              echo "<td class='datatd'>Update</td><td>$lastupdate</td>\n";
-            echo "</tr>\n";
-          echo "</table>\n";
-        echo "</td>\n";
-#      }
+
+      echo "<td class='datatd'>\n";
+        echo "<table width='100%' >\n";
+          echo "<tr class='datatr'>\n";
+            echo "<td class='datatd' width='40'>Uptime</td>\n";
+            echo "<td>${days}d ${hours}h ${minutes}m ${seconds}s</td>\n";
+            echo "<td align='right'><img id='time_${sensor}-${vlanid}_img' src='${address}images/plus.gif' style='cursor:pointer;' title='Click to view/hide extra info.' onclick=\"changeId('time_$sensor-$vlanid');\" \></td>\n";
+          echo "</tr>\n";
+        echo "</table>\n";
+        echo "<table id='time_$sensor-$vlanid' style='display:none;'>\n";
+          echo "<tr class='datatr'>\n";
+            echo "<td class='datatd' width='40'>Start</td><td width='100%'>$laststart</td>\n";
+          echo "</tr>\n";
+          echo "<tr class='datatr'>\n";
+            echo "<td class='datatd'>Stop</td><td>$laststop</td>\n";
+          echo "</tr>\n";
+          echo "<tr class='datatr'>\n";
+            echo "<td class='datatd'>Update</td><td>$lastupdate</td>\n";
+          echo "</tr>\n";
+        echo "</table>\n";
+      echo "</td>\n";
     
       if ($status == 0) {
         echo "<td class='datatd' bgcolor='red'>&nbsp;</td>\n";
-      }
-      elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
+      } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
         echo "<td class='datatd' bgcolor='green'>&nbsp;</td>\n";
-      }
-      elseif ($diffupdate > 3600 && $status == 1) {
+      } elseif ($diffupdate > 3600 && $status == 1) {
         echo "<td class='datatd' bgcolor='orange'>&nbsp;</td>\n";
-      }
-      elseif ($status == 1 && empty($tap)) {
+      } elseif ($status == 1 && empty($tap)) {
         echo "<td class='datatd' bgcolor='yellow'>&nbsp;</td>\n";
-      }
-      elseif ($status == 2) {
+      } elseif ($status == 2) {
         echo "<td class='datatd' bgcolor='black'>&nbsp;</td>\n";
-      }
-      else {
+      } else {
         echo "<td class='datatd' bgcolor='red'>&nbsp;</td>\n";
       }
       if ($s_access_sensor == 9) {
@@ -275,43 +274,34 @@ if ($sorterr == 0) {
       }
       if ($s_access_sensor > 0) {
         echo "<td class='datatd' valign='top' style='padding-top: 10px;'>\n";
+
 ###################################
-          echo "<select name='f_${sensor}' style='width:100%;'>\n";
+           echo "<input type='hidden' name='vlanid' value='$vlanid' />\n";
+           echo "<input type='hidden' name='keyname' value='$sensor' />\n";
+            echo "<select name='action' style='width:100%;'>\n";
             echo "" . printOption("NONE", "None", $action) . "\n";
             echo "" . printOption("REBOOT", "Reboot", $action) . "\n";
             if ($ssh == 1) {
               echo "" . printOption("SSHOFF", "SSH off", $action) . "\n";
-            }
-            else {
+            } else {
               echo "" . printOption("SSHON", "SSH on", $action) . "\n";
             }
-            if ($status == 1) {
-              echo "" . printOption("CLIENT", "Stop", $action) . "\n";
-              echo "" . printOption("RESTART", "Restart", $action) . "\n";
-            }
-            elseif ($status == 0) {
-              echo "" . printOption("CLIENT", "Start", $action) . "\n";
-              echo "" . printOption("BLOCK", "Disable", $action) . "\n";
-            }
-            elseif ($status == 2) {
-              echo "" . printOption("BLOCK", "Enable", $action) . "\n";
-            }
+            echo "" . printOption("STOP", "Stop", $action) . "\n";
+            echo "" . printOption("START", "Start", $action) . "\n";
+            echo "" . printOption("RESTART", "Restart", $action) . "\n";
+            echo "" . printOption("BLOCK", "Disable", $action) . "\n";
+            echo "" . printOption("UNBLOCK", "Enable", $action) . "\n";
           echo "</select>\n";
+      echo "<td colspan='12' class='datatd' align='right'>\n";
+      echo "<input type='submit' name='submit' value='Update' class='button' /></td>\n";
+    echo "</form>\n";
 #################################
         echo "</td>\n";
       }
     echo "</tr>\n";
   }
 
-  if ($s_access_sensor > 0) {
-    echo "<tr>\n";
-      echo "<td colspan='12' class='datatd' align='right'><input type='submit' name='submit' value='Update' class='button' /></td>\n";
-    echo "</tr>\n";
-  }
   echo "</table>\n";
-  if ($s_access_sensor > 0) {
-    echo "</form>\n";
-  }
   echo "<br />\n";
   echo "<table>\n";
     echo "<tr>\n";
@@ -335,12 +325,10 @@ if ($sorterr == 0) {
       echo "<td>Sensor disabled by admin</td>\n";
     echo "</tr>\n";
   echo "</table>\n";
-}
-else {
+} else {
   echo "Error in sort querystring.<br />\n";
   echo "<a href='sensorstatus.php'>Back</a>\n";
 }
-pg_close($pgconn);
 ?>
 
 <?php footer(); ?>

@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.06                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.06 Added intval() for session variables
 # 1.02.05 Added some more input checks and removed includes
 # 1.02.04 Enhanced debugging
@@ -38,20 +39,15 @@ if ($s_admin != 1) {
 
 if (isset($_GET['m'])) {
   $m = intval($_GET['m']);
-
-  if ($m == 1) { $m = '<p>Successfully updated the organisation details!</p>'; }
-  elseif ($m == 91) { $m = '<p>Admin rights are required to modify organisation info!</p>'; }
-  elseif ($m == 92) { $m = '<p>The organisation was not set!</p>'; }
-  elseif ($m == 93) { $m = '<p>The organisation already exists!</p>'; }
-
-  echo "<p><font color='red'>" .$m. "</font></p>";
+  $m = stripinput($errors[$m]);
+  $m = "<p>$m</p>";
+  echo "<font color='red'>" .$m. "</font>";
 }
 
 if ($err == 0) {
   if ($s_access_user == 9) {
     $sql_orgs = "SELECT * FROM organisations";
-  }
-  else {
+  } else {
     $sql_orgs = "SELECT * FROM organisations WHERE id = $s_org";
   }
   $result_orgs = pg_query($pgconn, $sql_orgs);
@@ -63,6 +59,7 @@ if ($err == 0) {
     echo "</pre>\n";
   }
 
+  echo "<form name='orgadmin' action='orgsave.php?type=org' method='post'>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td class='dataheader' width='50'>ID</td>\n";
@@ -92,6 +89,7 @@ if ($err == 0) {
       echo "<td class='datatd'><input type='submit' class='button' style='width: 100%;' value='Insert' /></td>\n";
     echo "</tr>\n";
   echo "</table>\n";
+  echo "</form>\n";
 }
 ?>
 <?php footer(); ?>

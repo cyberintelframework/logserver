@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.08                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Code layout
 # 1.02.08 Added intval() to session variables + pattern matching on $b + intval() for $month and $day
 # 1.02.07 Added some more input checks and removed includes
 # 1.02.06 Removed intval from date browsing
@@ -38,11 +39,10 @@ $db_org_name = pg_escape_string(pg_result($result_getorg, 0));
 if (isset($_GET['b'])) {
   $b = pg_escape_string($_GET['b']);
   $pattern = '/^(weekly|daily|monthly|all)$/';
-  if (preg_match($pattern, $b) != 1) {
+  if (!preg_match($pattern, $b)) {
     $b = "weekly";
   }
-}
-else {
+} else {
   $b = "weekly";
 }
 
@@ -93,8 +93,7 @@ echo "<form name='selectorg' method='get' action='logcheck.php?org=$q_org'>\n";
   echo "<input type='hidden' name='org' value='$q_org' />\n";
   if ($b != "all") {
     echo "<input type='button' value='Prev' class='button' onClick=window.location='logcheck.php?b=$b&amp;i=$prev&amp;org=$q_org';>\n";
-  }
-  else {
+  } else {
     echo "<input type='button' value='Prev' class='button' disabled>\n";
   }
   echo "<select name='b' onChange='javascript: this.form.submit();'>\n";
@@ -122,12 +121,10 @@ echo "<form name='selectorg' method='get' action='logcheck.php?org=$q_org'>\n";
   if ($b != "all") {
     if ($end > $today) {
       echo "<input type='button' value='Next' class='button' disabled>\n";
-    }
-    else {
+    } else {
       echo "<input type='button' value='Next' class='button' onClick=window.location='logcheck.php?b=$b&amp;i=$next&amp;org=$q_org';>\n";
     }
-  }
-  else {
+  } else {
     echo "<input type='button' value='Next' class='button' disabled>\n";
   }
 echo "</form>\n";
@@ -149,8 +146,7 @@ if ($err != 1) {
     echo "<tr>\n";
       if ($b == "all") {
         echo "<td class='dataheader' width='600' colspan='3'>All results</td>\n";
-      }
-      elseif ($b == "daily") {
+      } elseif ($b == "daily") {
         $datestart = date("d-m-Y", $start);
         echo "<td class='datatitle' width='600' colspan='3'>Results from $datestart</td>\n";
       } else {
@@ -209,17 +205,14 @@ if ($err != 1) {
         echo "<td class='datatd' align='right'><a href='logsearch.php?f_field=source&amp;f_search=$range&amp;f_sev=1&amp;org=$q_org$dateqs'>" . nf($count_total) . "</a>&nbsp;</td>\n";
         if ($s_access_search == 9) {
           echo "<td class='datatd' align='right'><a href='loglist.php?range=$range$dateqs&amp;org=$q_org&b=$b'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
-        }
-        else {
+        } else {
           echo "<td class='datatd' align='right'><a href='loglist.php?range=$range$dateqs&amp;org=$q_org'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
         }
-      }
-      else {
+      } else {
         echo "<td class='datatd' align='right'>" . nf($count_total) . "&nbsp;</td>\n";
         echo "<td class='datatd' align='right'>" . nf($count_uniq) . "&nbsp;</td>\n";
       }
     echo "</tr>\n";
-
   }
   echo "</table>\n";
 }

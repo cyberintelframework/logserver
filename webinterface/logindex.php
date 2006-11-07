@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.11                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Code layout
 # 1.02.11 Added intval() for session variables
 # 1.02.10 Added some more input checks and removed includes
 # 1.02.09 Fixed a bug with the search querystring and the period
@@ -40,17 +41,15 @@ if ($s_access_search == 9 && isset($_GET['org'])) {
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
-#$db_org_name = pg_result($result_getorg, 0);
 
 ### Default browse method is weekly.
 if (isset($_GET['b'])) {
   $b = pg_escape_string($_GET['b']);
   $pattern = '/^(weekly|daily|monthly|all)$/';
-  if (preg_match($pattern, $b) != 1) {
+  if (!preg_match($pattern, $b)) {
     $b = "weekly";
   }
-}
-else {
+} else {
   $b = "weekly";
 }
 
@@ -69,6 +68,7 @@ if ($b == "monthly") {
 if ($b == "daily") {
   $day = $_GET['i'];
   if ($day == "") { $day = date("d"); }
+  $day = intval($day);
   $prev = $day - 1;
   $next = $day + 1;
   $start = getStartDay($day, $month, $year);
@@ -79,6 +79,7 @@ if ($b == "daily") {
 if ($b == "weekly") {
   $day = $_GET['i'];
   if ($day == "") { $day = date("d"); }
+  $day = intval($day);
   $prev = $day - 7;
   $next = $day + 7;
   $start = getStartWeek($day, $month, $year);
@@ -99,8 +100,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
   echo "<input type='hidden' name='org' value='$q_org' />\n";
   if ($b != "all") {
     echo "<input type='button' value='Prev' class='button' onClick=window.location='logindex.php?b=$b&amp;i=$prev&amp;org=$q_org';>\n";
-  }
-  else {
+  } else {
     echo "<input type='button' value='Prev' class='button' disabled>\n";
   }
   echo "<select name='b' onChange='javascript: this.form.submit();'>\n";
@@ -129,12 +129,10 @@ echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
   if ($b != "all") {
     if ($end > $today) {
       echo "<input type='button' value='Next' class='button' disabled>\n";
-    }
-    else {
+    } else {
       echo "<input type='button' value='Next' class='button' onClick=window.location='logindex.php?b=$b&amp;i=$next&amp;org=$q_org';>\n";
     }
-  }
-  else {
+  } else {
     echo "<input type='button' value='Next' class='button' disabled>\n";
   }
 echo "</form>\n";
@@ -187,8 +185,7 @@ echo "<table class='datatable'>\n";
       echo "<td class='datatd'>$description</td>\n";
       if ($severity == 0 || $severity == 16) {
         echo "<td class='datatd' align='right'><a href='logsearch.php?f_sev=$severity&amp;f_field=source&amp;f_search=&amp;org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
-      }
-      elseif ($severity == 1 || $severity == 32) {
+      } elseif ($severity == 1 || $severity == 32) {
         echo "<td class='datatd' align='right'><a href='logattacks.php?sev=$severity&amp;org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
       }
     echo "</tr>\n";

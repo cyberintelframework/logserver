@@ -1,14 +1,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.12                  #
-# 08-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.01 Added php closing tag
+# 1.02.13 Added No Data! picture
 # 1.02.12 Added intval() to $s_org and $s_admin
 # 1.02.11 input checks for $sev and $bin
 # 1.02.10 Added another intval()
@@ -21,12 +23,11 @@
 # 1.02.03 Query tuning
 #########################################################################
 
-
 session_start();
 if (intval(@strlen($_SESSION["s_user"])) == 0) {
-	// User not logged in
-	Header("Location: login.php");
-	exit;
+  // User not logged in
+  header("Location: login.php");
+  exit;
 }
 
 header("Content-type: image/png");
@@ -41,7 +42,7 @@ require_once("../libchart/libchart.php");
 
 $charttype = intval($_GET['type']);
 $org = intval($_GET['org']);
-$sql = $_SESSION['chartsql'];
+$sql = cleansql($_SESSION['chartsql']);
 
 if ($charttype == 0) {
   $chart =  new PieChart();
@@ -58,8 +59,8 @@ if ($err != 1) {
   $result_chart = pg_query($pgconn, $sql);
   $totalrows = pg_num_rows($result_chart);
   if ($totalrows == 0) { 
-    $drawerr = 1; 
-    echo "No data to process ";
+    $drawerr = 1;
+    readfile("images/nodata.gif");
   } else {
     $chart->setTitle($title);
     while ($row = pg_fetch_row($result_chart)) {
@@ -74,3 +75,4 @@ if ($err != 1) {
     $chart->render();
   }
 }
+?>

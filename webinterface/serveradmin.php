@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.03                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Removed s_access variables
 # 1.02.03 Added some more input checks and removed includes
 # 1.02.02 Enhanced debugging
 # 1.02.01 Initial release
@@ -17,10 +18,6 @@
 
 $s_org = $_SESSION['s_org'];
 $s_admin = $_SESSION['s_admin'];
-$s_access = $_SESSION['s_access'];
-$s_access_sensor = $s_access{0};
-$s_access_search = $s_access{1};
-$s_access_user = $s_access{2};
 $err = 0;
 
 if ( $s_admin != 1 ) {
@@ -31,24 +28,20 @@ if ( $s_admin != 1 ) {
 if (isset($_GET['m'])) {
   $m = intval($_GET['m']);
 
-  if ($m == 10) { $m = "<p>Successfully added a new server!</p>"; }
-  elseif ($m == 11) {
-    $count = $_GET['c'];
+  if ($m == 100) { 
+    $count = intval($_GET['c']);
     if ($count == 0) {
       $m = "<p>Successfully deleted a server!</p>";
-    }
-    elseif ($count == 1) {
+    } elseif ($count == 1) {
       $m = "<p>Successfully deleted a server!<br />Reset 1 sensor to default server!</p>";
-    }
-    else {
+    } else {
       $m = "<p>Successfully deleted a server!<br />Reset $count sensors to default server!</p>";
     }
+  } else {
+    $m = intval($_GET['m']);
+    $m = stripinput($errors[$m]);
+    $m = "<p>$m</p>\n";
   }
-  elseif ($m == 91) { $m = "<p>Admin rights are required to add or delete a server!</p>"; }
-  elseif ($m == 92) { $m = "<p>Server ID was not set in the querystring!</p>"; }
-  elseif ($m == 93) { $m = "<p>Server field was empty!</p>"; }
-  elseif ($m == 94) { $m = "<p>There has to be at least 1 server. Create one first before deleting this one!</p>"; }
-
   echo "<font color='red'>" .$m. "</font>";
 }
 
@@ -73,13 +66,14 @@ if ($err == 0) {
       echo "<td class='dataheader'>Organisation</td>\n";
       echo "<td class='dataheader'>Actions</td>\n";
     echo "</tr>\n";
+
   while ($row = pg_fetch_assoc($result_servers)) {
     $id = $row['id'];
     $server = $row['server'];
     echo "<tr>\n";
       echo "<td class='datatd'>$id</td>\n";
       echo "<td class='datatd'>$server</td>\n";
-      echo "<td class='datatd'><a href='serverdel.php?serverid=$id' alt='Delete the server' class='linkbutton'>Delete</a></td>\n";
+      echo "<td class='datatd'><a href='serverdel.php?serverid=$id' alt='Delete the server' class='linkbutton' onclick=\"javascript: return confirm('Are you sure you want to delete this server?');\">Delete</a></td>\n";
     echo "</tr>\n";
   }
   echo "</table>\n";

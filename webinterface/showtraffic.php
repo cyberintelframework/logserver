@@ -2,21 +2,21 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.01                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
-# 1.02.01 Initial release
+# 1.04.01 Initial release
 ####################################
 
 session_start();
 if (intval(@strlen($_SESSION["s_user"])) == 0) {
-        // User not logged in
-        Header("Location: login.php");
-        exit;
+  // User not logged in
+  header("Location: login.php");
+  exit;
 }
 
 include '../include/config.inc.php';

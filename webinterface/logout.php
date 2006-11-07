@@ -2,13 +2,14 @@
 
 #########################################
 # SURFnet IDS    
-# Version 1.02.03
-# 08-09-2006     
+# Version 1.04.01
+# 06-11-2006     
 # Jan van Lith & Kees Trippelvitz
 #########################################
 
 #############################################
 # Changelog:
+# 1.04.01 Added pg_close
 # 1.02.03 Added setcookie, and session sql query
 # 1.02.02 added session_unset() and session_destroy()
 # 1.02.01 Initial release
@@ -44,5 +45,6 @@ session_unset();
 session_destroy();
 $_SESSION = array();
 
+pg_close($pgconn);
 header("location: login.php");
 ?>

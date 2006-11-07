@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.03                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.03 Removed includes
 # 1.02.02 Changed the way sensor is passed along the querystring
 # 1.02.01 Initial release
@@ -24,8 +25,7 @@ $db_org_name = pg_result($result_getorg, 0);
 
 if ($s_admin == 1) {
   $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE type = 'day'";
-}
-else {
+} else {
   $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE orgid = $s_org AND type = 'day'";
 }
 $result_sensors = pg_query($pgconn, $sql_sensors);
@@ -33,8 +33,7 @@ $numrows_result_sensors = pg_numrows($result_sensors);
 
 if ($numrows_result_sensors == 0) {
   echo "You have no sensors active";
-}
-else { 
+} else { 
   if ($s_admin == 1) {
     echo "<h3>Traffic analysis for: All</h3>\n";
   } else {

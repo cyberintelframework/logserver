@@ -3,14 +3,17 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.06                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
+# Contribution by Bjoern Weiland   #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Added some more checks and removed includes
 # 1.02.05 Removed the intval from date browsing
 # 1.02.04 Minor bugfixes and code cleaning
@@ -19,10 +22,10 @@
 # 1.02.01 Small fixes
 ####################################
 
-$s_org = $_SESSION['s_org'];
-$s_admin = $_SESSION['s_admin'];
+$s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
-$s_access_search = $s_access{1};
+$s_access_search = intval($s_access{1});
 
 if ($s_access_search == 9 && isset($_GET['org'])) {
   $q_org = intval($_GET['org']);
@@ -40,17 +43,17 @@ $db_org_name = pg_result($result_getorg, 0);
 if (isset($_GET['b'])) {
   $b = pg_escape_string($_GET['b']);
   $pattern = '/^(weekly|daily|monthly|all)$/';
-  if (preg_match($pattern, $b) != 1) {
+  if (!preg_match($pattern, $b)) {
     $b = "weekly";
   }
-}
-else {
+} else {
   $b = "weekly";
 }
 $year = date("Y");
 if ($b == "monthly") {
   $month = $_GET['i'];
   if ($month == "") { $month = date("n"); }
+  $month = intval($month);
   $next = $month + 1;
   $prev = $month - 1;
   $start = getStartMonth($month, $year);
@@ -61,6 +64,7 @@ if ($b == "monthly") {
 if ($b == "daily") {
   $day = $_GET['i'];
   if ($day == "") { $day = date("d"); }
+  $day = intval($day);
   $prev = $day - 1;
   $next = $day + 1;  
   $start = getStartDay($day, $month, $year);
@@ -71,6 +75,7 @@ if ($b == "daily") {
 if ($b == "weekly") {
   $day = $_GET['i'];
   if ($day == "") { $day = date("d"); }
+  $day = intval($day);
   $prev = $day - 7;
   $next = $day + 7;
   $start = getStartWeek($day, $month, $year);
@@ -88,11 +93,9 @@ echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br
 ### BROWSE MENU
 $today = date("U");
 echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
-#  echo "<input type='hidden' name='org' value='$q_org' />\n";
   if ($b != "all") {
     echo "<input type='button' value='Prev' class='button' onClick=window.location='rank.php?b=$b&amp;i=$prev&amp;org=$q_org';>\n";
-  }
-  else {
+  } else {
     echo "<input type='button' value='Prev' class='button' disabled>\n";
   }
   echo "<select name='b' onChange='javascript: this.form.submit();'>\n";
@@ -121,12 +124,10 @@ echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
   if ($b != "all") {
     if ($end > $today) {
       echo "<input type='button' value='Next' class='button' disabled>\n";
-    }
-    else {
+    } else {
       echo "<input type='button' value='Next' class='button' onClick=window.location='rank.php?b=$b&amp;i=$next&amp;org=$q_org';>\n";
     }
-  }
-  else {
+  } else {
     echo "<input type='button' value='Next' class='button' disabled>\n";
   }
 echo "</form>\n";
@@ -134,20 +135,19 @@ echo "</form>\n";
 ### Checking period.
 if ($b == "all") {
   $periodtext = "All results";
-}
-else {
+} else {
   $datestart = date("d-m-Y", $start);
   $dateend = date("d-m-Y", $end);
   $periodtext = "Results from $datestart to $dateend";
 }
 echo "&nbsp;&nbsp;<b>$periodtext</b>\n";
 
-$sql_active = "SELECT count(*) as total FROM sensors WHERE tap != ''";
+$sql_active = "SELECT count(id) as total FROM sensors WHERE tap != ''";
 $result_active = pg_query($pgconn, $sql_active);
 $row = pg_fetch_assoc($result_active);
 $total_active = $row['total'];
 
-$sql_sensors = "SELECT Count(id) as total FROM sensors";
+$sql_sensors = "SELECT count(id) as total FROM sensors";
 $result_sensors = pg_query($pgconn, $sql_sensors);
 $row = pg_fetch_assoc($result_sensors);
 $total_sensors = $row['total'];
@@ -254,8 +254,7 @@ echo "<table width='100%'>\n";
               $org_attacks = $row['total'];
               if ($org_attacks == 0) {
                 $org_attacks_perc = '0';
-              } 
-              else {
+              } else {
                 $org_attacks_perc = floor(($org_attacks / $total_attacks) * 100);
               }
 
@@ -279,8 +278,7 @@ echo "<table width='100%'>\n";
               $org_downloads = $row['total'];
               if ($org_downloads == 0) {
                 $org_downloads_perc = '0';
-              } 
-              else {
+              } else {
                 $org_downloads_perc = floor(($org_downloads / $total_downloads) * 100);
               }
 
@@ -372,8 +370,7 @@ echo "<table width='100%'>\n";
                   echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
                   if ($attack_url != "") {
                     echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
-                  }
-                  else {
+                  } else {
                     echo "<td class='datatd'>$attack</td>\n";
                   }
                   echo "<td class='datatd' align='right'>" . nf($total) . "&nbsp;</td>\n";
@@ -402,8 +399,7 @@ echo "<table width='100%'>\n";
                     echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
                     if ($attack_url != "") {
                       echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
-                    }
-                    else {
+                    } else {
                       echo "<td class='datatd'>$attack</td>\n";
                     }
                     echo "<td class='datatd' align='right'>" . nf($total) . "&nbsp;</td>\n";
@@ -491,11 +487,9 @@ echo "<table width='100%'>\n";
                     echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
                     if ($s_admin == 1) {
                       echo "<td class='datatd'>$db_org_name - $keyname</td>\n";
-                    }
-                    elseif ($q_org == $db_org) {
+                    } elseif ($q_org == $db_org) {
                       echo "<td class='datatd'>$keyname</td>\n";
-                    }
-                    else {
+                    } else {
                       echo "<td class='datatd'>&nbsp;</td>\n";
                     }
                     echo "<td class='datatd' align='right'>" . nf($total) . "&nbsp;</td>\n";
@@ -536,6 +530,362 @@ echo "<table width='100%'>\n";
       echo "</table>\n";
     echo "</td>\n";
   echo "</tr>\n";
+
+ ########################## Top 10 ports // START of modification by bjou
+  add_db_table("attacks");
+  $where[] = "$tsquery";
+  prepare_sql();
+  $sql_topports = "SELECT DISTINCT attacks.dport, COUNT(attacks.dport) as total ";
+  $sql_topports .= " FROM $sql_from ";
+  $sql_topports .= " $sql_where ";
+  $sql_topports .= " GROUP BY attacks.dport ORDER BY total DESC LIMIT 10 OFFSET 0 "; // change LIMIT into variable to be read from conf
+  $result_topports = pg_query($pgconn, $sql_topports);
+
+  # Resetting the sql generation arrays
+  $where = array();
+  $db_table = array();
+
+  add_db_table("attacks");
+  add_db_table("sensors");
+  $where[] = "sensors.id = attacks.sensorid";
+  $where[] = "sensors.organisation = $q_org";
+  $where[] = "$tsquery";
+  prepare_sql();
+  $sql_topports_org = "SELECT DISTINCT attacks.dport, COUNT(attacks.dport) as total ";
+  $sql_topports_org .= " FROM $sql_from ";
+  $sql_topports_org .= " $sql_where ";
+  $sql_topports_org .= " GROUP BY attacks.dport ORDER BY total DESC LIMIT 10 OFFSET 0 ";  // change LIMIT into variable to be read from conf
+
+  $result_topports_org = pg_query($pgconn, $sql_topports_org);
+
+  # Resetting the sql generation arrays
+  $where = array();
+  $db_table = array();
+
+  # Debug info
+  if ($debug == 1) {
+    echo "<pre>";
+    echo "SQL_TOPPORTS: $sql_topports\n";
+    echo "SQL_TOPPORTS_ORG: $sql_topports_org";
+    echo "</pre>\n";
+  }
+
+  echo "<tr>\n";
+    echo "<td>\n";
+      echo "<table width='100%'>\n";
+        echo "<tr>\n";
+          echo "<td width='45%'>\n";
+            echo "<b>Top 10 ports of all sensors</b>\n"; // change this into variable to be read from conf
+            echo "<table class='datatable' width='100%'>\n";
+              echo "<tr class='dataheader'>\n";
+                echo "<td width='5%' class='datatd'>#</td>\n";
+                echo "<td width='15%' class='datatd'>Port</td>\n";
+                echo "<td width='70%' class='datatd'>Port Description</td>\n";
+                echo "<td width='10%' class='datatd'>Total</td>\n";
+              echo "</tr>\n";
+              $i=1;
+              while ($row = pg_fetch_assoc($result_topports)) {
+                $port = $row['dport'];
+                $total = $row['total'];
+                echo "<tr class='datatr'>\n";
+                  echo "<td class='datatd'>$i</td>\n";
+                  echo "<td class='datatd'><a href='logsearch.php?d_radio=A&destination_port=$port&order_m=DESC$dateqs'>$port</a></td>\n";
+                  echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
+                  
+                  echo "<td class='datatd'>$total</td>\n";
+                echo "</tr>\n";
+                $i++;
+              }
+            echo "</table>\n";
+          echo "</td>\n";
+          echo "<td width='10%'></td>\n";
+          echo "<td width='45%' valign='top'>\n";
+            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+              echo "<b>Top 10 ports of your sensors</b>\n"; // change this into variable to be read from conf
+              echo "<table class='datatable' width='100%'>\n";
+                echo "<tr class='dataheader'>\n";
+                  echo "<td width='5%' class='datatd'>#</td>\n";
+                  echo "<td width='15%' class='datatd'>Port</td>\n";
+                  echo "<td width='70%' class='datatd'>Port Description</td>\n";
+                  echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "</tr>\n";
+                $i = 1;
+                while ($row = pg_fetch_assoc($result_topports_org)) {
+                  $port = $row['dport'];
+                  $total = $row['total'];
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
+                        echo "<td class='datatd'><a href='logsearch.php?d_radio=A&destination_port=$port&order_m=DESC$dateqs'>$port</a></td>\n";
+                        echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
+                        echo "<td class='datatd'>$total</td>\n";
+                  echo "</tr>\n";
+                  $i++;
+                }
+              echo "</table>\n";
+            }
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    echo "</td>\n";
+  echo "</tr>\n";
+
+ ########################## Top 10 source addresses
+  add_db_table("attacks");
+  $where[] = "$tsquery";
+  prepare_sql();
+  $sql_topsource = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
+  $sql_topsource .= " FROM $sql_from ";
+  $sql_topsource .= " $sql_where ";
+  $sql_topsource .= " GROUP BY attacks.source ORDER BY total DESC LIMIT 10 OFFSET 0 "; // change LIMIT into variable to be read from conf
+  $result_topsource = pg_query($pgconn, $sql_topsource);
+
+  # Resetting the sql generation arrays
+  $where = array();
+  $db_table = array();
+
+  add_db_table("attacks");
+  add_db_table("sensors");
+  $where[] = "sensors.id = attacks.sensorid";
+  $where[] = "sensors.organisation = $q_org";
+  $where[] = "$tsquery";
+  prepare_sql();
+  $sql_topsource_org = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
+  $sql_topsource_org .= " FROM $sql_from ";
+  $sql_topsource_org .= " $sql_where ";
+  $sql_topsource_org .= " GROUP BY attacks.source ORDER BY total DESC LIMIT 10 OFFSET 0 ";  // change LIMIT into variable to be read from conf
+
+  $result_topsource_org = pg_query($pgconn, $sql_topsource_org);
+
+  # Resetting the sql generation arrays
+  $where = array();
+  $db_table = array();
+
+  # Debug info
+  if ($debug == 1) {
+    echo "<pre>";
+    echo "SQL_TOPSOURCE: $sql_topsource\n";
+    echo "SQL_TOPSOURCE_ORG: $sql_topsource_org";
+    echo "</pre>\n";
+  }
+
+  echo "<tr>\n";
+    echo "<td>\n";
+      echo "<table width='100%'>\n";
+        echo "<tr>\n";
+          echo "<td width='45%'>\n";
+            echo "<b>Top 10 source addresses of all sensors</b>\n";// change this into variable to be read from conf
+            echo "<table class='datatable' width='100%'>\n";
+              echo "<tr class='dataheader'>\n";
+                echo "<td width='5%' class='datatd'>#</td>\n";
+                echo "<td width='85%' class='datatd'>Address</td>\n";
+                echo "<td width='10%' class='datatd'>Total</td>\n";
+              echo "</tr>\n";
+              $i=1;
+              while ($row = pg_fetch_assoc($result_topsource)) {
+                $source = $row['source'];
+                $total = $row['total'];
+                echo "<tr class='datatr'>\n";
+                  echo "<td class='datatd'>$i</td>\n";
+                  echo "<td class='datatd'><a href='whois.php?ip=$source'>$source</a></td>\n";
+                  echo "<td class='datatd'>$total</td>\n";
+                echo "</tr>\n";
+                $i++;
+              }
+            echo "</table>\n";
+          echo "</td>\n";
+          echo "<td width='10%'></td>\n";
+          echo "<td width='45%' valign='top'>\n";
+            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+              echo "<b>Top 10 source addresses of your sensors</b>\n";  // change this into variable to be read from conf
+              echo "<table class='datatable' width='100%'>\n";
+                echo "<tr class='dataheader'>\n";
+                  echo "<td width='5%' class='datatd'>#</td>\n";
+                  echo "<td width='85%' class='datatd'>Address</td>\n";
+                  echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "</tr>\n";
+                $i = 1;
+                while ($row = pg_fetch_assoc($result_topsource_org)) {
+                  $source = $row['source'];
+                  $total = $row['total'];
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
+                        echo "<td class='datatd'><a href='whois.php?ip=$source'>$source</a></td>\n";
+                        echo "<td class='datatd'>$total</td>\n";
+                  echo "</tr>\n";
+                  $i++;
+                }
+              echo "</table>\n";
+            }
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    echo "</td>\n";
+  echo "</tr>\n";
+
+ ########################## Top 10 Filenames
+  add_db_table("details");
+  $where[] = "$tsquery";
+  $where[] = "type = 4";
+  prepare_sql();
+  $sql_topfiles = "SELECT DISTINCT text, COUNT(details.text) as total ";
+  $sql_topfiles .= " FROM $sql_from ";
+  $sql_topfiles .= " $sql_where ";
+  $sql_topfiles .= " GROUP BY text ORDER BY total DESC OFFSET 0";
+  $result_topfiles = pg_query($pgconn, $sql_topfiles);
+
+  # Resetting the sql generation arrays
+  $where = array();
+  $db_table = array();
+
+  add_db_table("details");
+  add_db_table("sensors");
+  $where[] = "sensors.id = details.sensorid";
+  $where[] = "sensors.organisation = $q_org";
+  $where[] = "type = 4";
+  $where[] = "$tsquery";
+  prepare_sql();
+  $sql_topfiles_org = "SELECT DISTINCT text, COUNT(details.text) as total ";
+  $sql_topfiles_org .= " FROM $sql_from ";
+  $sql_topfiles_org .= " $sql_where ";
+  $sql_topfiles_org .= " GROUP BY text ORDER BY total DESC OFFSET 0";
+  $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);
+  
+  # Resetting the sql generation arrays
+  $where = array();
+  $db_table = array();
+        
+  # Debug info
+  if ($debug == 1) {
+    echo "<pre>";
+    echo "SQL_TOPFILES: $sql_topfiles\n";
+    echo "SQL_TOPFILES_ORG: $sql_topfiles_org";
+    echo "</pre>\n";
+  }
+
+  echo "<tr>\n";
+    echo "<td>\n";
+      echo "<table width='100%'>\n";
+        echo "<tr>\n";
+          echo "<td width='45%'>\n";
+            echo "<b>Top 10 filenames of all sensors</b>\n"; // change this into variable to be read from conf
+            echo "<table class='datatable' width='100%'>\n";
+              echo "<tr class='dataheader'>\n";
+                echo "<td width='5%' class='datatd'>#</td>\n";
+                echo "<td width='20%' class='datatd'>Filename</td>\n";
+                echo "<td width='65%' class='datatd'>Binary</td>\n";
+                echo "<td width='10%' class='datatd'>Total</td>\n";
+              echo "</tr>\n";
+              $filenameArray = array();
+              while ($row = pg_fetch_assoc($result_topfiles)) {
+                $url = $row['text'];
+                $total = $row['total'];
+                $array = @parse_url($url);
+                $filename = trim($array['path'],'/');
+                
+                if (strlen($filename) > 0 && !array_key_exists($filename, $filenameArray)) {
+                  $filenameArray[$filename] = $total;
+                }
+                elseif (array_key_exists($filename, $filenameArray)) {
+                  $filenameArray[$filename] += $total;
+                }
+              }
+              arsort($filenameArray);
+              $i=1;
+              foreach ($filenameArray as $file => $count) {
+                if ($i==11) break; // change this into variable+1 to be read from conf
+                
+                # Query preparation                
+                add_db_table("details");
+                $where[] = "$tsquery";
+                $where[] = "type = 8";
+                $where[] = "attackid in (SELECT attackid FROM details WHERE type = 4 AND text LIKE '%$file')";
+                prepare_sql();
+                $sql_topbin = "SELECT DISTINCT text ";
+                $sql_topbin .= " FROM $sql_from ";
+                $sql_topbin .= " $sql_where ";
+                $result_topbin = pg_query($pgconn, $sql_topbin);
+                
+                # Resetting the sql generation arrays
+                $where = array();
+                $db_table = array();
+                
+                $row = pg_fetch_assoc($result_topbin);
+                $bin = $row['text'];
+                                 
+                echo "<tr class='datatr'>\n";
+                  echo "<td class='datatd'>$i</td>\n";
+                  echo "<td class='datatd'><a href='logsearch.php?d_radio=A&f_filename=$file&order_m=DESC$dateqs'>$file</a></td>\n";
+                  echo "<td class='datatd'><a href='binaryhist.php?bin=$bin'>$bin</a></td>\n";
+                  echo "<td class='datatd'>$count</td>\n";
+                echo "</tr>\n";
+               $i++;
+              }
+            echo "</table>\n";
+          echo "</td>\n";
+          echo "<td width='10%'></td>\n";
+          echo "<td width='45%' valign='top'>\n";
+            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+              echo "<b>Top 10 filenames of your sensors</b>\n";// change this into variable to be read from conf
+              echo "<table class='datatable' width='100%'>\n";
+                echo "<tr class='dataheader'>\n";
+                   echo "<td width='5%' class='datatd'>#</td>\n";
+                   echo "<td width='20%' class='datatd'>Filename</td>\n";
+                   echo "<td width='65%' class='datatd'>Binary</td>\n";
+                   echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "</tr>\n";
+                 $filenameArray = array();
+                  while ($row = pg_fetch_assoc($result_topfiles_org)) {
+                    $url = $row['text'];
+                    $total = $row['total'];
+                    $array = @parse_url($url);
+                    $filename = trim($array['path'],'/');
+                    if (strlen($filename) > 0 && !array_key_exists($filename, $filenameArray)) {
+                      $filenameArray[$filename] = $total;
+                    }
+                    elseif (array_key_exists($filename, $filenameArray)) {
+                      $filenameArray[$filename] += $total;
+                    }
+                  }
+                  arsort($filenameArray);
+                  $i=1;
+                  foreach ($filenameArray as $file => $count) {
+                    if ($i==11) break;  // change this into variable to be read from conf
+                    
+                    # Query preparation                
+                    add_db_table("details");
+                    $where[] = "$tsquery";
+                    $where[] = "type = 8";
+                    $where[] = "attackid in (SELECT attackid FROM details WHERE type = 4 AND text LIKE '%$file')";
+                    prepare_sql();
+                    $sql_topbin_org = "SELECT DISTINCT text ";
+                    $sql_topbin_org .= " FROM $sql_from ";
+                    $sql_topbin_org .= " $sql_where ";
+                    $result_topbin_org = pg_query($pgconn, $sql_topbin_org);
+                
+                    # Resetting the sql generation arrays
+                    $where = array();
+                    $db_table = array();
+                
+                    $row = pg_fetch_assoc($result_topbin_org);
+                    $bin = $row['text'];
+                    echo "<tr class='datatr'>\n";
+                      echo "<td class='datatd'>$i</td>\n";
+                      echo "<td class='datatd'><a href='logsearch.php?d_radio=A&f_filename=$file&order_m=DESC$dateqs'>$file</a></td>\n";
+                      echo "<td class='datatd'><a href='binaryhist.php?bin=$bin'>$bin</a></td>\n";
+                      echo "<td class='datatd'>$count</td>\n";
+                    echo "</tr>\n";
+                  $i++;
+                  }
+              echo "</table>\n";
+            }
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    echo "</td>\n";
+  echo "</tr>\n";
+
+// END of modification by bjou
+
 ########################## Top 5 Organisations
   add_db_table("attacks");
   add_db_table("sensors");
@@ -579,11 +929,9 @@ echo "<table width='100%'>\n";
             echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
             if ($s_admin == 1) {
               echo "<td class='datatd'>$db_org_name</td>\n";
-            }
-            elseif ($q_org == $db_org) {
+            } elseif ($q_org == $db_org) {
               echo "<td class='datatd'>$db_org_name</td>\n";
-            }
-            else {
+            } else {
               echo "<td class='datatd'>&nbsp;</td>\n";
             }            
             echo "<td class='datatd' align='right'>" . nf($count) . "&nbsp;</td>\n";
@@ -593,7 +941,5 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 echo "</table>\n";
-
-pg_close($pgconn);
 ?>
 <?php footer(); ?>

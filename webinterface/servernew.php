@@ -3,24 +3,24 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.02                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.02 Added exit after admin check
 # 1.02.01 Initial release
 #############################################
 
-$s_org = $_SESSION['s_org'];
-$s_admin = $_SESSION['s_admin'];
-$s_access = $_SESSION['s_access'];
+$s_admin = intval($_SESSION['s_admin']);
 
 if ( $s_admin == 0 ) {
   $err = 1;
   $m = 91;
+  pg_close($pgconn);
   header("location: serveradmin.php?m=$m");
   exit;
 }

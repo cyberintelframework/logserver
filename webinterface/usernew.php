@@ -3,23 +3,24 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.04                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.02.04 Added some more input checks and removed includes
 # 1.02.03 Removed old maillogging and email fields
 # 1.02.02 Initial release
 #############################################
 
-$s_org = $_SESSION['s_org'];
-$s_user = $_SESSION['s_userid'];
+$s_org = intval($_SESSION['s_org']);
+$s_user = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
-$s_access_user = $s_access{2};
+$s_access_user = intval($s_access{2});
 $err = 0;
 
 $access_sensor = 0;
@@ -28,7 +29,10 @@ $access_user = 0;
 
 if ($s_access_user < 2) {
   $err = 1;
-  $m = 99;
+  $m = 90;
+  pg_close($pgconn);
+  header("location: useradmin.php?m=$m");
+  exit;
 }
 
 if ($err == 0) {
@@ -61,8 +65,7 @@ if ($err == 0) {
                 echo "<option value='$d_org_id'>$d_org</option>\n";
               }
             echo "</select>\n";
-          }
-          else {
+          } else {
             $sql_org = "SELECT organisation FROM organisations WHERE id = $s_org";
             $result_org = pg_query($pgconn, $sql_org);
             $db_org_name = pg_result($result_org, 0);
@@ -86,7 +89,6 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: Search</td>\n";
         echo "<td class='datatd'>\n";
-#          echo "" . printRadio("0 - $access_ar_search[0]", "f_access_search", 0, $access_search) . "<br />\n";
           echo "" . printRadio("1 - $access_ar_search[1]", "f_access_search", 1, $access_search) . "<br />\n";
           if ($s_access_user == 9) {
             echo "" . printRadio("9 - $access_ar_search[9]", "f_access_search", 9, $access_search) . "<br />\n";

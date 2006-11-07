@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.04                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Code layout
 # 1.02.04 Added intval() to session variables + access handling change
 # 1.02.03 Added some more input checks and removed includes
 # 1.02.02 Initial release
@@ -23,8 +24,7 @@ $err = 0;
 ### Variables check
 if (isset($_GET['id'])) {
   $id = intval($_GET['id']);
-}
-else {
+} else {
   echo "Wrong or missing attack ID in the querystring.<br />\n";
   echo "<a href='logindex.php'>Logging Overview</a>\n";
   $err = 1;
@@ -34,8 +34,7 @@ else {
 if ($err != 1) {
   if ($s_access_search == 9) {
     $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id;
-  }
-  else {
+  } else {
     $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$s_org. "'";
   }
   $result_details = pg_query($pgconn, $sql_details);
@@ -72,8 +71,7 @@ if ($err != 1) {
       $clamav_result = "Not scanned";
       $bdc_result = "Not scanned";
       $antivir_result = "Not scanned";
-    }
-    else {
+    } else {
       while ($row_getbin = pg_fetch_assoc($result_getbin)) {
         $scanner = $row_getbin['scanner'];
         if ($scanner == "ClamAV") {
@@ -99,8 +97,7 @@ if ($err != 1) {
         if ($antivir == 1) {
           echo "<td class='datatd'>&nbsp;$antivir_result</td>\n";
         }
-      }
-      else {
+      } else {
         echo "<td class='datatd'>&nbsp;</td>\n";
         echo "<td class='datatd'>&nbsp;</td>\n";
         echo "<td class='datatd'>&nbsp;</td>\n";

@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.03                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.01 Added pg_close when not logged in
 # 1.02.03 Added intval() to session variables + $s_admin check
 # 1.02.02 Added some more input checks
 # 1.02.01 Initial release
@@ -22,6 +23,7 @@ session_start();
 header("Cache-control: private");
 
 if (!isset($_SESSION['s_admin'])) {
+  pg_close($pgconn);
   $address = getaddress($web_port);
   header("location: ${address}login.php");
   exit;
@@ -57,8 +59,7 @@ if ($err == 0) {
     $sql_del = "DELETE FROM org_id WHERE id = $ident AND orgid = $orgid";
     $execute = pg_query($pgconn, $sql_del);
     $m = 11;
-  }
-  else {
+  } else {
     $m = 93;
   }
 }

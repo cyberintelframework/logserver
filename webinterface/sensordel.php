@@ -2,7 +2,7 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.01                  #
+# Version 1.04.01                  #
 # 25-09-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -10,7 +10,7 @@
 
 #############################################
 # Changelog:
-# 1.02.01 Initial release
+# 1.04.01 Initial release
 #############################################
 
 include '../include/config.inc.php';

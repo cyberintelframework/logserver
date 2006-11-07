@@ -1,13 +1,18 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.03                  #
-# 08-09-2006                       #
+# Version 1.04.03                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
+# Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.03 Code layout
+# 1.04.02 Added server info page
+# 1.04.01 Changed REQUEST_URI to SCRIPT_NAME for $url
+# 1.02.04 Added JavaScript functions submitSearchTemplate(), submitSearchTemplateFromResults(), URLDecode()
 # 1.02.03 Moved the include directory to the surfnetids root dir
 # 1.02.02 Changed the url redirection when $_GET['url'] is present + added intval() to session variables
 # 1.02.01 Initial release
@@ -28,17 +33,17 @@ $address = getaddress($web_port);
 if ($file != "login.php") {
   if (isset($_SESSION['s_admin'])) {
     $s_admin = intval($_SESSION['s_admin']);
+    $s_user = $_SESSION['s_user'];
     $s_access = $_SESSION['s_access'];
     $s_access_user = intval($s_access{2});
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
-      $url = basename($_SERVER['REQUEST_URI']);
+      $url = basename($_SERVER['SCRIPT_NAME']);
       header("location: ${address}login.php?url=$url");
       exit;
     }
-  }
-  else {
-    $url = basename($_SERVER['REQUEST_URI']);
+  } else {
+    $url = basename($_SERVER['SCRIPT_NAME']);
     header("location: ${address}login.php?url=$url");
     exit;
   }
@@ -46,8 +51,7 @@ if ($file != "login.php") {
   if ($s_admin == 1) {
     $sql_active = "SELECT COUNT(*) as total FROM sensors WHERE status = 1";
     $sql_sensors = "SELECT COUNT(id) as total FROM sensors";
-  }
-  else {
+  } else {
     $sql_active = "SELECT COUNT(tapip) as total FROM sensors WHERE status = 1 AND organisation = " .$s_org;
     $sql_sensors = "SELECT COUNT(tapip) as total FROM sensors WHERE organisation = " .$s_org;
   }
@@ -121,6 +125,68 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         document.getElementById(but).blur();
       }
     }
+    
+    function submitSearchTemplate() {
+    	var form = document.getElementById('searchform');
+    	//searchtemplate_title
+    	var title = prompt('Please submit a title for this searchtemplate');
+    	if ((title == '') || (title == null) || (title == 'undefined')) {
+    		alert('Invalid title.');
+    		return false;
+    	}
+    	if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
+    		document.getElementById('searchtemplate_title').value = title;
+    		form.action = 'searchtemplate.php';
+    		form.submit();
+    	} else return false;
+    }
+    
+    function submitSearchTemplateFromResults(url) {
+    	//searchtemplate_title
+    	var title = prompt('Please submit a title for this searchtemplate');
+    	if ((title == '') || (title == null) || (title == 'undefined')) {
+    		alert('Invalid title.');
+    		return false;
+    	}
+    	if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
+    		url = '/searchtemplate.php?' + url + '&searchtemplate_title=' + title;
+    		url = URLDecode(url);
+			window.location.href = url;
+    		return true;
+    	} else return false;
+    }
+    
+    function URLDecode(encoded)
+	{
+	   // Replace + with ' '
+	   // Replace %xx with equivalent character
+	   // Put [ERROR] in output if %xx is invalid.
+	   var HEXCHARS = "0123456789ABCDEFabcdef"; 
+	   var plaintext = "";
+	   var i = 0;
+	   while (i < encoded.length) {
+	       var ch = encoded.charAt(i);
+		   if (ch == "+") {
+		       plaintext += " ";
+			   i++;
+		   } else if (ch == "%") {
+				if (i < (encoded.length-2) 
+						&& HEXCHARS.indexOf(encoded.charAt(i+1)) != -1 
+						&& HEXCHARS.indexOf(encoded.charAt(i+2)) != -1 ) {
+					plaintext += unescape( encoded.substr(i,3) );
+					i += 3;
+				} else {
+					alert( 'Bad escape combination near ...' + encoded.substr(i) );
+					plaintext += "%[ERROR]";
+					i++;
+				}
+			} else {
+			   plaintext += ch;
+			   i++;
+			}
+		} // while
+	   return plaintext;
+	}
 
 <?php
     echo "</script>\n";
@@ -145,7 +211,6 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<div class='filler'></div>\n";
     echo "<div class='nav-menu'>\n";
       echo "<ul>\n";
-#        echo "<li><a href='${address}index.php'>Home</a></li>\n";
         echo "<li><a href='${address}sensorstatus.php'>Sensor Status</a></li>\n";
         echo "<li><a href='${address}rank.php'>Ranking</a></li>\n";
         echo "<li><a href='${address}search.php'>Search</a></li>\n";
@@ -164,8 +229,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       $s_a_sensor = $s_access{0};
       $s_a_search = $s_access{1};
       $s_a_user = $s_access{2};
+
       echo "<div class='nav-sub-menu'>\n";
-        echo "<ul align='center'>\n";
+        echo "<ul>\n";
           if ($s_a_user > 1) {
             echo "<li><a href='${address}useradmin.php'>User Admin</a></li>\n";
           } elseif ($s_a_user > 0) {
@@ -180,6 +246,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           if ($s_a_sensor > 1) {
             echo "<li><a href='${address}arpadmin.php'>ARP Admin</a></li>\n";
           }
+          if ($s_admin == 1) {
+            echo "<li><a href='${address}serverstats.php'>Server Info</a></li>\n";
+          }
         echo "</ul>\n";
       echo "</div>\n";
       echo "<div class='filler'></div>\n";
@@ -190,8 +259,11 @@ function set_title($title) {
   echo "<h3>$title</h3>\n";
 }
 
-function footer()
-{
+function footer() {
+  if (isset($pgconn)) {
+    pg_close($pgconn);
+  }
+
   echo "</div>\n"; 
   echo "<div id='footer'><a href='http://validator.w3.org/'>Valid XHTML</a> - &copy; SURFnet</div>\n"; 
   echo "</body>\n";

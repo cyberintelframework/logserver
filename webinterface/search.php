@@ -2,13 +2,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.06                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:			   	    
+# 1.04.01 Rereleased as 1.04.01
+# 1.02.08 Added Searchtemplates
+# 1.02.07 Added VLAN support 
 # 1.02.06 Removed includes
 # 1.02.05 Added search templates            
 # 1.02.04 Added multiple sensor select      
@@ -41,7 +44,7 @@ function check_byte(b_val,next_field) {
 }
 </script>
 
-<form method="get" action="logsearch.php">
+<form method="get" action="logsearch.php" id="searchform">
 
 <table border='0'>
   <tr>
@@ -71,13 +74,18 @@ function check_byte(b_val,next_field) {
 		$query = pg_query($sql);
 		while ($sensor_data = pg_fetch_assoc($query)) {
 			$label = $sensor_data["keyname"];
+			$vlanid = $sensor_data["vlanid"];
+			if ($vlanid != 0 ) {
+			  $label .=  "-" .$vlanid;
+			}
 			if ($s_admin == 1) {
 				// get organisation name
 				$query_org = pg_query("SELECT organisation FROM organisations WHERE id = '" . intval($sensor_data["organisation"]) . "'");
 				$org = pg_result($query_org, 0);
 				$label .= " (" . $org . ")";
 			}
-			echo printOption($sensor_data["id"], $label, $sensorid);
+			
+			  echo printOption($sensor_data["id"], $label, $sensorid);
 		}
 		echo "</select>\n";
 		echo "  </td>\n";
@@ -123,6 +131,20 @@ function check_byte(b_val,next_field) {
   <td colspan=2><h4>When</h4></td>
  </tr>
  <tr>
+  <td class="datatd">Select:</td>
+  <td class="datatd">
+   <select name="ts_select" style="background-color:white;">
+    <option value=""></option>
+    <option value="H">Last hour</option>
+    <option value="D">Last 24 hour</option>
+    <option value="T">Today</option>
+    <option value="W">Last week</option>
+    <option value="M">Last month</option>
+    <option value="Y">Last year</option>
+   </select>
+  </td>
+ </tr>
+ <tr>
   <td class="datatd">Between:</td>
   <td class="datatd"><input type="text" name="ts_start" id="ts_start" value="<?=$ts_start;?>" /> <input type="button" value="..." name="ts_start_trigger" id="ts_start_trigger" /></td>
  </tr>
@@ -142,6 +164,7 @@ function check_byte(b_val,next_field) {
     <option value="chart_sensor">Chart for sensor</option>
     <option value="chart_attack">Chart for attack</option>
     <option value="idmef">IDMEF</option>
+    <option value="pdf">PDF</option>
    </select>
   </td>
  </tr>
@@ -215,17 +238,31 @@ function check_byte(b_val,next_field) {
  </tr>
  </div>
  <tr>
-   <td colspan=2 align="right"><br /><input type="hidden" name="c" value=0><input type="submit" name="f_submit" value="Search" class="button" style="cursor:pointer;" /></td>
+   <td colspan=2 align="right"><br /><input type="hidden" name="c" value=0><input type="hidden" name="searchtemplate_title" id="searchtemplate_title" value=""><input type="button" name="f_submit_template" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="f_submit" value="Search" class="button" style="cursor:pointer;" /></td>
  </tr>
 </table>
 </form>
 <p>*) Wildcard is %</p>
 
+<div id="searchtemplate">
 <div id="searchtemplate_form">
-  <h3>Searchtemplates</h3>
-  <a href="/logsearch.php?ts_start=<?=urlencode(date("d-m-Y") . " 00:00");?>&ts_end=<?=urlencode(date("d-m-Y", (time() + (60 * 60 * 24))) . " 00:00");?>" class="searchtemplate_item">Today's attacks</a>
-  <a href="/logsearch.php?ts_start=<?=urlencode(date("d-m-Y") . " 00:00");?>&ts_end=<?=urlencode(date("d-m-Y", (time() + (60 * 60 * 24))) . " 00:00");?>&f_reptype=single" class="searchtemplate_item">Today's attacks in single page report</a>
-  <a href="/logsearch.php?ts_start=<?=urlencode(date("d-m-Y", (time() - (60 * 60 * 24 * 7))) . " 00:00");?>&ts_end=<?=urlencode(date("d-m-Y") . " 23:59");?>" class="searchtemplate_item">Last week attacks</a>
+  <?
+	// get user searchtemplates
+	$userid = intval($_SESSION["s_userid"]);
+	//if ($userid == 49) $userid = 1;
+	// userid 0 => default searchtemplates
+	$sql = "SELECT * FROM searchtemplate WHERE userid = '" . intval($userid) . "' ORDER BY title";
+	echo "<h3>Personal searchtemplates</h3>\n";
+	showSearchTemplates($sql);
+	echo "</div>\n";
+	echo "<a href=\"/searchtemplate.php?action=admin\" style=\"margin-left:132px;\">Searchtemplate administration</a>\n";
+	echo "<br /><br /><br /><br />\n";
+	echo "<div id=\"searchtemplate_form\">\n";
+	echo "<h3>Default searchtemplates</h3>\n";
+	$sql = "SELECT * FROM searchtemplate WHERE userid = '0' ORDER BY title";
+	showSearchTemplates($sql);
+	  ?>
+</div>
 </div>
 <?
    $sql_templates = "SELECT * FROM search_templates";

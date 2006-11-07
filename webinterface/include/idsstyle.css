@@ -149,13 +149,11 @@ select {
   width:		auto;
   list-style: 		none;
   margin-top:		0px;
-  padding-left:		18%;
-  text-align:		center;
+  padding-left:		10%;
 }
 
 .nav-sub-menu li
 {
-  text-align:		center;
   float: 		left;
   margin-top: 		1px;
   margin-bottom:	1px;
@@ -175,7 +173,6 @@ select {
   border: 		1px solid #dcdce9;
   color: 		#0d2474;
   text-decoration: 	none;
-  text-align: 		center;
   font-style: 		normal;
   font-weight: 		normal;
 }
@@ -321,6 +318,17 @@ PRE {
   position: absolute;
   right: 10px;
   top: 10px;
+  width: 50px;
+  cursor: pointer;
+  text-align: center;
+}
+#pdf_btn {
+  position: absolute;
+  right: 80px;
+  top: 10px;
+  width: 50px;
+  cursor: pointer;
+  text-align: center;
 }
 #search_wait {
   position: absolute;
@@ -332,12 +340,17 @@ PRE {
   padding: 10px;
   z-index: 50;
 }
-#searchtemplate_form {
+#searchtemplate {
   position: absolute;
   width: 300px;
   height: auto;
-  left: 500px;
-  top: 58px;
+  left: 535px;
+  top: 59px;
+}
+#searchtemplate_form {
+  position: relative;
+  width: 300px;
+  height: auto;
   border: 1px solid gray;
 }
 #searchtemplate_form h3 {
@@ -357,8 +370,10 @@ a.searchtemplate_item {
   background-color: white;
   padding: 5px;
 }
+
 #personal_searchtemplate {
   position: absolute;
-  right: 90px;
-  top: 20px;
+  right: 146px;
+  top: 10px;
+  cursor: pointer;
 }

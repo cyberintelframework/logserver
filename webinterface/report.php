@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.02                  #
-# 28-07-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Code layout
 # 1.02.02 Removed includes
 # 1.02.01 Initial release
 #############################################
@@ -29,14 +30,12 @@ $err = 0;
 $userid = intval($_GET["userid"]);
 // Permissions for this userid?
 if ($s_access_user == 0) {
-	echo "<p style='color:red;'><b>You don't have sufficient rights to perform the requested action.</b></p>\n";
-	footer();
-	exit;
-}
-elseif ($s_userid <> $userid && $s_access_user < 2 ) {
-	$userid = $s_userid;
-}
-elseif ($s_access < 9) {
+  echo "<p style='color:red;'><b>You don't have sufficient rights to perform the requested action.</b></p>\n";
+  footer();
+  exit;
+} elseif ($s_userid <> $userid && $s_access_user < 2 ) {
+  $userid = $s_userid;
+} elseif ($s_access < 9) {
   $sql_login = "SELECT * FROM login WHERE organisation = $s_org AND id = $userid";
   $result_login = pg_query($pgconn, $sql_login);
   $numrows_login = pg_num_rows($result_login);
@@ -551,12 +550,6 @@ if (in_array($action, $allowed_action)) {
 }
 
 footer();
-/*
-echo " <tr class='datatr'>";
-echo "  <td class='datatd'></td>\n";
-echo "  <td class='datatd'></td>\n";
-echo " </tr>\n";
-*/
 
 function write_report_template_threshold_fields() {
 	global $priority, $target, $timespan, $operator, $value, $value_user, $deviation, $mail_priority_ar, $mail_target_ar, $mail_timespan_ar, $mail_operator_ar;

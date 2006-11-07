@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.06                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.01 Code layout & error message handling
 # 1.02.06 Added intval() to session variables + pg_close
 # 1.02.05 Added some more input checks and removed includes
 # 1.02.04 Enhanced debugging
@@ -30,33 +31,16 @@ if ( $s_admin != 1 ) {
 
 if ( ! isset($_GET['orgid'] )) {
   $err = 1;
-}
-else {
+} else {
   $orgid = intval($_GET['orgid']);
 }
 
 if (isset($_GET['m'])) {
   $m = intval($_GET['m']);
-
-  # orgdel.php
-  if ($m == 90) { $m = '<p>Admin rights needed to delete an organisation!</p>'; }
-  elseif ($m == 91) { $m = '<p>Organisation ID was not set!</p>'; }
-  elseif ($m == 92) { $m = '<p>Identifier ID was not set!</p>'; }
-  elseif ($m == 93) { $m = '<p>There was no record with this ID!</p>'; }
-  elseif ($m == 11) { $m = '<p>Succesfuly deleted this identifier!</p>'; }
-
-  # orgsave.php
-  elseif ($m == 81) { $m = '<p>User admin rights are required for this action!</p>'; }
-  elseif ($m == 82) { $m = '<p>Organisation ID was not set!</p>'; }
-  elseif ($m == 83) { $m = '<p>Organisation name was not set!</p>'; }
-  elseif ($m == 12) { $m = '<p>Succesfuly saved the organisation details!</p>'; }
-
-  # Unknown error
-  else { $m = "<p><font color='red'>Unknown error!</font></p>"; }
-
-  echo "<p><font color='red'>" .$m. "</font></p>";
+  $m = stripinput($errors[$m]);
+  $m = "<p>$m</p>";
+  echo "<font color='red'>" .$m. "</font>";
 }
-
 
 if ($err != 1) {
   $sql_orgs = "SELECT * FROM organisations WHERE id = " .$orgid;
@@ -75,7 +59,7 @@ if ($err != 1) {
   $ranges = $row['ranges'];
   $ranges = str_replace(";", "\n", $ranges);
 
-  echo "<form action='orgsave.php' method='POST'>\n";
+  echo "<form action='orgsave.php?type=ident' method='POST'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='100'>ID</td>\n";

@@ -3,14 +3,17 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.13                  #
-# 09-08-2006                       #
+# Version 1.04.01                  #
+# 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
+# 1.03.02 Fixed organisation bug
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.13 Added intval() to session variables
 # 1.02.12 Fixed typo in intval() function
 # 1.02.11 Added some more input checks and removed includes
@@ -31,8 +34,7 @@ $q_org = $s_org;
 
 if (isset($_GET['sev'])) {
   $sev = intval($_GET['sev']);
-}
-else {
+} else {
   $err = 1;
   echo "No severity given in the querystring.<br />\n";
   echo "<a href='logindex.php'>Back</a>\n";
@@ -46,10 +48,11 @@ if ($s_access_search == 9) {
       add_db_table("sensors");
       $where[] = "sensors.organisation = $q_org";
       $querystring = $querystring . "&amp;org=$q_org";
+    } else {
+      $q_org = 0;
     }
   }
-}
-else {
+} else {
   add_db_table("sensors");
   $where[] = "sensors.organisation = $q_org";
 }
@@ -108,8 +111,7 @@ if ($err != 1) {
           echo "<tr>\n";
             if ($attack_url != "") {
               echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
-            }
-            else {
+            } else {
               echo "<td class='datatd'>$attack</td>\n";
             }
             echo "<td class='datatd' align='right'><a href='logsearch.php?f_attack=$dia&amp;f_search=&amp;f_field=source&amp;c=0$querystring$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
@@ -178,8 +180,7 @@ if ($err != 1) {
           $numrows_clamav = pg_num_rows($result_clamav);
           if ($numrows_clamav == 0) {
             $clamav_info = "Not scanned";
-          }
-          else {
+          } else {
             $clamav_info = pg_result($result_clamav, "info");
           }
 
@@ -189,8 +190,7 @@ if ($err != 1) {
             $numrows_bdc = pg_num_rows($result_bdc);
             if ($numrows_bdc == 0) {
               $bdc_info = "Not scanned";
-            }
-            else {
+            } else {
               $bdc_info = pg_result($result_bdc, "info");
             }
           }
@@ -201,8 +201,7 @@ if ($err != 1) {
             $numrows_antivir = pg_num_rows($result_antivir);
             if ($numrows_antivir == 0) {
               $antivir_info = "Not scanned";
-            }
-            else {
+            } else {
               $antivir_info = pg_result($result_antivir, "info");
             }
           }          
@@ -210,8 +209,7 @@ if ($err != 1) {
           # Starting the count for the viri.
           if (!array_key_exists($virus, $virus_count_ar)) {
             $virus_count_ar[$virus] = $count;
-          }
-          else {
+          } else {
             $newcount = $virus_count_ar[$virus] + $count;
             $virus_count_ar[$virus] = $newcount;
           }
@@ -220,19 +218,16 @@ if ($err != 1) {
           echo "<tr>\n";
             if ($clamav_info == "Not scanned" || $bdc_info == "Not scanned" || $antivir_info == "Not scanned") {
               echo "<td class='datatd'>$malware</td>\n";
-            }
-            else {
+            } else {
               echo "<td class='datatd'><a href='binaryhist.php?bin=$malware'>$malware</a></td>\n";
             }
             ### ClamAV ###
             if ($clamav_info == "Suspicious") {
               echo "<td class='datatd'>$clamav_info</td>\n";
               $clamav_total++;
-            }
-            elseif ($clamav_info == "Not scanned") {
+            } elseif ($clamav_info == "Not scanned") {
               echo "<td class='datatd'>$clamav_info</td>\n";
-            }
-            else {
+            } else {
               echo "<td class='datatd'><font color='red'>$clamav_info</font></td>\n";
               $clamav_found++;
               $clamav_total++;
@@ -241,11 +236,9 @@ if ($err != 1) {
             if ($bdc_info == "Suspicious") {
               echo "<td class='datatd'>$bdc_info</td>\n";
               $bdc_total++;
-            }
-            elseif ($bdc_info == "Not scanned") {
+            } elseif ($bdc_info == "Not scanned") {
               echo "<td class='datatd'>$bdc_info</td>\n";
-            }
-            else {
+            } else {
               echo "<td class='datatd'><font color='red'>$bdc_info</font></td>\n";
               $bdc_total++;
               $bdc_found++;
@@ -254,11 +247,9 @@ if ($err != 1) {
             if ($antivir_info == "Suspicious") {
               echo "<td class='datatd'>$antivir_info</td>\n";
               $antivir_total++;
-            }
-            elseif ($antivir_info == "Not scanned") {
+            } elseif ($antivir_info == "Not scanned") {
               echo "<td class='datatd'>$antivir_info</td>\n";
-            }
-            else {
+            } else {
               echo "<td class='datatd'><font color='red'>$antivir_info</font></td>\n";
               $antivir_total++;
               $antivir_found++;
