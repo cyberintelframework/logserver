@@ -1,17 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 01-11-2006                       #
+# Version 1.02.10                  #
+# 30-10-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.04 Changed the getStartWeek() function to correctly display the start of the week
-# 1.04.03 Added getPortDescr() function
-# 1.04.02 Added showSearchTemplates() function
+# 1.02.10 Added 
 # 1.04.01 Added cleansql() function
 # 1.02.09 Added genpass and stripinput function
 # 1.02.08 Removed admin_header function and fixed prepare_sql bug
@@ -23,72 +21,72 @@
 #############################################
 
 function showSearchTemplates($sql) {
-  $query = pg_query($sql);
-  while ($row = pg_fetch_assoc($query)) {
-    $querystring = "";
-    $db_querystring = $row["querystring"];
-    // parse querystring
-    $parse = explode("|", $db_querystring);
-    for ($i = 0; $i < (count($parse) - 1); $i++) {
-      // $i == even -> key, $i == odd -> value
-      if (($i % 2) == 0) $querystring .= $parse[$i];
-      else {
-        // parse value
-        // %dt = datetime
-        $key = $parse[$i];
-        if (substr($key, 0, 3) == "%dt") {
-          // set current timestamp
-          $dt = time();
-          $sub = substr($key, 3);
-          if (strlen($sub) > 0) {
-            // substitute date
-            if (substr($sub, 0, 1) == "-") {
-              $sub = substr($sub, 1);
-              $date_min = 60;
-              $date_hour = 60 * $date_min;
-              $date_day = 24 * $date_hour;
-              $date_week = 7 * $date_day;
-              $date_month = 31 * $date_day;
-              $date_year = 365 * $date_day;
-              $dt_sub = 0;
-              // determine substitute value
-              //"H", "D", "T", "W", "M", "Y"
-              switch ($sub) {
-                case "%Y":
-                  $dt_sub = $date_year;
-                  break;
-                case "%M":
-                  $dt_sub = $date_month;
-                  break;
-                case "%W":
-                  $dt_sub = $date_week;
-                  break;
-                case "%D":
-                  $dt_sub = $date_day;
-                  break;
-                case "%H":
-                  $dt_sub = $date_hour;
-                  break;
-                case "%T":
-                  // today
-                  $dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
-                  break;
-                default:
-                  // use absolute value
-                  $dt_sub = $sub;
-                  break;
-              }
-              if ($dt_sub > 0) $dt -= $dt_sub;
-            }
-          }
-          $querystring .= urlencode(date("d-m-Y H:i:s", $dt));
-        }
-      }
-    }
-    if (!empty($parse[$i])) $querystring .= $parse[$i];
-    
-    echo "<a href=\"/logsearch.php?" . $querystring . "\" class=\"searchtemplate_item\">" . $row["title"] . "</a>\n";
-  }
+$query = pg_query($sql);
+	while ($row = pg_fetch_assoc($query)) {
+		$querystring = "";
+		$db_querystring = $row["querystring"];
+		// parse querystring
+		$parse = explode("|", $db_querystring);
+		for ($i = 0; $i < (count($parse) - 1); $i++) {
+			// $i == even -> key, $i == odd -> value
+			if (($i % 2) == 0) $querystring .= $parse[$i];
+			else {
+				// parse value
+				// %dt = datetime
+				$key = $parse[$i];
+				if (substr($key, 0, 3) == "%dt") {
+					// set current timestamp
+					$dt = time();
+					$sub = substr($key, 3);
+					if (strlen($sub) > 0) {
+						// substitute date
+						if (substr($sub, 0, 1) == "-") {
+							$sub = substr($sub, 1);
+							$date_min = 60;
+							$date_hour = 60 * $date_min;
+							$date_day = 24 * $date_hour;
+							$date_week = 7 * $date_day;
+							$date_month = 31 * $date_day;
+							$date_year = 365 * $date_day;
+							$dt_sub = 0;
+							// determine substitute value
+							//"H", "D", "T", "W", "M", "Y"
+							switch ($sub) {
+								case "%Y":
+									$dt_sub = $date_year;
+									break;
+								case "%M":
+									$dt_sub = $date_month;
+									break;
+								case "%W":
+									$dt_sub = $date_week;
+									break;
+								case "%D":
+									$dt_sub = $date_day;
+									break;
+								case "%H":
+									$dt_sub = $date_hour;
+									break;
+								case "%T":
+									// today
+									$dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
+									break;
+								default:
+									// use absolute value
+									$dt_sub = $sub;
+									break;
+							}
+							if ($dt_sub > 0) $dt -= $dt_sub;
+						}
+					}
+					$querystring .= urlencode(date("d-m-Y H:i:s", $dt));
+				}
+			}
+		}
+		if (!empty($parse[$i])) $querystring .= $parse[$i];
+		
+		echo "<a href=\"/logsearch.php?" . $querystring . "\" class=\"searchtemplate_item\">" . $row["title"] . "</a>\n";
+	}
 }
 
 function cleansql($s_sql) {
@@ -128,7 +126,8 @@ function getaddress($web_port) {
   $https = $_SERVER['HTTPS'];
   if ($https == "") {
     $http = "http";
-  } else {
+  }
+  else {
     $http = "https";
   }
   $servername = $_SERVER['SERVER_NAME'];
@@ -146,7 +145,8 @@ function stripinput($input) {
 }
 
 # generates a random string of 8 characters
-function genpass($length = 8) {
+function genpass($length = 8)
+{
   # start with a blank password
   $password = "";
   # define possible characters
@@ -165,6 +165,7 @@ function genpass($length = 8) {
       $password .= $char;
       $i++;
     }
+
   }
   # done!
   return $password;
@@ -246,11 +247,16 @@ function check_where_table($ch_val) {
   $ch_val = trim($ch_val);
   $arguments = explode(" ", $ch_val);
   $left = trim($arguments[0]);
+#  $right = trim($arguments[2]);
   $pat = "/^.*\..*$/";
   if (preg_match($pat, $left)) {
     $ch_table = explode(".", $left);
     add_db_table($ch_table[0]);
   }
+#  if (preg_match($pat, $right)) {
+#    $ch_table = explode(".", $right);
+#    add_db_table($ch_table[0]);
+#  }
 }
 
 // Function for creating sql-FROM (used by searchresults)
@@ -267,7 +273,7 @@ function prepare_sql_from() {
 }
 
 # Function to convert amount of bytes into human readable format.
-function size_hum_read($size) {
+function size_hum_read($size){
   /*
   Returns a human readable size
   */
@@ -281,7 +287,8 @@ function size_hum_read($size) {
 }
 
 # Function to print a radio button
-function printRadio($desc, $radio_name, $value, $data) {
+function printRadio($desc, $radio_name, $value, $data)
+{
   // prints a <input type='radio'>
   // $desc = Text behind the radio button.
   // $radio_name = name attribute
@@ -297,7 +304,8 @@ function printRadio($desc, $radio_name, $value, $data) {
 }
 
 # Function to print a checkbox
-function printCheckBox($desc, $cb_name, $value, $data) {
+function printCheckBox($desc, $cb_name, $value, $data)
+{
   // prints a <input type='checkbox'>
   // $desc = Text behind the radio button.
   // $cb_name = name attribute
@@ -312,7 +320,8 @@ function printCheckBox($desc, $cb_name, $value, $data) {
 }
 
 # Function to print a select option
-function printOption($value, $text, $val) {
+function printOption($value, $text, $val)
+{
   $return = "<option value=\"$value\"";
   if ($val == $value) {
     $return .= " selected";
@@ -322,7 +331,8 @@ function printOption($value, $text, $val) {
 }
 
 # Function used to calculate rendering time of the search pages.
-function microtime_float() {
+function microtime_float()
+{
    list($usec, $sec) = explode(" ", microtime());
    return ((float)$usec + (float)$sec);
 }
@@ -355,11 +365,14 @@ function makeChart($charttype, $title, $result_chart, $org) {
 
   if ($charttype == 0) {
     $chart =  new PieChart();
-  } elseif ($charttype == 1) {
+  }
+  elseif ($charttype == 1) {
     $chart = new HorizontalChart();
-  } elseif ($charttype == 2) {
+  }
+  elseif ($charttype == 2) {
     $chart = new VerticalChart();
-  } else {
+  }
+  else {
     echo "Wrong type selected<br />\n";
     $siderr = 1;
   }
@@ -382,21 +395,32 @@ function makeChart($charttype, $title, $result_chart, $org) {
     $chart->render("charts/$org.png");
     return "charts/$org.png";
    }
-  } else {
+  }
+  else {
     return "false";
   }
 }
 
 # Function used to determine the start of a week. Returns timestamp in epoch format.
 function getStartWeek($day = '', $month = '', $year = '') {
+#  if ($day == '' || $month == '' || $year == '') {
+#    $day = date("d");
+#    $month = date("n");
+#    $year = date("Y");
+#  }
   $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek + 1;
+  $startofweek = $day - $dayofweek;
   $stamp = mktime(0,0,0,$month,$startofweek,$year);
   return $stamp;
 }
 
 # Function used to determine the end of a week. Returns timestamp in epoch format.
 function getEndWeek($day = '', $month = '', $year = '') {
+#  if ($day == '' || $month == '' || $year == '') {
+#    $day = date("d");
+#    $month = date("n");
+#    $year = date("Y");
+#  }
   $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
   $startofweek = $day - $dayofweek;
   $endofweek = $startofweek + 6;
@@ -406,12 +430,20 @@ function getEndWeek($day = '', $month = '', $year = '') {
 
 # Function used to determine the start of a month. Returns timestamp in epoch format.
 function getStartMonth($month = '', $year = '') {
+#  if ($month == "" || $year == "") {
+#    $month = date("n");
+#    $year = date("Y");
+#  }
   $stamp = mktime(0,0,0,$month,1,$year);
   return $stamp;
 }
 
 # Function used to determine the end of a month. Returns timestamp in epoch format.
 function getEndMonth($month = '', $year = '') {
+#  if ($month == '' || $year == '') {
+#    $month = date("n");
+#    $year = date("Y");
+#  }
   $endofmonth = date("t", mktime(0,0,0,$month,1,$year));
   $stamp = mktime(23,59,59,$month,$endofmonth,$year);
   return $stamp;
@@ -419,49 +451,23 @@ function getEndMonth($month = '', $year = '') {
 
 # Function used to determine the start of the day. Returns timestamp in epoch format.
 function getStartDay($day = '', $month = '', $year = '') {
+#  if ($day == '' || $month == '' || $year == '') {
+#    $day = date("d");
+#    $month = date("n");
+#    $year = date("Y");
+#  }
   $stamp = mktime(0,0,0,$month,$day,$year);
   return $stamp;
 }
 
 # Function used to determine the end of the day. Returns timestamp in epoch format.
 function getEndDay($day = '', $month = '', $year = '') {
+#  if ($day == '' || $month == '' || $year == '') {
+#    $day = date("d");
+#    $month = date("n");
+#    $year = date("Y");
+#  }
   $stamp = mktime(23,59,59,$month,$day,$year);
   return $stamp;
 }
-
-# Function used to determine the description of a (well-known) port. To be extended...
-function getPortDescr($aPort) {
-  switch ($aPort) {
-      case   20: return "ftp-data"; break;
-      case   21: return "ftp"; break;
-      case   22: return "ssh"; break;
-      case   23: return "telnet"; break;
-      case   25: return "smtp"; break;
-      case   42: return "name"; break;
-      case   43: return "whois"; break;
-      case   53: return "domain"; break;
-      case   69: return "tftp"; break;
-      case   79: return "finger"; break;
-      case   80: return "http"; break;
-      case  109: return "pop2"; break;
-      case  110: return "pop3"; break;
-      case  115: return "sftp"; break;
-      case  119: return "nntp"; break;
-      case  135: return "msrpc"; break;
-      case  137: return "netbios-ns"; break;
-      case  138: return "netbios-dgm"; break;
-      case  139: return "netbios-ssn"; break;
-      case  143: return "imap4"; break;
-      case  220: return "imap3"; break;
-      case  389: return "ldap"; break;
-      case  443: return "https"; break;
-      case  445: return "microsoft-ds"; break;
-      case  465: return "smtps"; break;
-      case  993: return "imap4s"; break;
-      case  995: return "pop3s"; break;
-      case 5000: return "UPnP"; break;
-      default  : return "Port could not be determined"; break;
-  }
-}
-
 ?>

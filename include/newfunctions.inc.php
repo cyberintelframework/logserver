@@ -1,18 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 01-11-2006                       #
+# Version 1.03.01                  #
+# 25-10-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.04 Changed the getStartWeek() function to correctly display the start of the week
-# 1.04.03 Added getPortDescr() function
-# 1.04.02 Added showSearchTemplates() function
-# 1.04.01 Added cleansql() function
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Added genpass and stripinput function
 # 1.02.08 Removed admin_header function and fixed prepare_sql bug
 # 1.02.07 Fixed a bug with empty $db_table when preparing the sql
@@ -21,75 +18,6 @@
 # 1.02.04 Modified prepare_sql_where function. Renamed to prepare_sql with a hook to prepare_sql_from()
 # 1.02.03 Initial release
 #############################################
-
-function showSearchTemplates($sql) {
-  $query = pg_query($sql);
-  while ($row = pg_fetch_assoc($query)) {
-    $querystring = "";
-    $db_querystring = $row["querystring"];
-    // parse querystring
-    $parse = explode("|", $db_querystring);
-    for ($i = 0; $i < (count($parse) - 1); $i++) {
-      // $i == even -> key, $i == odd -> value
-      if (($i % 2) == 0) $querystring .= $parse[$i];
-      else {
-        // parse value
-        // %dt = datetime
-        $key = $parse[$i];
-        if (substr($key, 0, 3) == "%dt") {
-          // set current timestamp
-          $dt = time();
-          $sub = substr($key, 3);
-          if (strlen($sub) > 0) {
-            // substitute date
-            if (substr($sub, 0, 1) == "-") {
-              $sub = substr($sub, 1);
-              $date_min = 60;
-              $date_hour = 60 * $date_min;
-              $date_day = 24 * $date_hour;
-              $date_week = 7 * $date_day;
-              $date_month = 31 * $date_day;
-              $date_year = 365 * $date_day;
-              $dt_sub = 0;
-              // determine substitute value
-              //"H", "D", "T", "W", "M", "Y"
-              switch ($sub) {
-                case "%Y":
-                  $dt_sub = $date_year;
-                  break;
-                case "%M":
-                  $dt_sub = $date_month;
-                  break;
-                case "%W":
-                  $dt_sub = $date_week;
-                  break;
-                case "%D":
-                  $dt_sub = $date_day;
-                  break;
-                case "%H":
-                  $dt_sub = $date_hour;
-                  break;
-                case "%T":
-                  // today
-                  $dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
-                  break;
-                default:
-                  // use absolute value
-                  $dt_sub = $sub;
-                  break;
-              }
-              if ($dt_sub > 0) $dt -= $dt_sub;
-            }
-          }
-          $querystring .= urlencode(date("d-m-Y H:i:s", $dt));
-        }
-      }
-    }
-    if (!empty($parse[$i])) $querystring .= $parse[$i];
-    
-    echo "<a href=\"/logsearch.php?" . $querystring . "\" class=\"searchtemplate_item\">" . $row["title"] . "</a>\n";
-  }
-}
 
 function cleansql($s_sql) {
   $pattern_ar = array("UNION", "JOIN", "INNER", "OUTER", "INSERT", "DELETE", "UPDATE", "INTO", "login");
@@ -165,6 +93,7 @@ function genpass($length = 8) {
       $password .= $char;
       $i++;
     }
+
   }
   # done!
   return $password;
@@ -348,49 +277,10 @@ function matchCIDR($addr, $cidr) {
   return $output;
 }
 
-# Function used to generate a chart image.
-function makeChart($charttype, $title, $result_chart, $org) {
-  global $pgconn;
-//  $result_chart = pg_query($pgconn, $sql);
-
-  if ($charttype == 0) {
-    $chart =  new PieChart();
-  } elseif ($charttype == 1) {
-    $chart = new HorizontalChart();
-  } elseif ($charttype == 2) {
-    $chart = new VerticalChart();
-  } else {
-    echo "Wrong type selected<br />\n";
-    $siderr = 1;
-  }
-
-  if ($siderr != 1) {
-   $totalrows = pg_num_rows($result_chart);
-   if ($totalrows == 0) { $drawerr = 1; echo "No data to process "; }
-   else {
-    $chart->setTitle($title);
-    while ($row = pg_fetch_row($result_chart)) {
-      $key = $row[0];
-      $value = $row[1];
-      $dia = substr_count($key, "Dialogue");
-      if ($dia > 0) {
-        global $attacks_ar;
-        $key = $attacks_ar[$key]["Attack"];
-      }
-      $chart->addPoint(new Point("$key ($value)", $value));
-    }
-    $chart->render("charts/$org.png");
-    return "charts/$org.png";
-   }
-  } else {
-    return "false";
-  }
-}
-
 # Function used to determine the start of a week. Returns timestamp in epoch format.
 function getStartWeek($day = '', $month = '', $year = '') {
   $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek + 1;
+  $startofweek = $day - $dayofweek;
   $stamp = mktime(0,0,0,$month,$startofweek,$year);
   return $stamp;
 }
