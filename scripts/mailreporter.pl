@@ -2,14 +2,16 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS          	           #
-# Version 1.02.09                  #
-# 27-06-2006          	           #
+# Version 1.03.02                  #
+# 10-11-2006          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
-# Changelog:                                                                            
+# Changelog:
+# 1.03.02 Fixed average attack calculation
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Bugfixes
 # 1.02.08 Bugfix
 # 1.02.07 Fully addapted for new mail reporting.                                        
@@ -70,8 +72,7 @@ if ($logstamp == 1) {
     mkdir("$surfidsdir/log/$day$month$year");
   }
   $logfile = "$surfidsdir/log/$day$month$year/$logfile";
-}
-else {
+} else {
   $logfile = "$surfidsdir/log/$logfile";
 }
 
@@ -148,7 +149,12 @@ $day = (24 * $hour);
 $week = (7 * $day);
 
 # Get organisation and email of all users with mailreporting enabled and status active
-$email_query = $dbh->prepare("SELECT report.email, login.organisation, report_content.id, report_content.template, report_content.sensor_id, report_content.frequency, report_content.last_sent, report_content.interval, report_content.priority, report.subject, report.gpg_enabled, report_content.title FROM report, login, report_content WHERE report.user_id = login.id AND report.enabled = TRUE AND report.id = report_content.report_id AND report_content.active = TRUE");
+$sql_email = "SELECT report.email, login.organisation, report_content.id, report_content.template, ";
+$sql_email .= "report_content.sensor_id, report_content.frequency, report_content.last_sent, report_content.interval, report_content.priority, ";
+$sql_email .= "report.subject, report.gpg_enabled, report_content.title ";
+$sql_email .= "FROM report, login, report_content ";
+$sql_email .= "WHERE report.user_id = login.id AND report.enabled = TRUE AND report.id = report_content.report_id AND report_content.active = TRUE";
+$email_query = $dbh->prepare($sql_email);
 $execute_result = $email_query->execute();
 while (@row = $email_query->fetchrow_array) {
 	$email = $row[0];
@@ -201,7 +207,6 @@ while (@row = $email_query->fetchrow_array) {
 		if ($frequency == 1) { $timespan = $hour; }
 		elsif ($frequency == 2) { $timespan = $day; }
 		elsif ($frequency == 3) { $timespan = $week; }
-
 		$next_send = ($last_sent + $timespan);
 		# Add 50 minutes to ts_now to avoid sending once in two sequences instead of every sequence
 		$ts_check = ($ts_now + (50 * $minute));
@@ -332,7 +337,6 @@ while (@row = $email_query->fetchrow_array) {
 				$deviation = $detail[2];
 				$db_operator = $detail[3];
 				
-				if ($target == 1) {
 					# target = Number malicious attacks
 					
 					# Timespan: 1=last hour, 2=last day, 3=last week
@@ -355,28 +359,49 @@ while (@row = $email_query->fetchrow_array) {
 					if ($db_value > -1) {
 						$value = $db_value;
 					} else {
-						# Get average value for this timespan
-						# 2 possibilities: use db_table stats_history of attacks
-						# Now using stats_history
-						$sql = "SELECT SUM(count_malicious) AS total, COUNT(month) AS nr_months FROM stats_history, sensors WHERE stats_history.sensorid = sensors.id AND sensors.organisation = '$org' $sensor_where";
-						$avg_query = $dbh->prepare($sql);
-						$execute_result = $avg_query->execute();
-						@avg = $avg_query->fetchrow_array;
-						
-						$total = $avg[0];
-						$nr_months = $avg[1];
-						$average = floor($total / $nr_months);
-						# Average for 1 month
-						# Assume 1 month =~ 30 days
+						# Calculate the timespan for the average
+						$sql = "SELECT (sum(uptime + up)) as total_uptime ";
+						$sql .= "FROM sensors, ";
+						# Start subquery
+						$sql .= "(SELECT sum(floor(extract(epoch from now()) -laststart)) as up ";
+						$sql .= " FROM sensors WHERE status = 1 AND sensors.organisation = '$org' $sensor_where) as current ";
+						# End subquery
+						$sql .= "WHERE sensors.organisation = '$org' $sensor_where ";
+						$first_query = $dbh->prepare($sql);
+						$er = $first_query->execute();
+						@first_result = $first_query->fetchrow_array;
+						$uptime = $first_result[0];
+
+						# Get the total amount of attacks
+						$sql = "SELECT COUNT(attacks.id) as total FROM attacks, sensors ";
+						$sql .= "WHERE severity = $target AND sensors.id = attacks.sensorid ";
+						$sql .= "AND sensors.organisation = '$org' $sensors_where";
+						$total_query = $dbh->prepare($sql);
+						$er = $total_query->execute();
+						@total_result = $total_query->fetchrow_array;
+						$total = $total_result[0];
+
+						# Calculate the average number of attacks per hour
+						$uptime_hours = floor($uptime / 60);
+						$uptime_days = floor($uptime / 60 / 24);
+						$uptime_weeks = floor($uptime / 60 / 24 / 7);
+						$average_hours = floor($total / $uptime_hours);
+						$average_days = floor($total / $uptime_days);
+						$average_weeks = floor($total / $uptime_weeks);
+
 						if ($timespan == $hour) {
-							$value = floor($average / 30 / 24);
+							$value = $average_hours;
 						} elsif ($timespan == $day) {
-							$value = floor($average / 30);
-						} 
+							$value = $average_days;
+						} elsif ($timespan == $week) {
+							$value = $average_weeks;
+						}
 					}
 					
 					# Get current value for last timespan
-					$sql = "SELECT COUNT(attacks.id) FROM attacks, sensors WHERE sensors.id = attacks.sensorid AND sensors.organisation = '$org' AND timestamp >= '$ts_start' AND timestamp <= '$ts_end'";
+					$sql = "SELECT COUNT(attacks.id) FROM attacks, sensors ";
+					$sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid AND sensors.organisation = '$org' ";
+					$sql .= "AND timestamp >= '$ts_start' AND timestamp <= '$ts_end'";
 					$check_query = $dbh->prepare($sql);
 					$execute_result = $check_query->execute();
 					@db_row = $check_query->fetchrow_array;
@@ -407,7 +432,7 @@ while (@row = $email_query->fetchrow_array) {
 						print MAIL "Triggered threshold report: $title\n";
 						print MAIL "\n";
 						print MAIL "Use next link to view related attacks:\n";
-						print MAIL $webinterface_prefix . "/logsearch.php?from=$ts_start&to=$ts_end&f_reptype=multi&f_submit=Search";
+						print MAIL $webinterface_prefix . "/logsearch.php?from=$ts_start&to=$ts_end&f_reptype=multi&f_sev=$target&f_submit=Search";
 						print MAIL "\n";
 					} else {
 						# Free file
@@ -415,7 +440,6 @@ while (@row = $email_query->fetchrow_array) {
 						# Remove file
 						system "rm $mailfile";
 					}
-				}			
 			}
 			
 			if ($send == 1) {

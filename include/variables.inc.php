@@ -169,7 +169,10 @@ $mail_priority_ar = array(
 
 # Array with the mailreporting targets
 $mail_target_ar = array(
-		1 => "Number malicious attacks"
+		0 => "Possible malicious attacks",
+		1 => "Malicious attacks",
+		16 => "Malware offered",
+		32 => "Malware downloaded"
 );
 
 # Array with the mailreporting timespans

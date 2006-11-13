@@ -129,6 +129,19 @@ if ($err == 0) {
           }
         echo "</td>\n";
       echo "</tr>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>Email address</td>\n";
+        echo "<td class='datatd'><input type='text' name='email' value='" . $report["email"] . "' size='30'></td>\n";
+      echo "</td>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>Email signing (gpg)</td>\n";
+        echo "<td class='datatd'>\n";
+          echo printCheckBox("", "gpg_enabled", "Y", "$gpg") . "\n";
+#          echo "<input type='checkbox' name='gpg_enabled' value='Y' id='gpg_enabled' style='cursor:pointer;'" . $report["gpg_enabled"] . "><label for='gpg_enabled' style='cursor:pointer;'> Sign e-mail messages (gpg)</label><br />\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+
+
       if ($s_access_user > 1) {
         #### Access: Sensor ####
         echo "<tr class='datatr'>\n";
@@ -270,7 +283,6 @@ echo "<input type='hidden' name='submit' value='1'>\n";
 echo "<input type='submit' name='submitBtn' value='Update' class='button'>";
 echo "&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <i>Usage:</i> %date%, %day%, %time%, %hour%<br />\n";
 echo "<br /><br />\n";
-echo "</form>\n";
 
 # Reports
 echo "<b>Reports</b><br /><br />";
@@ -299,6 +311,7 @@ while ($report_content = pg_fetch_assoc($result_report_content)) {
 
 echo "</table>\n";
 echo "<a href='./report.php?action=add&userid=" . intval($_GET["userid"]) . "'>Add report</a>";
+echo "</form>\n";
 echo "</div>\n";
 
 echo "</div></td></tr></table>\n";

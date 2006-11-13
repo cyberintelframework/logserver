@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 1.04.02 Added extra check on severity in sql query when sev = 1
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.02 Fixed organisation bug
 # 1.03.01 Released as part of the 1.03 package
@@ -73,6 +74,7 @@ if ($err != 1) {
 
   if ($sev == 1) {
 
+    $where[] .= " attacks.severity = 1 ";
     $where[] .= " details.type = 1 ";
     add_db_table("sensors");
     add_db_table("details");
@@ -128,6 +130,7 @@ if ($err != 1) {
   ######### Table for Downloaded Malware (SEV: 32) #############
   
   elseif ($sev == 32) {
+    $where[] .= " attacks.severity = 32 ";
     $where[] = " details.type = 8 ";
     add_db_table("sensors");
     add_db_table("details");

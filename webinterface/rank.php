@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 13-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.02 Organisation name bugfix
 # 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Added some more checks and removed includes
@@ -152,7 +153,9 @@ $result_sensors = pg_query($pgconn, $sql_sensors);
 $row = pg_fetch_assoc($result_sensors);
 $total_sensors = $row['total'];
 
-$sql_getorg = "SELECT organisations.organisation FROM organisations, sensors WHERE sensors.organisation = organisations.id";
+echo "QORG: $q_org<br />\n";
+
+$sql_getorg = "SELECT organisations.organisation FROM organisations, sensors WHERE sensors.organisation = organisations.id AND organisations.id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $row = pg_fetch_assoc($result_getorg);
 $orgname = $row['organisation'];
