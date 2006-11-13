@@ -23,7 +23,7 @@ require "functions_log.pl";
 # Dependency checks
 ##########################
 
-$psqlcheck = `psql -V | head -n1 | awk '{print \$3}'`;
+$psqlcheck = `psql -V | head -n1 | awk '{print $3}'`;
 chomp($psqlcheck);
 if ($psqlcheck !~ /^8\.1.*$/) {
   printmsg("Checking for PostgreSQL 8.1:", "false");
