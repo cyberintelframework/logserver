@@ -3,14 +3,13 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
+# Version 1.03.02                  #
 # 06-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
-# 1.04.01 Code layout
 # 1.03.02 Added sorting option and links to mailadmin
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.05 Added some more input checks and removed includes
