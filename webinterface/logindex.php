@@ -171,11 +171,13 @@ echo "<table class='datatable'>\n";
 
   $result_severity = pg_query($pgconn, $sql_severity);
 
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_SEVERITY: $sql_severity<br />\n";
-    echo "</pre>\n";
-  }
+  debug("SQL_SEVERITY_TEST", $sql_severity);
+
+#  if ($debug == 1) {
+#    echo "<pre>";
+#    echo "SQL_SEVERITY: $sql_severity<br />\n";
+#    echo "</pre>\n";
+#  }
 
   while($row = pg_fetch_assoc($result_severity)) {
     $severity = $row['severity'];

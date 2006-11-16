@@ -237,6 +237,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           } elseif ($s_a_user > 0) {
             echo "<li><a href='${address}useredit.php'>User Admin</a></li>\n";
           }
+          if ($s_a_user > 0) {
+            echo "<li><a href='${address}mailadmin.php'>Mail Admin</a></li>\n";
+          }
           if ($s_admin == 1) {
             echo "<li><a href='${address}orgadmin.php'>Organisation Admin</a></li>\n";
           }

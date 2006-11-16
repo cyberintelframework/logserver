@@ -355,11 +355,11 @@ if (in_array($action, $allowed_action)) {
 				if (($step == 3) && ($step == $request_step)) {
 				# All clear, save data
 					// Get report_id:
-					$query = pg_query("SELECT id FROM report WHERE user_id = '$userid' LIMIT 1 OFFSET 0");
-					$report_id = intval(@pg_result($query, 0));
-					if ($report_id > 0) {
+//					$query = pg_query("SELECT id FROM report WHERE user_id = '$userid' LIMIT 1 OFFSET 0");
+//					$report_id = intval(@pg_result($query, 0));
+//					if ($report_id > 0) {
 						// Table report_content
-						$query = pg_query("INSERT INTO report_content (report_id, title, priority, sensor_id, interval, frequency, template, active) VALUES ('$report_id', '$title', '$priority', '$sensor_id', '$interval_db', '$frequency', '$template', 't')");
+						$query = pg_query("INSERT INTO report_content (user_id, title, priority, sensor_id, interval, frequency, template, active) VALUES ('$userid', '$title', '$priority', '$sensor_id', '$interval_db', '$frequency', '$template', 't')");
 						if (pg_affected_rows($query) == 1) {
 							$query = pg_query("SELECT currval('report_content_id_seq') AS last_insert_id FROM report_content");
 							$report_content_id = intval(@pg_result($query, 0));
@@ -369,7 +369,7 @@ if (in_array($action, $allowed_action)) {
 							}
 							echo "<p style='color:green;'>Data saved!</p>\n";
 						} else echo "<p style='color:red;'>Data couldn't be saved.</p>\n";
-					} else echo "<p style='color:red;'>No reference found for this user, does this user have a record in table 'report'?</p>\n";
+//					} else echo "<p style='color:red;'>No reference found for this user, does this user have a record in table 'report'?</p>\n";
 				}
 			}
 			

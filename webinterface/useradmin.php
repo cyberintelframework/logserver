@@ -18,7 +18,7 @@
 # 1.02.01 Initial release
 ####################################
 
-$s_org = $_SESSION['s_org'];
+$s_org = intval($_SESSION['s_org']);
 
 if (isset($_GET['m'])) {
   $m = intval($_GET['m']);

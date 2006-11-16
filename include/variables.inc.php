@@ -157,7 +157,8 @@ $maillog_ar = array (
 $mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
-		3 => "Threshold"
+		3 => "Threshold",
+		4 => "Sensor status"
 );
 
 # Array with the mailreporting priorities
@@ -199,7 +200,6 @@ $mail_frequency_ar = array(
 		3 => "Every week"
 );
 
-
 $errors = array (
 	1 => "Successfully added a new user!",
 	2 => "Successfully deleted the user!",
@@ -208,6 +208,10 @@ $errors = array (
 	5 => "Successfully deleted this identifier!",
 	6 => "Successfully added a new server!",
 	7 => "Successfully updated the sensor information",
+	8 => "Successfully saved mail settings!",
+	9 => "Disabled all reports!",
+	10 => "Enabled all reports!",
+	11 => "Reset all report timestamps!",
 	20 => "One of the password fields was empty!",
 	21 => "The passwords did not match!",
 	22 => "The username field was empty!",
@@ -230,6 +234,7 @@ $errors = array (
 	41 => "No severity was given!",
 	42 => "No attack ID given!",
 	43 => "Wrong username or password!",
+	44 => "Wrong action!",
 	90 => "Not enough rights to access this page!",
 	91 => "Admin rights are required to access this page!",
 	99 => "Unknown error!"

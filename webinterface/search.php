@@ -8,7 +8,7 @@
 ####################################
 
 #############################################
-# Changelog:			   	    
+# Changelog:
 # 1.04.01 Rereleased as 1.04.01
 # 1.02.08 Added Searchtemplates
 # 1.02.07 Added VLAN support 

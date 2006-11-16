@@ -2,7 +2,7 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS          	           #
-# Version 1.03.04                  #
+# Version 1.04.01                  #
 # 16-11-2006          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -10,6 +10,7 @@
 
 #########################################################################################
 # Changelog:
+# 1.04.01 Rereleased as 1.04.01
 # 1.03.04 Updated with sensor status report
 # 1.03.03 Fixed division by zero bug
 # 1.03.02 Fixed average attack calculation

@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.03
--- 25-10-2006
+-- Version 1.04.04
+-- 16-11-2006
 --
 
 -- Version history
+-- 1.04.04 Removed table report and modified login
 -- 1.04.03 Switched source and dest in the Nepenthes function surfnet_attack_by_id
 -- 1.04.02 Added Nepenthes log-surfnet pgsql functions
 -- 1.04.01 Removed the tbl_ references
@@ -100,10 +101,8 @@ CREATE TABLE "login" (
     username character varying NOT NULL,
     "password" character varying NOT NULL,
     email character varying,
+    gpg integer DEFAULT 0,
     maillog integer DEFAULT 0,
-    alltreshold integer DEFAULT 50,
-    owntreshold integer DEFAULT 10,
-    timeunit integer DEFAULT 0,
     lastlogin integer,
     organisation integer DEFAULT 0 NOT NULL,
     "access" character varying DEFAULT '000'::character varying NOT NULL,
@@ -120,15 +119,6 @@ CREATE TABLE organisations (
     id serial NOT NULL,
     organisation character varying NOT NULL,
     ranges text
-);
-
-CREATE TABLE report (
-    id serial NOT NULL,
-    user_id integer NOT NULL,
-    enabled boolean NOT NULL,
-    email character varying,
-    gpg_enabled boolean,
-    subject character varying
 );
 
 CREATE TABLE report_content (
@@ -281,9 +271,6 @@ ALTER TABLE ONLY org_id
 ALTER TABLE ONLY organisations
     ADD CONSTRAINT primary_organisations PRIMARY KEY (id);
 
-ALTER TABLE ONLY report
-    ADD CONSTRAINT primary_report PRIMARY KEY (id);
-
 ALTER TABLE ONLY report_content
     ADD CONSTRAINT primary_report_content PRIMARY KEY (id);
 
@@ -319,9 +306,6 @@ ALTER TABLE ONLY "system"
 
 ALTER TABLE ONLY org_id
     ADD CONSTRAINT unique_identifier UNIQUE (identifier);
-
-ALTER TABLE ONLY report
-    ADD CONSTRAINT unique_report_user_id UNIQUE (user_id);
 
 ALTER TABLE ONLY severity
     ADD CONSTRAINT unique_severity UNIQUE (val);
@@ -374,9 +358,6 @@ ALTER TABLE ONLY report_content
 
 ALTER TABLE ONLY report_template_threshold
     ADD CONSTRAINT foreign_report_template_threshold_report_content_id FOREIGN KEY (report_content_id) REFERENCES report_content(id);
-
-ALTER TABLE ONLY report
-    ADD CONSTRAINT foreign_report_user_id FOREIGN KEY (user_id) REFERENCES "login"(id);
 
 ALTER TABLE ONLY attacks
     ADD CONSTRAINT foreign_sensor FOREIGN KEY (sensorid) REFERENCES sensors(id);
@@ -450,8 +431,6 @@ GRANT SELECT,UPDATE ON TABLE org_id_id_seq TO ids;
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE organisations TO ids;
 
 GRANT SELECT,UPDATE ON TABLE organisations_id_seq TO ids;
-
-GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report TO ids;
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report_content TO ids;
 

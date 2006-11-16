@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 01-11-2006                       #
+# Version 1.04.05                  #
+# 14-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added debug function
 # 1.04.04 Changed the getStartWeek() function to correctly display the start of the week
 # 1.04.03 Added getPortDescr() function
 # 1.04.02 Added showSearchTemplates() function
@@ -21,6 +22,15 @@
 # 1.02.04 Modified prepare_sql_where function. Renamed to prepare_sql with a hook to prepare_sql_from()
 # 1.02.03 Initial release
 #############################################
+
+function debug($title, $query) {
+  global $debug;
+  if ($debug == 1) {
+    echo "<pre>";
+    echo "$title: $query\n";
+    echo "</pre>\n";
+  }
+}
 
 function showSearchTemplates($sql) {
   $query = pg_query($sql);
