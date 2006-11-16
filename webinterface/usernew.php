@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 10-10-2006                       #
+# Version 1.03.02                  #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 Added email and gpg input fields
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Added some more input checks and removed includes
 # 1.02.03 Removed old maillogging and email fields
@@ -74,6 +75,22 @@ if ($err == 0) {
           }
         echo "</td>\n";
       echo "</tr>\n";
+
+      # Email
+      echo "<tr>\n";
+        echo "<td class='datatd'>Email address</td>\n";
+        echo "<td class='datatd'>";
+          echo "<input type='text' name='f_email' value='" . $email . "' size='30'><br />";
+        echo "</td>\n";
+      echo "</td>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>Email signing</td>\n";
+        echo "<td class='datatd'>\n";
+          echo printRadio("Enable GPG signing", "f_gpg", 1, $gpg) . "<br />\n";
+          echo printRadio("Disable GPG signing", "f_gpg", 0, $gpg) . "<br />\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+
       #### Access: Sensor ####
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: Sensor</td>\n";
