@@ -10,6 +10,7 @@
 #############################################
 # Changelog:
 # 1.04.01 Fixed username check
+# 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.03 SQL injection fix
 # 1.02.02 Added some more input checks and removed includes
@@ -60,7 +61,7 @@ $f_org = intval($_POST['f_org']);
 $f_maillog = intval($_POST['f_maillog']);
 $f_email = stripinput(pg_escape_string($_POST['f_email']));
 $f_username = stripinput(trim(pg_escape_string($_POST['f_username'])));
-$f_gpg = $_POST['f_gpg'];
+$f_gpg = intval($_POST['f_gpg']);
 
 # Checking for access rights.
 if ($s_access_user == 0) {

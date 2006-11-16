@@ -3,7 +3,7 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
+# Version 1.04.01                  #
 # 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -11,8 +11,8 @@
 
 #############################################
 # Changelog:
-# 1.04.02 Added email and gpg input fields
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.02 Added email and gpg input fields
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Added some more input checks and removed includes
 # 1.02.03 Removed old maillogging and email fields

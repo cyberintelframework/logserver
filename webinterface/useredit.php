@@ -11,8 +11,8 @@
 
 #############################################
 # Changelog:
-# 1.04.02 Removed the mailreport part
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.07 Added some more input checks and removed includes
 # 1.02.06 Enhanced debugging
@@ -145,7 +145,6 @@ if ($err == 0) {
           echo printRadio("Disable GPG signing", "f_gpg", 0, $gpg) . "<br />\n";
         echo "</td>\n";
       echo "</tr>\n";
-
 
       if ($s_access_user > 1) {
         #### Access: Sensor ####
