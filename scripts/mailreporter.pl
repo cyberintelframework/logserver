@@ -11,6 +11,7 @@
 #########################################################################################
 # Changelog:
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.05 Fixed bug when email address was empty
 # 1.03.04 Updated with sensor status report
 # 1.03.03 Fixed division by zero bug
 # 1.03.02 Fixed average attack calculation
@@ -167,7 +168,7 @@ $sql_email = "SELECT login.email, login.organisation, report_content.id, report_
 $sql_email .= "report_content.sensor_id, report_content.frequency, report_content.last_sent, report_content.interval, report_content.priority, ";
 $sql_email .= "report_content.subject, login.gpg, report_content.title ";
 $sql_email .= "FROM login, report_content ";
-$sql_email .= "WHERE report_content.user_id = login.id AND report_content.active = TRUE";
+$sql_email .= "WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
 $email_query = $dbh->prepare($sql_email);
 $execute_result = $email_query->execute();
 while (@row = $email_query->fetchrow_array) {
@@ -236,6 +237,9 @@ while (@row = $email_query->fetchrow_array) {
 			if ($sensor > -1) { $sensor_where = " AND sensors.id = '$sensor'"; }
 			else { $sensor_where = ""; }
 			$mailfile = "/tmp/" .$id. ".mail";
+			if (-e "$mailfile") {
+				system "rm $mailfile";
+			}
 			
 			# Open a mail file
 			open(MAIL, ">> $mailfile");

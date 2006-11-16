@@ -2,15 +2,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.01 Code layout
+# 1.04.02 Removed report stuff
+# 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added some more input checks and login check
 # 1.02.02 Remove mailreporting records
@@ -62,25 +63,16 @@ if ($err == 0) {
   $userid = intval($_GET['userid']);
   # Mailreporting records
   // report_content_threshold
-  $sql = "SELECT *, report_content.id AS report_content_id FROM report, report_content WHERE report_content.report_id = report.id AND report.user_id = '$userid' AND report_content.template = 3";
+  $sql = "SELECT id FROM report_content WHERE report_content.user_id = '$userid' AND report_content.template = 3";
   $query = pg_query($pgconn, $sql);
   while ($row = pg_fetch_assoc($query)) {
-    $report_content_id = $row["report_content_id"];
+    $report_content_id = $row["id"];
     $sql_template = "DELETE FROM report_template_threshold WHERE report_content_id = '$report_content_id'";
     $query_template = pg_query($pgconn, $sql_template);
   }
 
   // report_content
-  $sql = "SELECT * FROM report WHERE user_id = '$userid'";
-  $query = pg_query($pgconn, $sql);
-  while ($row = pg_fetch_assoc($query)) {
-	$report_id = $row["id"];
-    $sql = "DELETE FROM report_content WHERE report_id = '$report_id'";
-    $query = pg_query($pgconn, $sql);
-  }
-
-  // report
-  $sql = "DELETE FROM report WHERE user_id = '$userid'";
+  $sql = "DELETE FROM report_content WHERE user_id = '$userid'";
   $query = pg_query($pgconn, $sql);
 
   // Login records
