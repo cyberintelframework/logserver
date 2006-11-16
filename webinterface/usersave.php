@@ -10,6 +10,7 @@
 #############################################
 # Changelog:
 # 1.04.01 Fixed username check
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.03 SQL injection fix
 # 1.02.02 Added some more input checks and removed includes
 # 1.02.01 Initial release

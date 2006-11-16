@@ -11,7 +11,9 @@
 
 #############################################
 # Changelog:
+# 1.04.02 Removed the mailreport part
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.07 Added some more input checks and removed includes
 # 1.02.06 Enhanced debugging
 # 1.02.05 Fixed a userid bug
@@ -203,119 +205,6 @@ if ($err == 0) {
     echo "</table>\n";
     echo "</form>\n";
 }
-
-echo "</td><td width=50>&nbsp;</td><td valign='top'><div style='position:relative;top:0px;'>\n";
-
-# Submit data
-if (isset($_GET["submit"])) {
-	$error = array();
-	if ($_GET["enabled"] == "Y") $update["enabled"] = 't';
-	else $update["enabled"] = 'f';
-	if ($_GET["gpg_enabled"] == "Y") $update["gpg_enabled"] = 't';
-	else $update["gpg_enabled"] = 'f';
-	if (validate_email($_GET["email"])) $update["email"] = stripinput(strip_tags(pg_escape_string($_GET["email"])));
-	else $error[] = "E-mail address";
-	$update["subject"] = strip_tags(pg_escape_string($_GET["subject"]));
-	if (empty($update["subject"])) $error[] = "Report subject";
-	
-	if (@count($error) > 0) {
-		// Errors detected
-		echo "<p style='color:red;'>An error occured, please complete the next fields:</p>\n";
-		echo "<ul>";
-		foreach ($error as $msg) echo "<li>$msg</li>\n";
-		echo "</ul>\n";
-	} else {
-		// All clear, go ahead
-		$query = pg_query("UPDATE report SET enabled = '" . $update["enabled"] . "', email = '" . $update["email"] . "', gpg_enabled = '" . $update["gpg_enabled"] . "', subject = '" . $update["subject"] . "' WHERE user_id = '$userid'");
-		if (pg_affected_rows($query) == 1) echo "<p style='color:green;'>Data succesfully saved.</p>\n";
-		else echo "<p style='color:red;'>Data <b>not</b> saved.</p>\n";
-	}
-}
-
-# Get userdata for mailreporting:
-$query = pg_query("SELECT * FROM report WHERE user_id = '$userid' LIMIT 1 OFFSET 0");
-$row = pg_fetch_assoc($query);
-if ($row === false) {
-	$query = pg_query("INSERT INTO report (user_id, enabled, email, gpg_enabled, subject) VALUES ('$userid', 'f', '', 't', 'SURFnet IDS stats for %date%')");
-	if (pg_affected_rows($query) <> 1) {
-		echo "Report data could't be created.";
-		footer;
-		exit;
-	} else {
-		$query = pg_query("SELECT * FROM report WHERE user_id = '$userid' LIMIT 1 OFFSET 0");
-		$row = pg_fetch_assoc($query);
-	}
-}
-$report_id = intval($row["id"]);
-if ($row["enabled"] == "t") {
-	// mailreporting ON:
-	$report["enabled"] = " checked";
-	$report["style_enabled"] = "";
-} else {
-	// mailreporting OFF:
-	$report["enabled"] = "";
-	$report["style_enabled"] = " style=\"display:none;\"";
-}
-$report["subject"] = $row["subject"];
-$report["email"] = $row["email"];
-if ($row["gpg_enabled"] == 't') $report["gpg_enabled"] = " checked";
-else $report["gpg_enabled"] = "";
-
-echo "<form method='get' action='useredit.php'>\n";
-echo "<input type='hidden' name='userid' value='$userid'>\n";
-echo "<input type='checkbox' name='enabled' value='Y' id='enabled' style='cursor:pointer;'" . $report["enabled"] . " onclick=\"if(this.checked) { document.getElementById('reports_enabled').style.display='';document.getElementById('reports_disabled').style.display='none'; } else { document.getElementById('reports_enabled').style.display='none';document.getElementById('reports_disabled').style.display=''; }\"><label for='enabled' style='cursor:pointer;' onclick=\"if(this.checked) { document.getElementById('reports_enabled').style.display='';document.getElementById('reports_disabled').style.display='none'; } else { document.getElementById('reports_enabled').style.display='none';document.getElementById('reports_disabled').style.display=''; }\"> Enable mailreporting</label><br /><br />\n";
-echo "<input type='submit' name='submitBtn' value='Update' class='button' id='reports_disabled' style='display:none;'>";
-echo "<div id='reports_enabled'" . $report["style_enabled"] . "'>\n";
-echo "<b>General data</b><br /><br />\n";
-echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
-echo " <tr class='datatr'>\n";
-echo "  <td class='datatd' colspan=2>\n";
-echo "   <input type='checkbox' name='gpg_enabled' value='Y' id='gpg_enabled' style='cursor:pointer;'" . $report["gpg_enabled"] . "><label for='gpg_enabled' style='cursor:pointer;'> Sign e-mail messages (gpg)</label><br />\n";
-echo "  </td>\n";
-echo " </tr>\n";
-echo " <tr class='datatr'>\n";
-echo "  <td class='datatd'>Send reports to: </td>\n";
-echo "  <td class='datatd'><input type='text' name='email' value='" . $report["email"] . "' style='width:200px;'> <i>(e-mail address)</i></td>\n";
-echo " </tr>\n";
-echo " <tr class='datatr'>\n";
-echo "  <td class='datatd'>Report subject: </td>\n";
-echo "  <td class='datatd'><input type='text' name='subject' value=\"" . $report["subject"] . "\" style='width:300px;'></td>\n";
-echo " </tr>\n";
-echo "</table>\n";
-echo "<input type='hidden' name='submit' value='1'>\n";
-echo "<input type='submit' name='submitBtn' value='Update' class='button'>";
-echo "&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <i>Usage:</i> %date%, %day%, %time%, %hour%<br />\n";
-echo "<br /><br />\n";
-
-# Reports
-echo "<b>Reports</b><br /><br />";
-echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable' width=500>\n";
-echo " <tr class='dataheader'>\n";
-echo "  <td class='datatd'>Title</td><td class='datatd'>Last sent</td><td class='datatd'>Template</td><td class='datatd'>Status</td>\n";
-echo " </tr>\n";
-
-# Get reports
-$sql = "SELECT * FROM report_content WHERE report_id = '$report_id' ORDER BY title";
-$result_report_content = pg_query($sql);
-while ($report_content = pg_fetch_assoc($result_report_content)) {
-	$report_content_id = $report_content["id"];
-	echo " <tr class='datatr'>\n";
-	echo "  <td class='datatd'><a href='./report.php?action=edit&userid=$userid&report_content_id=$report_content_id'>" . $report_content["title"] . "</a></td>\n";
-	if ($report_content["last_sent"] == null) $last_sent = "<i>never</i>";
-	else $last_sent = date("d-m-Y H:i", $report_content["last_sent"]);
-	echo "  <td class='datatd'>" . $last_sent . "</td>\n";
-	echo "  <td class='datatd'>" . $mail_template_ar[$report_content["template"]] . "</td>\n";
-	if ($report_content["active"] == "t") $status = "<font style='color:green;'>Active</font";
-	else $status = "<font style='color:red;'>Inactive</font>";
-	echo "  <td class='datatd'>" . $status . "</td>\n";
-	echo "  <td width=10>[<a href='./report.php?action=del&userid=$userid&report_content_id=$report_content_id'>X</a>]</td>\n";
-	echo " </tr>\n";
-}
-
-echo "</table>\n";
-echo "<a href='./report.php?action=add&userid=" . intval($_GET["userid"]) . "'>Add report</a>";
-echo "</form>\n";
-echo "</div>\n";
 
 echo "</div></td></tr></table>\n";
 

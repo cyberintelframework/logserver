@@ -2,26 +2,17 @@
 ####################################
 # SURFnet IDS                      #
 # Version 1.04.01                  #
-# 06-11-2006                       #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
-#########################################################################
+#############################################
 # Changelog:
-# 1.04.01 Added php closing tag
-# 1.02.13 Added No Data! picture
-# 1.02.12 Added intval() to $s_org and $s_admin
-# 1.02.11 input checks for $sev and $bin
-# 1.02.10 Added another intval()
-# 1.02.09 Fixed a $_GET vulnerability
-# 1.02.08 Fixed a bug with the destination address search
-# 1.02.07 Added debugging option
-# 1.02.06 Bugfix organisation_id in query string
-# 1.02.05 Added Classification and additional info to the IDMEF report
-# 1.02.04 Multiple sensor-select
-# 1.02.03 Query tuning
-#########################################################################
+# 1.04.01 Released as 1.04.01
+# 1.03.02 Added No Data! picture
+# 1.03.01 Query tuning
+#############################################
 
 session_start();
 if (intval(@strlen($_SESSION["s_user"])) == 0) {

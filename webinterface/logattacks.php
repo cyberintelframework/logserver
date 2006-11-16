@@ -13,18 +13,18 @@
 # Changelog:
 # 1.04.02 Added extra check on severity in sql query when sev = 1
 # 1.04.01 Rereleased as 1.04.01
-# 1.03.02 Fixed organisation bug
+# 1.03.02 Fixed an organisation bug when selecting ALL orgs and ALL logs
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.13 Added intval() to session variables
 # 1.02.12 Fixed typo in intval() function
 # 1.02.11 Added some more input checks and removed includes
 # 1.02.10 Fixed some organisation bugs
 # 1.02.09 Minor bugfixes and code cleaning
-# 1.02.08 Enhanced debugging			   	    
+# 1.02.08 Enhanced debugging
 # 1.02.07 Added debug option
 # 1.02.06 Fixed an organisation bug for normal users
 # 1.02.05 Fixed some organisation bugs
-# 1.02.04 Added number formatting           
+# 1.02.04 Added number formatting
 #############################################
 
 $s_org = intval($_SESSION['s_org']);

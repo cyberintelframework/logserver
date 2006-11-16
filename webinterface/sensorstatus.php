@@ -3,15 +3,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.01 Code layout
-# 1.02.10 Added VLAN support 
+# 1.04.02 Added VLAN support 
+# 1.04.01 Released as 1.04.01
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Added some more input checks and removed includes
 # 1.02.08 Enhanced debugging
 # 1.02.07 Change the way SSH remote control is handled

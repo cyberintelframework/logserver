@@ -10,6 +10,7 @@
 #############################################
 # Changelog:                              
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added some more input checks + login check
 # 1.02.02 Fixed a bug with the server resetting
 # 1.02.01 Initial release                   

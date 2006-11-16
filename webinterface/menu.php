@@ -1,22 +1,25 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 06-11-2006                       #
+# Version 1.04.04                  #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
-#########################################################################
+#############################################
 # Changelog:
-# 1.04.03 Code layout
-# 1.04.02 Added server info page
-# 1.04.01 Changed REQUEST_URI to SCRIPT_NAME for $url
-# 1.02.04 Added JavaScript functions submitSearchTemplate(), submitSearchTemplateFromResults(), URLDecode()
+# 1.04.04 Added server info page
+# 1.04.03 Changed REQUEST_URI to SCRIPT_NAME for $url
+# 1.04.02 Added JavaScript functions submitSearchTemplate(), submitSearchTemplateFromResults(), URLDecode()
+# 1.04.01 Released as 1.04.01
+# 1.03.02 Replaced REQUEST_URI with SCRIPT_NAME for $url
+# 1.03.01 Released as part of the 1.03 package
+# 1.02.04 Added pg_close to footer()
 # 1.02.03 Moved the include directory to the surfnetids root dir
 # 1.02.02 Changed the url redirection when $_GET['url'] is present + added intval() to session variables
 # 1.02.01 Initial release
-#########################################################################
+#############################################
 
 session_start();
 header("Cache-control: private");

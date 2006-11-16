@@ -4,20 +4,15 @@
 ####################################
 # SURFnet IDS                      #
 # Version 1.04.01                  #
-# 06-11-2006                       #
+# 16-11-2006                       #
 # Peter Arts                       #
+# Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.01 Code layout
-# 1.02.02 Removed includes
-# 1.02.01 Initial release
-#############################################
-
-#############################################
-# Todo:
-# Show current average by selecting average
+# 1.04.01 Released as 1.04.01
+# 1.03.01 Split up report.php into seperate files
 #############################################
 
 $s_org = intval($_SESSION['s_org']);

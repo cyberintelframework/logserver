@@ -12,6 +12,7 @@
 #############################################
 # Changelog:
 # 1.04.01 Code layout
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.11 Added intval() for session variables
 # 1.02.10 Added some more input checks and removed includes
 # 1.02.09 Fixed a bug with the search querystring and the period

@@ -10,6 +10,7 @@
 #########################################################################
 # Changelog:
 # 1.04.01 Released as 1.04.01
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.08 $numrows_user == 1, intval() to $id and $db_org
 # 1.02.07 Changed the url redirection when $_GET['url'] is present
 # 1.02.06 Changed the location of the pg_close command

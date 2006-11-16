@@ -10,6 +10,7 @@
 #############################################
 # Changelog:
 # 1.04.01 Added pg_close
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added setcookie, and session sql query
 # 1.02.02 added session_unset() and session_destroy()
 # 1.02.01 Initial release

@@ -10,6 +10,7 @@
 ####################################
 # Changelog:
 # 1.04.01 Added pg_close when not logged in
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added intval() to session variables + $s_admin check
 # 1.02.02 Added some more input checks
 # 1.02.01 Initial release

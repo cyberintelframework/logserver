@@ -3,13 +3,14 @@
 ####################################
 # SURFnet IDS                      #
 # Version 1.04.01                  #
-# 06-11-2006                       #
-# Peter Arts                       #
+# 16-11-2006                       #
+# Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.01 Initial release
+# 1.04.01 Released as 1.04.01
+# 1.03.01 Initial release
 #############################################
 
 include '../include/config.inc.php';

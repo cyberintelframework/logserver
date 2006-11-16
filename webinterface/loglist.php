@@ -12,6 +12,7 @@
 #############################################
 # Changelog:
 # 1.04.01 Code layout
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.05 Added intval() to session variables + modified daily table header
 # 1.02.04 Added some more input checks and removed includes
 # 1.02.03 Enhanced debugging

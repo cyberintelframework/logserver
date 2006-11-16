@@ -12,6 +12,7 @@
 #############################################
 # Changelog:
 # 1.04.01 Code layout
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.08 Added intval() to session variables + pattern matching on $b + intval() for $month and $day
 # 1.02.07 Added some more input checks and removed includes
 # 1.02.06 Removed intval from date browsing

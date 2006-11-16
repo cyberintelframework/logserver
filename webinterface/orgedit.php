@@ -11,6 +11,7 @@
 ####################################
 # Changelog:
 # 1.04.01 Code layout & error message handling
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Added intval() to session variables + pg_close
 # 1.02.05 Added some more input checks and removed includes
 # 1.02.04 Enhanced debugging

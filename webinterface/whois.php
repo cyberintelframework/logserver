@@ -11,6 +11,7 @@
 #############################################
 # Changelog:
 # 1.04.01 pg_close added
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.02 Added exit after failed preg_match
 # 1.02.01 Initial release
 #############################################

@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 13-11-2006                       #
+# Version 1.04.01                  #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,8 +12,8 @@
 
 ####################################
 # Changelog:
-# 1.04.02 Organisation name bugfix
 # 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
+# 1.03.02 Organisation name bugfix
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Added some more checks and removed includes
 # 1.02.05 Removed the intval from date browsing

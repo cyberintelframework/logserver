@@ -2,20 +2,22 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.03                  #
+# 16-11-2006                       #
 # Peter Arts                       #
+# Modified by Jan van Lith         #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Added Searchtemplates
+# 1.04.02 Added VLAN support 
 # 1.04.01 Rereleased as 1.04.01
-# 1.02.08 Added Searchtemplates
-# 1.02.07 Added VLAN support 
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Removed includes
-# 1.02.05 Added search templates            
-# 1.02.04 Added multiple sensor select      
-# 1.02.03 Added IDMEF to the report types   
+# 1.02.05 Added search templates
+# 1.02.04 Added multiple sensor select
+# 1.02.03 Added IDMEF to the report types
 #############################################
 
 if (isset($_SESSION['s_total_search_records'])) {
