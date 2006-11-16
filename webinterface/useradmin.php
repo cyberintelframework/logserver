@@ -11,6 +11,8 @@
 ####################################
 # Changelog:
 # 1.04.01 Code layout
+# 1.03.02 Added sorting option and links to mailadmin
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.05 Added some more input checks and removed includes
 # 1.02.04 Enhanced debugging
 # 1.02.03 Added admin_header
@@ -44,10 +46,12 @@ if (isset($_GET['sort'])) {
     $direction = "DESC";
   }
   if ($type == "u") {
-    $sqlsort = "ORDER BY lastlogin $direction";
+    $sqlsort = "ORDER BY username $direction";
   } elseif ($type == "l") {
     $sqlsort = "ORDER BY lastlogin $direction";
   }
+} else {
+  $neworder = "d";
 }
 
 if ($s_access_user > 1) {
