@@ -81,6 +81,7 @@ if ($err == 0) {
   $email = $row['email'];
   $maillog = $row['maillog'];
   $access = $row['access'];
+  $gpg = $row['gpg'];
   $access_sensor = $access{0};
   $access_search = $access{1};
   $access_user = $access{2};
@@ -131,13 +132,15 @@ if ($err == 0) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>Email address</td>\n";
-        echo "<td class='datatd'><input type='text' name='email' value='" . $report["email"] . "' size='30'></td>\n";
+        echo "<td class='datatd'>";
+          echo "<input type='text' name='f_email' value='" . $email . "' size='30'><br />";
+        echo "</td>\n";
       echo "</td>\n";
       echo "<tr>\n";
-        echo "<td class='datatd'>Email signing (gpg)</td>\n";
+        echo "<td class='datatd'>Email signing</td>\n";
         echo "<td class='datatd'>\n";
-          echo printCheckBox("", "gpg_enabled", "Y", "$gpg") . "\n";
-#          echo "<input type='checkbox' name='gpg_enabled' value='Y' id='gpg_enabled' style='cursor:pointer;'" . $report["gpg_enabled"] . "><label for='gpg_enabled' style='cursor:pointer;'> Sign e-mail messages (gpg)</label><br />\n";
+          echo printRadio("Enable GPG signing", "f_gpg", 1, $gpg) . "<br />\n";
+          echo printRadio("Disable GPG signing", "f_gpg", 0, $gpg) . "<br />\n";
         echo "</td>\n";
       echo "</tr>\n";
 
@@ -258,7 +261,7 @@ $report["email"] = $row["email"];
 if ($row["gpg_enabled"] == 't') $report["gpg_enabled"] = " checked";
 else $report["gpg_enabled"] = "";
 
-echo "<form method='get' action'useredit.php'>\n";
+echo "<form method='get' action='useredit.php'>\n";
 echo "<input type='hidden' name='userid' value='$userid'>\n";
 echo "<input type='checkbox' name='enabled' value='Y' id='enabled' style='cursor:pointer;'" . $report["enabled"] . " onclick=\"if(this.checked) { document.getElementById('reports_enabled').style.display='';document.getElementById('reports_disabled').style.display='none'; } else { document.getElementById('reports_enabled').style.display='none';document.getElementById('reports_disabled').style.display=''; }\"><label for='enabled' style='cursor:pointer;' onclick=\"if(this.checked) { document.getElementById('reports_enabled').style.display='';document.getElementById('reports_disabled').style.display='none'; } else { document.getElementById('reports_enabled').style.display='none';document.getElementById('reports_disabled').style.display=''; }\"> Enable mailreporting</label><br /><br />\n";
 echo "<input type='submit' name='submitBtn' value='Update' class='button' id='reports_disabled' style='display:none;'>";

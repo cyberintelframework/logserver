@@ -59,6 +59,7 @@ $f_org = intval($_POST['f_org']);
 $f_maillog = intval($_POST['f_maillog']);
 $f_email = stripinput(pg_escape_string($_POST['f_email']));
 $f_username = stripinput(trim(pg_escape_string($_POST['f_username'])));
+$f_gpg = $_POST['f_gpg'];
 
 # Checking for access rights.
 if ($s_access_user == 0) {
@@ -103,18 +104,19 @@ if ($err != 1) {
   }
   if ($s_access_user < 2) {
     $m = 3;
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email'$passwordstring WHERE id = $f_userid";
+    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring WHERE id = $f_userid";
   } elseif ($s_access_user < 9) {
     $m = 3;
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email'$passwordstring, access = '$access' WHERE id = $f_userid";
+    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring, access = '$access' WHERE id = $f_userid";
   } elseif ($s_access_user == 9) {
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email'$passwordstring, access = '$access', organisation = '$f_org' WHERE id = $f_userid";
+    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring, access = '$access', organisation = '$f_org' WHERE id = $f_userid";
     $m = 3;
   } else {
     $m = 99;
   }
   $execute_save = pg_query($pgconn, $sql_save);
 }
+
 pg_close($pgconn);
 header("location: useradmin.php?m=$m");
 ?>
