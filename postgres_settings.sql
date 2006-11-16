@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL settings
--- Version: 1.03.02
--- 30-10-2006
+-- Version: 1.03.03
+-- 16-11-2006
 
 -- Changelog
+-- 1.03.03 Removed table report and changed login
 -- 1.03.02 Removed the timeunit from table login
 -- 1.03.01 Initial release
 
@@ -46,6 +47,7 @@ CREATE TABLE "login" (
     username character varying NOT NULL,
     "password" character varying NOT NULL,
     email character varying,
+    gpg integer DEFAULT 0,
     lastlogin integer,
     organisation integer DEFAULT 0 NOT NULL,
     "access" character varying DEFAULT '000'::character varying NOT NULL,
@@ -62,15 +64,6 @@ CREATE TABLE organisations (
     id serial NOT NULL,
     organisation character varying NOT NULL,
     ranges text
-);
-
-CREATE TABLE report (
-    id serial NOT NULL,
-    user_id integer NOT NULL,
-    enabled boolean NOT NULL,
-    email character varying,
-    gpg_enabled boolean,
-    subject character varying
 );
 
 CREATE TABLE report_content (
@@ -223,9 +216,6 @@ ALTER TABLE ONLY org_id
 ALTER TABLE ONLY organisations
     ADD CONSTRAINT primary_organisations PRIMARY KEY (id);
 
-ALTER TABLE ONLY report
-    ADD CONSTRAINT primary_report PRIMARY KEY (id);
-
 ALTER TABLE ONLY report_content
     ADD CONSTRAINT primary_report_content PRIMARY KEY (id);
 
@@ -265,9 +255,6 @@ ALTER TABLE ONLY "system"
 ALTER TABLE ONLY org_id
     ADD CONSTRAINT unique_identifier UNIQUE (identifier);
 
-ALTER TABLE ONLY report
-    ADD CONSTRAINT unique_report_user_id UNIQUE (user_id);
-
 ALTER TABLE ONLY severity
     ADD CONSTRAINT unique_severity UNIQUE (val);
 
@@ -304,9 +291,6 @@ ALTER TABLE ONLY report_content
 
 ALTER TABLE ONLY report_template_threshold
     ADD CONSTRAINT foreign_report_template_threshold_report_content_id FOREIGN KEY (report_content_id) REFERENCES report_content(id);
-
-ALTER TABLE ONLY report
-    ADD CONSTRAINT foreign_report_user_id FOREIGN KEY (user_id) REFERENCES "login"(id);
 
 ALTER TABLE ONLY attacks
     ADD CONSTRAINT foreign_sensor FOREIGN KEY (sensorid) REFERENCES sensors(id);
@@ -357,9 +341,6 @@ GRANT SELECT,UPDATE ON TABLE org_id_id_seq TO idslog;
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE organisations TO idslog;
 GRANT SELECT,UPDATE ON TABLE organisations_id_seq TO idslog;
-
-GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report TO idslog;
-GRANT SELECT,UPDATE ON TABLE report_id_seq TO idslog;
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report_content TO idslog;
 GRANT SELECT,UPDATE ON TABLE report_content_id_seq TO idslog;
