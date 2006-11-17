@@ -1,15 +1,17 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.02.02                  #
-# 23-05-2006                       #
+# Version 1.03.02                  #
+# 17-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
-# Changelog:			   	                #
-# 1.02.02 Added new mailreporting arrays    #
+# Changelog:
+# 1.03.02 Added sensor status to mail report templates
+# 1.03.01 Released as part of the 1.03 package
+# 1.02.02 Added new mailreporting arrays
 #############################################
 
 # The array with dialogue name, exploit name and additional info. Desc is not used at the moment.
@@ -156,7 +158,8 @@ $maillog_ar = array (
 $mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
-		3 => "Threshold"
+		3 => "Threshold",
+                4 => "Sensor status"
 );
 
 # Array with the mailreporting priorities
