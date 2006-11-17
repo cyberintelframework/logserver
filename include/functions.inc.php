@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.02                  #
-# 01-11-2006                       #
+# Version 1.03.03                  #
+# 17-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.03 Added debug function
 # 1.03.02 Changed getStartWeek() to correctly display the start of the week
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Added genpass and stripinput function
@@ -19,6 +20,15 @@
 # 1.02.04 Modified prepare_sql_where function. Renamed to prepare_sql with a hook to prepare_sql_from()
 # 1.02.03 Initial release
 #############################################
+
+function debug($title, $query) {
+  global $debug;
+  if ($debug == 1) {
+    echo "<pre>";
+    echo "$title: $query\n";
+    echo "</pre>\n";
+  }
+}
 
 function cleansql($s_sql) {
   $pattern_ar = array("UNION", "JOIN", "INNER", "OUTER", "INSERT", "DELETE", "UPDATE", "INTO", "login");
