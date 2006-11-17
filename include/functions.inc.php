@@ -1,19 +1,20 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 14-11-2006                       #
+# Version 1.04.03                  #
+# 17-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.05 Added debug function
-# 1.04.04 Changed the getStartWeek() function to correctly display the start of the week
 # 1.04.03 Added getPortDescr() function
 # 1.04.02 Added showSearchTemplates() function
 # 1.04.01 Added cleansql() function
+# 1.03.03 Added debug function
+# 1.03.02 Changed getStartWeek() to correctly display the start of the week
+# 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Added genpass and stripinput function
 # 1.02.08 Removed admin_header function and fixed prepare_sql bug
 # 1.02.07 Fixed a bug with empty $db_table when preparing the sql

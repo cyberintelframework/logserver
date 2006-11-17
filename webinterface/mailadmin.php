@@ -4,13 +4,14 @@
 ####################################
 # SURFnet IDS                      #
 # Version 1.04.01                  #
-# 13-11-2006                       #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
-# 1.04.01 Initial release
+# 1.04.01 Released as 1.04.01
+# 1.03.01 Initial release
 ####################################
 
 $s_org = intval($_SESSION['s_org']);
