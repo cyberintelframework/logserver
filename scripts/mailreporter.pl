@@ -3,7 +3,7 @@
 # Mail reporter                    #
 # SURFnet IDS          	           #
 # Version 1.04.01                  #
-# 16-11-2006          	           #
+# 20-11-2006          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
@@ -11,6 +11,7 @@
 #########################################################################################
 # Changelog:
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.06 Fixed a send bug with template 4
 # 1.03.05 Fixed bug when email address was empty
 # 1.03.04 Updated with sensor status report
 # 1.03.03 Fixed division by zero bug
@@ -486,6 +487,7 @@ while (@row = $email_query->fetchrow_array) {
 						system "rm $mailfile";
 					}
 			} elsif ($template == 4) {
+				$send = 0;
                                 print MAIL "Sensor status overview for " .getdatetime($ts_now) . "\n";
                                 print MAIL "\n";
 
