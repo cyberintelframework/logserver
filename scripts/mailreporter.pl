@@ -486,6 +486,7 @@ while (@row = $email_query->fetchrow_array) {
 						system "rm $mailfile";
 					}
 			} elsif ($template == 4) {
+				$send = 0;
                                 print MAIL "Sensor status overview for " .getdatetime($ts_now) . "\n";
                                 print MAIL "\n";
 
