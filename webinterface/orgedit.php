@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 20-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.02 Added identifier type
 # 1.04.01 Code layout & error message handling
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Added intval() to session variables + pg_close
@@ -80,29 +81,44 @@ if ($err != 1) {
     $sql_orgids = "SELECT * FROM org_id WHERE orgid = " .$orgid;
     $result_orgids = pg_query($pgconn, $sql_orgids);
     
+    echo "<a href='orgsave.php?type=md5&orgid=$orgid'>Generate Random Identifier String</a><br />\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='dataheader' width='100'>ID</td>\n";
         echo "<td class='dataheader' width='250'>Identifier</td>\n";
+        echo "<td class='dataheader' width='150'>Type</td>\n";
         echo "<td class='dataheader' width='50'>Action</td>\n";
       echo "</tr>\n";
 
       while ($row = pg_fetch_assoc($result_orgids)) {
         $id = $row['id'];
+        $type = $row['type'];
         $identifier = $row['identifier'];
 
         echo "<tr class='datatr'>\n";
           echo "<td class='datatd'>$id</td>\n";
           echo "<td class='datatd'>$identifier</td>\n";
+          echo "<td class='datatd'>$org_ident_type_ar[$type]</td>\n";
           echo "<td class='datatd'><a href='orgdel.php?orgid=$orgid&ident=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
         echo "</tr>\n";
       }
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>#</td>\n";
-        echo "<td class='datatd' colspan='2'><input type='text' name='f_org_ident' style='width: 99%;' /></td>\n";
+        echo "<td class='datatd' colspan='1'><input type='text' name='f_org_ident' style='width: 99%;' /></td>\n";
+        echo "<td class='datatd' colspan='2'>\n";
+          echo "<select name='f_type' style='width: 99%;'>";
+            echo printOption(0, "Select a type...", 0);
+            foreach ($org_ident_type_ar as $key => $val) {
+              if ($key != 1) {
+                echo printOption($key, $val, 0);
+              }
+            }
+          echo "</select>\n";
+        echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td class='datatd' colspan='3' align='right'><input type='submit' name='submit_org' value='Save' class='button' /></td>\n";
+        echo "<td class='datatd' colspan='4' align='right'>";
+          echo "<input type='submit' name='submit_org' value='Save' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";

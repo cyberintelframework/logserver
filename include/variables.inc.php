@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 17-11-2006                       #
+# Version 1.04.02                  #
+# 20-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added org_ident_type_ar
 # 1.04.01 Released as 1.04.01
 # 1.03.02 Added sensor status to mail report templates
 # 1.03.01 Released as part of the 1.03 package
@@ -203,6 +204,14 @@ $mail_frequency_ar = array(
 		3 => "Every week"
 );
 
+# Array with the organisation identifier types
+$org_ident_type_ar = array(
+		1 => "Random Identifier String",
+		2 => "WHOIS netname",
+		3 => "Domain name",
+		4 => "SURFnet SOAP"
+);
+
 $errors = array (
 	1 => "Successfully added a new user!",
 	2 => "Successfully deleted the user!",
@@ -238,6 +247,8 @@ $errors = array (
 	42 => "No attack ID given!",
 	43 => "Wrong username or password!",
 	44 => "Wrong action!",
+	45 => "Identifier type was not set!",
+	46 => "Identifier name was not set!",
 	90 => "Not enough rights to access this page!",
 	91 => "Admin rights are required to access this page!",
 	99 => "Unknown error!"

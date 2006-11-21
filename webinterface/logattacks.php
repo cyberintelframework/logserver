@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 21-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
@@ -13,6 +13,7 @@
 # Changelog:
 # 1.04.02 Added extra check on severity in sql query when sev = 1
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.03 Fixed a bug with 0 BD and AVG scans
 # 1.03.02 Fixed an organisation bug when selecting ALL orgs and ALL logs
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.13 Added intval() to session variables
@@ -269,13 +270,13 @@ if ($err != 1) {
             $clamav_perc = floor($clamav_found / $clamav_total * 100);
             echo "<td class='dataheader'>$clamav_found / $clamav_total = $clamav_perc %</td>\n";
           }
-          if ($clamav_total == 0) {
+          if ($bdc_total == 0) {
             echo "<td class='dataheader'>0 scanned</td>\n";
           } else {
             $bdc_perc = floor($bdc_found / $bdc_total * 100);
             echo "<td class='dataheader'>$bdc_found / $bdc_total = $bdc_perc %</td>\n";
           }
-          if ($clamav_total == 0) {
+          if ($antivir_total == 0) {
             echo "<td class='dataheader'>0 scanned</td>\n";
           } else {
             $antivir_perc = floor($antivir_found / $antivir_total * 100);

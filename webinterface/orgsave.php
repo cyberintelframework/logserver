@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 20-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added identifier type
 # 1.04.01 pg_close() when not logged in
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added some more input checks
@@ -38,7 +39,7 @@ $err = 0;
 
 # Get the type of update
 $type = $_GET['type'];
-$pattern = '/^(org|ident)$/';
+$pattern = '/^(org|ident|md5)$/';
 if (!preg_match($pattern, $type)) {
   $err = 1;
   $m = 84;
@@ -53,22 +54,43 @@ if ($type == "ident") {
   $orgid = intval($_POST['f_orgid']);
   $org = trim(pg_escape_string(stripinput($_POST['f_org'])));
   $ranges = stripinput($_POST['f_ranges']);
+  $ftype = intval($_POST['f_type']);
+  $ident = pg_escape_string($_POST['f_org_ident']);
 
   if (empty($orgid)) {
     $err = 1;
-    $m = 82;
+    $m = 36;
   }
 
   if (empty($org)) {
     $err = 1;
-    $m = 83;
+    $m = 38;
+  }
+
+  if ($ftype == 0) {
+    $err = 1;
+    $m = 45;
+  }
+
+  if (empty($ident)) {
+    $err = 1;
+    $m = 46;
   }
 } elseif ($type == "org") {
   if (!empty($_POST['orgname'])) {
     $orgname = pg_escape_string($_POST['orgname']);
   } else {
     $err = 1;
-    $m = 92;
+    $m = 38;
+  }
+} elseif ($type == "md5") {
+  if (isset($_GET['orgid'])) {
+    $orgid = intval($_GET['orgid']);
+    $ident = genpass(16);
+    $ftype = 1;
+  } else {
+    $err = 1;
+    $m = 36;
   }
 }
 
@@ -80,15 +102,17 @@ if ($err != 1) {
     $execute = pg_query($pgconn, $sql);
 
     if (!empty($_POST['f_org_ident'])) {
-      $ident = pg_escape_string($_POST['f_org_ident']);
-      $sql = "INSERT INTO org_id (identifier, orgid) VALUES ('$ident', $orgid)";
+      $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $ftype)";
       $execute = pg_query($pgconn, $sql);
     }
   } elseif ($type == "org") {
     $sql = "INSERT INTO organisations (organisation) VALUES ('$orgname')";
     $execute = pg_query($pgconn, $sql);
+  } elseif ($type == "md5") {
+    $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $ftype)";
+    $execute = pg_query($pgconn, $sql);
   }
-  $m = 12;
+  $m = 4;
 }
 pg_close($pgconn);
 if ($type == "org") {

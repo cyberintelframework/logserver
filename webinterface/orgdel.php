@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 20-11-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.02 Modified error messages
 # 1.04.01 Added pg_close when not logged in
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added intval() to session variables + $s_admin check
@@ -36,17 +37,17 @@ $err = 0;
 
 if ($s_admin != 1) {
   $err = 1;
-  $m = 90;
+  $m = 91;
 }
 
 if (!isset($_GET['orgid'])) {
   $err = 1;
-  $m = 91;
+  $m = 36;
 }
 
 if (!isset($_GET['ident'])) {
   $err = 1;
-  $m = 92;
+  $m = 46;
 }
 
 if ($err == 0) {
@@ -59,9 +60,9 @@ if ($err == 0) {
   if ($numrows_check != 0) {
     $sql_del = "DELETE FROM org_id WHERE id = $ident AND orgid = $orgid";
     $execute = pg_query($pgconn, $sql_del);
-    $m = 11;
+    $m = 5;
   } else {
-    $m = 93;
+    $m = 35;
   }
 }
 pg_close($pgconn);
