@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.02                  #
-# 01-11-2006                       #
+# Version 1.03.03                  #
+# 17-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.03 Added mailadmin link
 # 1.03.02 Replaced REQUEST_URI with SCRIPT_NAME for $url
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Added pg_close to footer()
@@ -168,6 +169,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
             echo "<li><a href='${address}useradmin.php'>User Admin</a></li>\n";
           } elseif ($s_a_user > 0) {
             echo "<li><a href='${address}useredit.php'>User Admin</a></li>\n";
+          }
+          if ($s_a_user > 0) {
+            echo "<li><a href='${address}mailadmin.php'>Mail Admin</a></li>\n";
           }
           if ($s_admin == 1) {
             echo "<li><a href='${address}orgadmin.php'>Organisation Admin</a></li>\n";

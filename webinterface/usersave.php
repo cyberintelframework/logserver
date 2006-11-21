@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 10-10-2006                       #
+# Version 1.03.02                  #
+# 16-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.03 SQL injection fix
 # 1.02.02 Added some more input checks and removed includes
@@ -58,6 +59,7 @@ $f_org = intval($_POST['f_org']);
 $f_maillog = intval($_POST['f_maillog']);
 $f_email = stripinput(pg_escape_string($_POST['f_email']));
 $f_username = stripinput(trim(pg_escape_string($_POST['f_username'])));
+$f_gpg = intval($_POST['f_gpg']);
 
 # Checking for access rights.
 if ($s_access_user == 0) {
@@ -102,12 +104,12 @@ if ($err != 1) {
   }
   if ($s_access_user < 2) {
     $m = 3;
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email'$passwordstring WHERE id = $f_userid";
+    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring WHERE id = $f_userid";
   } elseif ($s_access_user < 9) {
     $m = 3;
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email'$passwordstring, access = '$access' WHERE id = $f_userid AND organisation = '$f_org'";
+    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring, access = '$access' WHERE id = $f_userid AND organisation = '$f_org'";
   } elseif ($s_access_user == 9) {
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email'$passwordstring, access = '$access', organisation = '$f_org' WHERE id = $f_userid";
+    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring, access = '$access', organisation = '$f_org' WHERE id = $f_userid";
     $m = 3;
   } else {
     $m = 99;

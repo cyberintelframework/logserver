@@ -2,14 +2,18 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS          	           #
-# Version 1.03.02                  #
-# 10-11-2006          	           #
+# Version 1.03.06                  #
+# 20-11-2006          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.03.06 Fixed a send bug with template 4
+# 1.03.05 Fixed a bug when email address was empty
+# 1.03.04 Updated with sensor status report
+# 1.03.03 Fixed division by zero bug
 # 1.03.02 Fixed average attack calculation
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.09 Bugfixes
@@ -148,12 +152,23 @@ $hour = (60 * $minute);
 $day = (24 * $hour);
 $week = (7 * $day);
 
+# Get the organisation id for organisation ADMIN
+$sql_aid = "SELECT id FROM organisations WHERE organisation = 'ADMIN'";
+$aid_query = $dbh->prepare($sql_aid);
+$er_aid = $aid_query->execute();
+@row_aid = $aid_query->fetchrow_array;
+$aid = $row_aid[0];
+
+if ("$aid" eq "") {
+  $aid = 0;
+}
+
 # Get organisation and email of all users with mailreporting enabled and status active
-$sql_email = "SELECT report.email, login.organisation, report_content.id, report_content.template, ";
+$sql_email = "SELECT login.email, login.organisation, report_content.id, report_content.template, ";
 $sql_email .= "report_content.sensor_id, report_content.frequency, report_content.last_sent, report_content.interval, report_content.priority, ";
-$sql_email .= "report.subject, report.gpg_enabled, report_content.title ";
-$sql_email .= "FROM report, login, report_content ";
-$sql_email .= "WHERE report.user_id = login.id AND report.enabled = TRUE AND report.id = report_content.report_id AND report_content.active = TRUE";
+$sql_email .= "report_content.subject, login.gpg, report_content.title ";
+$sql_email .= "FROM login, report_content ";
+$sql_email .= "WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
 $email_query = $dbh->prepare($sql_email);
 $execute_result = $email_query->execute();
 while (@row = $email_query->fetchrow_array) {
@@ -222,6 +237,9 @@ while (@row = $email_query->fetchrow_array) {
 			if ($sensor > -1) { $sensor_where = " AND sensors.id = '$sensor'"; }
 			else { $sensor_where = ""; }
 			$mailfile = "/tmp/" .$id. ".mail";
+                        if (-e "$mailfile") {
+                                system "rm $mailfile";
+                        }
 			
 			# Open a mail file
 			open(MAIL, ">> $mailfile");
@@ -237,9 +255,15 @@ while (@row = $email_query->fetchrow_array) {
 				
 				print MAIL "Results from " . getdatetime($ts_start) . " till " . getdatetime($ts_end) . "\n";
 				print MAIL "\n";
-				
+
+                                if ($aid == $org) {
+                                  $andorg = "";
+                                } else {
+                                  $andorg = "AND sensors.organisation = '$org'";
+                                }
+
 				# Get total of attacks and downloads and print to the mail
-				$sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total FROM attacks, sensors, severity WHERE attacks.severity = severity.val AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id AND sensors.organisation = '$org' $sensor_where GROUP BY severity.txt, severity.val ORDER BY severity.val";
+				$sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total FROM attacks, sensors, severity WHERE attacks.severity = severity.val AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id $andorg $sensor_where GROUP BY severity.txt, severity.val ORDER BY severity.val";
 				$overview_query = $dbh->prepare($sql);
 				$execute_result = $overview_query->execute();
 				$malattacks = $overview_query->rows;
@@ -360,13 +384,18 @@ while (@row = $email_query->fetchrow_array) {
 						$value = $db_value;
 					} else {
 						# Calculate the timespan for the average
+						if ($aid == $org) {
+							$andorg = "";
+						} else {
+							$andorg = "AND sensors.organisation = '$org'";
+						}
 						$sql = "SELECT (sum(uptime + up)) as total_uptime ";
 						$sql .= "FROM sensors, ";
 						# Start subquery
-						$sql .= "(SELECT sum(floor(extract(epoch from now()) -laststart)) as up ";
-						$sql .= " FROM sensors WHERE status = 1 AND sensors.organisation = '$org' $sensor_where) as current ";
+						$sql .= "(SELECT sum(floor(extract(epoch from now()) - laststart)) as up ";
+						$sql .= " FROM sensors WHERE status = 1 $andorg $sensor_where) as current ";
 						# End subquery
-						$sql .= "WHERE sensors.organisation = '$org' $sensor_where ";
+						$sql .= "WHERE sensors.id = sensors.id $andorg $sensor_where ";
 						$first_query = $dbh->prepare($sql);
 						$er = $first_query->execute();
 						@first_result = $first_query->fetchrow_array;
@@ -375,19 +404,25 @@ while (@row = $email_query->fetchrow_array) {
 						# Get the total amount of attacks
 						$sql = "SELECT COUNT(attacks.id) as total FROM attacks, sensors ";
 						$sql .= "WHERE severity = $target AND sensors.id = attacks.sensorid ";
-						$sql .= "AND sensors.organisation = '$org' $sensors_where";
+						$sql .= "$andorg $sensors_where";
 						$total_query = $dbh->prepare($sql);
 						$er = $total_query->execute();
 						@total_result = $total_query->fetchrow_array;
 						$total = $total_result[0];
 
 						# Calculate the average number of attacks per hour
-						$uptime_hours = floor($uptime / 60);
-						$uptime_days = floor($uptime / 60 / 24);
-						$uptime_weeks = floor($uptime / 60 / 24 / 7);
-						$average_hours = floor($total / $uptime_hours);
-						$average_days = floor($total / $uptime_days);
-						$average_weeks = floor($total / $uptime_weeks);
+						if ($uptime != 0) {
+							$uptime_hours = floor($uptime / 60);
+							$uptime_days = floor($uptime / 60 / 24);
+							$uptime_weeks = floor($uptime / 60 / 24 / 7);
+							$average_hours = floor($total / $uptime_hours);
+							$average_days = floor($total / $uptime_days);
+							$average_weeks = floor($total / $uptime_weeks);
+						} else {
+							$average_hours = 0;
+							$average_days = 0;
+							$average_weeks = 0;
+						}
 
 						if ($timespan == $hour) {
 							$value = $average_hours;
@@ -400,8 +435,9 @@ while (@row = $email_query->fetchrow_array) {
 					
 					# Get current value for last timespan
 					$sql = "SELECT COUNT(attacks.id) FROM attacks, sensors ";
-					$sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid AND sensors.organisation = '$org' ";
+					$sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid $andorg $sensorwhere ";
 					$sql .= "AND timestamp >= '$ts_start' AND timestamp <= '$ts_end'";
+
 					$check_query = $dbh->prepare($sql);
 					$execute_result = $check_query->execute();
 					@db_row = $check_query->fetchrow_array;
@@ -411,25 +447,34 @@ while (@row = $email_query->fetchrow_array) {
 					$perc = ($deviation / 100);
 					$db_upper = ($db_value + ($db_value * $perc));
 					$db_lower = ($db_value - ($db_value * $perc));
-					
+
 					$send = 0;
-					if ($operator == '<') { 
-						if ($value < $db_lower) { $send = 1; }
-					} elsif ($operator == '<=') {
-						if ($value <= $db_lower) { $send = 1; }
-					} elsif ($operator == '>') {
-						if ($value > $db_upper) { $send = 1; }
-					} elsif ($operator == '>=') {
-						if ($value >= $db_upper) { $send = 1; }
-					} elsif ($operator == '=') {
-						if (($value >= $db_lower) && ($value <= $db_upper)) { $send = 1; }
-					} elsif ($operator == '!=') {
-						if (($value < $db_lower) && ($value > $db_upper)) { $send = 1; }
+					if ($operator eq "<") {
+						if ($db_lower < $value) { $send = 1; }
+						$printcheck = "Measured attacks ($db_lower) < Allowed attacks ($value)";
+					} elsif ($operator eq "<=") {
+						if ($db_lower <= $value) { $send = 1; }
+						$printcheck = "Measured attacks ($db_lower) <= Allowed attacks ($value)";
+					} elsif ($operator eq ">") {
+						if ($db_upper > $value) { $send = 1; }
+						$printcheck = "Measured attacks ($db_upper) > Allowed attacks ($value)";
+					} elsif ($operator eq ">=") {
+						if ($db_upper >= $value) { $send = 1; }
+						$printcheck = "Measured attacks ($db_upper) >= Allowed attacks ($value)";
+					} elsif ($operator eq "=") {
+						if (($db_lower >= $value) && ($db_upper <= $value)) { $send = 1; }
+						$printcheck = "Measured attacks ($db_value) = $value with a deviation of $deviation";
+					} elsif ($operator eq "!=") {
+						if (($value < $db_lower) || ($value > $db_upper)) { $send = 1; }
+						$printcheck = "Measured attacks ($db_value) != Allowed attacks ($value)";
 					}
 					
 					if ($send == 1) {
 						# Send an e-mail
 						print MAIL "Triggered threshold report: $title\n";
+						print MAIL "\n";
+						print MAIL "Performed check:\n";
+						print MAIL "$printcheck\n";
 						print MAIL "\n";
 						print MAIL "Use next link to view related attacks:\n";
 						print MAIL $webinterface_prefix . "/logsearch.php?from=$ts_start&to=$ts_end&f_reptype=multi&f_sev=$target&f_submit=Search";
@@ -440,6 +485,47 @@ while (@row = $email_query->fetchrow_array) {
 						# Remove file
 						system "rm $mailfile";
 					}
+			} elsif ($template == 4) {
+				$send = 0;
+                                print MAIL "Sensor status overview for " .getdatetime($ts_now) . "\n";
+                                print MAIL "\n";
+
+                                if ($aid == $org) {
+                                  $andorg = "";
+                                } else {
+                                  $andorg = "WHERE sensors.organisation = '$org'";
+                                }
+
+				$sql = "SELECT status, lastupdate, tap, tapip, keyname FROM sensors ";
+				$sql .= "WHERE sensors.id = sensors.id $andorg $sensorwhere";
+				$sql .= "ORDER BY keyname";
+                                $sensors_query = $dbh->prepare($sql);
+                                $sensors_result = $sensors_query->execute();
+				while (@sensors = $sensors_query->fetchrow_array) {
+					$status = $sensors[0];
+					$lastupdate = $sensors[1];
+					$tap = $sensors[2];
+					$tapip = $sensors[3];
+					$keyname = $sensors[4];
+
+					if ($status == 0) {
+						$send = 1;
+						print MAIL "$keyname is down!\n";
+					} elsif ($status == 1) {
+						if ("$tap" eq "" && "$tapip" eq "") {
+							$send = 1;
+							print MAIL "$keyname tap/tapip error!\n";
+						}
+						if ("$lastupdate" ne "") {
+							$ts_diff = $ts_now - $lastupdate;
+							if ($ts_diff > 3900) {
+								$send = 1;
+								print MAIL "$keyname missed an update!\n";
+							}
+						}
+					}
+#					print MAIL "\n";
+				}
 			}
 			
 			if ($send == 1) {
@@ -487,6 +573,7 @@ sub sendmail {
 	$subject =~ s/%time%/$sub_time/;
 	$subject =~ s/%hour%/$sub_hour/;
 	$subject =~ s/%day%/$sub_day/;
+	$subject = $subject_prefix . $subject;
 
 	if ($gpg_enabled == 1) {
 		# Encrypt the mail with gnupg 

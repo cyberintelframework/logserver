@@ -1,4 +1,18 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+####################################
+# Installation script              #
+# SURFnet IDS                      #
+# Version 1.03.02                  #
+# 13-11-2006                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
+
+####################################
+# Changelog:
+# 1.03.02 Added changelog, version info and removed -w
+# 1.03.01 Initial release
+####################################
 
 ##########################
 # Variables
@@ -23,7 +37,7 @@ require "functions_log.pl";
 # Dependency checks
 ##########################
 
-$psqlcheck = `psql -V | head -n1 | awk '{print $3}'`;
+$psqlcheck = `psql -V | head -n1 | awk '{print \$3}'`;
 chomp($psqlcheck);
 if ($psqlcheck !~ /^8\.1.*$/) {
   printmsg("Checking for PostgreSQL 8.1:", "false");
