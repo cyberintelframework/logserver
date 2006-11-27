@@ -1,9 +1,10 @@
 -- SURFnet IDS SQL changes for 1.03
--- Version: 1.03.01
--- 30-10-2006
+-- Version: 1.03.02
+-- 27-11-2006
 
 -- Changelog
 -- Removed the timeunit from table login
+-- 1.03.02 Removed table report and added gpg to table login
 -- 1.03.01 Initial release
 
 CREATE TABLE sessions (
@@ -34,31 +35,9 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE rrd TO idslog;
 
 GRANT SELECT,UPDATE ON TABLE rrd_id_seq TO idslog;
 
-CREATE TABLE report (
-    id serial NOT NULL,
-    user_id integer NOT NULL,
-    enabled boolean NOT NULL,
-    email character varying,
-    gpg_enabled boolean,
-    subject character varying
-);
-
-ALTER TABLE ONLY report
-    ADD CONSTRAINT primary_report PRIMARY KEY (id);
-
-ALTER TABLE ONLY report
-    ADD CONSTRAINT unique_report_user_id UNIQUE (user_id);
-
-ALTER TABLE ONLY report
-    ADD CONSTRAINT foreign_report_user_id FOREIGN KEY (user_id) REFERENCES "login"(id);
-
-GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report TO idslog;
-
-GRANT SELECT,UPDATE ON TABLE report_id_seq TO idslog;
-
 CREATE TABLE report_content (
     id serial NOT NULL,
-    report_id integer,
+    user_id integer,
     title character varying,
     "template" integer,
     last_sent integer,
@@ -73,7 +52,7 @@ ALTER TABLE ONLY report_content
     ADD CONSTRAINT primary_report_content PRIMARY KEY (id);
 
 ALTER TABLE ONLY report_content
-    ADD CONSTRAINT foreign_report_content_report_id FOREIGN KEY (report_id) REFERENCES report(id);
+    ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES login(id);
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report_content TO idslog;
 
@@ -116,3 +95,5 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE org_id TO idslog;
 GRANT SELECT,UPDATE ON TABLE org_id_id_seq TO idslog;
 
 ALTER TABLE login ADD COLUMN serverhash character varying;
+ALTER TABLE login ADD COLUMN gpg integer;
+
