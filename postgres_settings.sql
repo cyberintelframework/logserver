@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.04
--- 16-11-2006
+-- Version 1.04.05
+-- 27-11-2006
 --
 
 -- Version history
+-- 1.04.05 Changed constraint for report_content
 -- 1.04.04 Removed table report and modified login
 -- 1.04.03 Switched source and dest in the Nepenthes function surfnet_attack_by_id
 -- 1.04.02 Added Nepenthes log-surfnet pgsql functions
@@ -354,7 +355,7 @@ ALTER TABLE ONLY details
     ADD CONSTRAINT foreign_attack FOREIGN KEY (attackid) REFERENCES attacks(id);
 
 ALTER TABLE ONLY report_content
-    ADD CONSTRAINT foreign_report_content_report_id FOREIGN KEY (report_id) REFERENCES report(id);
+    ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES login(id);
 
 ALTER TABLE ONLY report_template_threshold
     ADD CONSTRAINT foreign_report_template_threshold_report_content_id FOREIGN KEY (report_content_id) REFERENCES report_content(id);
