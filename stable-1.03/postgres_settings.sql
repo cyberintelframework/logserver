@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL settings
--- Version: 1.03.03
--- 16-11-2006
+-- Version: 1.03.04
+-- 27-11-2006
 
 -- Changelog
+-- 1.03.04 Changed the constraint for report_content
 -- 1.03.03 Removed table report and changed login
 -- 1.03.02 Removed the timeunit from table login
 -- 1.03.01 Initial release
@@ -287,7 +288,7 @@ ALTER TABLE ONLY details
     ADD CONSTRAINT foreign_attack FOREIGN KEY (attackid) REFERENCES attacks(id);
 
 ALTER TABLE ONLY report_content
-    ADD CONSTRAINT foreign_report_content_report_id FOREIGN KEY (report_id) REFERENCES report(id);
+    ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES login(id);
 
 ALTER TABLE ONLY report_template_threshold
     ADD CONSTRAINT foreign_report_template_threshold_report_content_id FOREIGN KEY (report_content_id) REFERENCES report_content(id);
