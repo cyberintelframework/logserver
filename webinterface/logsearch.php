@@ -11,7 +11,7 @@
 # Changelog:
 # 1.04.04 Added personal searchtemplate button for charts
 # 1.04.03 Added some default values for ts_start
-# 1.04.02 Added source and destionation empty check
+# 1.04.02 Added source and destination empty check
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.16 Changed the way graphs are generated
