@@ -3,7 +3,7 @@
 # Mail reporter                    #
 # SURFnet IDS          	           #
 # Version 1.04.01                  #
-# 20-11-2006          	           #
+# 28-11-2006          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
@@ -11,6 +11,7 @@
 #########################################################################################
 # Changelog:
 # 1.04.01 Rereleased as 1.04.01
+# 1.03.07 Fixed a bug in the sensorstatus query
 # 1.03.06 Fixed a send bug with template 4
 # 1.03.05 Fixed bug when email address was empty
 # 1.03.04 Updated with sensor status report
@@ -494,7 +495,7 @@ while (@row = $email_query->fetchrow_array) {
                                 if ($aid == $org) {
                                   $andorg = "";
                                 } else {
-                                  $andorg = "WHERE sensors.organisation = '$org'";
+                                  $andorg = "AND sensors.organisation = '$org'";
                                 }
 
 				$sql = "SELECT status, lastupdate, tap, tapip, keyname FROM sensors ";

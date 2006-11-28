@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 16-11-2006                       #
+# Version 1.04.03                  #
+# 28-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Added input checks for $action, $vlanid and $keyname
 # 1.04.02 Added VLAN support 
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
@@ -48,10 +49,16 @@ if (isset($_GET['selview'])) {
 }
       
 $error = 0;
-$keyname = $_POST['keyname'];
-$vlanid = $_POST['vlanid'];
-$action = $_POST['action'];
-if (isset($_POST[tapip])) {
+$keyname = pg_escape_string($_POST['keyname']);
+$vlanid = intval($_POST['vlanid']);
+$action = pg_escape_string($_POST['action']);
+$action_pattern = '/^(NONE|REBOOT|SSHOFF|SSHON|CLIENT|RESTART|BLOCK)$/';
+if (preg_match($action_pattern, $action) != 1) {
+  $m = 44;
+  $error = 1;
+}
+
+if (isset($_POST[tapip]) && $error != 1) {
   $tapip = pg_escape_string(stripinput($_POST[tapip]));
   if (preg_match($ipregexp, $tapip)) {
     $sql_checkip = "SELECT tapip FROM sensors WHERE tapip = '$tapip' AND NOT keyname = '$keyname'";
