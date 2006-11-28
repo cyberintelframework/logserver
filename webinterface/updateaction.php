@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 10-10-2006                       #
+# Version 1.03.02                  #
+# 28-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 pg_escape_string added for $action
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 SQL injection fix
 # 1.02.03 Added some more input checks
@@ -55,7 +56,7 @@ while ($row = pg_fetch_assoc($result_sensors)) {
   $keyname = $row['keyname'];
   $ssh = $row['ssh'];
   $formkey = "f_" . $keyname;
-  $action = stripinput($_POST[$formkey]);
+  $action = pg_escape_string(stripinput($_POST[$formkey]));
   $tapkey = "tapip_" . $keyname;
   if (isset($_POST[$tapkey])) {
     $tapip = pg_escape_string(stripinput($_POST[$tapkey]));

@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS          	           #
-# Version 1.03.06                  #
-# 20-11-2006          	           #
+# Version 1.03.07                  #
+# 28-11-2006          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.03.07 Fixed a bug with the sensorstatus query
 # 1.03.06 Fixed a send bug with template 4
 # 1.03.05 Fixed a bug when email address was empty
 # 1.03.04 Updated with sensor status report
