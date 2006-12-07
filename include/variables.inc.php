@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.02                  #
-# 17-11-2006                       #
+# Version 1.03.03                  #
+# 29-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.03 Added error message
 # 1.03.02 Added sensor status to mail report templates
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.02 Added new mailreporting arrays
@@ -229,6 +230,7 @@ $errors = array (
 	41 => "No severity was given!",
 	42 => "No attack ID given!",
 	43 => "Wrong username or password!",
+	47 => "Wrong access variable given!",
 	90 => "Not enough rights to access this page!",
 	91 => "Admin rights are required to access this page!",
 	99 => "Unknown error!"
