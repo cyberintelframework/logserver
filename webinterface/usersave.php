@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 29-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Fixed a bug with access handling
 # 1.04.01 Fixed username check
 # 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
@@ -73,7 +74,18 @@ if ($s_access_user == 0) {
   $access = $s_access;
 } elseif ($s_access_user == 2) {
   $f_org = $s_org;
-  $access = $f_access_sensor . $f_access_search . $f_access_user;
+  if ($f_access_sensor >= 9) {
+    $err = 1;
+    $m = 90;
+  } elseif ($f_access_search >= 9) {
+    $err = 1;
+    $m = 90;
+  } elseif ($f_access_user >= 9) {
+    $err = 1;
+    $m = 90;
+  } else {
+    $access = $f_access_sensor . $f_access_search . $f_access_user;
+  }
 } else {
   $access = $f_access_sensor . $f_access_search . $f_access_user;
 }

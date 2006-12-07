@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 16-11-2006                       #
+# Version 1.04.05                  #
+# 06-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.05 Changed binary search method conform database changes
 # 1.04.04 Added personal searchtemplate button for charts
 # 1.04.03 Added some default values for ts_start
 # 1.04.02 Added source and destination empty check
@@ -353,7 +354,9 @@ if ($f_virus > 0) {
 	// From inputbox
 	add_db_table("binaries");
 	add_db_table("details"); // for binaries, don't remove!
-	$where[] = "binaries.info LIKE '%$f_virus_txt%'";
+        add_db_table("stats_virus");
+        $where[] = "binaries.info = stats_virus.id";
+	$where[] = "stats_virus.name LIKE '%$f_virus_txt%'";
 }
 
 ### Limit filename
@@ -366,8 +369,10 @@ if (!empty($f_filename)) {
 ### Limit binary
 if (!empty($f_bin)) {
 	add_db_table("details");
+        add_db_table("uniq_binaries");
 	$where[] = "details.type = 8";
-	$where[] = "details.text = '$f_bin'";
+        $where[] = "details.text = uniq_binaries.name";
+	$where[] = "uniq_binaries.name LIKE '$f_bin'";
 }
 
 if ($rapport == "idmef") {

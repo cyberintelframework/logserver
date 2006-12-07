@@ -132,15 +132,17 @@ if ($err != 1) {
   
   elseif ($sev == 32) {
     $where[] .= " attacks.severity = 32 ";
-    $where[] = " details.type = 8 ";
+    $where[] .= " details.type = 8 ";
+    $where[] = " details.text = uniq_binaries.name ";
     add_db_table("sensors");
     add_db_table("details");
+    add_db_table("uniq_binaries");
     prepare_sql();
 
-    $sql_down = "SELECT DISTINCT details.text, count(details.id) as total ";
+    $sql_down = "SELECT DISTINCT uniq_binaries.id, details.text, count(details.id) as total ";
     $sql_down .= "FROM $sql_from ";
     $sql_down .= " $sql_where ";
-    $sql_down .= " GROUP BY details.text ";
+    $sql_down .= " GROUP BY uniq_binaries.id, details.text ";
     $sql_down .= " ORDER BY total DESC ";
     $result_down = pg_query($pgconn, $sql_down);
     $numrows_down = pg_num_rows($result_down);
@@ -153,134 +155,84 @@ if ($err != 1) {
     }
 
     if ($numrows_down > 0) {
+      $sql_scanners = "SELECT * FROM scanners";
+      $result_scanners = pg_query($pgconn, $sql_scanners);
+
       echo "Malware statistics.<br /><br />\n";
       $virus_count_ar = array();
       echo "<table class='datatable' width='800'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader'>Malware downloaded</td>\n";
-          echo "<td class='dataheader'>ClamAV</td>\n";
-          if ($bdc == 1) {
-            echo "<td class='dataheader'>BitDefender</td>\n";
+          while ($scanners = pg_fetch_assoc($result_scanners)) {
+            $name = $scanners['name'];
+            echo "<td class='dataheader' width='15%'>$name</td>\n";
           }
-          if ($antivir == 1) {
-            echo "<td class='dataheader'>Antivir</td>\n";
-          }
+          pg_result_seek($result_scanners, 0);
           echo "<td class='dataheader'>Statistics</td>\n";
         echo "</tr>\n";
 
-        $clamav_found = 0;
-        $bdc_found = 0;
-        $antivir_found = 0;
-        $clamav_total = 0;
-        $bdc_total = 0;
-        $antivir_total = 0;
-
         while ($row = pg_fetch_assoc($result_down)) {
+          $bin_id = $row['id'];
           $malware = $row['text'];
           $count = $row['total'];
 
-          $sql_clamav = "SELECT * FROM binaries WHERE bin = '$malware' AND scanner = 'ClamAV'";
-          $result_clamav = pg_query($pgconn, $sql_clamav);
-          $numrows_clamav = pg_num_rows($result_clamav);
-          if ($numrows_clamav == 0) {
-            $clamav_info = "Not scanned";
-          } else {
-            $clamav_info = pg_result($result_clamav, "info");
-          }
-
-          if ($bdc == 1) {
-            $sql_bdc = "SELECT * FROM binaries WHERE bin = '$malware' AND scanner = 'BitDefender'";
-            $result_bdc = pg_query($pgconn, $sql_bdc);
-            $numrows_bdc = pg_num_rows($result_bdc);
-            if ($numrows_bdc == 0) {
-              $bdc_info = "Not scanned";
-            } else {
-              $bdc_info = pg_result($result_bdc, "info");
-            }
-          }
-
-          if ($antivir == 1) {
-            $sql_antivir = "SELECT * FROM binaries WHERE bin = '$malware' AND scanner = 'Antivir'";
-            $result_antivir = pg_query($pgconn, $sql_antivir);
-            $numrows_antivir = pg_num_rows($result_antivir);
-            if ($numrows_antivir == 0) {
-              $antivir_info = "Not scanned";
-            } else {
-              $antivir_info = pg_result($result_antivir, "info");
-            }
-          }          
-
-          # Starting the count for the viri.
-          if (!array_key_exists($virus, $virus_count_ar)) {
-            $virus_count_ar[$virus] = $count;
-          } else {
-            $newcount = $virus_count_ar[$virus] + $count;
-            $virus_count_ar[$virus] = $newcount;
-          }
-
-          # Table row showing the virus info.
           echo "<tr>\n";
-            if ($clamav_info == "Not scanned" || $bdc_info == "Not scanned" || $antivir_info == "Not scanned") {
-              echo "<td class='datatd'>$malware</td>\n";
-            } else {
-              echo "<td class='datatd'><a href='binaryhist.php?bin=$malware'>$malware</a></td>\n";
+            echo "<td class='datatd'><a href='binaryhist.php?binname=$malware'>$malware</a></td>\n";
+            while ($scanners = pg_fetch_assoc($result_scanners)) {
+              $scanner_id = $scanners['id'];
+              $sql_virus = "SELECT stats_virus.name as virusname FROM binaries, uniq_binaries, stats_virus ";
+              $sql_virus .= "WHERE binaries.bin = $bin_id AND binaries.scanner = $scanner_id ";
+              $sql_virus .= "AND binaries.info = stats_virus.id LIMIT 1";
+              $result_virus = pg_query($pgconn, $sql_virus);
+              $numrows_virus = pg_num_rows($result_virus);
+
+              # Debug info
+              if ($debug == 1) {
+                echo "<pre>";
+                echo "SQL_VIRUS: $sql_virus<br />\n";
+                echo "</pre>\n";
+              }
+
+              if ($numrows_virus == 0) {
+                $virus = "Not scanned";
+              } else {
+                $virus = pg_result($result_virus, "virusname");
+                $virus = "<font color='red'>$virus</font>";
+              }
+
+              # Starting the count for the viri.
+#              if (!array_key_exists($virus, $virus_count_ar)) {
+                $virus_count_ar[$virus] = $virus_count_ar[$virus] + $count;
+#              } else {
+#                $newcount = $virus_count_ar[$virus] + $count;
+#                $virus_count_ar[$virus] = $newcount;
+#              }
+
+              if ($virus == "Not scanned") {
+                $$name_ignore++;
+              } elseif ($virus == "Suspicious") {
+                $$name_total++;
+              } else {
+                $$name_found++;
+                $$name_total++;
+              }
+              echo "<td class='datatd'>$virus</td>\n";
             }
-            ### ClamAV ###
-            if ($clamav_info == "Suspicious") {
-              echo "<td class='datatd'>$clamav_info</td>\n";
-              $clamav_total++;
-            } elseif ($clamav_info == "Not scanned") {
-              echo "<td class='datatd'>$clamav_info</td>\n";
-            } else {
-              echo "<td class='datatd'><font color='red'>$clamav_info</font></td>\n";
-              $clamav_found++;
-              $clamav_total++;
-            }
-            ### BitDefender ###
-            if ($bdc_info == "Suspicious") {
-              echo "<td class='datatd'>$bdc_info</td>\n";
-              $bdc_total++;
-            } elseif ($bdc_info == "Not scanned") {
-              echo "<td class='datatd'>$bdc_info</td>\n";
-            } else {
-              echo "<td class='datatd'><font color='red'>$bdc_info</font></td>\n";
-              $bdc_total++;
-              $bdc_found++;
-            }
-            ### Antivir ###
-            if ($antivir_info == "Suspicious") {
-              echo "<td class='datatd'>$antivir_info</td>\n";
-              $antivir_total++;
-            } elseif ($antivir_info == "Not scanned") {
-              echo "<td class='datatd'>$antivir_info</td>\n";
-            } else {
-              echo "<td class='datatd'><font color='red'>$antivir_info</font></td>\n";
-              $antivir_total++;
-              $antivir_found++;
-            }
-            //echo "<td class='datatd'><a href='logattacks.php?sev=detail$querystring&amp;bin=$malware$dateqs'>$count</a></td>\n";
-            echo "<td class='datatd'><a href='logsearch.php?org=" . $q_org . "&f_bin=$malware$dateqs'>$count</a></td>\n";
+            echo "<td class='datatd'><a href='logsearch.php?org=" . $q_org . "&f_bin=$bin_id$dateqs'>$count</a></td>\n";
+            pg_result_seek($result_scanners, 0);
           echo "</tr>\n";
         }
         echo "<tr class='datatr'>\n";
           echo "<td class='dataheader'>Total recognition %</td>\n";
-          if ($clamav_total == 0) {
+          while ($scanners = pg_fetch_assoc($result_scanners)) {
+            $name = $scanners['name'];
+
+            if ($$name_total == 0) {
             echo "<td class='dataheader'>0 scanned</td>\n";
-          } else {
-            $clamav_perc = floor($clamav_found / $clamav_total * 100);
-            echo "<td class='dataheader'>$clamav_found / $clamav_total = $clamav_perc %</td>\n";
-          }
-          if ($bdc_total == 0) {
-            echo "<td class='dataheader'>0 scanned</td>\n";
-          } else {
-            $bdc_perc = floor($bdc_found / $bdc_total * 100);
-            echo "<td class='dataheader'>$bdc_found / $bdc_total = $bdc_perc %</td>\n";
-          }
-          if ($antivir_total == 0) {
-            echo "<td class='dataheader'>0 scanned</td>\n";
-          } else {
-            $antivir_perc = floor($antivir_found / $antivir_total * 100);
-            echo "<td class='dataheader'>$antivir_found / $antivir_total = $antivir_perc %</td>\n";
+            } else {
+              $$name_perc = floor($$name_found / $$name_total * 100);
+              echo "<td class='dataheader'>$$name_found / $$name_total = $$name_perc %</td>\n";
+            }
           }
           echo "<td class='dataheader'>&nbsp;</td>\n";
         echo "</tr>\n";        

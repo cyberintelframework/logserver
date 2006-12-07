@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 20-11-2006                       #
+# Version 1.04.03                  #
+# 29-11-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Added a few more error messages
 # 1.04.02 Added org_ident_type_ar
 # 1.04.01 Released as 1.04.01
 # 1.03.02 Added sensor status to mail report templates
@@ -249,6 +250,7 @@ $errors = array (
 	44 => "Wrong action!",
 	45 => "Identifier type was not set!",
 	46 => "Identifier name was not set!",
+	47 => "Wrong access variable given!",
 	90 => "Not enough rights to access this page!",
 	91 => "Admin rights are required to access this page!",
 	99 => "Unknown error!"
