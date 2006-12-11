@@ -56,7 +56,6 @@ img {
 
 #submenu
 {
-//  border:		1px solid red;
   height:		25px;
 }
 
@@ -338,7 +337,7 @@ PRE {
   position: absolute;
   left: 350px;
   width: 290px;
-  height; 100px;
+  height: 100px;
   border: 1px solid black;
   background-color: white;
   padding: 10px;

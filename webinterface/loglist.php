@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.05 Added intval() to session variables + modified daily table header
@@ -115,12 +116,7 @@ if ($err != 1) {
   $sql_uniq .= " $orderby ";
   $result_uniq = pg_query($pgconn, $sql_uniq);
 
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_UNIQ: $sql_uniq<br />\n";
-    echo "</pre>\n";
-  }
+  $debuginfo[] = $sql_uniq;
 
   while ($row = pg_fetch_assoc($result_uniq)) {
     $source = $row['source'];
@@ -133,5 +129,6 @@ if ($err != 1) {
 }
 echo "</table>\n";
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

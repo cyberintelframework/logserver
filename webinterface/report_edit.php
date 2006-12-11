@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Split up report.php into seperate files
 #############################################
@@ -33,6 +34,7 @@ if (isset($_GET['userid'])) {
     $user_id = $s_userid;
   } elseif ($s_access_user < 9) {
     $sql_login = "SELECT * FROM login WHERE organisation = $s_org AND id = $user_id";
+    $debuginfo[] = $sql_login;
     $result_login = pg_query($pgconn, $sql_login);
     $numrows_login = pg_num_rows($result_login);
     if ($numrows_login == 0) {
@@ -55,7 +57,7 @@ if ($report_content_id > 0) {
   # Getting data from database
   $sql_report_content = "SELECT * FROM report_content ";
   $sql_report_content .= "WHERE user_id = '$user_id' AND id = '$report_content_id'";
-  debug("SQL_REPORT_CONTENT", $sql_report_content);
+  $debuginfo[] = $sql_report_content;
 
   $result_report_content = pg_query($sql_report_content);
   if (pg_num_rows($result_report_content) == 1) {
@@ -90,7 +92,7 @@ if ($report_content_id > 0) {
           $sql_update = "UPDATE report_content SET ";
           $sql_update .= "title = '$title', sensor_id = '$sensor_id', active = '$active', priority = '$priority', ";
           $sql_update .= "frequency = '$timespan', interval = 0, subject = '$subject' WHERE id = '$report_content_id'";
-          debug("SQL_UPDATE", $sql_update);
+          $debuginfo[] = $sql_update;
 
           $result = pg_query($sql_update);
           $msg = pg_errormessage();
@@ -98,7 +100,7 @@ if ($report_content_id > 0) {
             $sql_threshold = "UPDATE report_template_threshold SET ";
             $sql_threshold .= "target = '$target', operator = '$operator', value = '$value', deviation = '$deviation' ";
             $sql_threshold .= "WHERE report_content_id = '$report_content_id'";
-            debug("SQL_THRESHOLD", $sql_threshold);
+            $debuginfo[] = $sql_threshold;
 
             $result = pg_query($sql_threshold);
             $msg = pg_errormessage();
@@ -106,7 +108,7 @@ if ($report_content_id > 0) {
               echo "<p style='color:green'><b>Data updated succesfully</b>.</p>\n";
               // Reload title/status var
               $sql_report_content = "SELECT * FROM report_content WHERE user_id = '$user_id' AND id = '$report_content_id'";
-              debug("SQL_REPORT_CONTENT", $sql_report_content);
+              $debuginfo[] = $sql_report_content;
 
               $result_report_content = pg_query($sql_report_content);
               $report_content = pg_fetch_assoc($result_report_content);
@@ -120,7 +122,7 @@ if ($report_content_id > 0) {
       }
       
       $sql_template = "SELECT * FROM report_template_threshold WHERE report_content_id = '$report_content_id'";
-      debug("SQL_TEMPLATE", $sql_template);
+      $debuginfo[] = $sql_template;
       $result_template = pg_query($sql_template);
       $report_template = pg_fetch_assoc($result_template);
       
@@ -171,10 +173,13 @@ if ($report_content_id > 0) {
                 } else {
                   $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
                 }
+                $debuginfo[] = $sql;
                 $query = pg_query($sql);
                 while ($sensor_data = pg_fetch_assoc($query)) {
                   $label = $sensor_data["keyname"];
-                  echo printOption($sensor_data["id"], $label, $sensor_id);
+                  $vlanid = $sensor_data["vlanid"];
+		  if ($vlanid != 0) echo printOption($sensor_data["id"], "$label-$vlanid", $sensor_id);
+		  else echo printOption($sensor_data["id"], $label, $sensor_id);
                 }
               echo "</select>\n";
             echo "</td>\n";
@@ -231,7 +236,7 @@ if ($report_content_id > 0) {
           $sql_update .= "title = '$title', sensor_id = '$sensor_id', priority = '$priority', ";
           $sql_update .= "frequency = '$frequency', interval = '$interval_db', active = '$active', subject = '$subject' ";
           $sql_update .= "WHERE id = '$report_content_id'";
-          debug("SQL_UPDATE", $sql_update);
+          $debuginfo[] = $sql_update;
 
           $result = pg_query($sql_update);
           $msg = pg_errormessage();
@@ -240,7 +245,7 @@ if ($report_content_id > 0) {
             // Reload title/status var
             $sql_report_content = "SELECT * FROM report_content ";
             $sql_report_content .= "WHERE user_id = '$user_id' AND id = '$report_content_id'";
-            debug("SQL_REPORT_CONTENT", $sql_report_content);
+            $debuginfo[] = $sql_report_content;
 
             $result_report_content = pg_query($sql_report_content);
             $report_content = pg_fetch_assoc($result_report_content);
@@ -294,10 +299,13 @@ if ($report_content_id > 0) {
                 } else {
                   $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
                 }
+                $debuginfo[] = $sql;
                 $query = pg_query($sql);
                 while ($sensor_data = pg_fetch_assoc($query)) {
                   $label = $sensor_data["keyname"];
-                  echo printOption($sensor_data["id"], $label, $sensor_id);
+                  $vlanid = $sensor_data["vlanid"];
+		  if ($vlanid != 0) echo printOption($sensor_data["id"], "$label-$vlanid", $sensor_id);
+		  else echo printOption($sensor_data["id"], $label, $sensor_id);
                 }
               echo "</select>\n";
             echo "</td>\n";
@@ -442,4 +450,5 @@ function write_report_template_threshold_fields() {
     echo "<td class='datatd'><input type='text' name='deviation' id='deviation' value='$deviation' style='width:50px;'> %</td>\n";
   echo "</tr>\n";
 }
+debug();
 ?>

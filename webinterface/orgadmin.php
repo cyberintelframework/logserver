@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.06 Added intval() for session variables
@@ -18,11 +19,6 @@
 # 1.02.03 Added modifications for org_id table
 # 1.02.02 Added identifier column to table
 # 1.02.01 Initial release
-####################################
-
-####################################
-# ToDo:
-# Removing $s_access_user from this page as access is only allowed for $s_admin == 1
 ####################################
 
 ### Access level: s_admin == 1
@@ -46,19 +42,13 @@ if (isset($_GET['m'])) {
 }
 
 if ($err == 0) {
-  if ($s_access_user == 9) {
+  if ($s_admin == 1) {
     $sql_orgs = "SELECT * FROM organisations";
   } else {
     $sql_orgs = "SELECT * FROM organisations WHERE id = $s_org";
   }
+  $debuginfo[] = $sql_orgs;
   $result_orgs = pg_query($pgconn, $sql_orgs);
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_ORGS: $sql_orgs";
-    echo "</pre>\n";
-  }
 
   echo "<form name='orgadmin' action='orgsave.php?type=org' method='post'>\n";
   echo "<table class='datatable'>\n";
@@ -73,6 +63,7 @@ if ($err == 0) {
       $id = $row['id'];
       $org = $row['organisation'];
       $sql_count = "SELECT id FROM org_id WHERE orgid = $id";
+      $debuginfo[] = $sql_count;
       $result_count = pg_query($pgconn, $sql_count);
       $count = pg_num_rows($result_count);
     
@@ -92,5 +83,6 @@ if ($err == 0) {
   echo "</table>\n";
   echo "</form>\n";
 }
+debug();
 ?>
 <?php footer(); ?>

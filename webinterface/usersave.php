@@ -103,6 +103,7 @@ if ( $_POST['f_org'] == "none" ) {
 }
 
 $sql = "SELECT username FROM login WHERE username = '$f_username' AND NOT id = $f_userid";
+$debuginfo[] = $sql;
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
 if ($rows == 1) {
@@ -128,9 +129,10 @@ if ($err != 1) {
   } else {
     $m = 99;
   }
+  $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
 }
-
 pg_close($pgconn);
+debug();
 header("location: useradmin.php?m=$m");
 ?>

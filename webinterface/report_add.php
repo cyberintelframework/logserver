@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Split up report.php into seperate files
 #############################################
@@ -33,6 +34,7 @@ if (isset($_GET['userid'])) {
     $user_id = $s_userid;
   } elseif ($s_access_user < 9) {
     $sql_login = "SELECT * FROM login WHERE organisation = $s_org AND id = $user_id";
+    $debuginfo[] = $sql_login;
     $result_login = pg_query($pgconn, $sql_login);
     $numrows_login = pg_num_rows($result_login);
     if ($numrows_login == 0) {
@@ -103,7 +105,7 @@ if (isset($_POST["nextstep"])) {
     $sql_insert .= "(user_id, title, priority, sensor_id, interval, frequency, template, active, subject) ";
     $sql_insert .= "VALUES ('$user_id', '$title', '$priority', '$sensor_id', '$interval_db', '$frequency', '$template', 't', '$subject')";
 
-    debug("SQL_INSERT", $sql_insert);
+    $debuginfo[] = $sql_insert;
 
     $query = pg_query($sql_insert);
     if (pg_affected_rows($query) == 1) {
@@ -114,7 +116,7 @@ if (isset($_POST["nextstep"])) {
         $sql_threshold = "INSERT INTO report_template_threshold ";
         $sql_threshold .= "(report_content_id, target, operator, value, deviation) VALUES ";
         $sql_threshold .= "('$report_content_id', '$target', '$operator', '$value', '$deviation')";
-        debug("SQL_THRESHOLD", $sql_threshold);
+        $debuginfo[] = $sql_threshold;
 
         $query = pg_query($sql_threshold);
       }
@@ -204,10 +206,13 @@ echo ">\n";
               } else {
                 $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
               }
+              $debuginfo[] = $sql;
               $query = pg_query($sql);
               while ($sensor_data = pg_fetch_assoc($query)) {
                 $label = $sensor_data["keyname"];
-                echo printOption($sensor_data["id"], $label, $sensor_id);
+                 $vlanid = $sensor_data["vlanid"];
+	         if ($vlanid != 0) echo printOption($sensor_data["id"], "$label-$vlanid", $sensor_id);
+	         else echo printOption($sensor_data["id"], $label, $sensor_id);
               }
             echo "</select>\n";
           echo "</td>\n";
@@ -262,10 +267,13 @@ echo ">\n";
               } else {
                 $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
               }
+              $debuginfo[] = $sql;
               $query = pg_query($sql);
               while ($sensor_data = pg_fetch_assoc($query)) {
                 $label = $sensor_data["keyname"];
-                echo printOption($sensor_data["id"], $label, $sensor_id);
+                 $vlanid = $sensor_data["vlanid"];
+	         if ($vlanid != 0) echo printOption($sensor_data["id"], "$label-$vlanid", $sensor_id);
+	         else echo printOption($sensor_data["id"], $label, $sensor_id);
               }
             echo "</select>\n";
           echo "</td>\n";
@@ -381,4 +389,5 @@ function write_report_template_threshold_fields() {
     echo "<td class='datatd'><input type='text' name='deviation' id='deviation' value='$deviation' style='width:50px;'> %</td>\n";
   echo "</tr>\n";
 }
+debug();
 ?>

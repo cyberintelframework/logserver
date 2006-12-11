@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 06-12-2006                       #
+# Version 1.04.06                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.06 Changed debug stuff
 # 1.04.05 Changed binary search method conform database changes
 # 1.04.04 Added personal searchtemplate button for charts
 # 1.04.03 Added some default values for ts_start
@@ -348,8 +349,9 @@ if ($f_virus > 0) {
 	add_db_table("binaries");
 	add_db_table("details"); // for binaries, don't remove!
 	add_db_table("stats_virus");
-	$where[] = "binaries.info = stats_virus.name";
-	$where[] = "stats_virus.id = '$f_virus'";
+#	$where[] = "binaries.info = stats_virus.id";
+#	$where[] = "stats_virus.id = '$f_virus'";
+        $where[] = "binaries.info = $f_virus";
 } elseif (!empty($f_virus_txt)) {
 	// From inputbox
 	add_db_table("binaries");
@@ -702,6 +704,7 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
 	$sql_count =  " SELECT COUNT(attacks.id) AS total ";
 	$sql_count .= " FROM $sql_from ";
 	$sql_count .= " $sql_where ";
+        $debuginfo[] = $sql_count;
 
 	// SQL-count query
 	$query_count = pg_query($sql_count);
@@ -715,12 +718,7 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
 $num_rows = intval($_SESSION["search_num_rows"]);
 
 if ($num_rows == 0) {
-        # Debug info
-        if ($debug == 1) {
-          echo "<pre>";
-          echo "SQL_COUNT: $sql_count<br />\n";
-          echo "</pre>\n";
-        }
+        debug();
 	echo "<p>No matching results found!</p>\n";
 	?>
 	<script language="javascript" type="text/javascript">
@@ -800,12 +798,7 @@ $sql .= " $sql_where ";
 $sql .= " ORDER BY $sql_order_by $asc_desc ";
 $sql .= " $sql_limit ";
 
-# Debug info
-if ($debug == 1) {
-  echo "<pre>";
-  echo "SQL: $sql";
-  echo "</pre>";
-}
+$debuginfo[] = $sql;
 
 $result = pg_query($sql);
 
@@ -858,16 +851,14 @@ while ($row = pg_fetch_assoc($result)) {
     $fingerprint = pg_result($result_finger, 0);
     $finger_ar = explode(" ", $fingerprint);
     $os = $finger_ar[0];
-  }
-  else {
+  } else {
     $numrows_finger = 0;
   }
 
   echo "<tr>\n";
     if ($numrows_details != 0) {
       echo "<td class='datatd'><a href='logdetail.php?id=$id'>$id</a></td>\n";
-    }
-    else {
+    } else {
       echo "<td class='datatd'>$id</td>\n";
     }
     echo "<td class='datatd'>$ts</td>\n";
@@ -875,21 +866,18 @@ while ($row = pg_fetch_assoc($result)) {
     if ($numrows_finger != 0) {
       $img = "$surfidsdir/webinterface/images/$os.gif";
       if (file_exists($img)) {
-        echo "<td class='datatd'><img src='images/$os.gif' alt='$fingerprint' title='$fingerprint' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
+        echo "<td class='datatd'><img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
+      } else {
+        echo "<td class='datatd'><img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
       }
-      else {
-        echo "<td class='datatd'><img src='images/Blank.gif' alt='$fingerprint' title='$fingerprint' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
-      }
-    }
-    else {
+    } else {
       echo "<td class='datatd'><img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
     }
     if ($hide_dest_ip == 1 && $s_admin == 0) {
       $range_check = matchCIDR($dest, $ranges_ar);
       if ($range_check == 1) {
         echo "<td class='datatd'>$dest:$dport</td>\n";
-      }
-      else {
+      } else {
         echo "<td class='datatd'>&lt;hidden&gt;</td>\n";
       }
     }
@@ -909,8 +897,7 @@ while ($row = pg_fetch_assoc($result)) {
         } else {
           echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
         }
-      }
-      elseif ($sev == 16) {
+      } elseif ($sev == 16) {
         $row_details = pg_fetch_assoc($result_details);
         $text = $row_details['text'];
         $file = basename($text);
@@ -919,8 +906,7 @@ while ($row = pg_fetch_assoc($result)) {
         } else {
           echo "<td class='datatd'>$file</td>\n";
         }
-      }
-      elseif ($sev == 32) {
+      } elseif ($sev == 32) {
         $dia_ar = array('attackid' => $id, 'type' => 8);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $bin = $dia_result_ar[0]['text'];
@@ -950,8 +936,7 @@ while ($row = pg_fetch_assoc($result)) {
           echo "<td class='datatd'></td>\n";
         }
       }
-    }
-    else {
+    } else {
       if ($smac != "") {
         echo "<td class='datatd'>$smac</td>\n";
       } else {
@@ -969,6 +954,8 @@ if ($rapport == "multi") {
 }
 
 pg_close($pgconn);
+
+debug();
 
 if ($searchtime == 1) {
   $timeend = microtime_float();

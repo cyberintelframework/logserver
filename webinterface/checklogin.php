@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.02 Added support for user agent checking
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.08 $numrows_user == 1, intval() to $id and $db_org
@@ -69,16 +70,17 @@ if ($numrows_user == 1) {
     // Adding the session - IP pair to the sessions table
     $timestamp = time();
     $remoteip = pg_escape_string($_SERVER['REMOTE_ADDR']);
+    $useragent = md5($_SERVER['HTTP_USER_AGENT']);
     $sid = pg_escape_string(session_id());
 
     $sql_session = "SELECT * FROM sessions WHERE ip = '$remoteip'";
     $result_session = pg_query($pgconn, $sql_session);
     $numrows_session = pg_num_rows($result_session);
     if ($numrows_session == 0) {
-      $sql_ins_session = "INSERT INTO sessions (sid, ip, ts, username) VALUES ('$sid', '$remoteip', '$timestamp', '$id')";
+      $sql_ins_session = "INSERT INTO sessions (sid, ip, ts, username, useragent) VALUES ('$sid', '$remoteip', '$timestamp', '$id', '$useragent')";
       $result_ins_session = pg_query($sql_ins_session);
     } else {
-      $sql_upd_session = "UPDATE sessions SET sid = '$sid', ts = '$timestamp', username = '$id' WHERE ip = '$remoteip'";
+      $sql_upd_session = "UPDATE sessions SET sid = '$sid', ts = '$timestamp', username = '$id', useragent = '$useragent' WHERE ip = '$remoteip'";
       $result_upd_session = pg_query($sql_upd_session);
     }
 

@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added debug stuff
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Split up report.php into seperate files
 #############################################
@@ -53,6 +54,7 @@ if ($report_content_id > 0) {
   # Getting data from database
   $sql_report_content = "SELECT * FROM report_content ";
   $sql_report_content .= "WHERE user_id = '$user_id' AND id = '$report_content_id'";
+  $debuginfo[] = $sql_report_content;
   $result_report_content = pg_query($sql_report_content);
   if (pg_num_rows($result_report_content) == 1) {
     $report_content = pg_fetch_assoc($result_report_content);
@@ -64,9 +66,11 @@ if ($report_content_id > 0) {
         // Reference table: report_template_threshold
         $ref_table = "report_template_threshold";
         $sql = "DELETE FROM $ref_table WHERE report_content_id = '$report_content_id'";
+        $debuginfo[] = $sql;
         $result = pg_query($sql);
       }            
       $sql = "DELETE FROM report_content WHERE id = '$report_content_id'";
+      $debuginfo[] = $sql;
       $result = pg_query($sql);
       if (pg_affected_rows($result) == 1) {
         echo "<p style='color:green;'><b>Data succesfully removed.</b></p>\n";
@@ -90,4 +94,5 @@ if ($report_content_id > 0) {
     echo "</form>\n";
   }
 }
+debug();
 ?>

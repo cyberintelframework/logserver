@@ -42,7 +42,7 @@ if ($file != "login.php") {
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);
-      header("location: ${address}login.php?url=$url");
+      header("location: ${address}login.php?url=$url&m=1010");
       exit;
     }
   } else {
@@ -74,6 +74,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
     echo "<script src='${address}include/md5.js' type='text/javascript'>\n";
     echo "</script>\n";
+    echo "<script type='text/javascript' src='${address}include/overlib/overlib.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
     echo "<script type='text/javascript' language='javascript'>\n";
 ?>
     function changeId(id) {
@@ -191,10 +192,31 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
 	   return plaintext;
 	}
 
+        function show_hide_column(col_no) {
+          var stl;
+
+          var tbl  = document.getElementById('malwaretable');
+          var rows = tbl.getElementsByTagName('tr');
+
+          for (var row=0; row<rows.length;row++) {
+            var cels = rows[row].getElementsByTagName('td');
+            var status = cels[col_no].style.display;
+            var but = 'scanner_' + col_no;
+            if (status == '') {
+              cels[col_no].style.display='none';
+              document.getElementById(but).className='tab';
+            } else {
+              cels[col_no].style.display='';
+              document.getElementById(but).className='tabsel';
+            }
+          }
+        }
+
 <?php
     echo "</script>\n";
   echo "</head>\n";
   echo "<body>\n";
+    echo "<div id='overDiv' style='position:absolute; visibility:hidden; z-index:1000;'></div>\n";
     echo "<div class='banner'>\n";
       echo "<table border='0' width='100%'>\n";
         echo "<tr>\n";
@@ -212,18 +234,25 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       echo "</table>\n";
     echo "</div>\n";
     echo "<div class='filler'></div>\n";
+    $popup_sensor = "Shows the status information of all your sensors!";
+    $popup_rank = "Shows the current ranking of your sensors and organisation!";
+    $popup_search = "Search engine for searching through the logging data!";
+    $popup_logindex = "Summarized overview of the different attacks detected!";
+    $popup_history = "Summarized data per month!";
+    $popup_check = "Check for attacks originating from your own networks!";
+    $popup_traffic = "Statistics about the traffic going through the sensors!";
     echo "<div class='nav-menu'>\n";
       echo "<ul>\n";
-        echo "<li><a href='${address}sensorstatus.php'>Sensor Status</a></li>\n";
-        echo "<li><a href='${address}rank.php'>Ranking</a></li>\n";
-        echo "<li><a href='${address}search.php'>Search</a></li>\n";
-        echo "<li><a href='${address}logindex.php'>Log Overview</a></li>\n";
-        echo "<li><a href='${address}loghistory.php'>Log History</a></li>\n";
-        echo "<li><a href='${address}logcheck.php'>Check</a></li>\n";
-        if ($enable_arpwatch == 1) {
-          echo "<li><a href='${address}arpindex.php'>ARP Monitor</a></li>\n";
-        }
-        echo "<li><a href='${address}traffic.php'>Traffic</a></li>\n";
+        echo "<li><a href='${address}sensorstatus.php' onmouseover='return overlib(\"$popup_sensor\");' onmouseout='return nd();'>Sensor Status</a></li>\n";
+        echo "<li><a href='${address}rank.php' onmouseover='return overlib(\"$popup_rank\");' onmouseout='return nd();'>Ranking</a></li>\n";
+        echo "<li><a href='${address}search.php' onmouseover='return overlib(\"$popup_search\");' onmouseout='return nd();'>Search</a></li>\n";
+        echo "<li><a href='${address}logindex.php' onmouseover='return overlib(\"$popup_logindex\");' onmouseout='return nd();'>Log Overview</a></li>\n";
+        echo "<li><a href='${address}loghistory.php' onmouseover='return overlib(\"$popup_history\");' onmouseout='return nd();'>Log History</a></li>\n";
+        echo "<li><a href='${address}logcheck.php' onmouseover='return overlib(\"$popup_check\");' onmouseout='return nd();'>Check</a></li>\n";
+#        if ($enable_arpwatch == 1) {
+#          echo "<li><a href='${address}arpindex.php'>ARP Monitor</a></li>\n";
+#        }
+        echo "<li><a href='${address}traffic.php' onmouseover='return overlib(\"$popup_traffic\");' onmouseout='return nd();'>Traffic</a></li>\n";
         echo "<li><a href='${address}logout.php'>Logout</a></li>\n";
       echo "</ul>\n";
     echo "</div>\n";
@@ -249,11 +278,14 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           if ($s_admin == 1) {
             echo "<li><a href='${address}serveradmin.php'>Server Admin</a></li>\n";
           }
-          if ($s_a_sensor > 1) {
-            echo "<li><a href='${address}arpadmin.php'>ARP Admin</a></li>\n";
-          }
+#          if ($s_a_sensor > 1) {
+#            echo "<li><a href='${address}arpadmin.php'>ARP Admin</a></li>\n";
+#          }
           if ($s_admin == 1) {
             echo "<li><a href='${address}serverstats.php'>Server Info</a></li>\n";
+          }
+          if ($s_admin == 1) {
+            echo "<li><a href='${address}virusadmin.php'>Scanner Admin</a></li>\n";
           }
         echo "</ul>\n";
       echo "</div>\n";

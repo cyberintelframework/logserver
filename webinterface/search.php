@@ -63,6 +63,7 @@ function check_byte(b_val,next_field) {
 	else $where = " WHERE organisation = '$s_org'";
 
     $sql = "SELECT COUNT(*) FROM sensors $where";
+    $debuginfo[] = $sql;
 	$query = pg_query($sql);
 	$nr_rows = intval(@pg_result($query, 0));
 	if ($nr_rows < $select_size) $select_size = ($nr_rows + 1);
@@ -73,6 +74,7 @@ function check_byte(b_val,next_field) {
 		echo "<select name=\"sensorid[]\" style=\"background-color:white;\" size=\"" . $select_size . "\" multiple=\"true\">\n";
 	    echo printOption(0, "All sensors", $sensorid);
 	    $sql = "SELECT * FROM sensors $where ORDER BY keyname";
+            $debuginfo[] = $sql;
 		$query = pg_query($sql);
 		while ($sensor_data = pg_fetch_assoc($query)) {
 			$label = $sensor_data["keyname"];
@@ -82,7 +84,9 @@ function check_byte(b_val,next_field) {
 			}
 			if ($s_admin == 1) {
 				// get organisation name
-				$query_org = pg_query("SELECT organisation FROM organisations WHERE id = '" . intval($sensor_data["organisation"]) . "'");
+                                $sql = "SELECT organisation FROM organisation WHERE id = '" . intval($sensor_data["organisation"]) . "'";
+                                $debuginfo[] = $sql;
+				$query_org = pg_query($sql);
 				$org = pg_result($query_org, 0);
 				$label .= " (" . $org . ")";
 			}
@@ -198,7 +202,9 @@ function check_byte(b_val,next_field) {
   <td class="datatd"><select name="f_attack" style="background-color:white;">
   <?
   echo printOption(-1, "All attacks", $f_attack);
-  $query = pg_query("SELECT * FROM stats_dialogue ORDER BY name");
+  $sql = "SELECT * FROM stats_dialogue ORDER BY name";
+  $debuginfo[] = $sql;
+  $query = pg_query($sql);
   while ($row = pg_fetch_assoc($query)) {
   	$name = str_replace("Dialogue", "", $row["name"]);
   	echo printOption($row["id"], $name, $f_attack);
@@ -211,7 +217,9 @@ function check_byte(b_val,next_field) {
   <td class="datatd"><select name="f_virus" style="background-color:white;">
   <?
   echo printOption(-1, "", $f_virus);
-  $query = pg_query("SELECT * FROM stats_virus ORDER BY name");
+  $sql = "SELECT * FROM stats_virus ORDER BY name";
+  $debuginfo[] = $sql;
+  $query = pg_query($sql);
   while ($row = pg_fetch_assoc($query)) {
   	echo printOption($row["id"], $row["name"], $f_virus);
   }
@@ -240,7 +248,7 @@ function check_byte(b_val,next_field) {
  </tr>
  </div>
  <tr>
-   <td colspan=2 align="right"><br /><input type="hidden" name="c" value=0><input type="hidden" name="searchtemplate_title" id="searchtemplate_title" value=""><input type="button" name="f_submit_template" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="f_submit" value="Search" class="button" style="cursor:pointer;" /></td>
+   <td colspan=2 align="right"><br /><input type="hidden" name="c" value=0><input type="hidden" name="searchtemplate_title" id="searchtemplate_title" value=""><input type="button" name="f_submit_template" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="f_submit" value="Show" class="button" style="cursor:pointer;" /></td>
  </tr>
 </table>
 </form>
@@ -254,20 +262,23 @@ function check_byte(b_val,next_field) {
 	//if ($userid == 49) $userid = 1;
 	// userid 0 => default searchtemplates
 	$sql = "SELECT * FROM searchtemplate WHERE userid = '" . intval($userid) . "' ORDER BY title";
+        $debuginfo[] = $sql;
 	echo "<h3>Personal searchtemplates</h3>\n";
 	showSearchTemplates($sql);
-	echo "</div>\n";
-	echo "<a href=\"/searchtemplate.php?action=admin\" style=\"margin-left:132px;\">Searchtemplate administration</a>\n";
+	echo "</div><br />\n";
+	echo "<input type='button' value='Searchtemplate administration' class='button' onClick=window.location='searchtemplate.php?action=admin';>\n";
 	echo "<br /><br /><br /><br />\n";
 	echo "<div id=\"searchtemplate_form\">\n";
 	echo "<h3>Default searchtemplates</h3>\n";
 	$sql = "SELECT * FROM searchtemplate WHERE userid = '0' ORDER BY title";
+        $debuginfo[] = $sql;
 	showSearchTemplates($sql);
 	  ?>
 </div>
 </div>
 <?
    $sql_templates = "SELECT * FROM search_templates";
+   $debuginfo[] = $sql_templates;
     $result_templates = pg_query($pgconn, $sql_templates);
     
     echo "</td>\n";
@@ -361,5 +372,7 @@ function catcalc(cal) {
     }
   );
 </script>
-
+<?php
+debug();
+?>
 <?php footer(); ?>

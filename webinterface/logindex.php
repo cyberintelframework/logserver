@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.11 Added intval() for session variables
@@ -42,6 +43,8 @@ if ($s_access_search == 9 && isset($_GET['org'])) {
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
+
+$debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.
 if (isset($_GET['b'])) {
@@ -116,6 +119,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
       $err = 1;
     }
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
     echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
       echo printOption(0, "All", $q_org) . "\n";
@@ -137,6 +141,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
     echo "<input type='button' value='Next' class='button' disabled>\n";
   }
 echo "</form>\n";
+echo "<br />\n";
 
 echo "<table class='datatable'>\n";
   ### Showing period
@@ -170,15 +175,9 @@ echo "<table class='datatable'>\n";
   $sql_severity .= " $sql_where ";
   $sql_severity .= " GROUP BY attacks.severity ";
 
+  $debuginfo[] = $sql_severity;
+
   $result_severity = pg_query($pgconn, $sql_severity);
-
-  debug("SQL_SEVERITY_TEST", $sql_severity);
-
-#  if ($debug == 1) {
-#    echo "<pre>";
-#    echo "SQL_SEVERITY: $sql_severity<br />\n";
-#    echo "</pre>\n";
-#  }
 
   while($row = pg_fetch_assoc($result_severity)) {
     $severity = $row['severity'];
@@ -195,5 +194,6 @@ echo "<table class='datatable'>\n";
   }
 echo "</table>\n";
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

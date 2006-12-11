@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 16-11-2006                       #
+# Version 1.04.03                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Changed debug stuff
 # 1.04.02 Added VLAN support 
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
@@ -111,14 +112,8 @@ if ($sorterr == 0) {
   } else {
     $sql_sensors = "SELECT * FROM sensors $where $orderby";
   }
+  $debuginfo[] = $sql_sensors;
   $result_sensors = pg_query($pgconn, $sql_sensors);
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_SENSORS: $sql_sensors";
-    echo "</pre>\n";
-  }
 
   echo "<table class='datatable' width='100%'>\n";
     echo "<tr class='datatr'>\n";
@@ -174,13 +169,15 @@ if ($sorterr == 0) {
     if ($s_access_sensor == 9) {
       $org = $row['organisation'];
       $sql_getorg = "SELECT organisation FROM organisations WHERE id = " .$org;
+      $debuginfo[] = $sql_getorg;
       $result_getorg = pg_query($pgconn, $sql_getorg);
       $org = pg_result($result_getorg, 0);
     }
 
     echo "<tr>\n";
       echo "<form name='rebootform' method='post' action='updateaction.php?selview=$selview'>\n";
-      echo "<td class='datatd' valign='top' style='padding-top: 10px;'><a href='trafficview.php?view=$sensor'>$sensor</a></td>\n";
+      if ($vlanid != 0) echo "<td class='datatd' valign='top' style='padding-top: 10px;'><a href='trafficview.php?label=$sensor-$vlanid'>$sensor</a></td>\n";
+      else echo "<td class='datatd' valign='top' style='padding-top: 10px;'><a href='trafficview.php?label=$sensor'>$sensor</a></td>\n";
       echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$remote</td>\n";
       echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$local</td>\n";
       # Tap device
@@ -330,6 +327,7 @@ if ($sorterr == 0) {
   echo "Error in sort querystring.<br />\n";
   echo "<a href='sensorstatus.php'>Back</a>\n";
 }
+debug();
 ?>
 
 <?php footer(); ?>

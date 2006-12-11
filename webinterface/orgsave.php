@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 20-11-2006                       #
+# Version 1.04.03                  #
+# 07-12-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Fixed a bug where it wouldn't save organisation changes
 # 1.04.02 Added identifier type
 # 1.04.01 pg_close() when not logged in
 # 1.03.01 Released as part of the 1.03 package
@@ -67,15 +68,6 @@ if ($type == "ident") {
     $m = 38;
   }
 
-  if ($ftype == 0) {
-    $err = 1;
-    $m = 45;
-  }
-
-  if (empty($ident)) {
-    $err = 1;
-    $m = 46;
-  }
 } elseif ($type == "org") {
   if (!empty($_POST['orgname'])) {
     $orgname = pg_escape_string($_POST['orgname']);
@@ -102,8 +94,22 @@ if ($err != 1) {
     $execute = pg_query($pgconn, $sql);
 
     if (!empty($_POST['f_org_ident'])) {
-      $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $ftype)";
-      $execute = pg_query($pgconn, $sql);
+      if ($ftype == 0) {
+        $err = 1;
+        $m = 45;
+      }
+
+      if (empty($ident)) {
+        $err = 1;
+        $m = 46;
+      }
+      if ($err == 0) {
+        $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $ftype)";
+        $execute = pg_query($pgconn, $sql);
+      } else {
+        pg_close($pgconn);
+        header("location: orgedit.php?orgid=$orgid&m=$m");
+      }
     }
   } elseif ($type == "org") {
     $sql = "INSERT INTO organisations (organisation) VALUES ('$orgname')";

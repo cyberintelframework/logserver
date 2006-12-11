@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Storing images in the database
@@ -28,6 +29,7 @@ if (isset($_GET['label'])) {
   } else {
     $sql_rrd = "SELECT id, orgid, type FROM rrd WHERE label = '$label' AND orgid = $s_org";
   }
+  $debuginfo[] = $sql_rrd;
   $result_rrd = pg_query($pgconn, $sql_rrd);
 
   echo "<h3>Traffic analysis for: $label</h3>";
@@ -61,5 +63,6 @@ if (isset($_GET['label'])) {
   echo "<h2>No sensor given.</h2>";
 }
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

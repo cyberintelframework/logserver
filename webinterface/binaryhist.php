@@ -3,13 +3,14 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.04.01                 #
-# 06-11-2006                      #
+# Version 1.04.02                 #
+# 11-12-2006                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Added debugging for $sql_filename
 # 1.03.02 Fixed a concatenation bug
 # 1.03.01 Released as part of the 1.03 package
@@ -267,5 +268,6 @@ if ($err == 0) {
   echo "</table>\n";
 }
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

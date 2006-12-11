@@ -3,13 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.03                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Changed debug stuff
+# 1.04.02 Added vlan support 
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Storing images in the database
@@ -22,6 +24,7 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $s_org";
+$debuginfo[] = $sql_getorg;
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $db_org_name = pg_result($result_getorg, 0);
 
@@ -30,6 +33,7 @@ if ($s_admin == 1) {
 } else {
   $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE orgid = $s_org AND type = 'day'";
 }
+$debuginfo[] = $sql_sensors;
 $result_sensors = pg_query($pgconn, $sql_sensors);
 $numrows_result_sensors = pg_numrows($result_sensors);
 
@@ -55,5 +59,6 @@ if ($numrows_result_sensors == 0) {
   echo "</table>\n";
 }
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

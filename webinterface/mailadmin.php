@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Initial release
 ####################################
@@ -54,7 +55,7 @@ if (isset($_POST['f_email'])) {
   } else {
     $sql_update .= "WHERE id = $user_id ";
   }
-  debug("SQL_UPDATE", $sql_update);
+  $debuginfo[] = $sql_update;
   $result_update = pg_query($sql_update);
   $m = 8;
 }
@@ -77,10 +78,9 @@ if ($s_access_user > 0) {
   } else {
     $sql_user = "SELECT email, gpg FROM login WHERE id = $user_id";
   }
+  $debuginfo[] = $sql_user;
   $result_user = pg_query($sql_user);
   $row = pg_fetch_assoc($result_user);
-
-  debug("SQL_USER", $sql_user);
 
   $email = $row['email'];
   $gpg = $row['gpg'];
@@ -110,10 +110,10 @@ if ($s_access_user > 0) {
   echo "<br /><br />\n";
 
   echo "<b>Reports</b><br /><br />";
-  echo "<a href='report_add.php?userid=$user_id'>Add report</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<a href='report_mod.php?userid=$user_id&a=d'>Disable all reports</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<a href='report_mod.php?userid=$user_id&a=e'>Enable all reports</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<a href='report_mod.php?userid=$user_id&a=r'>Reset all report timestamps</a><br />";
+  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_add.php?userid=$user_id';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Disable all reports' class='button' onClick=window.location='report_mod.php?userid=$user_id&a=d';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Enable all reports' class='button' onClick=window.location='report_mod.php?userid=$user_id&a=e';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?userid=$user_id&a=r';><br /><br />";
   echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
     echo "<tr class='dataheader'>\n";
       echo "<td class='datatd' width='400'>Title</td>\n";
@@ -132,8 +132,7 @@ if ($s_access_user > 0) {
       $sql = "SELECT * FROM report_content WHERE user_id = $user_id ORDER BY title";
     }
     $result_report_content = pg_query($sql);
-
-    debug("SQL", $sql);
+    $debuginfo[] = $sql;
 
     while ($report_content = pg_fetch_assoc($result_report_content)) {
       $report_content_id = $report_content["id"];
@@ -155,7 +154,7 @@ if ($s_access_user > 0) {
         echo "<td class='datatd'>" . $last_sent . "</td>\n";
         echo "<td class='datatd'>" . $mail_template_ar[$report_content["template"]] . "</td>\n";
         echo "<td class='datatd'>" . $status . "</td>\n";
-        echo "<td width='10' align='center'>[<a href='report_del.php?userid=$user_id&report_content_id=$report_content_id'>X</a>]</td>\n";
+        echo "<td align='center'><a href='report_del.php?userid=$user_id&report_content_id=$report_content_id'><img src='images/icons/email_delete_20.gif' alt='Delete Report' title='Delete Report' /></a></td>\n";
       echo "</tr>\n";
     }
 
@@ -163,5 +162,6 @@ if ($s_access_user > 0) {
 }
 
 pg_close($pgconn);
+debug();
 footer();
 ?>

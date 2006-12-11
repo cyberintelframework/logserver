@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added debug info
 # 1.04.01 Released as 1.04.01
 # 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
@@ -51,6 +52,7 @@ if ($s_access_user < 2) {
   $err = 1;
 } elseif ($s_access_user < 9) {
   $sql_check = "SELECT organisation FROM login WHERE id = $userid AND organisation = $s_org";
+  $debuginfo[] = $sql_check;
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
   if ($numrows_check == 0) {
@@ -64,23 +66,29 @@ if ($err == 0) {
   # Mailreporting records
   // report_content_threshold
   $sql = "SELECT id FROM report_content WHERE report_content.user_id = '$userid' AND report_content.template = 3";
+  $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
   while ($row = pg_fetch_assoc($query)) {
     $report_content_id = $row["id"];
     $sql_template = "DELETE FROM report_template_threshold WHERE report_content_id = '$report_content_id'";
+    $debuginfo[] = $sql_template;
     $query_template = pg_query($pgconn, $sql_template);
   }
 
   // report_content
   $sql = "DELETE FROM report_content WHERE user_id = '$userid'";
+  $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
 
   // Login records
   $sql = "DELETE FROM login WHERE id = $userid";
+  $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   
   $m = 2;
 }
+$debuginfo[] = "M: $m";
 pg_close($pgconn);
+debug();
 header("location: useradmin.php?m=$m");
 ?>

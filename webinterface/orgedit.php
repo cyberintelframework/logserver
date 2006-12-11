@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 20-11-2006                       #
+# Version 1.04.03                  #
+# 11-12-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.03 Changed debug stuff
 # 1.04.02 Added identifier type
 # 1.04.01 Code layout & error message handling
 # 1.03.01 Released as part of the 1.03 package
@@ -48,13 +49,7 @@ if ($err != 1) {
   $sql_orgs = "SELECT * FROM organisations WHERE id = " .$orgid;
   $result_orgs = pg_query($pgconn, $sql_orgs);
   $row = pg_fetch_assoc($result_orgs);
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_ORGS: $sql_orgs";
-    echo "</pre>\n";
-  }
+  $debuginfo[] = $sql_orgs;
 
   $org = $row['organisation'];
   $ident = $row['identifier'];
@@ -80,6 +75,7 @@ if ($err != 1) {
 
     $sql_orgids = "SELECT * FROM org_id WHERE orgid = " .$orgid;
     $result_orgids = pg_query($pgconn, $sql_orgids);
+    $debuginfo[] = $sql_orgids;
     
     echo "<a href='orgsave.php?type=md5&orgid=$orgid'>Generate Random Identifier String</a><br />\n";
     echo "<table class='datatable'>\n";
@@ -124,5 +120,6 @@ if ($err != 1) {
   echo "</form>\n";
 }
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

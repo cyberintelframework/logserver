@@ -14,10 +14,10 @@
 # 1.02.01 Initial release
 ####################################
 
-$s_org = $_SESSION['s_org'];
-$s_admin = $_SESSION['s_admin'];
+$s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
-$s_access_user = $s_access{2};
+$s_access_user = intval($s_access{2});
 
 if (isset($message)) {
   echo '<font color="red">', $message, '</font>';
@@ -29,8 +29,7 @@ if ( $s_admin != 1 ) {
 
 if ( ! isset($_GET['orgid'] )) {
   $err = 1;
-}
-else {
+} else {
   $orgid = intval($_GET['orgid']);
 }
 

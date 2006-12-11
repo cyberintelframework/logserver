@@ -75,8 +75,8 @@ if ($err != 1) {
 
   if ($sev == 1) {
 
-    $where[] .= " attacks.severity = 1 ";
-    $where[] .= " details.type = 1 ";
+    $where[] = " attacks.severity = 1 ";
+    $where[] = " details.type = 1 ";
     add_db_table("sensors");
     add_db_table("details");
     prepare_sql();
@@ -87,15 +87,9 @@ if ($err != 1) {
     $sql_count .= " $sql_where ";
     $sql_count .= " GROUP BY details.text ";
     $sql_count .= " ORDER BY total DESC ";
+    $debuginfo[] = "$sql_count";
     $result_count = pg_query($pgconn, $sql_count);
     $numrows_count = pg_num_rows($result_count);
-
-    # Debug info
-    if ($debug == 1) {
-      echo "<pre>";
-      echo "SQL_COUNT: $sql_count<br />\n";
-      echo "</pre>\n";
-    }
 
     if ($numrows_count > 0) {
       echo "<table class='datatable'>\n";
@@ -131,8 +125,8 @@ if ($err != 1) {
   ######### Table for Downloaded Malware (SEV: 32) #############
   
   elseif ($sev == 32) {
-    $where[] .= " attacks.severity = 32 ";
-    $where[] .= " details.type = 8 ";
+    $where[] = " attacks.severity = 32 ";
+    $where[] = " details.type = 8 ";
     $where[] = " details.text = uniq_binaries.name ";
     add_db_table("sensors");
     add_db_table("details");
@@ -144,28 +138,38 @@ if ($err != 1) {
     $sql_down .= " $sql_where ";
     $sql_down .= " GROUP BY uniq_binaries.id, details.text ";
     $sql_down .= " ORDER BY total DESC ";
+    $debuginfo[] = "$sql_down";
     $result_down = pg_query($pgconn, $sql_down);
     $numrows_down = pg_num_rows($result_down);
 
-    # Debug info
-    if ($debug == 1) {
-      echo "<pre>";
-      echo "SQL_DOWN: $sql_down<br />\n";
-      echo "</pre>\n";
-    }
+#    # Debug info
+#    if ($debug == 1) {
+#      echo "<pre>";
+#      echo "SQL_DOWN: $sql_down<br />\n";
+#      echo "</pre>\n";
+#    }
 
+    echo "Malware statistics.<br /><br />\n";
     if ($numrows_down > 0) {
       $sql_scanners = "SELECT * FROM scanners";
       $result_scanners = pg_query($pgconn, $sql_scanners);
+      $numrows_scanners = pg_num_rows($result_scanners);
+      $a = 0;
+      while ($scanners = pg_fetch_assoc($result_scanners)) {
+        $a++;
+        $name = $scanners['name'];
+        echo "<input type='button' class='tabsel' id='scanner_$a' name='scanner_$a' value='$name' onclick='show_hide_column($a);' />\n";
+      }
+      pg_result_seek($result_scanners, 0);
 
-      echo "Malware statistics.<br /><br />\n";
+      echo "<br /><br />\n";
       $virus_count_ar = array();
-      echo "<table class='datatable' width='800'>\n";
+      echo "<table class='datatable' id='malwaretable' width='800'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader'>Malware downloaded</td>\n";
           while ($scanners = pg_fetch_assoc($result_scanners)) {
             $name = $scanners['name'];
-            echo "<td class='dataheader' width='15%'>$name</td>\n";
+            echo "<td class='datatd'><b>$name</b></td>\n";
           }
           pg_result_seek($result_scanners, 0);
           echo "<td class='dataheader'>Statistics</td>\n";
@@ -180,41 +184,38 @@ if ($err != 1) {
             echo "<td class='datatd'><a href='binaryhist.php?binname=$malware'>$malware</a></td>\n";
             while ($scanners = pg_fetch_assoc($result_scanners)) {
               $scanner_id = $scanners['id'];
-              $sql_virus = "SELECT stats_virus.name as virusname FROM binaries, uniq_binaries, stats_virus ";
+              $sql_virus = "SELECT DISTINCT stats_virus.name as virusname, binaries.timestamp FROM binaries, stats_virus ";
               $sql_virus .= "WHERE binaries.bin = $bin_id AND binaries.scanner = $scanner_id ";
-              $sql_virus .= "AND binaries.info = stats_virus.id LIMIT 1";
+              $sql_virus .= "AND binaries.info = stats_virus.id ORDER BY binaries.timestamp DESC LIMIT 1";
+              $debuginfo[] = "$sql_virus";
               $result_virus = pg_query($pgconn, $sql_virus);
               $numrows_virus = pg_num_rows($result_virus);
 
               # Debug info
-              if ($debug == 1) {
-                echo "<pre>";
-                echo "SQL_VIRUS: $sql_virus<br />\n";
-                echo "</pre>\n";
-              }
+#              if ($debug == 1) {
+#                echo "<pre>";
+#                echo "SQL_VIRUS: $sql_virus<br />\n";
+#                echo "</pre>\n";
+#              }
 
               if ($numrows_virus == 0) {
                 $virus = "Not scanned";
               } else {
                 $virus = pg_result($result_virus, "virusname");
-                $virus = "<font color='red'>$virus</font>";
               }
 
               # Starting the count for the viri.
-#              if (!array_key_exists($virus, $virus_count_ar)) {
-                $virus_count_ar[$virus] = $virus_count_ar[$virus] + $count;
-#              } else {
-#                $newcount = $virus_count_ar[$virus] + $count;
-#                $virus_count_ar[$virus] = $newcount;
-#              }
+              $virus_count_ar[$virus] = $virus_count_ar[$virus] + $count;
 
               if ($virus == "Not scanned") {
-                $$name_ignore++;
+                $ignore[$scanner_id]++;
               } elseif ($virus == "Suspicious") {
-                $$name_total++;
+                $total[$scanner_id]++;
+                $virus = "<font color='red'>$virus</font>";
               } else {
-                $$name_found++;
-                $$name_total++;
+                $found[$scanner_id]++;
+                $total[$scanner_id]++;
+                $virus = "<font color='red'>$virus</font>";
               }
               echo "<td class='datatd'>$virus</td>\n";
             }
@@ -225,13 +226,14 @@ if ($err != 1) {
         echo "<tr class='datatr'>\n";
           echo "<td class='dataheader'>Total recognition %</td>\n";
           while ($scanners = pg_fetch_assoc($result_scanners)) {
+            $id = $scanners['id'];
             $name = $scanners['name'];
 
-            if ($$name_total == 0) {
+            if ($total[$id] == 0) {
             echo "<td class='dataheader'>0 scanned</td>\n";
             } else {
-              $$name_perc = floor($$name_found / $$name_total * 100);
-              echo "<td class='dataheader'>$$name_found / $$name_total = $$name_perc %</td>\n";
+              $perc[$id] = floor($found[$id] / $total[$id] * 100);
+              echo "<td class='dataheader'>$found[$id] / $total[$id] = $perc[$id] %</td>\n";
             }
           }
           echo "<td class='dataheader'>&nbsp;</td>\n";
@@ -240,6 +242,9 @@ if ($err != 1) {
     }
   }
 }
+
+# Debug info
+debug();
 
 pg_close($pgconn);
 ?>

@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
 # 1.03.02 Organisation name bugfix
 # 1.03.01 Released as part of the 1.03 package
@@ -39,6 +40,8 @@ if ($s_access_search == 9 && isset($_GET['org'])) {
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $db_org_name = pg_result($result_getorg, 0);
+
+$debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.
 if (isset($_GET['b'])) {
@@ -111,6 +114,7 @@ echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
       $err = 1;
     }
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
     echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
       echo printOption(0, "All", $q_org) . "\n";
@@ -132,6 +136,7 @@ echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
     echo "<input type='button' value='Next' class='button' disabled>\n";
   }
 echo "</form>\n";
+echo "<br />\n";
 
 ### Checking period.
 if ($b == "all") {
@@ -153,12 +158,14 @@ $result_sensors = pg_query($pgconn, $sql_sensors);
 $row = pg_fetch_assoc($result_sensors);
 $total_sensors = $row['total'];
 
-echo "QORG: $q_org<br />\n";
-
 $sql_getorg = "SELECT organisations.organisation FROM organisations, sensors WHERE sensors.organisation = organisations.id AND organisations.id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $row = pg_fetch_assoc($result_getorg);
 $orgname = $row['organisation'];
+
+$debuginfo[] = $sql_active;
+$debuginfo[] = $sql_sensors;
+$debuginfo[] = $sql_getorg;
 
 echo "<table width='100%'>\n";
 ##########################
@@ -170,6 +177,8 @@ echo "<table width='100%'>\n";
   $sql_attacks = "SELECT DISTINCT COUNT(attacks.severity) as total ";
   $sql_attacks .= " FROM $sql_from ";
   $sql_attacks .= " $sql_where ";
+
+  $debuginfo[] = $sql_attacks;
 
   $result_attacks = pg_query($pgconn, $sql_attacks);
   $row = pg_fetch_assoc($result_attacks);
@@ -188,6 +197,8 @@ echo "<table width='100%'>\n";
   $sql_downloads .= " FROM $sql_from ";
   $sql_downloads .= " $sql_where ";
 
+  $debuginfo[] = $sql_downloads;
+
   $result_downloads = pg_query($pgconn, $sql_downloads);
   $row = pg_fetch_assoc($result_downloads);
   $total_downloads = $row['total'];
@@ -195,14 +206,6 @@ echo "<table width='100%'>\n";
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_ATTACKS: $sql_attacks\n";
-    echo "SQL_DOWNLOADS: $sql_downloads";
-    echo "</pre>\n";
-  }
 
   if ($total_sensors != 0) {
     $avg_perc = floor(100 / $total_sensors);
@@ -249,6 +252,8 @@ echo "<table width='100%'>\n";
               $sql_attacks .= " $sql_where ";
               $result_attacks = pg_query($pgconn, $sql_attacks);
 
+              $debuginfo[] = $sql_attacks;
+
               # Resetting the sql generation arrays
               $where = array();
               $db_table = array();
@@ -272,6 +277,8 @@ echo "<table width='100%'>\n";
               $sql_downloads .= " FROM $sql_from ";
               $sql_downloads .= " $sql_where ";
               $result_downloads = pg_query($pgconn, $sql_downloads);
+
+              $debuginfo[] = $sql_downloads;
 
               # Resetting the sql generation arrays
               $where = array();
@@ -321,6 +328,8 @@ echo "<table width='100%'>\n";
   $sql_topexp .= " GROUP BY details.text ORDER BY total DESC LIMIT $topexploits OFFSET 0 ";
   $result_topexp = pg_query($pgconn, $sql_topexp);
 
+  $debuginfo[] = $sql_topexp;
+
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
@@ -337,19 +346,13 @@ echo "<table width='100%'>\n";
   $sql_topexp_org .= " $sql_where ";
   $sql_topexp_org .= " GROUP BY details.text ORDER BY total DESC LIMIT $topexploits OFFSET 0 ";
 
+  $debuginfo[] = $sql_topexp_org;
+
   $result_topexp_org = pg_query($pgconn, $sql_topexp_org);
 
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_TOPEXP: $sql_topexp\n";
-    echo "SQL_TOPEXP_ORG: $sql_topexp_org";
-    echo "</pre>\n";
-  }
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -428,6 +431,8 @@ echo "<table width='100%'>\n";
   $sql_top .= " $sql_where ";
   $sql_top .= " GROUP BY sensors.keyname, sensors.organisation ORDER BY total DESC";
 
+  $debuginfo[] = $sql_top;
+
   $result_top = pg_query($pgconn, $sql_top);
 
   # Resetting the sql generation arrays
@@ -446,20 +451,14 @@ echo "<table width='100%'>\n";
   $sql_top_org .= " $sql_where ";
   $sql_top_org .= " GROUP BY sensors.keyname ORDER BY total DESC LIMIT $topsensors OFFSET 0";
 
+  $debuginfo[] = $sql_top_org;
+
   $result_top_org = pg_query($pgconn, $sql_top_org);
   $numrows_top_org = pg_num_rows($result_top_org);
 
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_TOP: $sql_top\n";
-    echo "SQL_TOP_ORG: $sql_top_org";
-    echo "</pre>\n";
-  }
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -481,6 +480,8 @@ echo "<table width='100%'>\n";
                 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $db_org";
                 $result_getorg = pg_query($pgconn, $sql_getorg);
                 $db_org_name = pg_result($result_getorg, 0);
+
+                $debuginfo[] = $sql_getorg;
 
                 $keyname = $row['keyname'];
                 $total = $row['total'];
@@ -544,6 +545,8 @@ echo "<table width='100%'>\n";
   $sql_topports .= " GROUP BY attacks.dport ORDER BY total DESC LIMIT 10 OFFSET 0 "; // change LIMIT into variable to be read from conf
   $result_topports = pg_query($pgconn, $sql_topports);
 
+  $debuginfo[] = $sql_topports;
+
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
@@ -559,19 +562,13 @@ echo "<table width='100%'>\n";
   $sql_topports_org .= " $sql_where ";
   $sql_topports_org .= " GROUP BY attacks.dport ORDER BY total DESC LIMIT 10 OFFSET 0 ";  // change LIMIT into variable to be read from conf
 
+  $debuginfo[] = $sql_topports_org;
+
   $result_topports_org = pg_query($pgconn, $sql_topports_org);
 
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_TOPPORTS: $sql_topports\n";
-    echo "SQL_TOPPORTS_ORG: $sql_topports_org";
-    echo "</pre>\n";
-  }
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -642,6 +639,8 @@ echo "<table width='100%'>\n";
   $sql_topsource .= " GROUP BY attacks.source ORDER BY total DESC LIMIT 10 OFFSET 0 "; // change LIMIT into variable to be read from conf
   $result_topsource = pg_query($pgconn, $sql_topsource);
 
+  $debuginfo[] = $sql_topsource;
+
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
@@ -657,19 +656,13 @@ echo "<table width='100%'>\n";
   $sql_topsource_org .= " $sql_where ";
   $sql_topsource_org .= " GROUP BY attacks.source ORDER BY total DESC LIMIT 10 OFFSET 0 ";  // change LIMIT into variable to be read from conf
 
+  $debuginfo[] = $sql_topsource_org;
+
   $result_topsource_org = pg_query($pgconn, $sql_topsource_org);
 
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_TOPSOURCE: $sql_topsource\n";
-    echo "SQL_TOPSOURCE_ORG: $sql_topsource_org";
-    echo "</pre>\n";
-  }
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -736,6 +729,8 @@ echo "<table width='100%'>\n";
   $sql_topfiles .= " GROUP BY text ORDER BY total DESC OFFSET 0";
   $result_topfiles = pg_query($pgconn, $sql_topfiles);
 
+  $debuginfo[] = $sql_topfiles;
+
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
@@ -752,19 +747,13 @@ echo "<table width='100%'>\n";
   $sql_topfiles_org .= " $sql_where ";
   $sql_topfiles_org .= " GROUP BY text ORDER BY total DESC OFFSET 0";
   $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);
+
+  $debuginfo[] = $sql_topfiles_org;
   
   # Resetting the sql generation arrays
   $where = array();
   $db_table = array();
         
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_TOPFILES: $sql_topfiles\n";
-    echo "SQL_TOPFILES_ORG: $sql_topfiles_org";
-    echo "</pre>\n";
-  }
-
   echo "<tr>\n";
     echo "<td>\n";
       echo "<table width='100%'>\n";
@@ -807,6 +796,8 @@ echo "<table width='100%'>\n";
                 $sql_topbin .= " FROM $sql_from ";
                 $sql_topbin .= " $sql_where ";
                 $result_topbin = pg_query($pgconn, $sql_topbin);
+
+                $debuginfo[] = $sql_topbin;
                 
                 # Resetting the sql generation arrays
                 $where = array();
@@ -844,8 +835,7 @@ echo "<table width='100%'>\n";
                     $filename = trim($array['path'],'/');
                     if (strlen($filename) > 0 && !array_key_exists($filename, $filenameArray)) {
                       $filenameArray[$filename] = $total;
-                    }
-                    elseif (array_key_exists($filename, $filenameArray)) {
+                    } elseif (array_key_exists($filename, $filenameArray)) {
                       $filenameArray[$filename] += $total;
                     }
                   }
@@ -864,7 +854,9 @@ echo "<table width='100%'>\n";
                     $sql_topbin_org .= " FROM $sql_from ";
                     $sql_topbin_org .= " $sql_where ";
                     $result_topbin_org = pg_query($pgconn, $sql_topbin_org);
-                
+
+                    $debuginfo[] = $sql_topbin_org;
+
                     # Resetting the sql generation arrays
                     $where = array();
                     $db_table = array();
@@ -900,14 +892,9 @@ echo "<table width='100%'>\n";
   $sql_organisation .= " $sql_where ";
   $sql_organisation .= " GROUP BY sensors.organisation ORDER BY total DESC LIMIT $toporgs OFFSET 0";
 
-  $result_organisation = pg_query($pgconn, $sql_organisation);
+  $debuginfo[] = $sql_organisation;
 
-  # Debug info 
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_ORGANISATION: $sql_organisation";
-    echo "</pre>\n";
-  }
+  $result_organisation = pg_query($pgconn, $sql_organisation);
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -927,6 +914,8 @@ echo "<table width='100%'>\n";
           $result_getorg = pg_query($pgconn, $sql_getorg);
           $db_org_name = pg_result($result_getorg, 0);
 
+          $debuginfo[] = $sql_getorg;
+
           $count = $row['total'];
           echo "<tr>\n";
             echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
@@ -944,5 +933,6 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 echo "</table>\n";
+debug();
 ?>
 <?php footer(); ?>

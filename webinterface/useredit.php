@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
@@ -46,15 +47,9 @@ if ($s_access_user == 9) {
 } else {
   $sql_user = "SELECT * FROM login WHERE id = $userid AND organisation = $s_org";
 }
+$debuginfo[] = $sql_user;
 $result_user = pg_query($pgconn, $sql_user);
 $numrows_user = pg_num_rows($result_user);
-
-# Debug info
-if ($debug == 1) {
-  echo "<pre>";
-  echo "SQL_USER: $sql_user";
-  echo "</pre>\n";
-}
 
 if ($numrows_user == 0) {
   $err = 1;
@@ -116,6 +111,7 @@ if ($err == 0) {
               echo "<option value='none'></option>\n";
 
               $sql_org = "SELECT id, organisation FROM organisations";
+              $debuginfo[] = $sql_org;
               $result_org = pg_query($pgconn, $sql_org);
               while ($row_org = pg_fetch_assoc($result_org)) {
                 $d_org_id = $row_org['id'];
@@ -125,6 +121,7 @@ if ($err == 0) {
             echo "</select>\n";
           } else {
             $sql_org = "SELECT organisation FROM organisations WHERE id = $org";
+            $debuginfo[] = $sql_org;
             $result_org = pg_query($pgconn, $sql_org);
             $db_org_name = pg_result($result_org, 0);
             echo "<input type='hidden' name='f_org' value='$db_org_name' />\n";
@@ -208,5 +205,6 @@ if ($err == 0) {
 echo "</div></td></tr></table>\n";
 
 pg_close($pgconn);
+debug();
 footer();
 ?>

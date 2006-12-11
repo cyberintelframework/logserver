@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 07-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changes due to new table layout binaries, uniq_binaries, scanners, etc
 # 1.04.01 Code layout
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.04 Added intval() to session variables + access handling change
@@ -40,24 +41,12 @@ if ($err != 1) {
   }
   $result_details = pg_query($pgconn, $sql_details);
 
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_DETAILS: $sql_details";
-    echo "</pre>";
-  }
+  $debuginfo[] = $sql_details;
 
   echo "<table class='datatable'>\n";
     echo "<tr>\n";
       echo "<td class='dataheader' width='100'>AttackID</td>\n";
       echo "<td class='dataheader' width='300'>Logging</td>\n";
-      echo "<td class='dataheader' width='200'>ClamAV result</td>\n";
-      if ($bdc == 1) {
-        echo "<td class='dataheader' width='200'>BitDefender result</td>\n";
-      }
-      if ($antivir == 1) {
-        echo "<td class='dataheader' width='200'>Antivir result</td>\n";
-      }
     echo "</tr>\n";
 
   while ($row = pg_fetch_assoc($result_details)) {
@@ -65,43 +54,19 @@ if ($err != 1) {
     $logging = $row['text'];
     $type = $row['type'];
 
-    $sql_getbin = "SELECT * FROM binaries WHERE bin = '$logging' AND id IN (SELECT MAX(id) FROM binaries WHERE bin = '$logging' GROUP BY scanner)";
-    $result_getbin = pg_query($pgconn, $sql_getbin);
-    $numrows_getbin = pg_num_rows($result_getbin);
-    if ($numrows_getbin == 0) {
-      $clamav_result = "Not scanned";
-      $bdc_result = "Not scanned";
-      $antivir_result = "Not scanned";
-    } else {
-      while ($row_getbin = pg_fetch_assoc($result_getbin)) {
-        $scanner = $row_getbin['scanner'];
-        if ($scanner == "ClamAV") {
-          $clamav_result = $row_getbin['info'];
-        }
-        if ($bdc == 1 && $scanner == "BitDefender") {
-          $bdc_result = $row_getbin['info'];
-        }
-        if ($antivir == 1) {
-          $antivir_result = $row_getbin['info'];
-        }
-      }
-    }
+    $sql_check = "SELECT COUNT(id) as total FROM uniq_binaries WHERE name = '$logging'";
+    $result_check = pg_query($pgconn, $sql_check);
+    $row = pg_fetch_assoc($result_check);
+    $count = $row['total'];
+
+    $debuginfo[] = $sql_check;
 
     echo "<tr>\n";
       echo "<td class='datatd'>$attackid</td>\n";
-      echo "<td class='datatd'>$logging</td>\n";
-      if ($type == 8) {
-        echo "<td class='datatd'>&nbsp;$clamav_result</td>\n";
-        if ($bdc == 1) {
-          echo "<td class='datatd'>&nbsp;$bdc_result</td>\n";
-        }
-        if ($antivir == 1) {
-          echo "<td class='datatd'>&nbsp;$antivir_result</td>\n";
-        }
+      if ($count != 0) {
+        echo "<td class='datatd'><a href='binaryhist.php?binname=$logging'>$logging<a/></td>\n";
       } else {
-        echo "<td class='datatd'>&nbsp;</td>\n";
-        echo "<td class='datatd'>&nbsp;</td>\n";
-        echo "<td class='datatd'>&nbsp;</td>\n";
+        echo "<td class='datatd'>$logging</td>\n";
       }
     echo "</tr>\n";
   }
@@ -109,5 +74,6 @@ if ($err != 1) {
   echo "</table>\n";
 }
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

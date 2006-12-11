@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.02 Removed and changed some stuff referring to the report table
 # 1.03.01 Released as part of the 1.03 package
@@ -73,6 +74,7 @@ if ($s_access_user < 2) {
 }
 
 $sql = "SELECT username FROM login WHERE username = '$f_username'";
+$debuginfo[] = $sql;
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
 if ($rows == 1) {
@@ -83,10 +85,12 @@ if ($rows == 1) {
 if ($err != 1) {
   $sql = "INSERT INTO login (username, password, organisation, access, email, gpg) ";
   $sql .= "VALUES ('$f_username', '$f_pass', '$f_org', '$f_access', '$f_email', $f_gpg)";
+  $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
   if ($default_mail_sensor == 1) {
     $sql_getuid = "SELECT id FROM login WHERE username = '$f_username'";
+    $debuginfo[] = $sql_getuid;
     $result_getuid = pg_query($pgconn, $sql_getuid);
     $row_getuid = pg_fetch_assoc($result_getuid);
     $uid = $row_getuid['id'];
@@ -94,10 +98,12 @@ if ($err != 1) {
       $title = "Hourly sensor status";
       $sql_report = "INSERT INTO report_content (user_id, title, template, active, frequency, interval, priority, subject) ";
       $sql_report .= "VALUES ($uid, '$title', 4, 't', 1, 0, 1, '$title')";
+      $debuginfo[] = $sql_report;
       $execute = pg_query($pgconn, $sql_report);
     }
   }
 }
 pg_close($pgconn);
+debug();
 header("location: useradmin.php?m=$m");
 ?>

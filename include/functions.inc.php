@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 17-11-2006                       #
+# Version 1.04.04                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Changed the debug function
 # 1.04.03 Added getPortDescr() function
 # 1.04.02 Added showSearchTemplates() function
 # 1.04.01 Added cleansql() function
@@ -24,12 +25,43 @@
 # 1.02.03 Initial release
 #############################################
 
-function debug($title, $query) {
+function extractvars($ar) {
+  if (!is_array($ar)) {
+    return "error";
+  } else {
+    echo "Check<br />\n";
+    foreach ($ar as $key => $var) {
+      $explodedkey = explode("_", $key);
+      $temp = array_pop($explodedkey);
+      global $$temp;
+      foreach ($explodedkey as $check) {
+        $var = trim(htmlentities(strip_tags($var)));
+        if ($var == "int") {
+          $var = intval($var);
+        } elseif ($var == "str") {
+          $var = $var;
+        } elseif ($var == "bool") {
+          $var = $var;
+        }
+      }
+      $$temp = $var;
+    }
+  }
+  return "ok";
+}
+
+function debug() {
   global $debug;
+  global $debuginfo;
   if ($debug == 1) {
-    echo "<pre>";
-    echo "$title: $query\n";
-    echo "</pre>\n";
+    echo "<br /><br />\n";
+    echo "<textarea cols=138 rows=20>";
+    if (is_array($debuginfo)) {
+      foreach ($debuginfo as $val) {
+        echo "$val\n\n";
+      }
+    }
+    echo "</textarea>\n";
   }
 }
 
@@ -113,20 +145,43 @@ function cleansql($s_sql) {
 }
 
 function checkSID(){
-  $sid = pg_escape_string(session_id());
-  $remoteip = pg_escape_string($_SERVER['REMOTE_ADDR']);
-  $sql_checksid = "SELECT sid FROM sessions WHERE ip = '$remoteip'";
-  $result_check = pg_query($sql_checksid);
-  $numrows_check = pg_num_rows($result_check);
-  if ($numrows_check != 0) {
-    $row = pg_fetch_assoc($result_check);
-    $db_sid = $row['sid'];
-    if ($db_sid != $sid) {
-      return 1;
+  global $c_checksession;
+  $err = 0;
+  if ($c_chksession_ip == 1) {
+    $sid = session_id();
+    $sql_checksid = "SELECT ip FROM sessions WHERE sid = '$sid'";
+    $result_check = pg_query($sql_checksid);
+    $numrows_check = pg_num_rows($result_check);
+    if ($numrows_check != 0) {
+      $row = pg_fetch_assoc($result_check);
+      $db_ip = $row['ip'];
+      $remoteip = $_SERVER['REMOTE_ADDR'];
+      if ($db_ip != $remoteip) {
+        $err = 1;
+      }
     } else {
-      return 0;
+      $err = 1;
     }
-  } else {
+  }
+  if ($c_chksession_ua == 1) {
+    $sid = session_id();
+    $sql_checksid = "SELECT useragent FROM sessions WHERE sid = '$sid'";
+    $result_check = pg_query($sql_checksid);
+    $numrows_check = pg_num_rows($result_check);
+    if ($numrows_check != 0) {
+      $row = pg_fetch_assoc($result_check);
+      $db_ua = $row['useragent'];
+      $useragent = md5($_SERVER['HTTP_USER_AGENT']);
+      if ($db_ua != $useragent) {
+        $err = 1;
+      }
+    } else {
+      $err = 1;
+    }
+  }
+  if ($err == 0) {
+    return 0;
+  } elseif ($err == 1) {
     return 1;
   }
 }

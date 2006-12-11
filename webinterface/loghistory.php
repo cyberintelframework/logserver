@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Peter Arts & Kees Trippelvitz    #
 ####################################
 
 #################################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.07 Changed some access handling
@@ -44,9 +45,12 @@ $sql_getorg = "SELECT organisation FROM organisations WHERE id = '$s_org'";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 #$db_org_name = pg_result($result_getorg, 0);
 
+$debuginfo[] = $sql_getorg;
+
 if (!isset($_GET['org']) && $s_access_search == 9) {
   echo "Select an organisation.<br /><br />\n";
   $sql_org = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+  $debuginfo = $sql_org;
   $result_org = pg_query($pgconn, $sql_org);
   echo "<form name='sel_org' action='loghistory.php' method='get'>\n";
     echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
@@ -83,6 +87,7 @@ if ($err != 1) {
     if ($s_access_search == 9) {
       $err = 1;
       $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+      $debuginfo = $sql_orgs;
       $result_orgs = pg_query($pgconn, $sql_orgs);
       echo "<input type='hidden' name='m' value='$month' />\n";
       echo "<input type='hidden' name='y' value='$year' />\n";
@@ -100,10 +105,12 @@ if ($err != 1) {
     }
     
     $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
+    $debuginfo[] = $sql;
     $query = pg_query($sql);
     echo "<select name='sensor' onChange='javascript: this.form.submit();'>\n";
     while ($sensor_data = pg_fetch_assoc($query)) {
       $sql_check = "SELECT * FROM stats_history WHERE sensorid = '" . intval($sensor_data["id"]) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "'";
+      $debuginfo[] = $sql_check;
       $query_check = pg_query($sql_check);
       if (pg_num_rows($query_check) > 0) echo printOption($sensor_data["id"], $sensor_data["keyname"], $s_sensor);
     }
@@ -116,12 +123,7 @@ if ($err != 1) {
 	echo "<h4>History data for $monthname $year</h4>\n";
 	
 	$sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
-
-        if ($debug == 1) {
-          echo "<pre>";
-          echo "SQL: $sql";
-          echo "</pre>\n";
-        }
+        $debuginfo[] = $sql;
         
 	$query = pg_query($sql);
 	if (pg_num_rows($query) == 0) {
@@ -132,13 +134,7 @@ if ($err != 1) {
 		echo "<table border=0 cellspacing=0 cellpadding=0><tr><td valign=\"top\">\n";
 
 		$sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
-
-                # Debug info
-                if ($debug == 1) {
-                  echo "<pre>";
-                  echo "$SQL: $sql";
-                  echo "</pre>\n";
-                }
+                $debuginfo = $sql;
 
 		$query = pg_query($sql);
 		$stats_history = pg_fetch_assoc($query);
@@ -186,16 +182,10 @@ if ($err != 1) {
 		echo "  <td class='dataheader' width='400' colspan=2 align='center'><h3>Malicious attacks ($show)</h3></td>\n";
 		echo " </tr>\n";
 		$sql = "SELECT * FROM stats_history_dialogue AS shd, stats_dialogue AS sd WHERE shd.dialogueid = sd.id AND shd.historyid = '" . $history_id . "' ORDER BY count DESC $limit";
+                $debuginfo[] = $sql;
 		$query = pg_query($sql);
 		$i = 1;
 		$list_count_malicious = 0;
-
-                # Debug info
-                if ($debug == 1) {
-                  echo "<pre>";
-                  echo "SQL: $sql";
-                  echo "</pre>\n";
-                }
 
 		while ($dia = pg_fetch_assoc($query)) {
 			$attack_name = preg_replace("/Dialogue/", "", $dia["name"]);
@@ -231,18 +221,13 @@ if ($err != 1) {
 
 		$sql = "SELECT * FROM stats_history_virus AS shv, stats_virus AS sv WHERE shv.virusid = sv.id AND sv.name <> 'Suspicious' AND shv.historyid = '" . $history_id . "' ORDER BY count DESC $limit";
 		$sql_count = "SELECT SUM(count) FROM stats_history_virus AS shv, stats_virus AS sv WHERE shv.virusid = sv.id AND shv.historyid = '" . $history_id . "'";
+                $debuginfo[] = $sql;
+                $debuginfo[] = $sql_count;
 		$query_count = pg_query($sql_count);
 		$total = pg_result($query_count, 0);
 		$query = pg_query($sql);
 		$i = 1;
 		$list_count_virus = 0;
-
-                # Debug info 
-                if ($debug == 1) {
-                  echo "<pre>";
-                  echo "SQL: $sql";
-                  echo "</pre>\n";
-                }
 
 		while ($dia = pg_fetch_assoc($query)) {
 			echo " <tr>\n";
@@ -264,5 +249,6 @@ if ($err != 1) {
 	}
 }
 pg_close($pgconn);
+debug();
 ?>
 <?php footer(); ?>

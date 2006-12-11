@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.02 Added email and gpg input fields
 # 1.03.01 Released as part of the 1.03 package
@@ -60,6 +61,7 @@ if ($err == 0) {
               echo "<option value='none' selected></option>\n";
 
               $sql_org = "SELECT DISTINCT * FROM organisations";
+              $debuginfo[] = $sql_org;
               $result_org = pg_query($pgconn, $sql_org);
               while ($row_org = pg_fetch_assoc($result_org)) {
                 $d_org = $row_org['organisation'];
@@ -69,6 +71,7 @@ if ($err == 0) {
             echo "</select>\n";
           } else {
             $sql_org = "SELECT organisation FROM organisations WHERE id = $s_org";
+            $debuginfo[] = $sql_org;
             $result_org = pg_query($pgconn, $sql_org);
             $db_org_name = pg_result($result_org, 0);
             echo "<input type='hidden' name='f_org' value='$s_org' />\n";
@@ -137,5 +140,6 @@ if ($err == 0) {
     echo "</table>\n";
   echo "</form>\n";
 }
+debug();
 footer();
 ?>

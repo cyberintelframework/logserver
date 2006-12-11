@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.08 Added intval() to session variables + pattern matching on $b + intval() for $month and $day
@@ -35,6 +36,8 @@ if ($s_access_search == 9 && isset($_GET['org'])) {
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $db_org_name = pg_escape_string(pg_result($result_getorg, 0));
+
+$debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.
 if (isset($_GET['b'])) {
@@ -109,6 +112,7 @@ echo "<form name='selectorg' method='get' action='logcheck.php?org=$q_org'>\n";
       $err = 1;
     }
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
     echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
       while ($row = pg_fetch_assoc($result_orgs)) {
@@ -132,6 +136,7 @@ echo "</form>\n";
 
 if ($err != 1) {
   $sql_ranges = "SELECT ranges FROM organisations WHERE id = $q_org";
+  $debuginfo[] = $sql_ranges;
   $result_ranges = pg_query($pgconn, $sql_ranges);
   $row = pg_fetch_assoc($result_ranges);
 
@@ -183,6 +188,9 @@ if ($err != 1) {
     $sql_uniq .= " FROM $sql_from ";
     $sql_uniq .= " $sql_where ";
 
+    $debuginfo[] = $sql_total;
+    $debuginfo[] = $sql_uniq;
+
     $result_total = pg_query($pgconn, $sql_total);
     $row_total = pg_fetch_assoc($result_total);
     $count_total = $row_total['total'];
@@ -191,14 +199,6 @@ if ($err != 1) {
     $count_uniq = pg_num_rows($result_uniq);
 
     $where = array();
-
-    # Debug info
-    if ($debug == 1) {
-      echo "<pre>";
-      echo "SQL_UNIQ: $sql_uniq\n";
-      echo "SQL_TOTAL: $sql_total";
-      echo "</pre>\n";
-    }
 
     echo "<tr>\n";
       echo "<td class='datatd'>$range</td>\n";
@@ -217,6 +217,6 @@ if ($err != 1) {
   }
   echo "</table>\n";
 }
-
+debug();
 ?>
 <?php footer(); ?>
