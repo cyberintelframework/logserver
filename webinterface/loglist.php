@@ -25,9 +25,19 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
+$allowed_get = array(
+                "int_org",
+                "b",
+		"int_to",
+		"int_from",
+		"net_range"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 ### Checking for organisation.
-if (isset($_GET['org']) && $s_access_search == 9) {
-  $q_org = intval($_GET['org']);
+if (isset($clean['org']) && $s_access_search == 9) {
+  $q_org = $clean['org'];
 } elseif ($s_access_search == 9) {
   echo "No organisation given in the querystring.<br />\n";
   $err = 1;
@@ -36,21 +46,21 @@ if (isset($_GET['org']) && $s_access_search == 9) {
 }
 
 ### Checking for period.
-if (isset($_GET['to']) && isset($_GET['from'])) {
-  $start = intval($_GET['from']);
-  $end = intval($_GET['to']);
+if (isset($clean['to']) && isset($clean['from'])) {
+  $start = $clean['from'];
+  $end = $clean['to'];
   $tsquery = "attacks.timestamp >= $start AND attacks.timestamp <= $end";
-  $dateqs = "&amp;from=$start&amp;to=$end";
+  $dateqs = "&amp;int_from=$start&amp;int_to=$end";
 } else {
   $tsquery = "";
   $dateqs = "";
 }
 
 ### Checking for browse method in querystring.
-if (isset($_GET['b'])) {
-  $b = pg_escape_string($_GET['b']);
+if (isset($tainted['b'])) {
+  $b = pg_escape_string($tainted['b']);
   $pattern = '/^(weekly|daily|monthly|all)$/';
-  if (preg_match($pattern, $b) != 1) {
+  if (!preg_match($pattern, $b)) {
     $b = "weekly";
   }
 } else {
@@ -58,8 +68,12 @@ if (isset($_GET['b'])) {
 }
 
 ### Checking sort method.
-if (isset($_GET['sort'])) {
-  $sort = pg_escape_string(stripinput($_GET['sort']));
+if (isset($tainted['sort'])) {
+  $sort = $tainted['sort'];
+  $pattern = '/^(ip|count)$/';
+  if (!preg_match($pattern, $sort)) {
+    $sort = "count";
+  }
   if ($sort == "ip") {
     $orderby = "ORDER BY source ASC";
   } elseif ($sort == "count") {
@@ -72,8 +86,8 @@ if (isset($_GET['sort'])) {
 }
 
 ### Checking IP range to search.
-if (isset($_GET['range'])) {
-  $range = pg_escape_string(stripinput($_GET['range']));
+if (isset($clean['range'])) {
+  $range = $clean['range'];
   echo "Checking unique source addresses for $range.<br /><br />\n";
   echo "<table class='datatable'>\n";
     echo "<tr>\n";
@@ -89,8 +103,8 @@ if (isset($_GET['range'])) {
       }
     echo "</tr>\n";
     echo "<tr>\n";
-      echo "<td class='dataheader'><a href='loglist.php?range=$range&amp;org=$q_org&amp;b=$b&amp;sort=ip$dateqs'>Source IP Address</a></td>\n";
-      echo "<td class='dataheader'><a href='loglist.php?range=$range&amp;org=$q_org&amp;b=$b&amp;sort=count$dateqs'>Attacks</a></td>\n";
+      echo "<td class='dataheader'><a href='loglist.php?strip_html_escape_range=$range&amp;int_org=$q_org&amp;b=$b&amp;sort=ip$dateqs'>Source IP Address</a></td>\n";
+      echo "<td class='dataheader'><a href='loglist.php?strip_html_escape_range=$range&amp;int_org=$q_org&amp;b=$b&amp;sort=count$dateqs'>Attacks</a></td>\n";
     echo "</tr>\n";
 } else {
   echo "No range was given to search.<br />\n";
@@ -104,7 +118,7 @@ if ($err != 1) {
 
   add_db_table("attacks");
   $where[] = "$tsquery";
-  $where[] = "sensors.organisation = $q_org";
+#  $where[] = "sensors.organisation = $q_org";
   $where[] = "attacks.source <<= '$range'";
   $where[] = "attacks.severity = 1";
   prepare_sql();
@@ -123,12 +137,12 @@ if ($err != 1) {
     $count = $row['total'];
     echo "<tr>\n";
       echo "<td class='datatd'>$source</td>\n";
-      echo "<td class='datatd' align='right'><a href='logsearch.php?f_field=source&amp;f_search=$source&amp;f_sev=1$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+      echo "<td class='datatd' align='right'><a href='logsearch.php?ip_searchip=$source&amp;int_sev=1$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
     echo "</tr>\n";
   }
 }
 echo "</table>\n";
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

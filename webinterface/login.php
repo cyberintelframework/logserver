@@ -18,24 +18,39 @@
 # 1.02.01 Initial release
 #############################################
 
-if (isset($_GET['url'])) {
-  $url = "?url=" .$_GET['url'];
+echo "<center>\n";
+echo "<h3>Login</h3>\n";
+
+$allowed_get = array(
+                "int_m",
+		"strip_html_url"
+);
+$check = extractvars($_GET, $allowed_get);
+$allowed_post = array(
+                "strip_html_escape_user"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
+if (isset($clean['url'])) {
+  $url = "?strip_html_url=" .$clean['url'];
 } else {
   $url = "";
 }
 
-echo "<center>\n";
-echo "<h3>Login</h3>\n";
-
-if (isset($_GET['e'])) {
-  $e = intval($_GET['e']);
+if (isset($clean['m'])) {
+  $e = $clean['m'];
   if ($e == 1) { $e = "<p><font color='red'>Username or password was incorrect!</font></p>\n"; }
   else { $e = "<p><font color='red'>Unknown error!</font></p>\n"; }
   echo "$e";
 }
+
+##################
+# LOGIN METHOD 2
+##################
 if ($login_method == 2) {
-  if (isset($_POST['f_user'])) {
-    $f_user = pg_escape_string($_POST['f_user']);
+  if (isset($clean['user'])) {
+    $f_user = $clean['user'];
     $sql_user = "SELECT count(id) as total, password FROM login WHERE username = '$f_user' GROUP BY password";
     $result_user = pg_query($pgconn, $sql_user);
     $row = pg_fetch_assoc($result_user);
@@ -53,7 +68,7 @@ if ($login_method == 2) {
         echo "<table border='1'>\n";
           echo "<tr>\n";
             echo "<td>Username:</td>\n";
-            echo "<td><input type='text' name='f_user' class='loginput' /></td>\n";
+            echo "<td><input type='text' name='strip_html_user' class='loginput' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td colspan='2' align='center'><input type='submit' value='Login' class='button' /></td>\n";
@@ -70,8 +85,8 @@ if ($login_method == 2) {
           echo "<td>\n";
             echo "<input type='password' class='loginput' />\n";
             echo "<input type='hidden' value='$serverhash' size='50' />\n";
-            echo "<input type='hidden' name='f_pass' size='50' />\n";
-            echo "<input type='hidden' name='f_user' value='$f_user' />\n";
+            echo "<input type='hidden' name='md5_pass' size='50' />\n";
+            echo "<input type='hidden' name='strip_html_escape_user' value='$f_user' />\n";
           echo "</td>\n";
         echo "</tr>\n";
   } else {
@@ -79,7 +94,7 @@ if ($login_method == 2) {
       echo "<table border='1'>\n";
         echo "<tr>\n";
           echo "<td>Username:</td>\n";
-          echo "<td><input type='text' name='f_user' class='loginput' /></td>\n";
+          echo "<td><input type='text' name='strip_html_escape_user' class='loginput' /></td>\n";
         echo "</tr>\n";
   }
       echo "<tr>\n";
@@ -87,18 +102,21 @@ if ($login_method == 2) {
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
+##################
+# LOGIN METHOD 1
+##################
 } else {
-  echo "<form name='login' action='checklogin.php$url' method='post' onsubmit='javascript:f_pass.value=hex_md5(login.elements[1].value);'>\n";
+  echo "<form name='login' action='checklogin.php$url' method='post' onsubmit='javascript:md5_pass.value=hex_md5(login.elements[1].value);'>\n";
     echo "<table border='1'>\n";
       echo "<tr>\n";
         echo "<td>Username:</td>\n";
-        echo "<td><input type='text' name='f_user' class='loginput' /></td>\n";
+        echo "<td><input type='text' name='strip_html_escape_user' class='loginput' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td>Password:</td>\n";
         echo "<td>\n";
           echo "<input type='password' class='loginput' />\n";
-          echo "<input type='hidden' name='f_pass' />\n";
+          echo "<input type='hidden' name='md5_pass' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";

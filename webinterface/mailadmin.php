@@ -18,9 +18,16 @@
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 
+$allowed_get = array(
+                "int_userid",
+		"int_m"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 // Make sure all access rights are correct
-if (isset($_GET['userid'])) {
-  $user_id = intval($_GET['userid']);
+if (isset($clean['userid'])) {
+  $user_id = $clean['userid'];
   if ($s_access_user < 1) {
     header("location: index.php");
     pg_close($pgconn);
@@ -34,19 +41,26 @@ if (isset($_GET['userid'])) {
     if ($numrows_login == 0) {
       $user_id = $s_userid;
     } else {
-      $user_id = intval($_GET['userid']);
+      $user_id = $clean['userid'];
     }
   } else {
-    $user_id = intval($_GET['userid']);
+    $user_id = $clean['userid'];
   }
 } else {
   $user_id = $s_userid;
 }
 
-if (isset($_POST['f_email'])) {
+$allowed_post = array(
+                "int_gpg",
+		"strip_html_escape_email"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
+if (isset($clean['email'])) {
   # POST is set. Do save.
-  $f_email = stripinput(pg_escape_string($_POST['f_email']));
-  $f_gpg = intval($_POST['f_gpg']);
+  $f_email = $clean['email'];
+  $f_gpg = $clean['f_gpg'];
 
   $sql_update = "UPDATE login ";
   $sql_update .= "SET email = '$f_email', gpg = $f_gpg ";
@@ -57,16 +71,12 @@ if (isset($_POST['f_email'])) {
   }
   $debuginfo[] = $sql_update;
   $result_update = pg_query($sql_update);
-  $m = 8;
+  $clean['m'] = 8;
 }
 
-if (isset($m)) {
-  $m = stripinput($errors[$m]);
-  $m = "<p>$m</p>\n";
-  echo "<font color='red'>" .$m. "</font>";
-} elseif (isset($_GET['m'])) {
-  $m = intval($_GET['m']);
-  $m = stripinput($errors[$m]);
+if (isset($clean['m'])) {
+  $m = $clean['m'];
+  $m = $errors[$m];
   $m = "<p>$m</p>\n";
   echo "<font color='red'>" .$m. "</font>";
 }
@@ -86,19 +96,19 @@ if ($s_access_user > 0) {
   $gpg = $row['gpg'];
 
   echo "<b>Email settings</b><br /><br />\n";
-  echo "<form name='emailsettings' action='mailadmin.php?userid=$user_id' method='post'>\n";
+  echo "<form name='emailsettings' action='mailadmin.php?int_userid=$user_id' method='post'>\n";
   echo "<table border='0' class='datatable'>\n";
     echo "<tr>\n";
       echo "<td class='datatd' width='100'>Email address</td>\n";
       echo "<td class='datatd'>";
-        echo "<input type='text' name='f_email' value='" . $email . "' size='30'><br />";
+        echo "<input type='text' name='strip_html_escape_email' value='" . $email . "' size='30'><br />";
       echo "</td>\n";
     echo "</td>\n";
     echo "<tr>\n";
       echo "<td class='datatd'>Email signing</td>\n";
       echo "<td class='datatd'>\n";
-        echo printRadio("Enable GPG signing", "f_gpg", 1, $gpg) . "<br />\n";
-        echo printRadio("Disable GPG signing", "f_gpg", 0, $gpg) . "<br />\n";
+        echo printRadio("Enable GPG signing", "int_gpg", 1, $gpg) . "<br />\n";
+        echo printRadio("Disable GPG signing", "int_gpg", 0, $gpg) . "<br />\n";
       echo "</td>\n";
     echo "</tr>\n";
     echo "<tr>\n";
@@ -110,10 +120,10 @@ if ($s_access_user > 0) {
   echo "<br /><br />\n";
 
   echo "<b>Reports</b><br /><br />";
-  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_add.php?userid=$user_id';>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<input type='button' value='Disable all reports' class='button' onClick=window.location='report_mod.php?userid=$user_id&a=d';>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<input type='button' value='Enable all reports' class='button' onClick=window.location='report_mod.php?userid=$user_id&a=e';>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?userid=$user_id&a=r';><br /><br />";
+  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_add.php?int_userid=$user_id';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Disable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=d';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Enable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=e';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=r';><br /><br />";
   echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
     echo "<tr class='dataheader'>\n";
       echo "<td class='datatd' width='400'>Title</td>\n";
@@ -149,12 +159,12 @@ if ($s_access_user > 0) {
 
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>";
-          echo "<a href='report_edit.php?userid=$user_id&report_content_id=$report_content_id'>" . $report_content["title"] . "</a>";
+          echo "<a href='report_edit.php?int_userid=$user_id&int_rcid=$report_content_id'>" . $report_content["title"] . "</a>";
         echo "</td>\n";
         echo "<td class='datatd'>" . $last_sent . "</td>\n";
         echo "<td class='datatd'>" . $mail_template_ar[$report_content["template"]] . "</td>\n";
         echo "<td class='datatd'>" . $status . "</td>\n";
-        echo "<td align='center'><a href='report_del.php?userid=$user_id&report_content_id=$report_content_id'><img src='images/icons/email_delete_20.gif' alt='Delete Report' title='Delete Report' /></a></td>\n";
+        echo "<td align='center'><a href='report_del.php?int_userid=$user_id&int_rcid=$report_content_id'><img src='images/icons/email_delete_20.gif' alt='Delete Report' title='Delete Report' /></a></td>\n";
       echo "</tr>\n";
     }
 
@@ -162,6 +172,6 @@ if ($s_access_user > 0) {
 }
 
 pg_close($pgconn);
-debug();
+debug_sql();
 footer();
 ?>

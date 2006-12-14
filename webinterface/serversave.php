@@ -34,12 +34,18 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
 $err = 0;
 
+$allowed_post = array(
+                "strip_html_escape_server"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;
 }
 
-$f_server = stripinput(trim(pg_escape_string($_POST['f_server'])));
+$f_server = $clean['server'];
 if ($f_server == "") {
   $err = 1;
   $m = 31;
@@ -51,5 +57,5 @@ if ($err != 1) {
   $m = 6;
 }
 pg_close($pgconn);
-header("location: serveradmin.php?m=$m");
+header("location: serveradmin.php?int_m=$m");
 ?>

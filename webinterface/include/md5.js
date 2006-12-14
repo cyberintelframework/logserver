@@ -48,7 +48,7 @@ function generatep() {
   var serverhash = document.login.elements[1].value;
   var check = pass + serverhash;
 
-  document.login.f_pass.value = hex_md5(check);
+  document.login.md5_pass.value = hex_md5(check);
 }
 
 /*

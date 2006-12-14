@@ -28,29 +28,35 @@ include '../include/functions.inc.php';
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
+$allowed_get = array(
+		"int_imgid",
+                "type"
+);
+$check = extractvars($_GET, $allowed_get);
+
 header("Content-type: image/png");
 header("Cache-control: no-cache");
 header("Pragma: no-cache");
 
-if ($s_admin == 1) {
-  if (isset($_GET['orgid'])) {
-    $orgid = intval($_GET['orgid']);
-  } else {
-    $err = 1;
-  }
-} else {
-  $orgid = $s_org;
-}
+#if ($s_admin == 1) {
+#  if (isset($clean['orgid'])) {
+#    $orgid = $clean['orgid'];
+#  } else {
+#    $err = 1;
+#  }
+#} else {
+#  $orgid = $s_org;
+#}
 
-if (isset($_GET['imgid'])) {
-  $imgid = intval($_GET['imgid']);
+if (isset($clean['imgid'])) {
+  $imgid = $clean['imgid'];
 } else {
   $err = 1;
 }
 
-$type = pg_escape_string($_GET['type']);
+$type = $tainted['type'];
 $pattern = '/^(day|week|month|year)$/';
-if (preg_match($pattern, $type) != 1) {
+if (!preg_match($pattern, $type)) {
   $type = "day";
 }
 

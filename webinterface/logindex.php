@@ -33,8 +33,18 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-if ($s_access_search == 9 && isset($_GET['org'])) {
-  $q_org = intval($_GET['org']);
+$allowed_get = array(
+                "int_org",
+                "b",
+                "i",
+		"int_to",
+		"int_from"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if ($s_access_search == 9 && isset($clean['org'])) {
+  $q_org = $clean['org'];
 } elseif ($s_access_search == 9) {
   $q_org = 0;
 } else {
@@ -47,8 +57,8 @@ $result_getorg = pg_query($pgconn, $sql_getorg);
 $debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.
-if (isset($_GET['b'])) {
-  $b = pg_escape_string($_GET['b']);
+if (isset($tainted['b'])) {
+  $b = $tainted['b'];
   $pattern = '/^(weekly|daily|monthly|all)$/';
   if (!preg_match($pattern, $b)) {
     $b = "weekly";
@@ -59,7 +69,7 @@ if (isset($_GET['b'])) {
 
 $year = date("Y");
 if ($b == "monthly") {
-  $month = $_GET['i'];
+  $month = $tainted['i'];
   if ($month == "") { $month = date("n"); }
   $month = intval($month);
   $next = $month + 1;
@@ -70,7 +80,7 @@ if ($b == "monthly") {
   $month = date("n");
 }
 if ($b == "daily") {
-  $day = $_GET['i'];
+  $day = $tainted['i'];
   if ($day == "") { $day = date("d"); }
   $day = intval($day);
   $prev = $day - 1;
@@ -81,7 +91,7 @@ if ($b == "daily") {
   $day = date("d");
 }
 if ($b == "weekly") {
-  $day = $_GET['i'];
+  $day = $tainted['i'];
   if ($day == "") { $day = date("d"); }
   $day = intval($day);
   $prev = $day - 7;
@@ -93,17 +103,17 @@ if ($b == "all") {
   $searchqs = "";
   $tsquery = "";
 } else {
-  $searchqs = "&amp;from=$start&amp;to=$end";
+  $searchqs = "&amp;int_from=$start&amp;int_to=$end";
   $tsquery = "timestamp >= $start AND timestamp <= $end";
 }
 
 echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br />\n";
 ### BROWSE MENU
 $today = date("U");
-echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
-  echo "<input type='hidden' name='org' value='$q_org' />\n";
+echo "<form name='selectorg' method='get' action='logindex.php?int_org=$q_org'>\n";
+  echo "<input type='hidden' name='int_org' value='$q_org' />\n";
   if ($b != "all") {
-    echo "<input type='button' value='Prev' class='button' onClick=window.location='logindex.php?b=$b&amp;i=$prev&amp;org=$q_org';>\n";
+    echo "<input type='button' value='Prev' class='button' onClick=window.location='logindex.php?b=$b&amp;i=$prev&amp;int_org=$q_org';>\n";
   } else {
     echo "<input type='button' value='Prev' class='button' disabled>\n";
   }
@@ -121,7 +131,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
     $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
-    echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
+    echo "<select name='int_org' onChange='javascript: this.form.submit();'>\n";
       echo printOption(0, "All", $q_org) . "\n";
       while ($row = pg_fetch_assoc($result_orgs)) {
         $org_id = $row['id'];
@@ -135,7 +145,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?org=$q_org'>\n";
     if ($end > $today) {
       echo "<input type='button' value='Next' class='button' disabled>\n";
     } else {
-      echo "<input type='button' value='Next' class='button' onClick=window.location='logindex.php?b=$b&amp;i=$next&amp;org=$q_org';>\n";
+      echo "<input type='button' value='Next' class='button' onClick=window.location='logindex.php?b=$b&amp;i=$next&amp;int_org=$q_org';>\n";
     }
   } else {
     echo "<input type='button' value='Next' class='button' disabled>\n";
@@ -186,14 +196,14 @@ echo "<table class='datatable'>\n";
     echo "<tr>\n";
       echo "<td class='datatd'>$description</td>\n";
       if ($severity == 0 || $severity == 16) {
-        echo "<td class='datatd' align='right'><a href='logsearch.php?f_sev=$severity&amp;f_field=source&amp;f_search=&amp;org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+        echo "<td class='datatd' align='right'><a href='logsearch.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
       } elseif ($severity == 1 || $severity == 32) {
-        echo "<td class='datatd' align='right'><a href='logattacks.php?sev=$severity&amp;org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+        echo "<td class='datatd' align='right'><a href='logattacks.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
       }
     echo "</tr>\n";
   }
 echo "</table>\n";
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

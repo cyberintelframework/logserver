@@ -21,9 +21,9 @@ if (intval(@strlen($_SESSION["s_user"])) == 0) {
   exit;
 }
 
-#header("Content-type: image/png");
-#header("Cache-control: no-cache");
-#header("Pragma: no-cache");
+header("Content-type: image/png");
+header("Cache-control: no-cache");
+header("Pragma: no-cache");
 
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
@@ -31,8 +31,17 @@ include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 require_once("../libchart/libchart.php");
 
-$charttype = intval($_GET['type']);
-$org = intval($_GET['org']);
+$allowed_get = array(
+                "int_type"
+);
+$check = extractvars($_GET, $allowed_get);
+#debug_input();
+
+if (!isset($clean['type'])) {
+  $charttype = 0;
+} else {
+  $charttype = $clean['type'];
+}
 $sql = cleansql($_SESSION['chartsql']);
 
 if ($charttype == 0) {

@@ -262,30 +262,38 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       $s_a_search = $s_access{1};
       $s_a_user = $s_access{2};
 
+      $popup_useradmin = "Account management page. Add, change and delete user accounts!";
+      $popup_useredit = "Account management page. Modify your account information here!";
+      $popup_mail = "Mail report management. Manage your personal mail reports here!";
+      $popup_org = "Organisation management page. Modify organisation info and add organisation identifiers!";
+      $popup_server = "Tunnel server management page. Add or delete tunnel server machines!";
+      $popup_stats = "Shows statistics about the tunnel server machine!";
+      $popup_scanner = "Virus scanner management page. Add, change or delete virus scanners!";
+
       echo "<div class='nav-sub-menu'>\n";
         echo "<ul>\n";
           if ($s_a_user > 1) {
-            echo "<li><a href='${address}useradmin.php'>User Admin</a></li>\n";
+            echo "<li><a href='${address}useradmin.php' onmouseover='return overlib(\"$popup_useradmin\");' onmouseout='return nd();'>User Admin</a></li>\n";
           } elseif ($s_a_user > 0) {
-            echo "<li><a href='${address}useredit.php'>User Admin</a></li>\n";
+            echo "<li><a href='${address}useredit.php' onmouseover='return overlib(\"$popup_useredit\");' onmouseout='return nd();'>User Admin</a></li>\n";
           }
           if ($s_a_user > 0) {
-            echo "<li><a href='${address}mailadmin.php'>Mail Admin</a></li>\n";
+            echo "<li><a href='${address}mailadmin.php' onmouseover='return overlib(\"$popup_mail\");' onmouseout='return nd();'>Mail Admin</a></li>\n";
           }
           if ($s_admin == 1) {
-            echo "<li><a href='${address}orgadmin.php'>Organisation Admin</a></li>\n";
+            echo "<li><a href='${address}orgadmin.php' onmouseover='return overlib(\"$popup_org\");' onmouseout='return nd();'>Organisation Admin</a></li>\n";
           }
           if ($s_admin == 1) {
-            echo "<li><a href='${address}serveradmin.php'>Server Admin</a></li>\n";
+            echo "<li><a href='${address}serveradmin.php' onmouseover='return overlib(\"$popup_server\");' onmouseout='return nd();'>Server Admin</a></li>\n";
           }
 #          if ($s_a_sensor > 1) {
-#            echo "<li><a href='${address}arpadmin.php'>ARP Admin</a></li>\n";
+#            echo "<li><a href='${address}arpadmin.php' onmouseover='return overlib(\"$popup_arp\");' onmouseout='return nd();'>ARP Admin</a></li>\n";
 #          }
           if ($s_admin == 1) {
-            echo "<li><a href='${address}serverstats.php'>Server Info</a></li>\n";
+            echo "<li><a href='${address}serverstats.php' onmouseover='return overlib(\"$popup_stats\");' onmouseout='return nd();'>Server Info</a></li>\n";
           }
           if ($s_admin == 1) {
-            echo "<li><a href='${address}virusadmin.php'>Scanner Admin</a></li>\n";
+            echo "<li><a href='${address}virusadmin.php' onmouseover='return overlib(\"$popup_scanner\");' onmouseout='return nd();'>Scanner Admin</a></li>\n";
           }
         echo "</ul>\n";
       echo "</div>\n";

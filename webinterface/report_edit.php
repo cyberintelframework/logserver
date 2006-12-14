@@ -23,9 +23,16 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+$allowed_get = array(
+                "int_userid",
+		"int_rcid"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 // Make sure all access rights are correct
-if (isset($_GET['userid'])) {
-  $user_id = intval($_GET['userid']);
+if (isset($clean['userid'])) {
+  $user_id = $clean['userid'];
   if ($s_access_user < 1) {
     header("location: index.php");
     pg_close($pgconn);
@@ -42,17 +49,35 @@ if (isset($_GET['userid'])) {
       footer();
       exit;
     } else {
-      $user_id = intval($_GET['userid']);
+      $user_id = $clean['userid'];
     }
   } else {
-    $user_id = intval($_GET['userid']);
+    $user_id = $clean['userid'];
   }
 } else {
   $user_id = $s_userid;
 }
 
+$allowed_post = array(
+                "strip_html_escape_title",
+                "strip_html_escape_subject",
+                "int_sensorid",
+		"int_priority",
+		"int_target",
+		"int_timespan",
+		"int_operator",
+		"int_value",
+		"int_intervalday",
+		"int_intervalweek",
+		"int_frequency",
+		"bool_active",
+		"int_valueuser",
+		"int_deviation"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
 
-$report_content_id = intval($_GET["report_content_id"]);
+$report_content_id = $clean["rcid"];
 if ($report_content_id > 0) {
   # Getting data from database
   $sql_report_content = "SELECT * FROM report_content ";
@@ -69,21 +94,21 @@ if ($report_content_id > 0) {
     
     # Template: Thresholds
     if ($template == 3) {
-      if (intval($_POST["submit"]) == 1) {
+      if (isset($tainted["submit"])) {
         # Submit data, update database record
-        $title = pg_escape_string(htmlentities(strip_tags(trim($_POST["title"]))));
-        $sensor_id = intval($_POST["sensor_id"]);
-        $priority = intval($_POST["priority"]);
-        $target = intval($_POST["target"]);
-        $timespan = intval($_POST["timespan"]);
-        $operator = intval($_POST["operator"]);
-        $value = intval($_POST["value"]);
-        $active = pgboolval($_POST["active"]);
+        $title = $clean["title"];
+        $sensor_id = $clean["sensorid"];
+        $priority = $clean["priority"];
+        $target = $clean["target"];
+        $timespan = $clean["timespan"];
+        $operator = $clean["operator"];
+        $value = $clean["value"];
+        $active = $clean["active"];
         if ($value == -2) {
-          $value = intval($_POST["value_user"]);
+          $value = $clean["valueuser"];
         }
-        $deviation = intval($_POST["deviation"]);
-        $subject = pg_escape_string(htmlentities(strip_tags(trim($_POST['subject']))));
+        $deviation = $clean["deviation"];
+        $subject = $clean['subject'];
         
         if (empty($title)) {
           echo "<p style='color:red;'><b>Invalid title</b></p>\n";
@@ -150,23 +175,23 @@ if ($report_content_id > 0) {
       echo "<div name='threshold_user' id='threshold_user' style='position:absolute;left:400px;top:130px;border:1px solid black;padding:10px;'>Threshold: </div>";
       echo "<form method='post' onclick=\"updateThreshold();\">";
         echo "<input type='hidden' name='action' value='edit'>";
-        echo "<input type='hidden' name='userid' value='$user_id'>";
+        echo "<input type='hidden' name='int_userid' value='$user_id'>";
         echo "<input type='hidden' name='submit' value='1'>";
-        echo "<input type='hidden' name='report_content_id' value='$report_content_id'>\n";
+        echo "<input type='hidden' name='int_rcid' value='$report_content_id'>\n";
         echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Title: </td>\n";
-            echo "<td class='datatd'><input type='text' name='title' value='$title'></td>\n";
+            echo "<td class='datatd'><input type='text' name='strip_html_escape_title' value='$title'></td>\n";
           echo "</tr>\n";
           # Email subject
           echo "<tr class='datatr'>";
             echo "<td class='datatd'>Email subject: </td>\n";
-            echo "<td class='datatd'><input type='text' name='subject' value='$subject' /></td>";
+            echo "<td class='datatd'><input type='text' name='strip_html_escape_subject' value='$subject' /></td>";
           echo "</tr>\n";
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Sensor: </td>\n";
             echo "<td class='datatd'>\n";
-              echo "<select name=\"sensor_id\" style=\"background-color:white;\">\n";
+              echo "<select name='int_sensorid' style='background-color:white;'>\n";
                 echo printOption(-1, "All sensors", $sensor_id);
                 if ($s_admin == 1) {
                   $sql = "SELECT * FROM sensors ORDER BY sensors.keyname";
@@ -188,7 +213,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr'>";
             echo "<td class='datatd'>Alert priority: </td>\n";
             echo "<td class='datatd'>";
-              echo "<select name='priority' id='priority' style='background-color:white;'>\n";
+              echo "<select name='int_priority' id='priority' style='background-color:white;'>\n";
                 foreach ($mail_priority_ar as $key=>$val) {
                   echo "    " . printOption($key, $val, $priority);
                 }
@@ -199,7 +224,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Status: </td>\n";
             echo "<td class='datatd'>\n";
-              echo "<select name='active' style='background-color:white;'>\n";
+              echo "<select name='bool_active' style='background-color:white;'>\n";
                 echo "    " . printOption('t', "Active", $active);
                 echo "    " . printOption('f', "Inactive", $active);
               echo "</select>\n";
@@ -208,19 +233,19 @@ if ($report_content_id > 0) {
         echo "</table>\n";
         echo "<input type='submit' name='submitBtn' value='Update' class='button'>\n";
         echo "&nbsp;&nbsp;";
-        echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?userid=$user_id';\" class='button'>\n";
+        echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
       echo "</form>\n";
       echo "<script language=\"javascript\" type=\"text/javascript\">updateThreshold();</script>\n";
     } else {
       # Handle submitted data
-      if (intval($_POST["submit"]) == 1) {
-        $title = pg_escape_string(htmlentities(strip_tags(trim($_POST["title"]))));
-        $sensor_id = intval($_POST["sensor_id"]);
-        $priority = intval($_POST["priority"]);
-        $frequency = intval($_POST["frequency"]);
-        $interval_day = intval($_POST["interval_day"]);
-        $interval_week = intval($_POST["interval_week"]);
-        $active = pgboolval($_POST["active"]);
+      if (isset($tainted["submit"])) {
+        $title = $clean["title"];
+        $sensor_id = $clean["sensorid"];
+        $priority = $clean["priority"];
+        $frequency = $clean["frequency"];
+        $interval_day = $clean["intervalday"];
+        $interval_week = $clean["intervalweek"];
+        $active = $clean["active"];
         if ($frequency == 1) {
           $interval_db = 0;
         } elseif ($frequency == 2) {
@@ -276,23 +301,23 @@ if ($report_content_id > 0) {
       echo "<b>Edit " . $title . "</b><br /><br />\n";
       echo "<form method='post' onclick=\"updateThreshold();\">";
         echo "<input type='hidden' name='action' value='edit'>";
-        echo "<input type='hidden' name='userid' value='$user_id'>";
+        echo "<input type='hidden' name='int_userid' value='$user_id'>";
         echo "<input type='hidden' name='submit' value='1'>";
-        echo "<input type='hidden' name='report_content_id' value='$report_content_id'>\n";
+        echo "<input type='hidden' name='int_rcid' value='$report_content_id'>\n";
         echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Title: </td>\n";
-            echo "<td class='datatd'><input type='text' name='title' value='$title'></td>\n";
+            echo "<td class='datatd'><input type='text' name='strip_html_escape_title' value='$title'></td>\n";
           echo "</tr>\n";
           # Email subject
           echo "<tr class='datatr'>";
             echo "<td class='datatd'>Email subject: </td>\n";
-            echo "<td class='datatd'><input type='text' name='subject' value='$subject' /></td>";
+            echo "<td class='datatd'><input type='text' name='strip_html_escape_subject' value='$subject' /></td>";
           echo "</tr>\n";
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Sensor: </td>\n";
             echo "<td class='datatd'>\n";
-              echo "<select name=\"sensor_id\" style=\"background-color:white;\">\n";
+              echo "<select name='int_sensorid' style='background-color:white;'>\n";
                 echo printOption(-1, "All sensors", $sensor_id);
                 if ($s_admin == 1) {
                   $sql = "SELECT * FROM sensors ORDER BY keyname";
@@ -314,7 +339,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr'>";
             echo "<td class='datatd'>Alert priority: </td>\n";
             echo "<td class='datatd'>";
-              echo "<select name='priority' id='priority' style='background-color:white;'>\n";
+              echo "<select name='int_priority' id='priority' style='background-color:white;'>\n";
                 foreach ($mail_priority_ar as $key=>$val) {
                   echo "    " . printOption($key, $val, $priority);
                 }
@@ -324,7 +349,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr'>";
             echo "<td class='datatd'>Frequency: </td>\n";
             echo "<td class='datatd'>";
-              echo "<select name='frequency' style='background-color:white;' onclick=\"if (this.selectedIndex == 0) {document.getElementById('frequency-interval-day').style.display='none';document.getElementById('frequency-interval-week').style.display='none';} if (this.selectedIndex == 1) {document.getElementById('frequency-interval-day').style.display='';document.getElementById('frequency-interval-week').style.display='none'; }if (this.selectedIndex == 2) {document.getElementById('frequency-interval-day').style.display='none';document.getElementById('frequency-interval-week').style.display='';} \">\n";
+              echo "<select name='int_frequency' style='background-color:white;' onclick=\"if (this.selectedIndex == 0) {document.getElementById('frequency-interval-day').style.display='none';document.getElementById('frequency-interval-week').style.display='none';} if (this.selectedIndex == 1) {document.getElementById('frequency-interval-day').style.display='';document.getElementById('frequency-interval-week').style.display='none'; }if (this.selectedIndex == 2) {document.getElementById('frequency-interval-day').style.display='none';document.getElementById('frequency-interval-week').style.display='';} \">\n";
                 foreach ($mail_frequency_ar as $key=>$val) {
                   echo "    " . printOption($key, $val, $frequency);
                 }
@@ -339,7 +364,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr' $style id='frequency-interval-day' name='frequency-interval-day'>";
             echo "<td class='datatd'>At: </td>\n";
             echo "<td class='datatd'>";
-              echo "<select name='interval_day' style='background-color:white;'>\n";
+              echo "<select name='int_intervalday' style='background-color:white;'>\n";
                 for ($i = 0; $i < 24; $i++) {
                   $time = "$i:00 hour";
                   if ($i < 10) {
@@ -358,7 +383,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr' $style id='frequency-interval-week' name='frequency-interval-week'>";
             echo "<td class='datatd'>At: </td>\n";
             echo "<td class='datatd'>";
-              echo "<select name='interval_week' style='background-color:white;'>\n";
+              echo "<select name='int_intervalweek' style='background-color:white;'>\n";
                 $j = (4 * 86400); // monday
                 for ($i = 1; $i < 8; $i++) {
                   // Daynr 1 = monday, 0 = sunday
@@ -374,7 +399,7 @@ if ($report_content_id > 0) {
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Status: </td>\n";
             echo "<td class='datatd'>\n";
-              echo "<select name='active' style='background-color:white;'>\n";
+              echo "<select name='bool_active' style='background-color:white;'>\n";
                 echo "    " . printOption('t', "Active", $active);
                 echo "    " . printOption('f', "Inactive", $active);
               echo "</select>\n";
@@ -382,7 +407,7 @@ if ($report_content_id > 0) {
           echo "</tr>\n";
         echo "</table>\n";
         echo "<input type='submit' class='button' name='submitBtn' value='Update'>\n";
-        echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?userid=$user_id';\" class='button'>\n";
+        echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
         echo "<br />";
       echo "</form>\n";
     }
@@ -399,7 +424,7 @@ function write_report_template_threshold_fields() {
   echo "<tr class='datatr'>";
     echo "<td class='datatd'>Target: </td>\n";
     echo "<td class='datatd'>";
-      echo "<select name='target' id='target' style='background-color:white;'>\n";
+      echo "<select name='int_target' id='target' style='background-color:white;'>\n";
         foreach ($mail_target_ar as $key=>$val) {
           echo "    " . printOption($key, $val, $target);
         }
@@ -410,7 +435,7 @@ function write_report_template_threshold_fields() {
   echo "<tr class='datatr'>";
     echo "<td class='datatd'>Timespan: </td>\n";
     echo "<td class='datatd'>";
-      echo "<select name='timespan' id='timespan' style='background-color:white;'>\n";
+      echo "<select name='int_timespan' id='timespan' style='background-color:white;'>\n";
         foreach ($mail_timespan_ar as $key=>$val) {
           echo "    " . printOption($key, $val, $timespan);
         }
@@ -421,7 +446,7 @@ function write_report_template_threshold_fields() {
   echo "<tr class='datatr'>";
     echo "<td class='datatd'>Operator: </td>\n";
     echo "<td class='datatd'>";
-      echo "<select name='operator' id='operator' style='background-color:white;'>\n";
+      echo "<select name='int_operator' id='operator' style='background-color:white;'>\n";
         foreach ($mail_operator_ar as $key=>$val) {
           echo "    " . printOption($key, htmlentities($val), $operator);
         }
@@ -432,7 +457,7 @@ function write_report_template_threshold_fields() {
   echo "<tr class='datatr'>";
     echo "<td class='datatd'>Value: </td>\n";
     echo "<td class='datatd'>";
-      echo "<select name='value' id='value' style='background-color:white;' onchange=\"if (this.selectedIndex == 1) { document.getElementById('value_user').style.display=''; } else { document.getElementById('value_user').style.display='none'; }\">\n";
+      echo "<select name='int_value' id='value' style='background-color:white;' onchange=\"if (this.selectedIndex == 1) { document.getElementById('value_user').style.display=''; } else { document.getElementById('value_user').style.display='none'; }\">\n";
         echo "    " . printOption(-1, "Average", $value);
         echo "    " . printOption(-2, "User defined", $value);
       echo "</select>\n";
@@ -442,13 +467,13 @@ function write_report_template_threshold_fields() {
       } else {
         $value_user_style = " style=\"display:none\";";
       }
-      echo "<input type='text' name='value_user' id='value_user' value='$value_user'$value_user_style>";
+      echo "<input type='text' name='int_valueuser' id='value_user' value='$value_user'$value_user_style>";
     echo "</td>\n";
   echo "</tr>\n";
   echo "<tr class='datatr'>\n";
     echo "<td class='datatd'>Deviation: </td>\n";
-    echo "<td class='datatd'><input type='text' name='deviation' id='deviation' value='$deviation' style='width:50px;'> %</td>\n";
+    echo "<td class='datatd'><input type='text' name='int_deviation' id='deviation' value='$deviation' style='width:50px;'> %</td>\n";
   echo "</tr>\n";
 }
-debug();
+debug_sql();
 ?>

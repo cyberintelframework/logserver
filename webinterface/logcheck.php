@@ -27,8 +27,18 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-if ($s_access_search == 9 && isset($_GET['org'])) {
-  $q_org = intval($_GET['org']);
+$allowed_get = array(
+                "int_org",
+		"b",
+		"i",
+		"int_to",
+		"int_from"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if ($s_access_search == 9 && isset($clean['org'])) {
+  $q_org = $clean['org'];
 } else {
   $q_org = intval($s_org);
 }
@@ -40,8 +50,8 @@ $db_org_name = pg_escape_string(pg_result($result_getorg, 0));
 $debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.
-if (isset($_GET['b'])) {
-  $b = pg_escape_string($_GET['b']);
+if (isset($tainted['b'])) {
+  $b = $tainted['b'];
   $pattern = '/^(weekly|daily|monthly|all)$/';
   if (!preg_match($pattern, $b)) {
     $b = "weekly";
@@ -52,7 +62,7 @@ if (isset($_GET['b'])) {
 
 $year = date("Y");
 if ($b == "monthly") {
-  $month = $_GET['i'];
+  $month = $tainted['i'];
   if ($month == "") { $month = date("n"); }
   $month = intval($month);
   $next = $month + 1;
@@ -63,7 +73,7 @@ if ($b == "monthly") {
   $month = date("n");
 }
 if ($b == "daily") {
-  $day = $_GET['i'];
+  $day = $tainted['i'];
   if ($day == "") { $day = date("d"); }
   $day = intval($day);
   $prev = $day - 1;
@@ -74,7 +84,7 @@ if ($b == "daily") {
   $day = date("d");
 }
 if ($b == "weekly") {
-  $day = $_GET['i'];
+  $day = $tainted['i'];
   if ($day == "") { $day = date("d"); }
   $day = intval($day);
   $prev = $day - 7;
@@ -86,17 +96,17 @@ if ($b == "all") {
   $dateqs = "";
   $tsquery = "";
 } else {
-  $dateqs = "&amp;from=$start&amp;to=$end";
+  $dateqs = "&amp;int_from=$start&amp;int_to=$end";
   $tsquery = "timestamp >= $start AND timestamp <= $end";
 }
 
 echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br />\n";
 ### BROWSE MENU
 $today = date("U");
-echo "<form name='selectorg' method='get' action='logcheck.php?org=$q_org'>\n";
-  echo "<input type='hidden' name='org' value='$q_org' />\n";
+echo "<form name='selectorg' method='get' action='logcheck.php?int_org=$q_org'>\n";
+#  echo "<input type='hidden' name='int_org' value='$q_org' />\n";
   if ($b != "all") {
-    echo "<input type='button' value='Prev' class='button' onClick=window.location='logcheck.php?b=$b&amp;i=$prev&amp;org=$q_org';>\n";
+    echo "<input type='button' value='Prev' class='button' onClick=window.location='logcheck.php?b=$b&amp;i=$prev&amp;int_org=$q_org';>\n";
   } else {
     echo "<input type='button' value='Prev' class='button' disabled>\n";
   }
@@ -108,13 +118,13 @@ echo "<form name='selectorg' method='get' action='logcheck.php?org=$q_org'>\n";
   echo "</select>\n";
 
   if ($s_access_search == 9) {
-    if (!isset($_GET['org'])) {
+    if (!isset($clean['org'])) {
       $err = 1;
     }
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
     $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
-    echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
+    echo "<select name='int_org' onChange='javascript: this.form.submit();'>\n";
       while ($row = pg_fetch_assoc($result_orgs)) {
         $org_id = $row['id'];
         $organisation = $row['organisation'];
@@ -127,7 +137,7 @@ echo "<form name='selectorg' method='get' action='logcheck.php?org=$q_org'>\n";
     if ($end > $today) {
       echo "<input type='button' value='Next' class='button' disabled>\n";
     } else {
-      echo "<input type='button' value='Next' class='button' onClick=window.location='logcheck.php?b=$b&amp;i=$next&amp;org=$q_org';>\n";
+      echo "<input type='button' value='Next' class='button' onClick=window.location='logcheck.php?b=$b&amp;i=$next&amp;int_org=$q_org';>\n";
     }
   } else {
     echo "<input type='button' value='Next' class='button' disabled>\n";
@@ -203,11 +213,11 @@ if ($err != 1) {
     echo "<tr>\n";
       echo "<td class='datatd'>$range</td>\n";
       if ($count_total > 0) {
-        echo "<td class='datatd' align='right'><a href='logsearch.php?f_field=source&amp;f_search=$range&amp;f_sev=1&amp;org=$q_org$dateqs'>" . nf($count_total) . "</a>&nbsp;</td>\n";
+        echo "<td class='datatd' align='right'><a href='logsearch.php?net_searchnet=$range&amp;int_sev=1&amp;int_org=$q_org$dateqs'>" . nf($count_total) . "</a>&nbsp;</td>\n";
         if ($s_access_search == 9) {
-          echo "<td class='datatd' align='right'><a href='loglist.php?range=$range$dateqs&amp;org=$q_org&b=$b'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org&b=$b'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
         } else {
-          echo "<td class='datatd' align='right'><a href='loglist.php?range=$range$dateqs&amp;org=$q_org'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
         }
       } else {
         echo "<td class='datatd' align='right'>" . nf($count_total) . "&nbsp;</td>\n";
@@ -217,6 +227,6 @@ if ($err != 1) {
   }
   echo "</table>\n";
 }
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

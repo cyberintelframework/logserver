@@ -40,11 +40,17 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
-if ( ! isset($_GET['userid']) ) {
+$allowed_get = array(
+                "int_userid"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (!isset($clean['userid']) ) {
   $m = 29;
   $err = 1;
 } else {
-  $userid = intval($_GET['userid']);
+  $userid = $clean['userid'];
 }
 
 if ($s_access_user < 2) {
@@ -62,7 +68,6 @@ if ($s_access_user < 2) {
 }
 
 if ($err == 0) {
-  $userid = intval($_GET['userid']);
   # Mailreporting records
   // report_content_threshold
   $sql = "SELECT id FROM report_content WHERE report_content.user_id = '$userid' AND report_content.template = 3";
@@ -89,6 +94,6 @@ if ($err == 0) {
 }
 $debuginfo[] = "M: $m";
 pg_close($pgconn);
-debug();
-header("location: useradmin.php?m=$m");
+debug_sql();
+header("location: useradmin.php?int_m=$m");
 ?>

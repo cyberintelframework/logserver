@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 13-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Added support for user agent checking
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
@@ -22,15 +23,20 @@
 # 1.02.01 Initial release
 #########################################################################
 
-session_start();
-header("Cache-control: private");
-
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
-$f_user = pg_escape_string(stripinput($_POST['f_user']));
-$f_pass = $_POST['f_pass'];
+$allowed_post = array(
+                "strip_html_escape_user",
+                "md5_pass",
+		"strip_html_url"
+);
+$check = extractvars($_POST, $allowed_post);
+#debug_input();
+
+$f_user = $clean['user'];
+$f_pass = $clean['pass'];
 
 $sql_user = "SELECT * FROM login WHERE username = '" .$f_user. "'";
 $result_user = pg_query($pgconn, $sql_user);
@@ -56,6 +62,12 @@ if ($numrows_user == 1) {
     $sql_getorg = "SELECT organisation FROM organisations WHERE id = " . $db_org;
     $result_getorg = pg_query($pgconn, $sql_getorg);
     $db_org_name = pg_result($result_getorg, 0);
+
+    # Starting session and making sure a new SID is generated
+    session_start();
+    session_regenerate_id();
+    header("Cache-control: private");
+
     if ($db_org_name == "ADMIN") {
       $_SESSION['s_admin'] = 1;
       $_SESSION['s_access'] = $access;
@@ -105,8 +117,8 @@ if ($numrows_user == 1) {
       $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
       $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
     }
-    if (isset($_GET['url'])) {
-      $url = stripinput($_GET['url']);
+    if (isset($clean['url'])) {
+      $url = $clean['url'];
       pg_close($pgconn);
       $address = getaddress($web_port);
       header("location: $address$url");
@@ -116,10 +128,10 @@ if ($numrows_user == 1) {
     }
   } else {
     pg_close($pgconn);
-    header("location: login.php?m=43");
+    header("location: login.php?int_m=43");
   }
 } else {
   pg_close($pgconn);
-  header("location: login.php?m=43");
+  header("location: login.php?int_m=43");
 }
 ?>

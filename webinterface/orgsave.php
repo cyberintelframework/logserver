@@ -38,8 +38,27 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+$allowed_get = array(
+                "savetype",
+		"int_orgid"
+);
+$check = extractvars($_GET, $allowed_get);
+#debug_input();
+
+$allowed_post = array(
+		"int_orgid",
+		"strip_html_escape_org",
+		"strip_html_escape_ranges",
+		"int_identtype",
+		"strip_html_escape_orgident",
+		"strip_html_escape_orgname"
+);
+$check = extractvars($_POST, $allowed_post);
+#debug_input();
+
 # Get the type of update
-$type = $_GET['type'];
+$type = $tainted['savetype'];
+echo "TYPE: $type<br />\n";
 $pattern = '/^(org|ident|md5)$/';
 if (!preg_match($pattern, $type)) {
   $err = 1;
@@ -52,11 +71,11 @@ if ($s_admin != 1) {
 }
 
 if ($type == "ident") {
-  $orgid = intval($_POST['f_orgid']);
-  $org = trim(pg_escape_string(stripinput($_POST['f_org'])));
-  $ranges = stripinput($_POST['f_ranges']);
-  $ftype = intval($_POST['f_type']);
-  $ident = pg_escape_string($_POST['f_org_ident']);
+  $orgid = $clean['orgid'];
+  $org = $clean['org'];
+  $ranges = $clean['ranges'];
+  $ftype = $clean['identtype'];
+  $orgident = $clean['orgident'];
 
   if (empty($orgid)) {
     $err = 1;
@@ -69,15 +88,15 @@ if ($type == "ident") {
   }
 
 } elseif ($type == "org") {
-  if (!empty($_POST['orgname'])) {
-    $orgname = pg_escape_string($_POST['orgname']);
+  if (isset($clean['orgname'])) {
+    $orgname = $clean['orgname'];
   } else {
     $err = 1;
     $m = 38;
   }
 } elseif ($type == "md5") {
-  if (isset($_GET['orgid'])) {
-    $orgid = intval($_GET['orgid']);
+  if (isset($clean['orgid'])) {
+    $orgid = $clean['orgid'];
     $ident = genpass(16);
     $ftype = 1;
   } else {
@@ -93,22 +112,22 @@ if ($err != 1) {
     $sql = "UPDATE organisations SET organisation = '" .$org. "', ranges = '" .$ranges. "' WHERE id = $orgid";
     $execute = pg_query($pgconn, $sql);
 
-    if (!empty($_POST['f_org_ident'])) {
+    if (isset($clean['orgident'])) {
       if ($ftype == 0) {
         $err = 1;
         $m = 45;
       }
 
-      if (empty($ident)) {
+      if (empty($orgident)) {
         $err = 1;
         $m = 46;
       }
       if ($err == 0) {
-        $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $ftype)";
+        $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$orgident', $orgid, $ftype)";
         $execute = pg_query($pgconn, $sql);
       } else {
         pg_close($pgconn);
-        header("location: orgedit.php?orgid=$orgid&m=$m");
+        header("location: orgedit.php?int_orgid=$orgid&int_m=$m");
       }
     }
   } elseif ($type == "org") {
@@ -122,8 +141,8 @@ if ($err != 1) {
 }
 pg_close($pgconn);
 if ($type == "org") {
-  header("location: orgadmin.php?m=$m");
+  header("location: orgadmin.php?int_m=$m");
 } else {
-  header("location: orgedit.php?orgid=$orgid&m=$m");
+  header("location: orgedit.php?int_orgid=$orgid&int_m=$m");
 }
 ?>

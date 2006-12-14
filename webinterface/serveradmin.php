@@ -18,8 +18,8 @@
 # 1.02.01 Initial release
 #############################################
 
-$s_org = $_SESSION['s_org'];
-$s_admin = $_SESSION['s_admin'];
+$s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
 if ( $s_admin != 1 ) {
@@ -27,21 +27,26 @@ if ( $s_admin != 1 ) {
   $m = 91;
 }
 
-if (isset($_GET['m'])) {
-  $m = intval($_GET['m']);
+$allowed_get = array(
+                "int_c",
+		"int_m"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (isset($clean['m'])) {
+  $m = $clean['m'];
 
   if ($m == 100) { 
-    $count = intval($_GET['c']);
+    $count = $clean['c'];
     if ($count == 0) {
       $m = "<p>Successfully deleted a server!</p>";
-    } elseif ($count == 1) {
-      $m = "<p>Successfully deleted a server!<br />Reset 1 sensor to default server!</p>";
     } else {
-      $m = "<p>Successfully deleted a server!<br />Reset $count sensors to default server!</p>";
+      $m = "<p>Successfully deleted a server!<br />Reset " .ngettext("$count sensor", "$count sensors", $count). " to default server!</p>";
     }
   } else {
-    $m = intval($_GET['m']);
-    $m = stripinput($errors[$m]);
+    $m = $clean['m'];
+    $m = $errors[$m];
     $m = "<p>$m</p>\n";
   }
   echo "<font color='red'>" .$m. "</font>";
@@ -69,11 +74,11 @@ if ($err == 0) {
     echo "<tr>\n";
       echo "<td class='datatd'>$id</td>\n";
       echo "<td class='datatd'>$server</td>\n";
-      echo "<td class='datatd' align=center><a href='serverdel.php?serverid=$id' alt='Delete the server' class='linkbutton' onclick=\"javascript: return confirm('Are you sure you want to delete this server?');\"><img src='images/icons/delete.gif' title='Delete server' /></a></td>\n";
+      echo "<td class='datatd' align=center><a href='serverdel.php?int_serverid=$id' alt='Delete the server' class='linkbutton' onclick=\"javascript: return confirm('Are you sure you want to delete this server?');\"><img src='images/icons/delete.gif' title='Delete server' /></a></td>\n";
     echo "</tr>\n";
   }
   echo "</table>\n";
 }
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

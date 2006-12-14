@@ -43,22 +43,22 @@ if ($err == 0) {
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>Username</td>\n";
-        echo "<td class='datatd'><input type='text' name='f_username' size='30' /></td>\n";
+        echo "<td class='datatd'><input type='text' name='strip_html_escape_username' size='30' /></td>\n";
       echo "</tr>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>Password</td>\n";
-        echo "<td class='datatd'><input type='password' size='30' /><input type='hidden' name='f_pass' /></td>\n";
+        echo "<td class='datatd'><input type='password' size='30' /><input type='hidden' name='md5_pass' /></td>\n";
       echo "</tr>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>Confirm Password</td>\n";
-        echo "<td class='datatd'><input type='password' size='30' /><input type='hidden' name='f_confirm' /></td>\n";
+        echo "<td class='datatd'><input type='password' size='30' /><input type='hidden' name='md5_confirm' /></td>\n";
       echo "</tr>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>Organisation</td>\n";
         echo "<td>\n";
           if ($s_access_user == 9) {
-            echo "<select name='f_org'>\n";
-              echo "<option value='none' selected></option>\n";
+            echo "<select name='int_org'>\n";
+              echo "<option value='0' selected></option>\n";
 
               $sql_org = "SELECT DISTINCT * FROM organisations";
               $debuginfo[] = $sql_org;
@@ -74,7 +74,7 @@ if ($err == 0) {
             $debuginfo[] = $sql_org;
             $result_org = pg_query($pgconn, $sql_org);
             $db_org_name = pg_result($result_org, 0);
-            echo "<input type='hidden' name='f_org' value='$s_org' />\n";
+            echo "<input type='hidden' name='int_org' value='$s_org' />\n";
             echo "$db_org_name";
           }
         echo "</td>\n";
@@ -84,14 +84,14 @@ if ($err == 0) {
       echo "<tr>\n";
         echo "<td class='datatd'>Email address</td>\n";
         echo "<td class='datatd'>";
-          echo "<input type='text' name='f_email' value='" . $email . "' size='30'><br />";
+          echo "<input type='text' name='strip_html_escape_email' value='" . $email . "' size='30'><br />";
         echo "</td>\n";
       echo "</td>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>Email signing</td>\n";
         echo "<td class='datatd'>\n";
-          echo printRadio("Enable GPG signing", "f_gpg", 1, $gpg) . "<br />\n";
-          echo printRadio("Disable GPG signing", "f_gpg", 0, $gpg) . "<br />\n";
+          echo printRadio("Enable GPG signing", "int_gpg", 1, $gpg) . "<br />\n";
+          echo printRadio("Disable GPG signing", "int_gpg", 0, $gpg) . "<br />\n";
         echo "</td>\n";
       echo "</tr>\n";
 
@@ -99,10 +99,10 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: Sensor</td>\n";
         echo "<td class='datatd'>\n";
-          echo "" . printRadio("0 - $access_ar_sensor[0]", "f_access_sensor", 0, $access_sensor) . "<br />\n";
-          echo "" . printRadio("1 - $access_ar_sensor[1]", "f_access_sensor", 1, $access_sensor) . "<br />\n";
+          echo "" . printRadio("0 - $access_ar_sensor[0]", "int_asensor", 0, $access_sensor) . "<br />\n";
+          echo "" . printRadio("1 - $access_ar_sensor[1]", "int_asensor", 1, $access_sensor) . "<br />\n";
           if ($s_access_user == 9) {
-            echo "" . printRadio("9 - $access_ar_sensor[9]", "f_access_sensor", 9, $access_sensor) . "<br />\n";
+            echo "" . printRadio("9 - $access_ar_sensor[9]", "int_asensor", 9, $access_sensor) . "<br />\n";
           }
         echo "</td>\n";
       echo "</tr>\n";
@@ -110,9 +110,9 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: Search</td>\n";
         echo "<td class='datatd'>\n";
-          echo "" . printRadio("1 - $access_ar_search[1]", "f_access_search", 1, $access_search) . "<br />\n";
+          echo "" . printRadio("1 - $access_ar_search[1]", "int_asearch", 1, $access_search) . "<br />\n";
           if ($s_access_user == 9) {
-            echo "" . printRadio("9 - $access_ar_search[9]", "f_access_search", 9, $access_search) . "<br />\n";
+            echo "" . printRadio("9 - $access_ar_search[9]", "int_asearch", 9, $access_search) . "<br />\n";
           }
         echo "</td>\n";
       echo "</tr>\n";
@@ -120,13 +120,13 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: User Admin</td>\n";
         echo "<td class='datatd'>\n";
-          echo "" . printRadio("0 - $access_ar_user[0]", "f_access_user", 0, $access_user) . "<br />\n";
-          echo "" . printRadio("1 - $access_ar_user[1]", "f_access_user", 1, $access_user) . "<br />\n";
+          echo "" . printRadio("0 - $access_ar_user[0]", "int_auser", 0, $access_user) . "<br />\n";
+          echo "" . printRadio("1 - $access_ar_user[1]", "int_auser", 1, $access_user) . "<br />\n";
           if ($s_access_user > 1) {
-            echo "" . printRadio("2 - $access_ar_user[2]", "f_access_user", 2, $access_user) . "<br />\n";
+            echo "" . printRadio("2 - $access_ar_user[2]", "int_access_user", 2, $access_user) . "<br />\n";
           }
           if ($s_access_user == 9) {
-            echo "" . printRadio("9 - $access_ar_user[9]", "f_access_user", 9, $access_user) . "<br />\n";
+            echo "" . printRadio("9 - $access_ar_user[9]", "int_auser", 9, $access_user) . "<br />\n";
           }
         echo "</td>\n";
       echo "</tr>\n";
@@ -140,6 +140,6 @@ if ($err == 0) {
     echo "</table>\n";
   echo "</form>\n";
 }
-debug();
+debug_sql();
 footer();
 ?>

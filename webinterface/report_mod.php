@@ -35,11 +35,18 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+$allowed_get = array(
+                "int_userid",
+                "a"
+);
+$check = extractvars($_GET, $allowed_get);
+#debug_input();
+
 // Make sure all access rights are correct
-if (isset($_GET['userid'])) {
-  $user_id = intval($_GET['userid']);
+if (isset($clean['userid'])) {
+  $user_id = $clean['userid'];
   if ($s_access_user < 1) {
-    header("location: mailadmin.php?userid=$user_id&m=90");
+    header("location: mailadmin.php?int_userid=$user_id&int_m=90");
     pg_close($pgconn);
     exit;
   } elseif ($s_access_user < 2) {
@@ -53,16 +60,16 @@ if (isset($_GET['userid'])) {
       footer();
       exit;
     } else {
-      $user_id = intval($_GET['userid']);
+      $user_id = $clean['userid'];
     }
   } else {
-    $user_id = intval($_GET['userid']);
+    $user_id = $clean['userid'];
   }
 } else {
   $user_id = $s_userid;
 }
 
-$action = $_GET['a'];
+$action = $tainted['a'];
 $pattern = '/^(d|e|r)$/';
 if (!preg_match($pattern, $action)) {
   $err = 1;
@@ -87,5 +94,5 @@ if ($err == 0) {
 }
 
 pg_close($pgconn);
-header("location: mailadmin.php?userid=$user_id&m=$m");
+header("location: mailadmin.php?int_userid=$user_id&int_m=$m");
 ?>

@@ -37,38 +37,56 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 
+$allowed_get = array(
+                "int_selview",
+                "int_m"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 if ($s_access_sensor == 0) {
   $m = 90;
   pg_close($pgconn);
-  header("location: sensorstatus.php?selview=$selview&m=$m");
+  header("location: sensorstatus.php?int_selview=" .$clean['selview']. "&int_m=" .$clean['m']);
   exit;
 }
 
-if (isset($_GET['selview'])) {
-  $selview = intval($_GET['selview']);
+if (isset($clean['selview'])) {
+  $selview = $clean['selview'];
+} elseif (isset($selview)) {
+  $selview = intval($selview);
 }
-      
+
+$allowed_post = array(
+                "int_sid",
+                "int_vlanid",
+                "action",
+		"ip_tapip"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
 $error = 0;
-$keyname = pg_escape_string($_POST['keyname']);
-$vlanid = intval($_POST['vlanid']);
-$action = pg_escape_string($_POST['action']);
+$sid = $clean['sid'];
+$vlanid = $clean['vlanid'];
+$action = $tainted['action'];
 $action_pattern = '/^(NONE|REBOOT|SSHOFF|SSHON|CLIENT|RESTART|BLOCK)$/';
 if (preg_match($action_pattern, $action) != 1) {
   $m = 44;
   $error = 1;
 }
 
-if (isset($_POST[tapip]) && $error != 1) {
-  $tapip = pg_escape_string(stripinput($_POST[tapip]));
+if (isset($clean[tapip]) && $error != 1) {
+  $tapip = $clean[tapip];
   if (preg_match($ipregexp, $tapip)) {
-    $sql_checkip = "SELECT tapip FROM sensors WHERE tapip = '$tapip' AND NOT keyname = '$keyname'";
+    $sql_checkip = "SELECT tapip FROM sensors WHERE tapip = '$tapip' AND NOT id = '$sid'";
     $result_checkip = pg_query($pgconn, $sql_checkip);
     $checkip = pg_num_rows($result_checkip);
     if ($checkip > 0) {
       $m = 101;
       $error = 1;
     } else {
-      $sql_updatestatus = "UPDATE sensors SET tapip = '$tapip' WHERE keyname = '$keyname' AND vlanid ='$vlanid'";
+      $sql_updatestatus = "UPDATE sensors SET tapip = '$tapip' WHERE id = '$sid' AND vlanid = '$vlanid'";
       $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
       $m = 7;
     }
@@ -78,15 +96,15 @@ if (isset($_POST[tapip]) && $error != 1) {
   }
 } 
 if ($error == 0) {
-  $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE keyname = '$keyname'";
+  $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE id = '$sid'";
   $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
   $m = 7;
 }
 
 pg_close($pgconn);
 if ($m != 1) {
-  header("location: sensorstatus.php?selview=$selview&m=$m&key=$keyname");
+  header("location: sensorstatus.php?int_selview=$selview&int_m=$m&key=$keyname");
 } else {
-  header("location: sensorstatus.php?selview=$selview&m=$m");
+  header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
 }
 ?>

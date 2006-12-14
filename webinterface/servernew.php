@@ -22,7 +22,7 @@ if ( $s_admin == 0 ) {
   $err = 1;
   $m = 91;
   pg_close($pgconn);
-  header("location: serveradmin.php?m=$m");
+  header("location: serveradmin.php?int_m=$m");
   exit;
 }
 
@@ -31,7 +31,7 @@ if ($err != 1) {
     echo "<table class='datatable'>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>Server</td>\n";
-        echo "<td class='datatd'><input type='text' name='f_server' value='' style='width: 100%;' /></td>\n";
+        echo "<td class='datatd'><input type='text' name='strip_html_escape_server' value='' style='width: 100%;' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd' colspan='2' align='center'><input type='submit' name='submit_server' value='Save' class='button' /></td>\n";

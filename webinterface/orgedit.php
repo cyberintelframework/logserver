@@ -32,14 +32,21 @@ if ( $s_admin != 1 ) {
   $err = 1;
 }
 
-if ( ! isset($_GET['orgid'] )) {
+$allowed_get = array(
+                "int_orgid",
+                "int_m"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (!isset($clean['orgid'])) {
   $err = 1;
 } else {
-  $orgid = intval($_GET['orgid']);
+  $orgid = $clean['orgid'];
 }
 
-if (isset($_GET['m'])) {
-  $m = intval($_GET['m']);
+if (isset($clean['m'])) {
+  $m = $clean['m'];
   $m = stripinput($errors[$m]);
   $m = "<p>$m</p>";
   echo "<font color='red'>" .$m. "</font>";
@@ -56,19 +63,19 @@ if ($err != 1) {
   $ranges = $row['ranges'];
   $ranges = str_replace(";", "\n", $ranges);
 
-  echo "<form action='orgsave.php?type=ident' method='POST'>\n";
+  echo "<form action='orgsave.php?savetype=ident' method='POST'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='100'>ID</td>\n";
-        echo "<td class='datatd' width='300'>$orgid<input type='hidden' name='f_orgid' value='$orgid' /></td>\n";
+        echo "<td class='datatd' width='300'>$orgid<input type='hidden' name='int_orgid' value='$orgid' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>Organisation</td>\n";
-        echo "<td class='datatd'><input type='text' name='f_org' value='$org' style='width: 99%;' /></td>\n";
+        echo "<td class='datatd'><input type='text' name='strip_html_escape_org' value='$org' style='width: 99%;' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd' valign='top'>Ranges</td>\n";
-        echo "<td class='datatd'><textarea name='f_ranges' cols='40' rows='10'>$ranges</textarea></td>\n";
+        echo "<td class='datatd'><textarea name='strip_html_escape_ranges' cols='40' rows='10'>$ranges</textarea></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
     echo "<br />\n";
@@ -77,7 +84,7 @@ if ($err != 1) {
     $result_orgids = pg_query($pgconn, $sql_orgids);
     $debuginfo[] = $sql_orgids;
     
-    echo "<a href='orgsave.php?type=md5&orgid=$orgid'>Generate Random Identifier String</a><br />\n";
+    echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid'>Generate Random Identifier String</a><br />\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='dataheader' width='100'>ID</td>\n";
@@ -95,14 +102,14 @@ if ($err != 1) {
           echo "<td class='datatd'>$id</td>\n";
           echo "<td class='datatd'>$identifier</td>\n";
           echo "<td class='datatd'>$org_ident_type_ar[$type]</td>\n";
-          echo "<td class='datatd'><a href='orgdel.php?orgid=$orgid&ident=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
+          echo "<td class='datatd'><a href='orgdel.php?int_orgid=$orgid&int_ident=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
         echo "</tr>\n";
       }
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>#</td>\n";
-        echo "<td class='datatd' colspan='1'><input type='text' name='f_org_ident' style='width: 99%;' /></td>\n";
+        echo "<td class='datatd' colspan='1'><input type='text' name='strip_html_escape_orgident' style='width: 99%;' /></td>\n";
         echo "<td class='datatd' colspan='2'>\n";
-          echo "<select name='f_type' style='width: 99%;'>";
+          echo "<select name='int_identtype' style='width: 99%;'>";
             echo printOption(0, "Select a type...", 0);
             foreach ($org_ident_type_ar as $key => $val) {
               if ($key != 1) {
@@ -114,12 +121,12 @@ if ($err != 1) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd' colspan='4' align='right'>";
-          echo "<input type='submit' name='submit_org' value='Save' class='button' /></td>\n";
+          echo "<input type='submit' name='submit' value='Save' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
 }
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

@@ -29,8 +29,16 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-if ($s_access_search == 9 && isset($_GET['org'])) {
-  $q_org = intval($_GET['org']);
+$allowed_get = array(
+                "int_org",
+		"b",
+		"i"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if ($s_access_search == 9 && isset($clean['org'])) {
+  $q_org = $clean['org'];
 } elseif ($s_access_search == 9) {
   $q_org = 0;
 } else {
@@ -44,8 +52,8 @@ $db_org_name = pg_result($result_getorg, 0);
 $debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.
-if (isset($_GET['b'])) {
-  $b = pg_escape_string($_GET['b']);
+if (isset($tainted['b'])) {
+  $b = $tainted['b'];
   $pattern = '/^(weekly|daily|monthly|all)$/';
   if (!preg_match($pattern, $b)) {
     $b = "weekly";
@@ -55,7 +63,7 @@ if (isset($_GET['b'])) {
 }
 $year = date("Y");
 if ($b == "monthly") {
-  $month = $_GET['i'];
+  $month = $tainted['i'];
   if ($month == "") { $month = date("n"); }
   $month = intval($month);
   $next = $month + 1;
@@ -66,7 +74,7 @@ if ($b == "monthly") {
   $month = date("n");
 }
 if ($b == "daily") {
-  $day = $_GET['i'];
+  $day = $tainted['i'];
   if ($day == "") { $day = date("d"); }
   $day = intval($day);
   $prev = $day - 1;
@@ -77,7 +85,7 @@ if ($b == "daily") {
   $day = date("d");
 }
 if ($b == "weekly") {
-  $day = $_GET['i'];
+  $day = $tainted['i'];
   if ($day == "") { $day = date("d"); }
   $day = intval($day);
   $prev = $day - 7;
@@ -89,7 +97,7 @@ if ($b == "all") {
   $dateqs = "";
   $tsquery = "";
 } else {
-  $dateqs = "&amp;from=$start&amp;to=$end";
+  $dateqs = "&amp;int_from=$start&amp;int_to=$end";
   $tsquery = "timestamp >= $start AND timestamp <= $end";
 }
 
@@ -98,7 +106,7 @@ echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br
 $today = date("U");
 echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
   if ($b != "all") {
-    echo "<input type='button' value='Prev' class='button' onClick=window.location='rank.php?b=$b&amp;i=$prev&amp;org=$q_org';>\n";
+    echo "<input type='button' value='Prev' class='button' onClick=window.location='rank.php?b=$b&amp;i=$prev&amp;int_org=$q_org';>\n";
   } else {
     echo "<input type='button' value='Prev' class='button' disabled>\n";
   }
@@ -110,13 +118,13 @@ echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
   echo "</select>\n";
 
   if ($s_access_search == 9) {
-    if (!isset($_GET['org'])) {
+    if (!isset($clean['org'])) {
       $err = 1;
     }
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
     $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
-    echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
+    echo "<select name='int_org' onChange='javascript: this.form.submit();'>\n";
       echo printOption(0, "All", $q_org) . "\n";
       while ($row = pg_fetch_assoc($result_orgs)) {
         $org_id = $row['id'];
@@ -130,7 +138,7 @@ echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
     if ($end > $today) {
       echo "<input type='button' value='Next' class='button' disabled>\n";
     } else {
-      echo "<input type='button' value='Next' class='button' onClick=window.location='rank.php?b=$b&amp;i=$next&amp;org=$q_org';>\n";
+      echo "<input type='button' value='Next' class='button' onClick=window.location='rank.php?b=$b&amp;i=$next&amp;int_org=$q_org';>\n";
     }
   } else {
     echo "<input type='button' value='Next' class='button' disabled>\n";
@@ -239,7 +247,7 @@ echo "<table width='100%'>\n";
           echo "</td>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%'>\n";
-            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
               add_db_table("attacks");
               add_db_table("sensors");
               $where[] = "attacks.severity = 1";
@@ -387,7 +395,7 @@ echo "<table width='100%'>\n";
           echo "</td>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
-            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
               echo "<b>Top $topexploits exploits of your sensors</b>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
@@ -505,7 +513,7 @@ echo "<table width='100%'>\n";
           echo "</td>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
-            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
               echo "<b>Top $topsensors sensors of $orgname</b>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
@@ -600,7 +608,7 @@ echo "<table width='100%'>\n";
           echo "</td>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
-            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
               echo "<b>Top 10 ports of your sensors</b>\n"; // change this into variable to be read from conf
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
@@ -691,7 +699,7 @@ echo "<table width='100%'>\n";
           echo "</td>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
-            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
               echo "<b>Top 10 source addresses of your sensors</b>\n";  // change this into variable to be read from conf
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
@@ -809,7 +817,7 @@ echo "<table width='100%'>\n";
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
                   echo "<td class='datatd'><a href='logsearch.php?d_radio=A&f_filename=$file&order_m=DESC$dateqs'>$file</a></td>\n";
-                  echo "<td class='datatd'><a href='binaryhist.php?bin=$bin'>$bin</a></td>\n";
+                  echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
                   echo "<td class='datatd'>$count</td>\n";
                 echo "</tr>\n";
                $i++;
@@ -818,7 +826,7 @@ echo "<table width='100%'>\n";
           echo "</td>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
-            if ($s_admin != 1 || ($s_admin == 1 && isset($_GET['org']) && $_GET['org'] != 0) ) {
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
               echo "<b>Top 10 filenames of your sensors</b>\n";// change this into variable to be read from conf
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
@@ -866,7 +874,7 @@ echo "<table width='100%'>\n";
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
                       echo "<td class='datatd'><a href='logsearch.php?d_radio=A&f_filename=$file&order_m=DESC$dateqs'>$file</a></td>\n";
-                      echo "<td class='datatd'><a href='binaryhist.php?bin=$bin'>$bin</a></td>\n";
+                      echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
                       echo "<td class='datatd'>$count</td>\n";
                     echo "</tr>\n";
                   $i++;
@@ -933,6 +941,6 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 echo "</table>\n";
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

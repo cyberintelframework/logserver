@@ -1,7 +1,7 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
+# Version 1.04.07                  #
 # 11-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -9,6 +9,7 @@
 
 #########################################################################
 # Changelog:
+# 1.04.07 Bugfix with binaries table linking
 # 1.04.06 Changed debug stuff
 # 1.04.05 Changed binary search method conform database changes
 # 1.04.04 Added personal searchtemplate button for charts
@@ -56,11 +57,46 @@ if (in_array($_GET['f_reptype'], $ar_non_headers)) {
 	  	$fn = "SURFnet_IDMEF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".xml";
 	  	header("Content-disposition: attachment; filename=$fn");
     }
-}
-else {
+} else {
   include("menu.php");
   set_title("Search");
 }
+
+$allowed_get = array(
+                "reptype",
+		"net_searchnet",
+		"ip_searchip",
+		"int_org",
+		"sensorid",
+		"sourceip",
+		"sradio",
+		"int_sport",
+		"int_smask",
+		"destip",
+		"dradio",
+		"int_dport",
+		"int_dmask",
+		"tsselect",
+		"strip_html_escape_tsstart",
+		"strip_html_escape_tsend",
+		"int_sev",
+		"strip_html_escape_bin",
+		"int_attack",
+		"int_virus",
+		"strip_html_escape_virustxt",
+		"strip_html_escape_filename",
+		"int_from",
+		"int_to",
+		"int_charttype",
+		"chartof",
+		"order",
+		"orderm",
+		"int_page",
+		"int_c"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 if (($rapport != "chart_sensor") && ($rapport != "chart_attack") && (!in_array($rapport, $ar_non_headers))) {
 	echo "<div id=\"search_wait\">Search is being processed...<br /><br />Please be patient.</div>\n";
 }
@@ -78,12 +114,12 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
-$search = pg_escape_string(trim($_GET['f_search']));
+$search = $clean['search'];
 $where = array();
 
 ### Set organisation
 if ($s_access_search == 9) {
-	if (isset($_GET['org'])) $q_org = intval($_GET['org']);
+	if (isset($clean['org'])) $q_org = $clean['org'];
 }
 
 ### Checking for admin.
@@ -91,18 +127,21 @@ if ($s_access_search < 9) $where[] = "sensors.organisation = '" . intval($s_org)
 elseif ($q_org > 0) $where[] = "sensors.organisation = '" . intval($q_org) . "'";
 
 ### Setting values from searchform
-if (@is_array($_GET["sensorid"])) {
+if (@is_array($tainted["sensorid"])) {
 	$sensorid = -1;
 	$ar_sensorid = array();
-	foreach ($_GET["sensorid"] as $sid) {
+	foreach ($tainted["sensorid"] as $sid) {
 		$ar_sensorid[] = intval($sid);
 	}
 } else $sensorid = intval($_GET["sensorid"]);
 
-$source_ip = $_GET["source_ip"];
+####################
+# Source IP address
+####################
+$source_ip = $tainted['sourceip'];
 $full_source_ip = "";
 if (!empty($source_ip)) {
-  foreach ($source_ip as $key=>$val) {
+  foreach ($source_ip as $key => $val) {
 	$val = intval(trim($val));
 	if ($key > 0) $full_source_ip .= ".";
 	$full_source_ip .= $val;
@@ -113,14 +152,21 @@ if (!empty($source_ip)) {
 if ($full_source_ip == "0.0.0.0") $full_source_ip = -1;
 elseif (ip2long($full_source_ip) === -1) $full_source_ip = -2;
 
-if ($_GET["s_radio"] == "A") {
-	$source_port = intval($_GET["source_port"]);
+$sradio_pattern = '/^(A|N)$/';
+if (preg_match($sradio_pattern, $tainted['sradio'])) {
+  if ($tainted['sradio'] == "A") {
+	$source_port = $clean['sport'];
 	$source_mask = -1;
-} else {
+  } else {
 	$source_port = -1;
-	$source_mask = intval($_GET["source_mask"]);
+	$source_mask = $clean['smask'];
+  }
 }
-$destination_ip = $_GET["destination_ip"];
+
+####################
+# Destination IP address
+####################
+$destination_ip = $tainted['destip'];
 $full_destination_ip = "";
 if (!empty($destination_ip)) {
   foreach ($destination_ip as $key=>$val) {
@@ -134,14 +180,21 @@ if (!empty($destination_ip)) {
 if ($full_destination_ip == "0.0.0.0") $full_destination_ip = -1;
 elseif (ip2long($full_destination_ip) === -1) $full_destination_ip = -2;
 
-if ($_GET["d_radio"] == "A") {
-	$destination_port = intval($_GET["destination_port"]);
+$sradio_pattern = '/^(A|N)$/';
+if (preg_match($sradio_pattern, $tainted['sradio'])) {
+  if ($tainted["dradio"] == "A") {
+	$destination_port = $clean['dport'];
 	$destination_mask = -1;
-} else {
+  } else {
 	$destination_port = -1;
-	$destination_mask = intval($_GET["destination_mask"]);
+	$destination_mask = $clean['dmask'];
+  }
 }
-$ts_select = trim($_GET["ts_select"]);
+
+####################
+# WHEN timestamping stuff
+####################
+$ts_select = $tainted['tsselect'];
 $ar_valid_values = array("H", "D", "T", "W", "M", "Y");
 if (in_array($ts_select, $ar_valid_values)) {
 	$dt = time();
@@ -182,26 +235,58 @@ if (in_array($ts_select, $ar_valid_values)) {
 	$ts_start = trim(pg_escape_string(strip_tags($_GET["ts_start"])));
 	$ts_end = trim(pg_escape_string(strip_tags($_GET["ts_end"])));
 }
-if (isset($_GET["f_sev"])) {
-	$f_sev = intval($_GET["f_sev"]);
-	if ($f_sev < 0) unset($f_sev);
+
+####################
+# Severity
+####################
+if (isset($clean['sev'])) {
+	$f_sev = $clean['sev'];
+        $sev_pattern = '/^(0|1|16|32)$/';
+	if (!preg_match($sev_pattern, $f_sev)) unset($f_sev);
 }
-$f_bin = trim(pg_escape_string(strip_tags($_GET["f_bin"])));
-$f_attack = intval($_GET["f_attack"]);
-if ($f_attack == 0 && isset($_GET["f_attack"])) {
-	// Using old attack (name instead of id), lookup id
-	$query = pg_query("SELECT id FROM stats_dialogue WHERE name = '" . pg_escape_string($_GET["f_attack"]) . "'");
-	$f_attack = intval(@pg_result($query, 0));
+
+####################
+# Binary name
+####################
+$bin_pattern = '/^[a-zA-Z0-9%]{1,33}$/';
+if (preg_match($bin_pattern, $tainted['bin'])) {
+  $f_bin = $tainted['bin'];
+} else {
+  $f_bin = "";
 }
-$f_virus = intval($_GET["f_virus"]);
-$f_virus_txt = trim(pg_escape_string(strip_tags($_GET["f_virus_txt"])));
-$f_filename = trim(pg_escape_string(strip_tags($_GET["f_filename"])));
-$f_reptype = pg_escape_string(strip_tags($_GET["f_reptype"]));
+
+####################
+# Attack type
+####################
+$f_attack = $clean['f_attack'];
+#if ($f_attack == 0 && isset($_GET["f_attack"])) {
+#	// Using old attack (name instead of id), lookup id
+#	$query = pg_query("SELECT id FROM stats_dialogue WHERE name = '" . pg_escape_string($_GET["f_attack"]) . "'");
+#	$f_attack = intval(@pg_result($query, 0));
+#}
+
+####################
+# Virus type
+####################
+$f_virus = $clean['f_virus'];
+$f_virus_txt = $clean['virustxt'];
+
+####################
+# Filename
+####################
+$f_filename = $clean['filename'];
+
+####################
+# Report type
+####################
+$f_reptype = $rapport;
 
 $db_table = array("sensors", "attacks");
 $where[] = "attacks.sensorid = sensors.id";
 
-### Limit sensor:
+####################
+# Sensor ID's
+####################
 if ($sensorid > 0) {
 	add_db_table("sensors");
 	$where[] = "sensors.id = '$sensorid'";
@@ -217,7 +302,9 @@ if ($sensorid > 0) {
 	} // else: all sensors
 }
 
-### Limit source address
+####################
+# Source IP address
+####################
 if ($full_source_ip > 0) {
 	add_db_table("attacks");
 	if ($source_mask > 0) {
@@ -232,22 +319,21 @@ if ($full_source_ip > 0) {
 } elseif ($source_port > 0) {
 	add_db_table("attacks");
 	$where[] = "attacks.sport = '$source_port'"; // Just search for portnumber
-} elseif (isset($_GET["f_search"])) {
+} elseif (isset($clean['searchnet'])) {
 	// Input from other page
-	$input = trim(pg_escape_string(strip_tags($_GET["f_search"])));
-	if (!empty($input)) {
-		add_db_table("attacks");
-		if (strstr($input, "/") === false) {
-			// no slash found, assume source_ip
-			$where[] = "attacks.source = '$input'";
-		} else {
-			// slash found, assume network
-			$where[] = "attacks.source <<= '$input'";
-		}
-	}
+	$input = $clean['searchnet'];
+	add_db_table("attacks");
+	$where[] = "attacks.source <<= '$input'";
+} elseif (isset($clean['searchip'])) {
+	// Input from other page
+	$input = $clean['search'];
+	add_db_table("attacks");
+	$where[] = "attacks.source = '$input'";
 }
 
-### Limit destination address
+####################
+# Destination IP address
+####################
 if ($full_destination_ip > 0) {
 	add_db_table("attacks");
 	if ($destination_mask > 0) {
@@ -264,7 +350,9 @@ if ($full_destination_ip > 0) {
 	$where[] = "attacks.dport = '$destination_port'"; // Just search for portnumber
 }
 
-### Limit timestamp_start:
+####################
+# Start timestamp
+####################
 if (!empty($ts_start)) {
 	// Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
 	list($date, $time) = explode(" ", $ts_start);
@@ -290,13 +378,15 @@ if (!empty($ts_start)) {
 		}		
 		// else: Incomplete date, ignore this timestamp
 	}
-} elseif (isset($_GET["from"])) {
+} elseif (isset($clean['from'])) {
 	add_db_table("attacks");
-	$ts_start = intval($_GET["from"]);
+	$ts_start = $clean['from'];
 	$where[] = "attacks.timestamp >= '$ts_start'";
 }
 
-### Limit timestamp_end:
+####################
+# End timestamp
+####################
 if (!empty($ts_end)) {
 	// Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
 	list($date, $time) = explode(" ", $ts_end);
@@ -322,19 +412,23 @@ if (!empty($ts_end)) {
 		}		
 		// else: Incomplete date, ignore this timestamp
 	}
-} elseif (isset($_GET["to"])) {
+} elseif (isset($clean['to'])) {
 	add_db_table("attacks");
-	$ts_end = intval($_GET["to"]);
+	$ts_end = $clean['to'];
 	$where[] = "attacks.timestamp <= '$ts_end'";
 }
 
-### Limit severity
+####################
+# Severity
+####################
 if (isset($f_sev)) {
 	add_db_table("attacks");
 	$where[] = "attacks.severity = '$f_sev'";
 }
 
-### Limit attack
+####################
+# Type of attack
+####################
 if ($f_attack > 0) {
 	add_db_table("details");
 	add_db_table("stats_dialogue");
@@ -343,14 +437,14 @@ if ($f_attack > 0) {
 	$where[] = "stats_dialogue.id = '$f_attack'";
 }
 
-### Limit virusname (select OR match string)
+####################
+# Type of virus
+####################
 if ($f_virus > 0) {
 	// From selectbox
 	add_db_table("binaries");
 	add_db_table("details"); // for binaries, don't remove!
 	add_db_table("stats_virus");
-#	$where[] = "binaries.info = stats_virus.id";
-#	$where[] = "stats_virus.id = '$f_virus'";
         $where[] = "binaries.info = $f_virus";
 } elseif (!empty($f_virus_txt)) {
 	// From inputbox
@@ -361,14 +455,18 @@ if ($f_virus > 0) {
 	$where[] = "stats_virus.name LIKE '%$f_virus_txt%'";
 }
 
-### Limit filename
+####################
+# Filename
+####################
 if (!empty($f_filename)) {
 	add_db_table("details");
 	$where[] = "details.type = 4";
 	$where[] = "details.text LIKE '%$f_filename%'";
 }
 
-### Limit binary
+####################
+# Filename
+####################
 if (!empty($f_bin)) {
 	add_db_table("details");
         add_db_table("uniq_binaries");
@@ -583,24 +681,28 @@ if ($rapport == "pdf") {
 }
 
 if ($rapport == "chart_sensor") {
-	$type = abs(intval($_GET["f_chart_type"]));
+	$type = $clean['charttype'];
 	if ($type > 2) $type = 0;
 	$chartorg = $s_org;
 	
-	$f_chart_of = $_GET["f_chart_of"];
-	if ($f_chart_of == "attack") {
+        $chartof_pattern = '/^(attack|severity|virus)$/';
+	$f_chart_of = $tainted['chartof'];
+        if (!preg_match($chartof_pattern, $f_chart_of)) {
+          exit("Invalid data supplied");
+        } else {
+          if ($f_chart_of == "attack") {
 		$select = " SELECT DISTINCT details.text, COUNT(details.*) as total ";
 		add_db_table("details");
 		$where[] = "details.type = 1";
 		$group_by = " GROUP BY details.text, details.type";
 		$label = "Attacks";
-	} elseif ($f_chart_of == "severity") {
+          } elseif ($f_chart_of == "severity") {
 		$select = "SELECT DISTINCT severity.txt, COUNT(attacks.*) as total";
 		add_db_table("severity");
 		$where[] = "attacks.severity = severity.val";
 		$group_by = "GROUP BY severity.txt";
 		$label = "Severity";
-	} elseif ($f_chart_of == "virus") {
+          } elseif ($f_chart_of == "virus") {
 		$select = "SELECT DISTINCT stats_virus.name, count(binaries.info) as total";
 		add_db_table("binaries");
 		add_db_table("stats_virus");
@@ -609,7 +711,8 @@ if ($rapport == "chart_sensor") {
 		$where[] = "stats_virus.name NOT LIKE 'Suspicious'";
 		$group_by = "GROUP BY stats_virus.name ORDER BY total DESC LIMIT 15 OFFSET 0";
 		
-	} else exit("Invalid data supplied");
+          } else exit("Invalid data supplied");
+        }
 	
 	if ($sensorid == 0) $label .= " for ALL sensors";
 	else {
@@ -633,14 +736,14 @@ if ($rapport == "chart_sensor") {
 //        require_once("../libchart/libchart.php");
 //	$img = makeChart($type, $title, $sql, $chartorg);
 
-    echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;org=$chartorg' />\n";
+    echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;int_org=$chartorg' />\n";
     // Personal search templates
 	echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
 	footer();
 	exit;
 }
 if ($rapport == "chart_attack") {
-	$type = abs(intval($_GET["f_chart_type"]));
+	$type = $clean['charttype'];
 	if ($type > 2) $type = 0;
 	$chartorg = $s_org;
 	
@@ -668,7 +771,7 @@ if ($rapport == "chart_attack") {
         $_SESSION['chartsql'] = $sql;
 	
         $title = "Searchresults: $label";
-        echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;org=$chartorg' />\n";
+        echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;int_org=$chartorg' />\n";
         // Personal search templates
 		echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
 
@@ -688,18 +791,18 @@ $order_by_tbl = array(	"id"		=> "attacks.id",
 						"source"	=> "attacks.source",
 						"dest"		=> "attacks.dest",
 						"keyname"	=> "sensors.id");
-if (isset($_GET["order"])) {
-	$sql_order_by = $order_by_tbl[$_GET["order"]];
+if (isset($tainted['order'])) {
+	$sql_order_by = $order_by_tbl[$tainted['order']];
 }
 if (empty($sql_order_by) || !isset($sql_order_by)) $sql_order_by = $order_by_tbl["id"];
 // Order method (ascending or descending, default ASC)
-if (isset($_GET["order_m"])) {
-	if ($_GET["order_m"] == "DESC") $asc_desc = "DESC";
+if (isset($tainted['orderm'])) {
+	if ($tainted['orderm'] == "DESC") $asc_desc = "DESC";
 	else $asc_desc = "ASC";
 } else $asc_desc = "ASC";
-if ($asc_desc == "ASC") $order_m_url[$_GET["order"]] = "&order_m=DESC";
+if ($asc_desc == "ASC") $order_m_url[$tainted['order']] = "&orderm=DESC";
 
-if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]) == 0) || (intval($_GET["page"]) == 0)) {
+if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]) == 0) || ($clean['page'] == 0)) {
 	### Prepare count SQL query
 	$sql_count =  " SELECT COUNT(attacks.id) AS total ";
 	$sql_count .= " FROM $sql_from ";
@@ -718,7 +821,7 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
 $num_rows = intval($_SESSION["search_num_rows"]);
 
 if ($num_rows == 0) {
-        debug();
+        debug_sql();
 	echo "<p>No matching results found!</p>\n";
 	?>
 	<script language="javascript" type="text/javascript">
@@ -733,8 +836,8 @@ if ($rapport == "single") $per_page = $num_rows;
 else $per_page = 20;
 
 $last_page = ceil($num_rows / $per_page);
-if (isset($_GET["page"])) {
-	$page_nr = intval($_GET["page"]);
+if (isset($clean['page'])) {
+	$page_nr = $clean['page'];
 	if ($page_nr <= $last_page) {
 		$offset = ($page_nr - 1) * $per_page;
 	} else {
@@ -755,7 +858,7 @@ $last_result = number_format($last_result, 0, ".", ",");
 ### Navigation
 $nav = "Result page: ";
 $url = $_SERVER['REQUEST_URI'];
-$url = str_replace("&page=" . $_GET["page"], "", $url);
+$url = str_replace("&page=" . $clean["page"], "", $url);
 for ($i = ($page_nr - 3); $i <= ($page_nr + 3); $i++) {
 	if (($i > 0) && ($i <= $last_page)) {
 		if ($i == $page_nr) $nav .= "<b>&laquo;$i&raquo;</b>&nbsp;";
@@ -775,14 +878,14 @@ else $nav .= "&nbsp;&nbsp;<a href=\"$url&page=$last_page\">Last&nbsp;&gt;&gt;</a
 
 // XML IDMEF logging button
 $idmef_url = $_SERVER['REQUEST_URI'];
-if (intval(strpos($idmef_url, "f_reptype")) == 0) $idmef_url .= "&f_reptype=idmef";
-else $idmef_url = str_replace("f_reptype=" . $_GET["f_reptype"], "&f_reptype=idmef", $idmef_url);
+if (intval(strpos($idmef_url, "reptype")) == 0) $idmef_url .= "&reptype=idmef";
+else $idmef_url = str_replace("reptype=" . $tainted["reptype"], "&reptype=idmef", $idmef_url);
 echo "<div id=\"xml_idmef\" <a href=\"$idmef_url\" title=\"Download these results as IDMEF format XML file\"><img src=\"./images/xml.png\" border=\"0\" width=\"48\" height=\"52\"></a><br>IDMEF</div>\n";
 
 // PDF button
 $pdf_url = $_SERVER['REQUEST_URI'];
-if (intval(strpos($pdf_url, "f_reptype")) == 0) $pdf_url.= "&f_reptype=pdf";
-else $pdf_url = str_replace("f_reptype=" . $_GET["f_reptype"], "&f_reptype=pdf", $pdf_url);
+if (intval(strpos($pdf_url, "reptype")) == 0) $pdf_url.= "&reptype=pdf";
+else $pdf_url = str_replace("reptype=" . $tainted["reptype"], "&reptype=pdf", $pdf_url);
 echo "<div id=\"pdf_btn\" <a href=\"$pdf_url\" title=\"Download these results as PDF file\"><img src=\"./images/pdf.gif\" border=\"0\" width=\"48\" height=\"52\"></a><br>&nbsp;&nbsp; PDF</div>\n";
 
 // Personal search templates
@@ -812,7 +915,7 @@ if ($rapport == "multi") {
 }
 
 $url = $_SERVER['REQUEST_URI'];
-$ar_search = array("&order=" . $_GET["order"], "&order_m=" . $_GET["order_m"]);
+$ar_search = array("&order=" . $tainted["order"], "&orderm=" . $tainted["orderm"]);
 $url = str_replace($ar_search, "", $url);
 echo "<table class='datatable' width='100%'>\n";
   echo "<tr>\n";
@@ -836,7 +939,9 @@ while ($row = pg_fetch_assoc($result)) {
   $dest = $row['dest'];
   $dport = $row['dport'];
   $sensorid = $row['sensorid'];
+  $vlanid = $row['vlanid'];
   $sensorname = $row['keyname'];
+  if ($vlanid != 0) $sensorname = "$sensorname-$vlanid";
   $smac = $row['src_mac'];
 
   $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
@@ -857,7 +962,7 @@ while ($row = pg_fetch_assoc($result)) {
 
   echo "<tr>\n";
     if ($numrows_details != 0) {
-      echo "<td class='datatd'><a href='logdetail.php?id=$id'>$id</a></td>\n";
+      echo "<td class='datatd'><a href='logdetail.php?int_id=$id'>$id</a></td>\n";
     } else {
       echo "<td class='datatd'>$id</td>\n";
     }
@@ -866,12 +971,12 @@ while ($row = pg_fetch_assoc($result)) {
     if ($numrows_finger != 0) {
       $img = "$surfidsdir/webinterface/images/$os.gif";
       if (file_exists($img)) {
-        echo "<td class='datatd'><img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
+        echo "<td class='datatd'><img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
       } else {
-        echo "<td class='datatd'><img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
+        echo "<td class='datatd'><img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
       }
     } else {
-      echo "<td class='datatd'><img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;<a href='whois.php?ip=$source'>$source:$sport</a></td>\n";
+      echo "<td class='datatd'><img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
     }
     if ($hide_dest_ip == 1 && $s_admin == 0) {
       $range_check = matchCIDR($dest, $ranges_ar);
@@ -880,8 +985,7 @@ while ($row = pg_fetch_assoc($result)) {
       } else {
         echo "<td class='datatd'>&lt;hidden&gt;</td>\n";
       }
-    }
-    else {
+    } else {
       echo "<td class='datatd'>$dest:$dport</td>\n";
     }
     echo "<td class='datatd'>$sensorname</td>\n";
@@ -911,25 +1015,25 @@ while ($row = pg_fetch_assoc($result)) {
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $bin = $dia_result_ar[0]['text'];
 
-        $sql_bin = "SELECT info FROM binaries WHERE bin = '$bin' AND scanner = 'ClamAV' ORDER BY timestamp LIMIT 1";
+        $sql_bin = "SELECT binaries.bin, binaries.info FROM binaries, uniq_binaries, scanners WHERE uniq_binaries.name = '$bin' ";
+        $sql_bin .= " AND binaries.bin = uniq_binaries.id AND binaries.scanner = scanners.id AND scanners.name = 'ClamAV' ";
+        $sql_bin .= " ORDER BY timestamp LIMIT 1";
         $result_bin = pg_query($pgconn, $sql_bin);
         $numrows_bin = pg_num_rows($result_bin);
         $row_bin = pg_fetch_assoc($result_bin);
 
         echo "<td class='datatd'>";
         if ($numrows_bin != 0) {
-          $info = $row_bin['info'];
-          echo "<a href='binaryhist.php?bin=$bin'>$info</a>";
-        }
-        else {
+          $info = $row_bin['bin'];
+          echo "<a href='binaryhist.php?int_binid=$bin'>$info</a>";
+        } else {
           echo "Suspicious";
         }
         if ($smac != "") {
           echo "<br />$smac";
         }
         echo "</td>\n";
-      }
-      else {
+      } else {
         if ($smac != "") {
           echo "<td class='datatd'>Source MAC: $smac</td>\n";
         } else {
@@ -955,7 +1059,7 @@ if ($rapport == "multi") {
 
 pg_close($pgconn);
 
-debug();
+debug_sql();
 
 if ($searchtime == 1) {
   $timeend = microtime_float();

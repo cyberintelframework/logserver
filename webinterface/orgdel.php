@@ -35,24 +35,32 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
+$allowed_get = array(
+                "int_orgid",
+                "int_m",
+		"int_ident"
+);
+$check = extractvars($_GET, $allowed_get);
+#debug_input();
+
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;
 }
 
-if (!isset($_GET['orgid'])) {
+if (!isset($clean['orgid'])) {
   $err = 1;
   $m = 36;
 }
 
-if (!isset($_GET['ident'])) {
+if (!isset($clean['ident'])) {
   $err = 1;
   $m = 46;
 }
 
 if ($err == 0) {
-  $orgid = intval($_GET['orgid']);
-  $ident = intval($_GET['ident']);
+  $orgid = $clean['orgid'];
+  $ident = $clean['ident'];
   $sql_check = "SELECT * FROM org_id WHERE orgid = $orgid";
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
@@ -66,5 +74,5 @@ if ($err == 0) {
   }
 }
 pg_close($pgconn);
-header("location: orgedit.php?orgid=$orgid&m=$m");
+header("location: orgedit.php?int_orgid=$orgid&int_m=$m");
 ?>

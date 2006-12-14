@@ -29,13 +29,19 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+$allowed_get = array(
+                "int_m"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;
 }
 
-if (isset($_GET['m'])) {
-  $m = intval($_GET['m']);
+if (isset($clean['m'])) {
+  $m = $clean['m'];
   $m = stripinput($errors[$m]);
   $m = "<p>$m</p>";
   echo "<font color='red'>" .$m. "</font>";
@@ -71,7 +77,7 @@ if ($err == 0) {
         echo "<td class='datatd'>$id</td>\n";
         echo "<td class='datatd'>$org</td>\n";
         echo "<td class='datatd'>$count</td>\n";
-        echo "<td class='datatd'><a href='orgedit.php?orgid=$id' alt='Edit the organisation' class='linkbutton'>Edit</a></td>\n";
+        echo "<td class='datatd'><a href='orgedit.php?int_orgid=$id' alt='Edit the organisation' class='linkbutton'>Edit</a></td>\n";
       echo "</tr>\n";
     }
 
@@ -83,6 +89,6 @@ if ($err == 0) {
   echo "</table>\n";
   echo "</form>\n";
 }
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

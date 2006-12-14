@@ -3,13 +3,15 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.04.02                 #
-# 11-12-2006                      #
+# Version 1.04.04                 #
+# 13-12-2006                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.04 Changed data input handling
+# 1.04.03 Fixed typo
 # 1.04.02 Changed debug stuff
 # 1.04.01 Added debugging for $sql_filename
 # 1.03.02 Fixed a concatenation bug
@@ -23,43 +25,39 @@
 $s_org = intval($_SESSION['s_org']);
 $err = 0;
 
-if ( isset($_GET['binid']) ){
-  $bin_id = intval($_GET['binid']);
+$allowed_get = array(
+                "int_binid",
+                "md5_binname",
+		"show"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (isset($clean['binid']) ){
+  $bin_id = $clean['binid'];
 
   $sql_binname = "SELECT name FROM uniq_binaries WHERE id = $bin_id";
   $result_binname = pg_query($pgconn, $sql_binname);
   $bin_name = pg_result($result_binname, "name");
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_BINNAME: $sql_binname\n";
-    echo "</pre>\n";
-  }
-} elseif (isset($_GET['binname'])) {
-  $bin_name = pg_escape_string($_GET['binname']);
+  $debuginfo[] = $sql_binname;
+} elseif (isset($clean['binname'])) {
+  $bin_name = $clean['binname'];
 
   $sql_binid = "SELECT id FROM uniq_binaries WHERE name = '$bin_name'";
   $result_binid = pg_query($pgconn, $sql_binid);
   $bin_id = pg_result($result_binid, "id");
-
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_BINID: $sql_binid\n";
-    echo "</pre>\n";
-  }
+  $debuginfo[] = $sql_binid;
 } else {
   $err = 1;
 }
 
-if (isset($_GET['show'])) {
-  $show = $_GET['show'];
+if (isset($tainted['show'])) {
+  $show = $tainted['show'];
   $pattern = '/^(top|all)$/';
   if (!preg_match($pattern, $show)) {
     $show = "top";
   } else {
-    $show = stripinput($_GET['show']);
+    $show = $tainted['show'];
   }
 } else {
   $show = "top";
@@ -73,15 +71,10 @@ $sql_bindet = "SELECT id FROM binaries_detail WHERE bin = $bin_id";
 $result_bindet = pg_query($pgconn, $sql_bindet);
 $numrows_bindet = pg_num_rows($result_bindet);
 
-# Debug info
-if ($debug == 1) {
-  echo "<pre>";
-  echo "SQL_BINHIST: $sql_binhist\n";
-  echo "SQL_BINDET: $sql_bindet\n";
-  echo "</pre>\n";
-}
+$debuginfo[] = $sql_binhist;
+$debuginfo[] = $sql_bindet;
 
-if ($numrows_binhist == 0 && $numrows_det == 0) {
+if ($numrows_binhist == 0 && $numrows_bindet == 0) {
   $err = 1;
   echo "<font color='red'>No record could be found for the given binary!</font>\n";
 }
@@ -96,7 +89,7 @@ if ($err == 0) {
 
   $sql_firstseen = "SELECT attacks.timestamp, details.* ";
   $sql_firstseen .= "FROM attacks, details ";
-  $sql_firstseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin_name'";
+  $sql_firstseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin_name' ";
   $sql_firstseen .= "ORDER BY attacks.timestamp ASC LIMIT 1";
   $result_firstseen = pg_query($pgconn, $sql_firstseen);
   $row_firstseen = pg_fetch_assoc($result_firstseen);
@@ -105,22 +98,16 @@ if ($err == 0) {
 
   $sql_lastseen = "SELECT attacks.timestamp, details.* ";
   $sql_lastseen .= "FROM attacks, details ";
-  $sql_lastseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin_name'";
+  $sql_lastseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin_name' ";
   $sql_lastseen .= "ORDER BY attacks.timestamp DESC LIMIT 1";
   $result_lastseen = pg_query($pgconn, $sql_lastseen);
   $row_lastseen = pg_fetch_assoc($result_lastseen);
   $last_seen = $row_lastseen['timestamp'];
   $last_seen = date("d-m-Y H:i:s", $last_seen);
 
-  # Debug info
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_BINHIST: $sql_binhist\n";
-    echo "SQL_BINDETAIL: $sql_bindetail\n";
-    echo "SQL_FIRSTSEEN: $sql_firstseen\n";
-    echo "SQL_LASTSEEN: $sql_lastseen\n";
-    echo "</pre>\n";
-  }
+  $debuginfo[] = $sql_bindetail;
+  $debuginfo[] = $sql_firstseen;
+  $debuginfo[] = $sql_lastseen;
 
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
@@ -141,17 +128,17 @@ if ($err == 0) {
   echo "</table>\n";
   echo "<br />\n";
  
- $sql_norman = "SELECT result FROM norman WHERE binid = $bin_id";
- $result_norman = pg_query($pgconn, $sql_norman);
- $numrows_norman = pg_num_rows($result_norman);
+  $sql_norman = "SELECT result FROM norman WHERE binid = $bin_id";
+  $result_norman = pg_query($pgconn, $sql_norman);
+  $numrows_norman = pg_num_rows($result_norman);
+  $debuginfo[] = $sql_norman;
  
- if ($numrows_norman != 0) {
+  if ($numrows_norman != 0) {
     $row_norman = pg_fetch_assoc($result_norman);
     $normanresult = $row_norman['result'];
     echo "<b>Norman Result</b><br />\n";
     echo "<pre>$normanresult</pre>";
- }
- 
+  }
   
   echo "<b>Binary History</b><br />\n";
   echo "<table class='datatable' width='100%'>\n";
@@ -159,6 +146,7 @@ if ($err == 0) {
       echo "<td class='dataheader' width='15%'>Timestamp</a></td>\n";
 
       $sql_getscanners = "SELECT id, name FROM scanners";
+      $debuginfo[] = $sql_getscanners;
       $result_getscanners = pg_query($pgconn, $sql_getscanners);
       while ($row_scanners = pg_fetch_assoc($result_getscanners)) {
         $scanner_id = $row_scanners['id'];
@@ -181,6 +169,7 @@ if ($err == 0) {
         $sql_getvirus .= "AND binaries.scanner = $scanner_id AND binaries.bin = $bin_id AND binaries.timestamp = $timestamp";
         $result_getvirus = pg_query($pgconn, $sql_getvirus);
         $virus = pg_result($result_getvirus, "name");
+        $debuginfo[] = $sql_getvirus;
 
         if (!isset($vir_ar[$scanner_id])) {
           if ($virus == "") {
@@ -195,12 +184,6 @@ if ($err == 0) {
           }
         }
         $known_virus_ar[$scanner_id] = $virus;
-        # Debug info
-        if ($debug == 1) {
-          echo "<pre>";
-          echo "SQL_GETVIRUS: $sql_getvirus\n";
-          echo "</pre>\n";
-        }
 
         if ($virus == "Suspicious" || $virus == "Not scanned yet") {
           $virus_html = $virus;
@@ -228,12 +211,7 @@ if ($err == 0) {
     $sql_filename .= "WHERE details.type = 4 AND attackid IN (SELECT DISTINCT attackid FROM details WHERE text = '$bin_name') LIMIT 10";
   }
   $result_filename = pg_query($pgconn, $sql_filename);
-
-  if ($debug == 1) {
-    echo "<pre>";
-    echo "SQL_FILENAME: $sql_filename\n";
-    echo "</pre>\n";
-  }
+  $debuginfo[] = $sql_filename;
 
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
@@ -257,17 +235,17 @@ if ($err == 0) {
   if ($i >= 10) {
     if ($show != "all") {
       echo "<tr>\n";
-        echo "<td><a href='binaryhist.php?bin=$bin_id&show=all'>Show full list</a></td>\n";
+        echo "<td><a href='binaryhist.php?int_bin=$bin_id&show=all'>Show full list</a></td>\n";
       echo "</tr>\n";
     } else {
       echo "<tr>\n";
-        echo "<td><a href='binaryhist.php?bin=$bin_id&show=top'>Show top 10</a></td>\n";
+        echo "<td><a href='binaryhist.php?int_bin=$bin_id&show=top'>Show top 10</a></td>\n";
       echo "</tr>\n";
     }
   }
   echo "</table>\n";
 }
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

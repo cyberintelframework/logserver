@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 16-11-2006                       #
+# Version 1.04.04                  #
+# 12-12-2006                       #
 # Peter Arts                       #
 # Modified by Jan van Lith         #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Query tuning
 # 1.04.03 Added Searchtemplates
 # 1.04.02 Added VLAN support 
 # 1.04.01 Rereleased as 1.04.01
@@ -60,7 +61,7 @@ function check_byte(b_val,next_field) {
     $s_org = intval($_SESSION['s_org']);
     $s_admin = intval($_SESSION['s_admin']);
 	if ($s_admin == 1) $where = "";
-	else $where = " WHERE organisation = '$s_org'";
+	else $where = " AND organisation = '$s_org'";
 
     $sql = "SELECT COUNT(*) FROM sensors $where";
     $debuginfo[] = $sql;
@@ -73,22 +74,25 @@ function check_byte(b_val,next_field) {
 		echo "  <td class=\"datatd\">\n";
 		echo "<select name=\"sensorid[]\" style=\"background-color:white;\" size=\"" . $select_size . "\" multiple=\"true\">\n";
 	    echo printOption(0, "All sensors", $sensorid);
-	    $sql = "SELECT * FROM sensors $where ORDER BY keyname";
+	    $sql = "SELECT sensors.keyname, sensors.vlanid, organisations.organisation FROM sensors, organisations ";
+            $sql .= "WHERE organisations.id = sensors.organisation $where ORDER BY sensors.keyname";
             $debuginfo[] = $sql;
 		$query = pg_query($sql);
 		while ($sensor_data = pg_fetch_assoc($query)) {
 			$label = $sensor_data["keyname"];
 			$vlanid = $sensor_data["vlanid"];
+			$org = $sensor_data["organisation"];
 			if ($vlanid != 0 ) {
 			  $label .=  "-" .$vlanid;
 			}
 			if ($s_admin == 1) {
+	                        $label .= " (" .$org. ")";
 				// get organisation name
-                                $sql = "SELECT organisation FROM organisation WHERE id = '" . intval($sensor_data["organisation"]) . "'";
-                                $debuginfo[] = $sql;
-				$query_org = pg_query($sql);
-				$org = pg_result($query_org, 0);
-				$label .= " (" . $org . ")";
+#                                $sql = "SELECT organisation FROM organisation WHERE id = '" . intval($sensor_data["organisation"]) . "'";
+#                                $debuginfo[] = $sql;
+#				$query_org = pg_query($sql);
+#				$org = pg_result($query_org, 0);
+#				$label .= " (" . $org . ")";
 			}
 			
 			  echo printOption($sensor_data["id"], $label, $sensorid);
@@ -101,35 +105,35 @@ function check_byte(b_val,next_field) {
  <tr>
   <td class="datatd" width=140>Source:</td>
   <td class="datatd">
-    <input type="radio" name="s_radio" id="s_radioA" value="A" checked onclick="document.getElementById('source_A').style.display='';document.getElementById('source_N').style.display='none';"> 
+    <input type="radio" name="sradio" id="s_radioA" value="A" checked onclick="document.getElementById('source_A').style.display='';document.getElementById('source_N').style.display='none';"> 
      <label for="s_radioA" style="cursor:pointer;">Address</label> &nbsp; 
-    <input type="radio" name="s_radio" id="s_radioN" value="N" onclick="document.getElementById('source_N').style.display='';document.getElementById('source_A').style.display='none';"> 
+    <input type="radio" name="sradio" id="s_radioN" value="N" onclick="document.getElementById('source_N').style.display='';document.getElementById('source_A').style.display='none';"> 
      <label for="s_radioN" style="cursor:pointer;">Network</label><br />
-    <input type="text" name="source_ip[]" id="source_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip2');" /> . 
-    <input type="text" name="source_ip[]" id="source_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip3');" /> . 
-    <input type="text" name="source_ip[]" id="source_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip4');" />. 
-    <input type="text" name="source_ip[]" id="source_ip4" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, '');" />
+    <input type="text" name="sourceip[]" id="source_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip2');" /> . 
+    <input type="text" name="sourceip[]" id="source_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip3');" /> . 
+    <input type="text" name="sourceip[]" id="source_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip4');" />. 
+    <input type="text" name="sourceip[]" id="source_ip4" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, '');" />
     <font id="source_A" name="source_A">
-      : <input type="text" name="source_port" style="width:80px;" />
+      : <input type="text" name="int_sport" style="width:80px;" />
     </font>
     <font id="source_N" name="source_N" style="display:none;">
-      / <input type="text" name="source_mask" maxlength=3 style="width:40px;">
+      / <input type="text" name="int_smask" maxlength=3 style="width:40px;">
     </font>
    </td>
  </tr>
  <tr>
   <td class="datatd">Destination:</td>
   <td class="datatd">
-    <input type="radio" name="d_radio" id="d_radioA" value="A" checked onclick="document.getElementById('destination_A').style.display='';document.getElementById('destination_N').style.display='none';"> <label for="d_radioA" style="cursor:pointer;">Address</label> &nbsp; <input type="radio" name="d_radio" id="d_radioN" value="N" onclick="document.getElementById('destination_N').style.display='';document.getElementById('destination_A').style.display='none';"> <label for="d_radioN" style="cursor:pointer;">Network</label><br />
-    <input type="text" name="destination_ip[]" id="destination_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip2');" /> . 
-    <input type="text" name="destination_ip[]" id="destination_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip3');" /> . 
-    <input type="text" name="destination_ip[]" id="destination_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip4');" />. 
-    <input type="text" name="destination_ip[]" id="destination_ip4" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, '');" />
+    <input type="radio" name="dradio" id="d_radioA" value="A" checked onclick="document.getElementById('destination_A').style.display='';document.getElementById('destination_N').style.display='none';"> <label for="d_radioA" style="cursor:pointer;">Address</label> &nbsp; <input type="radio" name="d_radio" id="d_radioN" value="N" onclick="document.getElementById('destination_N').style.display='';document.getElementById('destination_A').style.display='none';"> <label for="d_radioN" style="cursor:pointer;">Network</label><br />
+    <input type="text" name="destip[]" id="destination_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip2');" /> . 
+    <input type="text" name="destip[]" id="destination_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip3');" /> . 
+    <input type="text" name="destip[]" id="destination_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip4');" />. 
+    <input type="text" name="destip[]" id="destination_ip4" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, '');" />
     <font id="destination_A">
-      : <input type="text" name="destination_port" style="width:80px;" />
+      : <input type="text" name="int_dport" style="width:80px;" />
     </font>
     <font id="destination_N" style="display:none;">
-      / <input type="text" name="destination_mask" maxlength=3 style="width:40px;">
+      / <input type="text" name="int_dmask" maxlength=3 style="width:40px;">
     </font>
    </td>
  </tr>
@@ -139,7 +143,7 @@ function check_byte(b_val,next_field) {
  <tr>
   <td class="datatd">Select:</td>
   <td class="datatd">
-   <select name="ts_select" style="background-color:white;">
+   <select name="tsselect" style="background-color:white;">
     <option value=""></option>
     <option value="H">Last hour</option>
     <option value="D">Last 24 hour</option>
@@ -152,11 +156,11 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr>
   <td class="datatd">Between:</td>
-  <td class="datatd"><input type="text" name="ts_start" id="ts_start" value="<?=$ts_start;?>" /> <input type="button" value="..." name="ts_start_trigger" id="ts_start_trigger" /></td>
+  <td class="datatd"><input type="text" name="strip_html_escape_tsstart" id="ts_start" value="<?=$ts_start;?>" /> <input type="button" value="..." name="ts_start_trigger" id="ts_start_trigger" /></td>
  </tr>
  <tr>
   <td class="datatd">And: </td>
-  <td class="datatd"><input type="text" name="ts_end" id="ts_end" value="<?=$ts_end;?>" /> <input type="button" value="..." name="ts_end_trigger" id="ts_end_trigger" /></td>
+  <td class="datatd"><input type="text" name="strip_html_escape_tsend" id="ts_end" value="<?=$ts_end;?>" /> <input type="button" value="..." name="ts_end_trigger" id="ts_end_trigger" /></td>
  </tr>
  <tr>
   <td colspan=2><h4>How</h4></td>
@@ -164,7 +168,7 @@ function check_byte(b_val,next_field) {
  <tr>
   <td class="datatd">Report type:</td>
   <td class="datatd">
-   <select name="f_reptype" style="background-color:white;" onchange="change_form(this.selectedIndex);">
+   <select name="reptype" style="background-color:white;" onchange="change_form(this.selectedIndex);">
     <option value="multi">Multi page</option>
     <option value="single">Single page</option>
     <option value="chart_sensor">Chart for sensor</option>
@@ -180,7 +184,7 @@ function check_byte(b_val,next_field) {
  <tr id="what_c1" name="what_c1" style="display:none;">
   <td class="datatd">Chart of:</td>
   <td class="datatd">
-   <select name="f_chart_of" style="background-color:white;">
+   <select name="chartof" style="background-color:white;">
     <option value="attack">Attack</option>
     <option value="severity">Severity</option>
     <option value="virus">Virus top 15</option>
@@ -189,7 +193,7 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr id="what_1" name="what_1">
   <td class="datatd">Severity: </td>
-  <td class="datatd"><select name="f_sev" style="background-color:white;">
+  <td class="datatd"><select name="int_sev" style="background-color:white;">
   <?
   $f_sev = -1;
   echo printOption(-1, "", $f_sev);
@@ -199,7 +203,7 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr id="what_2" name="what_2">
   <td class="datatd">Attack: </td>
-  <td class="datatd"><select name="f_attack" style="background-color:white;">
+  <td class="datatd"><select name="int_attack" style="background-color:white;">
   <?
   echo printOption(-1, "All attacks", $f_attack);
   $sql = "SELECT * FROM stats_dialogue ORDER BY name";
@@ -214,7 +218,7 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr id="what_3" name="what_3">
   <td class="datatd">Virus: </td>
-  <td class="datatd"><select name="f_virus" style="background-color:white;">
+  <td class="datatd"><select name="int_virus" style="background-color:white;">
   <?
   echo printOption(-1, "", $f_virus);
   $sql = "SELECT * FROM stats_virus ORDER BY name";
@@ -225,21 +229,21 @@ function check_byte(b_val,next_field) {
   }
   ?>
    </select><br>
-   <u><b>or</b></u> match: <input type="text" name="f_virus_txt" value="<?=$f_virus_txt;?>"> *
+   <u><b>or</b></u> match: <input type="text" name="strip_html_escape_virustxt" value="<?=$f_virus_txt;?>"> *
    </td>
  </tr>
  <tr id="what_4" name="what_4">
   <td class="datatd">Filename:</td>
-  <td class="datatd"><input type="text" name="f_filename" value="<?=$f_filename;?>" /> *</td>
+  <td class="datatd"><input type="text" name="strip_html_escape_filename" value="<?=$f_filename;?>" /> *</td>
  </tr>
  <tr id="what_5" name="what_5">
   <td class="datatd">Binary:</td>
-  <td class="datatd"><input type="text" name="f_bin" value="<?=$f_bin;?>" /> *</td>
+  <td class="datatd"><input type="text" name="strip_html_escape_bin" value="<?=$f_bin;?>" /> *</td>
  </tr>
  <tr id="what_c2" name="what_c2" style="display:none;">
   <td class="datatd">Chart type:</td>
   <td class="datatd">
-   <select name="f_chart_type" style="background-color:white;">
+   <select name="int_charttype" style="background-color:white;">
     <option value="0">Pie</option>
     <option value="1">Horizontal bar</option>
     <option value="2">Vertical bar</option>
@@ -248,7 +252,7 @@ function check_byte(b_val,next_field) {
  </tr>
  </div>
  <tr>
-   <td colspan=2 align="right"><br /><input type="hidden" name="c" value=0><input type="hidden" name="searchtemplate_title" id="searchtemplate_title" value=""><input type="button" name="f_submit_template" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="f_submit" value="Show" class="button" style="cursor:pointer;" /></td>
+   <td colspan=2 align="right"><br /><input type="hidden" name="int_c" value=0><input type="hidden" name="searchtemplate_title" id="searchtemplate_title" value=""><input type="button" name="submittemplate" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
  </tr>
 </table>
 </form>
@@ -373,6 +377,6 @@ function catcalc(cal) {
   );
 </script>
 <?php
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

@@ -23,8 +23,15 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
-if (isset($_GET['userid'])) {
-  $user_id = intval($_GET['userid']);
+$allowed_get = array(
+                "int_userid",
+		"int_rcid"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (isset($clean['userid'])) {
+  $user_id = $clean['userid'];
   if ($s_access_user < 1) {
     header("location: index.php");
     pg_close($pgconn);
@@ -40,16 +47,16 @@ if (isset($_GET['userid'])) {
       footer();
       exit;
     } else {
-      $user_id = intval($_GET['userid']);
+      $user_id = $clean['userid'];
     }
   } else {
-    $user_id = intval($_GET['userid']);
+    $user_id = $clean['userid'];
   }
 } else {
   $user_id = $s_userid;
 }
 
-$report_content_id = intval($_GET["report_content_id"]);
+$report_content_id = $clean["rcid"];
 if ($report_content_id > 0) {
   # Getting data from database
   $sql_report_content = "SELECT * FROM report_content ";
@@ -60,7 +67,7 @@ if ($report_content_id > 0) {
     $report_content = pg_fetch_assoc($result_report_content);
     
     # Submit data
-    if (intval($_GET["submit"]) == 1) {
+    if (isset($tainted["submit"])) {
       // First remove refence table
       if ($report_content["template"] == 3) {
         // Reference table: report_template_threshold
@@ -74,7 +81,7 @@ if ($report_content_id > 0) {
       $result = pg_query($sql);
       if (pg_affected_rows($result) == 1) {
         echo "<p style='color:green;'><b>Data succesfully removed.</b></p>\n";
-        echo "<p><a href='mailadmin.php?userid=$user_id'>Back</a></p>\n";
+        echo "<p><a href='mailadmin.php?int_userid=$user_id'>Back</a></p>\n";
         footer();
         exit;
       } else {
@@ -86,13 +93,13 @@ if ($report_content_id > 0) {
     echo "Are you sure you want to delete this report?<br /><br />\n";
     echo "<form method='get'>\n";
       echo "<input type='hidden' name='action' value='del'>";
-      echo "<input type='hidden' name='userid' value='$user_id'>";
+      echo "<input type='hidden' name='int_userid' value='$user_id'>";
       echo "<input type='hidden' name='submit' value='1'>";
-      echo "<input type='hidden' name='report_content_id' value='$report_content_id'>";
+      echo "<input type='hidden' name='int_rcid' value='$report_content_id'>";
       echo "<input type='submit' name='submitBtn' value='Yes' class='button'>\n";
-      echo "<input type='button' name='b1' value='No' onclick=\"window.location.href='mailadmin.php?userid=$user_id';\" class='button'>\n";
+      echo "<input type='button' name='b1' value='No' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
     echo "</form>\n";
   }
 }
-debug();
+debug_sql();
 ?>

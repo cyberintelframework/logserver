@@ -35,33 +35,66 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
-$s_org = $_SESSION['s_org'];
+$s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
-$s_access_user = $s_access{2};
+$s_access_user = intval($s_access{2});
 
-# Fetching POST data.
-$f_username = stripinput(trim(pg_escape_string($_POST['f_username'])));
-$f_org = intval($_POST['f_org']);
-$f_pass = pg_escape_string(stripinput($_POST['f_pass']));
-$f_confirm = pg_escape_string(stripinput($_POST['f_confirm']));
-$f_access_user = intval($_POST['f_access_user']);
-$f_access_search = intval($_POST['f_access_search']);
-$f_access_sensor = intval($_POST['f_access_sensor']);
-$f_access = $f_access_sensor . $f_access_search . $f_access_user;
-$f_gpg = intval($_POST['f_gpg']);
-$f_email = pg_escape_string(trim(stripinput($_POST['f_email'])));
+$allowed_post = array(
+                "strip_html_escape_username",
+                "int_asensor",
+                "int_asearch",
+                "int_auser",
+                "int_userid",
+                "md5_pass",
+                "md5_confirm",
+                "int_org",
+                "strip_html_escape_email",
+                "int_gpg"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
+# Checking MD5sums
+if (isset($clean['pass'])) {
+  $pass = $clean['pass'];
+} else {
+  $pass = "";
+}
+if (isset($clean['confirm'])) {
+  $confirm = $clean['confim'];
+} else {
+  $confirm = "";
+}
+
+# Checking if the username was set.
+if (!isset($clean['username'])) {
+  $err = 1;
+  $m = 22;
+} else {
+  $username = $clean['username'];
+}
+
+# Fetching POST data
+$asensor = $clean['asensor'];
+$asearch = $clean['asearch'];
+$auser = $clean['auser'];
+$userid = $clean['userid'];
+$org = $clean['org'];
+$email = $clean['email'];
+$username = $clean['username'];
+$gpg = $clean['gpg'];
 
 ### Password check
-if (empty($f_pass) || empty($f_confirm)) { 
+if (empty($pass) || empty($confirm)) { 
   $m = 20;
   $err = 1;
-} elseif ($f_pass != $f_confirm) {
+} elseif ($pass != $confirm) {
   $m = 21;
   $err = 1;
-} elseif (empty($f_username)) {
+} elseif (empty($username)) {
   $m = 22;
   $err = 1;
-} elseif (empty($f_org) || $f_org == "none") {
+} elseif (empty($org) || $org == 0) {
   $m = 23;
   $err = 1;
 }
@@ -70,10 +103,24 @@ if ($s_access_user < 2) {
   $m = 90;
   $err = 1;
 } elseif ($s_access_user == 2) {
-  $f_org = $s_org;
+  $org = $s_org;
+  if ($asensor >= 9) {
+    $err = 1;
+    $m = 90;
+  } elseif ($asearch >= 9) {
+    $err = 1;
+    $m = 90;
+  } elseif ($auser >= 9) {
+    $err = 1;
+    $m = 90;
+  } else {
+    $access = $asensor . $asearch . $auser;
+  }
+} elseif ($s_access_user == 9) {
+  $access = $asensor . $asearch . $auser;
 }
 
-$sql = "SELECT username FROM login WHERE username = '$f_username'";
+$sql = "SELECT username FROM login WHERE username = '$username'";
 $debuginfo[] = $sql;
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
@@ -84,12 +131,12 @@ if ($rows == 1) {
 
 if ($err != 1) {
   $sql = "INSERT INTO login (username, password, organisation, access, email, gpg) ";
-  $sql .= "VALUES ('$f_username', '$f_pass', '$f_org', '$f_access', '$f_email', $f_gpg)";
+  $sql .= "VALUES ('$username', '$pass', '$org', '$access', '$email', $gpg)";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
   if ($default_mail_sensor == 1) {
-    $sql_getuid = "SELECT id FROM login WHERE username = '$f_username'";
+    $sql_getuid = "SELECT id FROM login WHERE username = '$username'";
     $debuginfo[] = $sql_getuid;
     $result_getuid = pg_query($pgconn, $sql_getuid);
     $row_getuid = pg_fetch_assoc($result_getuid);
@@ -104,6 +151,6 @@ if ($err != 1) {
   }
 }
 pg_close($pgconn);
-debug();
-header("location: useradmin.php?m=$m");
+debug_sql();
+header("location: useradmin.php?int_m=$m");
 ?>

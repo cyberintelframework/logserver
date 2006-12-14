@@ -34,12 +34,18 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
+$allowed_get = array(
+                "int_serverid"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;
 }
 
-if (!isset($_GET['serverid'])) {
+if (!isset($clean['serverid'])) {
   $err = 1;
   $m = 30;
 }
@@ -54,7 +60,7 @@ if ($numrows_check == 1) {
 }
 
 if ($err == 0) {
-  $serverid = intval($_GET['serverid']);
+  $serverid = $clean['serverid'];
   $sql_check = "SELECT * FROM sensors WHERE server = $serverid";
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
@@ -76,8 +82,8 @@ if ($err == 0) {
 
 pg_close($pgconn);
 if ($m == 100) {
-  header("location: serveradmin.php?m=$m&c=$numrows_check");
+  header("location: serveradmin.php?int_m=$m&int_c=$numrows_check");
 } else {
-  header("location: serveradmin.php?m=$m");
+  header("location: serveradmin.php?int_m=$m");
 }
 ?>

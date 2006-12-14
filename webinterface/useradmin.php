@@ -23,15 +23,19 @@
 
 $s_org = intval($_SESSION['s_org']);
 
-if (isset($_GET['m'])) {
-  $m = intval($_GET['m']);
-  $m = stripinput($errors[$m]);
+$allowed_get = array("int_m", "sort");
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (isset($clean['m'])) {
+  $m = $clean['m'];
+  $m = $errors[$m];
   $m = "<p>$m</p>\n";
   echo "<font color='red'>" .$m. "</font>";
 }
 
-if (isset($_GET['sort'])) {
-  $sort = $_GET['sort'];
+if (isset($tainted['sort'])) {
+  $sort = $tainted['sort'];
   $pattern = '/^(ua|ud|la|ld)$/';
   if (!preg_match($pattern, $sort)) {
     $sort = "ua";
@@ -90,14 +94,14 @@ if ($s_access_user > 1) {
         echo "<td>$username</td>\n";
         echo "<td>$lastlogin</td>\n";
         echo "<td>$access</td>\n";
-        echo "<td align=center><a href='useredit.php?userid=$id'><img src='images/icons/user_info_20.gif' alt='Edit User' title='Edit User' /></a></td>\n";
-        echo "<td align=center><a href='userdel.php?userid=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this user?');\"><img src='images/icons/user_delete_20.gif' alt='Delete User' title='Delete User' /></a></td>\n";
-        echo "<td align=center><a href='mailadmin.php?userid=$id'><img src='images/icons/email_20.gif' alt='Edit Mailsetting' title='Edit Mailsettings' /></a></td>\n";
+        echo "<td align=center><a href='useredit.php?int_userid=$id'><img src='images/icons/user_info_20.gif' alt='Edit User' title='Edit User' /></a></td>\n";
+        echo "<td align=center><a href='userdel.php?int_userid=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this user?');\"><img src='images/icons/user_delete_20.gif' alt='Delete User' title='Delete User' /></a></td>\n";
+        echo "<td align=center><a href='mailadmin.php?int_userid=$id'><img src='images/icons/email_20.gif' alt='Edit Mailsetting' title='Edit Mailsettings' /></a></td>\n";
       echo "</tr>\n";
     }
   echo "</table>\n";
 }
 pg_close($pgconn);
-debug();
+debug_sql();
 footer();
 ?>

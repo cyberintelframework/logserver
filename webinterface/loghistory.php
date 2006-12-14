@@ -249,6 +249,6 @@ if ($err != 1) {
 	}
 }
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

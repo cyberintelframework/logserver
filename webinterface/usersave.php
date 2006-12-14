@@ -36,73 +36,96 @@ if (!isset($_SESSION['s_admin'])) {
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
-$s_access_user = intval($s_access{2});
+$s_auser = intval($s_access{2});
 $err = 0;
 
+$allowed_post = array(
+		"strip_html_escape_username",
+		"int_asensor",
+		"int_asearch",
+		"int_auser",
+		"int_userid",
+		"md5_pass",
+		"md5_confirm",
+		"int_org",
+		"strip_html_escape_email",
+		"int_gpg"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
+# Checking MD5sums
+if (isset($clean['pass'])) {
+  $pass = $clean['pass'];
+} else {
+  $pass = "";
+}
+if (isset($clean['confirm'])) {
+  $confirm = $clean['confirm'];
+} else {
+  $confirm = "";
+}
+
 # Checking if the username was set.
-if ( ! isset($_POST['f_username']) ) {
+if (!isset($clean['username'])) {
   $err = 1;
   $m = 22;
 } else {
-  $f_username = stripinput(trim(pg_escape_string($_POST['f_username'])));
-  if ($f_username == "") {
-    $err = 1;
-    $m = 22;
-  }
+  $username = $clean['username'];
 }
 
 # Fetching POST data
-$f_access_sensor = intval($_POST['f_access_sensor']);
-$f_access_search = intval($_POST['f_access_search']);
-$f_access_user = intval($_POST['f_access_user']);
-$f_userid = intval($_POST['f_userid']);
-$f_pass = pg_escape_string(stripinput($_POST['f_pass']));
-$f_confirm = pg_escape_string(stripinput($_POST['f_confirm']));
-$f_org = intval($_POST['f_org']);
-$f_maillog = intval($_POST['f_maillog']);
-$f_email = stripinput(pg_escape_string($_POST['f_email']));
-$f_username = stripinput(trim(pg_escape_string($_POST['f_username'])));
-$f_gpg = intval($_POST['f_gpg']);
+$asensor = $clean['asensor'];
+$asearch = $clean['asearch'];
+$auser = $clean['auser'];
+$userid = $clean['userid'];
+$org = $clean['org'];
+$email = $clean['email'];
+$username = $clean['username'];
+$gpg = $clean['gpg'];
+
+# Setting default $access value
+$access = "111";
 
 # Checking for access rights.
-if ($s_access_user == 0) {
+if ($s_auser == 0) {
   $err = 1;
   $m = 90;
-} elseif ($s_access_user == 1) {
-  $f_userid = $s_userid;
-  $f_org = $s_org;
+} elseif ($s_auser == 1) {
+  $userid = $s_userid;
+  $org = $s_org;
   $access = $s_access;
-} elseif ($s_access_user == 2) {
+} elseif ($s_auser == 2) {
   $f_org = $s_org;
-  if ($f_access_sensor >= 9) {
+  if ($asensor >= 9) {
     $err = 1;
     $m = 90;
-  } elseif ($f_access_search >= 9) {
+  } elseif ($asearch >= 9) {
     $err = 1;
     $m = 90;
-  } elseif ($f_access_user >= 9) {
+  } elseif ($auser >= 9) {
     $err = 1;
     $m = 90;
   } else {
-    $access = $f_access_sensor . $f_access_search . $f_access_user;
+    $access = $asensor . $asearch . $auser;
   }
-} else {
-  $access = $f_access_sensor . $f_access_search . $f_access_user;
+} elseif ($s_auser == 9) {
+  $access = $asensor . $asearch . $auser;
 }
 
 # Checking if the passwords were correct.
-if ($f_pass != $f_confirm) {
+if ($pass != $confirm) {
   $err = 1;
   $m = 21;
 }
 
 # Checking if the organisation is set correctly.
-if ( $_POST['f_org'] == "none" ) {
+if ($clean['org'] == 0) {
   $err = 1;
   $m = 23;
 }
 
-$sql = "SELECT username FROM login WHERE username = '$f_username' AND NOT id = $f_userid";
+$sql = "SELECT username FROM login WHERE username = '$username' AND NOT id = $userid";
 $debuginfo[] = $sql;
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
@@ -112,19 +135,19 @@ if ($rows == 1) {
 }
 
 if ($err != 1) {
-  if ($f_pass == "") {
+  if ($pass == "") {
     $passwordstring = "";
   } else {
-    $passwordstring = ", password = '$f_pass'";
+    $passwordstring = ", password = '$pass'";
   }
-  if ($s_access_user < 2) {
+  if ($s_auser < 2) {
     $m = 3;
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring WHERE id = $f_userid";
-  } elseif ($s_access_user < 9) {
+    $sql_save = "UPDATE login SET username = '$username', email = '$email', gpg = $gpg $passwordstring WHERE id = $userid";
+  } elseif ($s_auser < 9) {
     $m = 3;
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring, access = '$access' WHERE id = $f_userid";
-  } elseif ($s_access_user == 9) {
-    $sql_save = "UPDATE login SET username = '$f_username', email = '$f_email', gpg = $f_gpg $passwordstring, access = '$access', organisation = '$f_org' WHERE id = $f_userid";
+    $sql_save = "UPDATE login SET username = '$username', email = '$email', gpg = $gpg $passwordstring, access = '$access' WHERE id = $userid";
+  } elseif ($s_auser == 9) {
+    $sql_save = "UPDATE login SET username = '$username', email = '$email', gpg = $gpg $passwordstring, access = '$access', organisation = '$org' WHERE id = $userid";
     $m = 3;
   } else {
     $m = 99;
@@ -133,6 +156,6 @@ if ($err != 1) {
   $execute_save = pg_query($pgconn, $sql_save);
 }
 pg_close($pgconn);
-debug();
-header("location: useradmin.php?m=$m");
+debug_sql();
+header("location: useradmin.php?int_m=$m");
 ?>

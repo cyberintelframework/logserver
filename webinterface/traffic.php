@@ -53,12 +53,12 @@ if ($numrows_result_sensors == 0) {
     $label = $row['label'];
 
     echo "<tr>\n";
-      echo "<td><a href='trafficview.php?label=$label'><img src='showtraffic.php?imgid=$imgid' alt='$sensor' border='1' /></a></td>\n";
+      echo "<td><a href='trafficview.php?int_imgid=$imgid'><img src='showtraffic.php?int_imgid=$imgid' alt='$sensor' border='1' /></a></td>\n";
     echo "</tr>\n";
   } 
   echo "</table>\n";
 }
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>

@@ -34,8 +34,17 @@ $s_access_search = intval($s_access{1});
 $querystring = "";
 $q_org = $s_org;
 
-if (isset($_GET['sev'])) {
-  $sev = intval($_GET['sev']);
+$allowed_get = array(
+                "int_sev",
+		"int_org",
+		"int_to",
+		"int_from"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (isset($clean['sev'])) {
+  $sev = $clean['sev'];
 } else {
   $err = 1;
   echo "No severity given in the querystring.<br />\n";
@@ -44,12 +53,12 @@ if (isset($_GET['sev'])) {
 
 ### Making sure the correct organisation is set.
 if ($s_access_search == 9) {
-  if (isset($_GET['org'])) {
-    if ($_GET['org'] != 0) {
-      $q_org = intval($_GET['org']);
+  if (isset($clean['org'])) {
+    if ($clean['org'] != 0) {
+      $q_org = $clean['org'];
       add_db_table("sensors");
       $where[] = "sensors.organisation = $q_org";
-      $querystring = $querystring . "&amp;org=$q_org";
+      $querystring = $querystring . "&amp;int_org=$q_org";
     } else {
       $q_org = 0;
     }
@@ -60,14 +69,14 @@ if ($s_access_search == 9) {
 }
 
 ### Checking for period.
-if (isset($_GET['to']) && isset($_GET['from'])) {
-  $start = intval($_GET['from']);
-  $end = intval($_GET['to']);
+if (isset($clean['to']) && isset($clean['from'])) {
+  $start = $clean['from'];
+  $end = $clean['to'];
   add_db_table("attacks");
   $where[] = "attacks.id = details.attackid";
   $where[] = "attacks.timestamp >= $start";
   $where[] = "attacks.timestamp <= $end";
-  $dateqs = "&amp;from=$start&amp;to=$end";
+  $dateqs = "&amp;int_from=$start&amp;int_to=$end";
 }
 
 if ($err != 1) {
@@ -77,15 +86,17 @@ if ($err != 1) {
 
     $where[] = " attacks.severity = 1 ";
     $where[] = " details.type = 1 ";
+    $where[] = " details.text = stats_dialogue.name ";
+    add_db_table("stats_dialogue");
     add_db_table("sensors");
     add_db_table("details");
     prepare_sql();
 
     ### Admin check.
-    $sql_count = "SELECT count(DISTINCT details.attackid) as total, details.text ";
+    $sql_count = "SELECT count(DISTINCT details.attackid) as total, details.text, stats_dialogue.id ";
     $sql_count .= "FROM $sql_from ";
     $sql_count .= " $sql_where ";
-    $sql_count .= " GROUP BY details.text ";
+    $sql_count .= " GROUP BY details.text, stats_dialogue.id ";
     $sql_count .= " ORDER BY total DESC ";
     $debuginfo[] = "$sql_count";
     $result_count = pg_query($pgconn, $sql_count);
@@ -100,6 +111,7 @@ if ($err != 1) {
 
         $total = 0;
         while ($row = pg_fetch_assoc($result_count)) {
+          $id = $row['id'];
           $dia = $row['text'];
           $count = $row['total'];
           $total = $total + $count;
@@ -111,12 +123,12 @@ if ($err != 1) {
             } else {
               echo "<td class='datatd'>$attack</td>\n";
             }
-            echo "<td class='datatd' align='right'><a href='logsearch.php?f_attack=$dia&amp;f_search=&amp;f_field=source&amp;c=0$querystring$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+            echo "<td class='datatd' align='right'><a href='logsearch.php?int_attack=$id&amp;int_c=0$querystring$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
           echo "</tr>\n";
         }
         echo "<tr>\n";
           echo "<td class='dataheader' align='right'>Total&nbsp;</td>\n";
-          echo "<td class='dataheader' align='right'><a href='logsearch.php?f_sev=$sev&amp;f_search=&amp;f_field=source&amp;c=0$querystring$dateqs'>" . nf($total) . "</a>&nbsp;</td>\n";
+          echo "<td class='dataheader' align='right'><a href='logsearch.php?int_sev=$sev&amp;int_c=0$querystring$dateqs'>" . nf($total) . "</a>&nbsp;</td>\n";
         echo "</tr>\n";
       echo "</table>\n";
     }
@@ -141,13 +153,6 @@ if ($err != 1) {
     $debuginfo[] = "$sql_down";
     $result_down = pg_query($pgconn, $sql_down);
     $numrows_down = pg_num_rows($result_down);
-
-#    # Debug info
-#    if ($debug == 1) {
-#      echo "<pre>";
-#      echo "SQL_DOWN: $sql_down<br />\n";
-#      echo "</pre>\n";
-#    }
 
     echo "Malware statistics.<br /><br />\n";
     if ($numrows_down > 0) {
@@ -181,7 +186,7 @@ if ($err != 1) {
           $count = $row['total'];
 
           echo "<tr>\n";
-            echo "<td class='datatd'><a href='binaryhist.php?binname=$malware'>$malware</a></td>\n";
+            echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$malware'>$malware</a></td>\n";
             while ($scanners = pg_fetch_assoc($result_scanners)) {
               $scanner_id = $scanners['id'];
               $sql_virus = "SELECT DISTINCT stats_virus.name as virusname, binaries.timestamp FROM binaries, stats_virus ";
@@ -190,13 +195,6 @@ if ($err != 1) {
               $debuginfo[] = "$sql_virus";
               $result_virus = pg_query($pgconn, $sql_virus);
               $numrows_virus = pg_num_rows($result_virus);
-
-              # Debug info
-#              if ($debug == 1) {
-#                echo "<pre>";
-#                echo "SQL_VIRUS: $sql_virus<br />\n";
-#                echo "</pre>\n";
-#              }
 
               if ($numrows_virus == 0) {
                 $virus = "Not scanned";
@@ -219,7 +217,7 @@ if ($err != 1) {
               }
               echo "<td class='datatd'>$virus</td>\n";
             }
-            echo "<td class='datatd'><a href='logsearch.php?org=" . $q_org . "&f_bin=$bin_id$dateqs'>$count</a></td>\n";
+            echo "<td class='datatd'><a href='logsearch.php?int_org=" . $q_org . "&int_binid=$bin_id$dateqs'>$count</a></td>\n";
             pg_result_seek($result_scanners, 0);
           echo "</tr>\n";
         }
@@ -244,7 +242,7 @@ if ($err != 1) {
 }
 
 # Debug info
-debug();
+debug_sql();
 
 pg_close($pgconn);
 ?>

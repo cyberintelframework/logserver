@@ -23,9 +23,15 @@ $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 $err = 0;
 
+$allowed_get = array(
+                "int_id"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
 ### Variables check
-if (isset($_GET['id'])) {
-  $id = intval($_GET['id']);
+if (isset($clean['id'])) {
+  $id = $clean['id'];
 } else {
   echo "Wrong or missing attack ID in the querystring.<br />\n";
   echo "<a href='logindex.php'>Logging Overview</a>\n";
@@ -74,6 +80,6 @@ if ($err != 1) {
   echo "</table>\n";
 }
 pg_close($pgconn);
-debug();
+debug_sql();
 ?>
 <?php footer(); ?>
