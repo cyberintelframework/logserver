@@ -35,11 +35,11 @@
 
 ### Set report type.
 $valid_reptype = array("multi", "single", "chart_sensor", "chart_attack", "idmef", "pdf");
-if (in_array($_GET['f_reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['f_reptype']);
+if (in_array($_GET['reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['f_reptype']);
 else $rapport = "multi";
 
 $ar_non_headers = array("idmef", "pdf");
-if (in_array($_GET['f_reptype'], $ar_non_headers)) {
+if (in_array($rapport, $ar_non_headers)) {
 	session_start();
 	if (intval(@strlen($_SESSION["s_user"])) == 0) {
 		// User not logged in
@@ -50,7 +50,7 @@ if (in_array($_GET['f_reptype'], $ar_non_headers)) {
         include '../include/connect.inc.php';
         include '../include/functions.inc.php';
 
-    if ($_GET['f_reptype'] == "idmef") {
+    if ($rapport == "idmef") {
 		header("Content-type: text/xml");
 	  
 	  	header("Cache-control: private");
@@ -133,7 +133,7 @@ if (@is_array($tainted["sensorid"])) {
 	foreach ($tainted["sensorid"] as $sid) {
 		$ar_sensorid[] = intval($sid);
 	}
-} else $sensorid = intval($_GET["sensorid"]);
+} else $sensorid = intval($tainted['sensorid']);
 
 ####################
 # Source IP address
@@ -232,8 +232,8 @@ if (in_array($ts_select, $ar_valid_values)) {
 	$ts_start = date("d-m-Y H:i:s", $dt);
 	$ts_end = date("d-m-Y H:i:s", time());
 } else {
-	$ts_start = trim(pg_escape_string(strip_tags($_GET["ts_start"])));
-	$ts_end = trim(pg_escape_string(strip_tags($_GET["ts_end"])));
+	$ts_start = trim(pg_escape_string(strip_tags($tainted["tsstart"])));
+	$ts_end = trim(pg_escape_string(strip_tags($tainted["tsend"])));
 }
 
 ####################
@@ -259,11 +259,6 @@ if (preg_match($bin_pattern, $tainted['bin'])) {
 # Attack type
 ####################
 $f_attack = $clean['f_attack'];
-#if ($f_attack == 0 && isset($_GET["f_attack"])) {
-#	// Using old attack (name instead of id), lookup id
-#	$query = pg_query("SELECT id FROM stats_dialogue WHERE name = '" . pg_escape_string($_GET["f_attack"]) . "'");
-#	$f_attack = intval(@pg_result($query, 0));
-#}
 
 ####################
 # Virus type

@@ -125,7 +125,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?int_org=$q_org'>\
   echo "</select>\n";
 
   if ($s_access_search == 9) {
-    if (!isset($_GET['org'])) {
+    if (!isset($clean['org'])) {
       $err = 1;
     }
     $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
