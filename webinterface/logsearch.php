@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 11-12-2006                       #
+# Version 1.04.08                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.08 Changed data input handling
 # 1.04.07 Bugfix with binaries table linking
 # 1.04.06 Changed debug stuff
 # 1.04.05 Changed binary search method conform database changes
@@ -35,7 +36,7 @@
 
 ### Set report type.
 $valid_reptype = array("multi", "single", "chart_sensor", "chart_attack", "idmef", "pdf");
-if (in_array($_GET['reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['f_reptype']);
+if (in_array($_GET['reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['reptype']);
 else $rapport = "multi";
 
 $ar_non_headers = array("idmef", "pdf");
@@ -180,8 +181,8 @@ if (!empty($destination_ip)) {
 if ($full_destination_ip == "0.0.0.0") $full_destination_ip = -1;
 elseif (ip2long($full_destination_ip) === -1) $full_destination_ip = -2;
 
-$sradio_pattern = '/^(A|N)$/';
-if (preg_match($sradio_pattern, $tainted['sradio'])) {
+$dradio_pattern = '/^(A|N)$/';
+if (preg_match($dradio_pattern, $tainted['dradio'])) {
   if ($tainted["dradio"] == "A") {
 	$destination_port = $clean['dport'];
 	$destination_mask = -1;
@@ -258,12 +259,12 @@ if (preg_match($bin_pattern, $tainted['bin'])) {
 ####################
 # Attack type
 ####################
-$f_attack = $clean['f_attack'];
+$f_attack = $clean['attack'];
 
 ####################
 # Virus type
 ####################
-$f_virus = $clean['f_virus'];
+$f_virus = $clean['virus'];
 $f_virus_txt = $clean['virustxt'];
 
 ####################
@@ -321,7 +322,7 @@ if ($full_source_ip > 0) {
 	$where[] = "attacks.source <<= '$input'";
 } elseif (isset($clean['searchip'])) {
 	// Input from other page
-	$input = $clean['search'];
+	$input = $clean['searchip'];
 	add_db_table("attacks");
 	$where[] = "attacks.source = '$input'";
 }
@@ -709,11 +710,11 @@ if ($rapport == "chart_sensor") {
           } else exit("Invalid data supplied");
         }
 	
-	if ($sensorid == 0) $label .= " for ALL sensors";
+	if ($tainted['sensorid'][0] == 0) $label .= " for ALL sensors";
 	else {
 		// lookup keyname:
-		$query = pg_query("SELECT keyname FROM sensors WHERE id = '" . $sensorid . "'");
-		$label .= " for " . pg_result($query, 0);
+		$query = pg_query("SELECT keyname FROM sensors WHERE id = '" . $tainted['sensorid'][0] . "'");
+		$label .= " for " . ucfirst(pg_result($query, 0));
 	}
 	
 	prepare_sql();
@@ -726,14 +727,10 @@ if ($rapport == "chart_sensor") {
         $_SESSION['chartsql'] = $sql;
 	
         $title = "Searchresults: $label";
-#        $result_chart = pg_query($pgconn, $sql);
-
-//        require_once("../libchart/libchart.php");
-//	$img = makeChart($type, $title, $sql, $chartorg);
-
-    echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;int_org=$chartorg' />\n";
-    // Personal search templates
-	echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
+        echo "<h4>$title</h4>\n";
+        echo "<img alt='Chart' src='logsearchchart.php?type=$type&amp;int_org=$chartorg' />\n";
+        // Personal search templates
+	echo "<div id=\"personal_searchtemplate\"><a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
 	footer();
 	exit;
 }

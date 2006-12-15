@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 15-12-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.02 Changed data input handling
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.01 Initial release
@@ -37,16 +38,6 @@ $check = extractvars($_GET, $allowed_get);
 header("Content-type: image/png");
 header("Cache-control: no-cache");
 header("Pragma: no-cache");
-
-#if ($s_admin == 1) {
-#  if (isset($clean['orgid'])) {
-#    $orgid = $clean['orgid'];
-#  } else {
-#    $err = 1;
-#  }
-#} else {
-#  $orgid = $s_org;
-#}
 
 if (isset($clean['imgid'])) {
   $imgid = $clean['imgid'];

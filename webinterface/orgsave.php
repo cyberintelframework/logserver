@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 07-12-2006                       #
+# Version 1.04.04                  #
+# 15-12-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Changed data input handling
 # 1.04.03 Fixed a bug where it wouldn't save organisation changes
 # 1.04.02 Added identifier type
 # 1.04.01 pg_close() when not logged in

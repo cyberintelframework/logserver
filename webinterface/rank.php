@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
 # 1.03.02 Organisation name bugfix
@@ -597,7 +598,7 @@ echo "<table width='100%'>\n";
                 $total = $row['total'];
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='logsearch.php?d_radio=A&destination_port=$port&order_m=DESC$dateqs'>$port</a></td>\n";
+                  echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
                   echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
                   
                   echo "<td class='datatd'>$total</td>\n";
@@ -623,7 +624,7 @@ echo "<table width='100%'>\n";
                   $total = $row['total'];
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd'>$i</td>\n";
-                        echo "<td class='datatd'><a href='logsearch.php?d_radio=A&destination_port=$port&order_m=DESC$dateqs'>$port</a></td>\n";
+                        echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
                         echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
                         echo "<td class='datatd'>$total</td>\n";
                   echo "</tr>\n";
@@ -690,7 +691,7 @@ echo "<table width='100%'>\n";
                 $total = $row['total'];
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='whois.php?ip=$source'>$source</a></td>\n";
+                  echo "<td class='datatd'><a href='whois.php?ip_ip=$source'>$source</a></td>\n";
                   echo "<td class='datatd'>$total</td>\n";
                 echo "</tr>\n";
                 $i++;
@@ -713,7 +714,7 @@ echo "<table width='100%'>\n";
                   $total = $row['total'];
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd'>$i</td>\n";
-                        echo "<td class='datatd'><a href='whois.php?ip=$source'>$source</a></td>\n";
+                        echo "<td class='datatd'><a href='whois.php?ip_ip=$source'>$source</a></td>\n";
                         echo "<td class='datatd'>$total</td>\n";
                   echo "</tr>\n";
                   $i++;
@@ -816,7 +817,7 @@ echo "<table width='100%'>\n";
                                  
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='logsearch.php?d_radio=A&f_filename=$file&order_m=DESC$dateqs'>$file</a></td>\n";
+                  echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$file&orderm=DESC$dateqs'>$file</a></td>\n";
                   echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
                   echo "<td class='datatd'>$count</td>\n";
                 echo "</tr>\n";
@@ -873,7 +874,7 @@ echo "<table width='100%'>\n";
                     $bin = $row['text'];
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'><a href='logsearch.php?d_radio=A&f_filename=$file&order_m=DESC$dateqs'>$file</a></td>\n";
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$file&orderm=DESC$dateqs'>$file</a></td>\n";
                       echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
                       echo "<td class='datatd'>$count</td>\n";
                     echo "</tr>\n";

@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Removed s_access variables
 # 1.03.01 Released as part of the 1.03 package

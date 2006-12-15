@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-11-2006                       #
+# Version 1.04.02                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed data input handling
 # 1.04.01 Released as 1.04.01
 # 1.03.02 Added No Data! picture
 # 1.03.01 Query tuning

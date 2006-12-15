@@ -3,13 +3,14 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.04.04                 #
-# 13-12-2006                      #
+# Version 1.04.05                 #
+# 15-12-2006                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added download option for binaries
 # 1.04.04 Changed data input handling
 # 1.04.03 Fixed typo
 # 1.04.02 Changed debug stuff
@@ -23,6 +24,7 @@
 #############################################
 
 $s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
 $allowed_get = array(
@@ -111,7 +113,12 @@ if ($err == 0) {
 
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
-      echo "<td class='dataheader' width='100'>Binary</td><td class='datatd'>$bin_name</td>\n";
+      echo "<td class='dataheader' width='100'>Binary</td><td class='datatd'>";
+        echo "$bin_name";
+        if (file_exists("$surfidsdir/binaries/$bin_name") && $s_admin == 1) {
+          echo "&nbsp;&nbsp;[<a href='download.php?md5_binname=$bin_name'>download</a>]\n";
+        }
+      echo "</td>\n";
     echo "</tr>\n";
     echo "<tr class='datatr'>\n";
       echo "<td class='dataheader'>Size</td><td class='datatd'>$filesize</td>\n";

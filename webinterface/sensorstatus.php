@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 11-12-2006                       #
+# Version 1.04.04                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
 # 1.04.02 Added VLAN support 
 # 1.04.01 Released as 1.04.01

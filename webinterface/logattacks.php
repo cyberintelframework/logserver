@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 21-11-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Added extra check on severity in sql query when sev = 1
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.03 Fixed a bug with 0 BD and AVG scans

@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
 # 1.03.01 Released as part of the 1.03 package
@@ -54,10 +55,10 @@ if (isset($tainted['b'])) {
   $b = $tainted['b'];
   $pattern = '/^(weekly|daily|monthly|all)$/';
   if (!preg_match($pattern, $b)) {
-    $b = "weekly";
+    $b = "all";
   }
 } else {
-  $b = "weekly";
+  $b = "all";
 }
 
 $year = date("Y");
@@ -187,6 +188,7 @@ if ($err != 1) {
     add_db_table("attacks");
     $where[] = "attacks.source <<= '$range'";
     $where[] = "attacks.severity = 1";
+    $where[] = "sensors.organisation = '$q_org'";
     $where[] = "$tsquery";
     prepare_sql();
 

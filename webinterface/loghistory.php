@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Peter Arts & Kees Trippelvitz    #
 ####################################
 
 #################################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
@@ -24,16 +25,42 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-$month = intval($_GET["m"]);
-$year = intval($_GET["y"]);
+$allowed_get = array(
+                "int_m",
+		"int_y",
+		"int_org",
+		"int_sid",
+		"full"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+$allowed_post = array(
+                "int_m",
+		"int_y",
+		"int_org"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
+if (isset($tainted['full'])) {
+  $full = $tainted['full'];
+  $pattern = '/^(malicious|viruses)$/';
+  if (!preg_match($pattern, $full)) {
+    $full = "top";
+  }
+}
+
+$month = $clean["m"];
+$year = $clean["y"];
 if (($month < 1) || ($month > 12)) $month = (date("n") - 1);
 if ($year < 2004) $year = date("Y");
-if (isset($_GET['org']) && $s_access_search == 9) $s_org = intval($_GET['org']);
+if (isset($clean['org']) && $s_access_search == 9) $s_org = $clean['org'];
 $s_sensor = -1;
-if (isset($_GET["sensor"])) {
+if (isset($clean['sensor'])) {
 	// check for permissions
-	$query = pg_query("SELECT * FROM sensors WHERE id = '" . intval($_GET["sensor"]) . "' AND organisation = '" . $s_org . "' LIMIT 1");
-	if (pg_num_rows($query) == 1) $s_sensor = intval($_GET["sensor"]);
+	$query = pg_query("SELECT * FROM sensors WHERE id = '" . $clean['sensor'] . "' AND organisation = '" . $s_org . "' LIMIT 1");
+	if (pg_num_rows($query) == 1) $s_sensor = $clean['sensor'];
 }
 if (intval($s_sensor) <= 0) {
 	// set default sensor
@@ -47,13 +74,13 @@ $result_getorg = pg_query($pgconn, $sql_getorg);
 
 $debuginfo[] = $sql_getorg;
 
-if (!isset($_GET['org']) && $s_access_search == 9) {
+if (!isset($clean['org']) && $s_access_search == 9) {
   echo "Select an organisation.<br /><br />\n";
   $sql_org = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
-  $debuginfo = $sql_org;
+  $debuginfo[] = $sql_org;
   $result_org = pg_query($pgconn, $sql_org);
   echo "<form name='sel_org' action='loghistory.php' method='get'>\n";
-    echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
+    echo "<select name='int_org' onChange='javascript: this.form.submit();'>\n";
       echo "<option value='$s_org'>Select Organisation</option>\n";
       while ($row = pg_fetch_assoc($result_org)) {
         $org_id = $row['id'];
@@ -61,8 +88,8 @@ if (!isset($_GET['org']) && $s_access_search == 9) {
         echo "<option value='$org_id'>$organisation</option>\n";
       }
     echo "</select>\n";
-    echo "<input type='hidden' name='m' value='$month' />\n";
-    echo "<input type='hidden' name='y' value='$year' />\n";
+    echo "<input type='hidden' name='int_m' value='$month' />\n";
+    echo "<input type='hidden' name='int_y' value='$year' />\n";
   echo "</form>\n";
   $err = 1;
 }
@@ -82,20 +109,20 @@ if ($err != 1) {
   }
 
   echo "<form name='selectorg' method='get' action='loghistory.php'>\n";
-    echo "<input type='button' value='Prev' class='button' onClick=window.location='loghistory.php?m=$prevmonth&y=$prevyear&org=$s_org';>\n";
+    echo "<input type='button' value='Prev' class='button' onClick=window.location='loghistory.php?int_m=$prevmonth&int_y=$prevyear&int_org=$s_org';>\n";
     ### If user is admin, then enable organisation menu.
     if ($s_access_search == 9) {
       $err = 1;
       $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
-      $debuginfo = $sql_orgs;
+      $debuginfo[] = $sql_orgs;
       $result_orgs = pg_query($pgconn, $sql_orgs);
-      echo "<input type='hidden' name='m' value='$month' />\n";
-      echo "<input type='hidden' name='y' value='$year' />\n";
-      echo "<select name='org' onChange='javascript: this.form.submit();'>\n";
+      echo "<input type='hidden' name='int_m' value='$month' />\n";
+      echo "<input type='hidden' name='int_y' value='$year' />\n";
+      echo "<select name='int_org' onChange='javascript: this.form.submit();'>\n";
         while ($row = pg_fetch_assoc($result_orgs)) {
           $org_id = $row['id'];
           $organisation = $row['organisation'];
-          if (isset($_GET['org']) && $_GET['org'] == $org_id) {
+          if (isset($clean['org']) && $clean['org'] == $org_id) {
             echo "<option value='$org_id' selected>$organisation</option>\n";
           } else {
             echo "<option value='$org_id'>$organisation</option>\n";
@@ -115,7 +142,7 @@ if ($err != 1) {
       if (pg_num_rows($query_check) > 0) echo printOption($sensor_data["id"], $sensor_data["keyname"], $s_sensor);
     }
     echo "</select>\n";
-    echo "<input type='button' value='Next' class='button' onClick=window.location='loghistory.php?m=$nextmonth&y=$nextyear&org=$s_org';>\n";
+    echo "<input type='button' value='Next' class='button' onClick=window.location='loghistory.php?int_m=$nextmonth&int_y=$nextyear&int_org=$s_org';>\n";
     echo "</form>\n";
 
 	$mts = mktime(0,0,0,$month,1,$year);
@@ -129,12 +156,12 @@ if ($err != 1) {
 	if (pg_num_rows($query) == 0) {
 		echo "<p>No data present for this month.</p>\n";
 	} else {
-		$org_id = intval($_GET["org"]);
-		$sensorid = intval($_GET["sensor"]);
+		$org_id = $clean["org"];
+		$sensorid = $clean["sensor"];
 		echo "<table border=0 cellspacing=0 cellpadding=0><tr><td valign=\"top\">\n";
 
 		$sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
-                $debuginfo = $sql;
+                $debuginfo[] = $sql;
 
 		$query = pg_query($sql);
 		$stats_history = pg_fetch_assoc($query);
@@ -168,14 +195,14 @@ if ($err != 1) {
 		echo "</td><td width=50>&nbsp;</td><td valign=\"top\">\n";
 		
 		// Malicious attacks
-		if ($_GET["full"] == "malicious") {
+		if ($full == "malicious") {
 			$show = "full list";
 			$limit = "";
-			$link = "<a href=\"loghistory.php?m=$month&y=$year&org=$org_id&sensor=$sensorid\">Show top 5</a><br /><br />\n";
+			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid\">Show top 5</a><br /><br />\n";
 		} else {
 			$show = "top 5";
 			$limit = "LIMIT 5";
-			$link = "<a href=\"loghistory.php?m=$month&y=$year&org=$org_id&sensor=$sensorid&full=malicious\">Show full list</a><br /><br />\n";
+			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid&full=malicious\">Show full list</a><br /><br />\n";
 		}
 		echo "<table class='datatable'>\n";
 		echo " <tr>\n";
@@ -205,14 +232,14 @@ if ($err != 1) {
 		echo $link;
 		
 		// Viruses
-		if ($_GET["full"] == "viruses") {
+		if ($full == "viruses") {
 			$show = "full list";
 			$limit = "";
-			$link = "<a href=\"loghistory.php?m=$month&y=$year&org=$org_id&sensor=$sensorid\">Show top 5</a><br /><br />\n";
+			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid\">Show top 5</a><br /><br />\n";
 		} else {
 			$show = "top 5";
 			$limit = "LIMIT 5";
-			$link = "<a href=\"loghistory.php?m=$month&y=$year&org=$org_id&sensor=$sensorid&full=viruses\">Show full list</a><br /><br />\n";
+			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid&full=viruses\">Show full list</a><br /><br />\n";
 		}
 		echo "<table class='datatable'>\n";
 		echo " <tr>\n";

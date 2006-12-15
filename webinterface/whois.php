@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 06-11-2006                       #
+# Version 1.04.02                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed data input handling
 # 1.04.01 pg_close added
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.02 Added exit after failed preg_match

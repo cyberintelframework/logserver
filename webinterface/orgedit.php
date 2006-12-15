@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 11-12-2006                       #
+# Version 1.04.04                  #
+# 15-12-2006                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
 # 1.04.02 Added identifier type
 # 1.04.01 Code layout & error message handling

@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.02 Added email and gpg input fields
@@ -34,7 +35,7 @@ if ($s_access_user < 2) {
   $err = 1;
   $m = 90;
   pg_close($pgconn);
-  header("location: useradmin.php?m=$m");
+  header("location: useradmin.php?int_m=$m");
   exit;
 }
 

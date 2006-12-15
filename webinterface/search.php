@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 12-12-2006                       #
+# Version 1.04.05                  #
+# 15-12-2006                       #
 # Peter Arts                       #
 # Modified by Jan van Lith         #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Changed data input handling
 # 1.04.04 Query tuning
 # 1.04.03 Added Searchtemplates
 # 1.04.02 Added VLAN support 
@@ -47,7 +48,7 @@ function check_byte(b_val,next_field) {
 }
 </script>
 
-<form method="get" action="logsearch.php" id="searchform">
+<form method="get" action="logsearch.php" name="searchform" id="searchform">
 
 <table border='0'>
   <tr>
@@ -73,12 +74,13 @@ function check_byte(b_val,next_field) {
   		echo "  <td class=\"datatd\" width=140>Sensor:</td>\n";
 		echo "  <td class=\"datatd\">\n";
 		echo "<select name=\"sensorid[]\" style=\"background-color:white;\" size=\"" . $select_size . "\" multiple=\"true\">\n";
-	    echo printOption(0, "All sensors", $sensorid);
-	    $sql = "SELECT sensors.keyname, sensors.vlanid, organisations.organisation FROM sensors, organisations ";
+                  echo printOption(0, "All sensors", $sensorid);
+	    $sql = "SELECT sensors.id, sensors.keyname, sensors.vlanid, organisations.organisation FROM sensors, organisations ";
             $sql .= "WHERE organisations.id = sensors.organisation $where ORDER BY sensors.keyname";
             $debuginfo[] = $sql;
 		$query = pg_query($sql);
 		while ($sensor_data = pg_fetch_assoc($query)) {
+			$sid = $sensor_data['id'];
 			$label = $sensor_data["keyname"];
 			$vlanid = $sensor_data["vlanid"];
 			$org = $sensor_data["organisation"];
@@ -95,7 +97,7 @@ function check_byte(b_val,next_field) {
 #				$label .= " (" . $org . ")";
 			}
 			
-			  echo printOption($sensor_data["id"], $label, $sensorid);
+			  echo printOption($sid, $label, $sensorid);
 		}
 		echo "</select>\n";
 		echo "  </td>\n";
@@ -218,19 +220,7 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr id="what_3" name="what_3">
   <td class="datatd">Virus: </td>
-  <td class="datatd"><select name="int_virus" style="background-color:white;">
-  <?
-  echo printOption(-1, "", $f_virus);
-  $sql = "SELECT * FROM stats_virus ORDER BY name";
-  $debuginfo[] = $sql;
-  $query = pg_query($sql);
-  while ($row = pg_fetch_assoc($query)) {
-  	echo printOption($row["id"], $row["name"], $f_virus);
-  }
-  ?>
-   </select><br>
-   <u><b>or</b></u> match: <input type="text" name="strip_html_escape_virustxt" value="<?=$f_virus_txt;?>"> *
-   </td>
+  <td><input type="text" name="strip_html_escape_virustxt" value="<?=$f_virus_txt;?>"> *</td>
  </tr>
  <tr id="what_4" name="what_4">
   <td class="datatd">Filename:</td>
@@ -252,7 +242,7 @@ function check_byte(b_val,next_field) {
  </tr>
  </div>
  <tr>
-   <td colspan=2 align="right"><br /><input type="hidden" name="int_c" value=0><input type="hidden" name="searchtemplate_title" id="searchtemplate_title" value=""><input type="button" name="submittemplate" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
+   <td colspan=2 align="right"><br /><input type="hidden" name="int_c" value=0><input type="hidden" name="strip_html_escape_sttitle" id="searchtemplate_title" value=""><input type="button" name="submittemplate" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
  </tr>
 </table>
 </form>

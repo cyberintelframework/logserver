@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Initial release
@@ -60,7 +61,7 @@ debug_input();
 if (isset($clean['email'])) {
   # POST is set. Do save.
   $f_email = $clean['email'];
-  $f_gpg = $clean['f_gpg'];
+  $f_gpg = $clean['gpg'];
 
   $sql_update = "UPDATE login ";
   $sql_update .= "SET email = '$f_email', gpg = $f_gpg ";

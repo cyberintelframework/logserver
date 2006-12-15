@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 15-12-2006                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.03 Changed data input handling
 # 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.01 Released as part of the 1.03 package

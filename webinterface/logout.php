@@ -2,13 +2,14 @@
 
 #########################################
 # SURFnet IDS    
-# Version 1.04.01
+# Version 1.04.02
 # 06-11-2006     
 # Jan van Lith & Kees Trippelvitz
 #########################################
 
 #############################################
 # Changelog:
+# 1.04.02 Changed data input handling
 # 1.04.01 Added pg_close
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.03 Added setcookie, and session sql query
@@ -23,6 +24,10 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 
 $remoteip = pg_escape_string($_SERVER['REMOTE_ADDR']);
+$ipregexp = '/^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$/';
 if (preg_match($ipregexp, $remoteip)) {
   $sql_del_session = "DELETE FROM sessions WHERE ip = '$remoteip'";
   $result_del_session = pg_query($sql_del_session);

@@ -42,7 +42,7 @@ if ($file != "login.php") {
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);
-      header("location: ${address}login.php?url=$url&m=1010");
+      header("location: ${address}login.php?url=$url");
       exit;
     }
   } else {
@@ -140,8 +140,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     	}
     	if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
     		document.getElementById('searchtemplate_title').value = title;
-    		form.action = 'searchtemplate.php';
-    		form.submit();
+		alert('test');
+    		document.searchform.action = 'searchtemplate.php';
+    		document.searchform.submit();
     	} else return false;
     }
     
