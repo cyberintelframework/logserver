@@ -48,14 +48,14 @@ $check = extractvars($_GET, $allowed_get);
 debug_input();
 
 if (!isset($clean['userid']) ) {
-  $m = 29;
+  $m = 96;
   $err = 1;
 } else {
   $userid = $clean['userid'];
 }
 
 if ($s_access_user < 2) {
-  $m = 90;
+  $m = 91;
   $err = 1;
 } elseif ($s_access_user < 9) {
   $sql_check = "SELECT organisation FROM login WHERE id = $userid AND organisation = $s_org";
@@ -63,7 +63,7 @@ if ($s_access_user < 2) {
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
   if ($numrows_check == 0) {
-    $m = 28;
+    $m = 91;
     $err = 1;
   }
 }

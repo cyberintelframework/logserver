@@ -82,18 +82,17 @@ if (isset($clean['m'])) {
 
   if ($m == 101) { $m = "<p>IP address for $key is already in use. Changes not saved!</p>"; }
   elseif ($m == 102) { $m = "<p>Incorrect IP address for $key. Changes not saved!</p>"; }
-  elseif ($m == 103) { $m = "<p>Malformed sensor name returned!</p>"; }
+  elseif ($m == 103) { $m = "<p>Invalid sensor name returned!</p>"; }
   else {
-    $m = $clean['m'];
-    $m = $errors[$m];
-    $m = "<p>$m</p>\n";
+    $m = geterror($m);
+    echo $m;
   }
 }
 
 echo "<table width='100%'>\n";
   echo "<tr>\n";
-    if (isset($clean['m'])) {
-      echo "<td valign='top'><font color='red'>$m</font></td>\n";
+    if ($m) {
+      echo "<td>$m</td>\n";
     } else {
       echo "<td></td>\n";
     }
@@ -224,17 +223,17 @@ echo "<table class='datatable' width='100%'>\n";
         } elseif ($netconf == "vlans") {
           echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN static<br />\n";
             if ($s_access_sensor == 0) {
-              echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
+              echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
 	    } else {
-              echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' />\n";
+              echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
             }
           echo "</td>\n";
         } else {
           echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>static<br />\n";
             if ($s_access_sensor == 0) {
-              echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
+              echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
             } else {
-              echo "<input type='text' name='tapip' value='$tapip' size='14' class='sensorinput' />\n";
+              echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
             }
           echo "</td>\n";
         }

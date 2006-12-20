@@ -58,7 +58,7 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 debug_input();
 
-if (isset($clean['email'])) {
+if (isset($clean['email']) && isset($_POST['submit'])) {
   # POST is set. Do save.
   $f_email = $clean['email'];
   $f_gpg = $clean['gpg'];
@@ -72,14 +72,13 @@ if (isset($clean['email'])) {
   }
   $debuginfo[] = $sql_update;
   $result_update = pg_query($sql_update);
-  $clean['m'] = 8;
+  $clean['m'] = 1;
 }
 
 if (isset($clean['m'])) {
   $m = $clean['m'];
-  $m = $errors[$m];
-  $m = "<p>$m</p>\n";
-  echo "<font color='red'>" .$m. "</font>";
+  $m = geterror($m);
+  echo $m;
 }
 
 if ($s_access_user > 0) {
@@ -113,7 +112,7 @@ if ($s_access_user > 0) {
       echo "</td>\n";
     echo "</tr>\n";
     echo "<tr>\n";
-      echo "<td class='datatd' align='right' colspan='2'><input type='submit' class='button' value='Update' /></td>\n";
+      echo "<td class='datatd' align='right' colspan='2'><input type='submit' name='submit' class='button' value='Update' /></td>\n";
     echo "</tr>\n";
   echo "</table>\n";
   echo "</form>\n";
@@ -168,7 +167,6 @@ if ($s_access_user > 0) {
         echo "<td align='center'><a href='report_del.php?int_userid=$user_id&int_rcid=$report_content_id'><img src='images/icons/email_delete_20.gif' alt='Delete Report' title='Delete Report' /></a></td>\n";
       echo "</tr>\n";
     }
-
   echo "</table>\n";
 }
 

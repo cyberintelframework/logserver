@@ -40,13 +40,6 @@ if ($s_access_user < 2) {
   $userid = $clean['userid'];
 }
 
-if (isset($clean['m'])) {
-  $m = $clean['m'];
-  $m = $errors[$m];
-  $m = "<p>$m</p>";
-  echo "<font color='red'>" .$m. "</font>";
-}
-
 if ($s_access_user == 9) {
   $sql_user = "SELECT * FROM login WHERE id = $userid";
 } else {
@@ -58,10 +51,9 @@ $numrows_user = pg_num_rows($result_user);
 
 if ($numrows_user == 0) {
   $err = 1;
-  $m = 39;
+  $clean['m'] = 96;
   pg_close($pgconn);
   debug_sql();
-  header("location: useradmin.php?int_m=$m");
   exit;
 } else {
   $access_user = pg_result($result_user, "access");
@@ -70,10 +62,15 @@ if ($numrows_user == 0) {
 
 if ($s_access_user < $access_user) {
   $err = 1;
-  $m = 90;
+  $clean['m'] = 91;
   pg_close($pgconn);
-  header("location: useradmin.php?int_m=$m");
   exit;
+}
+
+if (isset($clean['m'])) {
+  $m = $clean['m'];
+  $m = geterror($m);
+  echo $m;
 }
 
 if ($err == 0) {
@@ -88,8 +85,6 @@ if ($err == 0) {
   $access_sensor = $access{0};
   $access_search = $access{1};
   $access_user = $access{2};
-  
-  echo "<table border=0 cellspacing=0 cellpadding=0><tr><td valign='top'>\n";
 
   echo "<form name='usermodify' action='usersave.php' method='post' onsubmit='return encrypt_pass();'>\n";
     echo "<table class='datatable'>\n";
@@ -207,8 +202,6 @@ if ($err == 0) {
     echo "</table>\n";
     echo "</form>\n";
 }
-
-echo "</div></td></tr></table>\n";
 
 pg_close($pgconn);
 debug_sql();

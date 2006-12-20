@@ -26,7 +26,6 @@ $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
 $allowed_get = array(
-                "int_m",
 		"int_y",
 		"int_org",
 		"int_sid",
@@ -36,7 +35,6 @@ $check = extractvars($_GET, $allowed_get);
 debug_input();
 
 $allowed_post = array(
-                "int_m",
 		"int_y",
 		"int_org"
 );

@@ -40,10 +40,9 @@ if (isset($clean['url'])) {
 }
 
 if (isset($clean['m'])) {
-  $e = $clean['m'];
-  if ($e == 1) { $e = "<p><font color='red'>Username or password was incorrect!</font></p>\n"; }
-  else { $e = "<p><font color='red'>Unknown error!</font></p>\n"; }
-  echo "$e";
+  $m = $clean['m'];
+  $m = geterror($m);
+  echo $m;
 }
 
 ##################

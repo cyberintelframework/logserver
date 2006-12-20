@@ -48,7 +48,6 @@ $check = extractvars($_GET, $allowed_get);
 
 $allowed_post = array(
 		"int_orgid",
-		"strip_html_escape_org",
 		"strip_html_escape_ranges",
 		"int_identtype",
 		"strip_html_escape_orgident",
@@ -59,50 +58,67 @@ $check = extractvars($_POST, $allowed_post);
 
 # Get the type of update
 $type = $tainted['savetype'];
-echo "TYPE: $type<br />\n";
 $pattern = '/^(org|ident|md5)$/';
 if (!preg_match($pattern, $type)) {
   $err = 1;
-  $m = 84;
+  $m = 95;
 }
 
 if ($s_admin != 1) {
   $err = 1;
-  $m = 81;
+  $m = 91;
 }
 
 if ($type == "ident") {
   $orgid = $clean['orgid'];
-  $org = $clean['org'];
+  $orgname = $clean['orgname'];
   $ranges = $clean['ranges'];
-  $ftype = $clean['identtype'];
+  $identtype = $clean['identtype'];
   $orgident = $clean['orgident'];
+
+  $sql_org = "SELECT organisation FROM organisations WHERE organisation = '$orgname'";
+  $debuginfo[] = $sql_org;
+  $result_org = pg_query($pgconn, $sql_org);
+  $rows = pg_num_rows($result_org);
+  if ($rows > 0) {
+    $m = 99;
+    $err = 1;
+  }
 
   if (empty($orgid)) {
     $err = 1;
-    $m = 36;
+    $m = 92;
   }
 
-  if (empty($org)) {
+  if (empty($orgname)) {
     $err = 1;
-    $m = 38;
+    $m = 96;
   }
 
 } elseif ($type == "org") {
   if (isset($clean['orgname'])) {
     $orgname = $clean['orgname'];
+
+    $sql_org = "SELECT organisation FROM organisations WHERE organisation = '$orgname'";
+    $debuginfo[] = $sql_org;
+    $result_org = pg_query($pgconn, $sql_org);
+    $rows = pg_num_rows($result_org);
+    if ($rows > 0) {
+      $m = 99;
+      $err = 1;
+    }
   } else {
+    $m = 96;
     $err = 1;
-    $m = 38;
   }
 } elseif ($type == "md5") {
   if (isset($clean['orgid'])) {
     $orgid = $clean['orgid'];
     $ident = genpass(16);
-    $ftype = 1;
+    $identtype = 1;
   } else {
     $err = 1;
-    $m = 36;
+    $m = 92;
   }
 }
 
@@ -110,21 +126,21 @@ if ($err != 1) {
   if ($type == "ident") {
     $ranges = str_replace("\r", ";", $ranges);
     $ranges = str_replace("\n", "", $ranges);
-    $sql = "UPDATE organisations SET organisation = '" .$org. "', ranges = '" .$ranges. "' WHERE id = $orgid";
+    $sql = "UPDATE organisations SET organisation = '" .$orgname. "', ranges = '" .$ranges. "' WHERE id = $orgid";
     $execute = pg_query($pgconn, $sql);
 
     if (isset($clean['orgident'])) {
-      if ($ftype == 0) {
+      if ($identtype == 0) {
         $err = 1;
-        $m = 45;
+        $m = 98;
       }
 
       if (empty($orgident)) {
         $err = 1;
-        $m = 46;
+        $m = 97;
       }
       if ($err == 0) {
-        $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$orgident', $orgid, $ftype)";
+        $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$orgident', $orgid, $identtype)";
         $execute = pg_query($pgconn, $sql);
       } else {
         pg_close($pgconn);
@@ -135,10 +151,10 @@ if ($err != 1) {
     $sql = "INSERT INTO organisations (organisation) VALUES ('$orgname')";
     $execute = pg_query($pgconn, $sql);
   } elseif ($type == "md5") {
-    $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $ftype)";
+    $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $identftype)";
     $execute = pg_query($pgconn, $sql);
   }
-  $m = 4;
+  $m = 1;
 }
 pg_close($pgconn);
 if ($type == "org") {

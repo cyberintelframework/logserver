@@ -43,9 +43,8 @@ if ($s_admin != 1) {
 
 if (isset($clean['m'])) {
   $m = $clean['m'];
-  $m = stripinput($errors[$m]);
-  $m = "<p>$m</p>";
-  echo "<font color='red'>" .$m. "</font>";
+  $m = geterror($m);
+  echo $m;
 }
 
 if ($err == 0) {
@@ -57,7 +56,7 @@ if ($err == 0) {
   $debuginfo[] = $sql_orgs;
   $result_orgs = pg_query($pgconn, $sql_orgs);
 
-  echo "<form name='orgadmin' action='orgsave.php?type=org' method='post'>\n";
+  echo "<form name='orgadmin' action='orgsave.php?savetype=org' method='post'>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td class='dataheader' width='50'>ID</td>\n";
@@ -84,7 +83,7 @@ if ($err == 0) {
 
     echo "<tr>\n";
       echo "<td class='datatd'>#</td>\n";
-      echo "<td class='datatd' colspan='2'><input type='text' name='orgname' size='40' /></td>\n";
+      echo "<td class='datatd' colspan='2'><input type='text' name='strip_html_escape_orgname' size='40' /></td>\n";
       echo "<td class='datatd'><input type='submit' class='button' style='width: 100%;' value='Insert' /></td>\n";
     echo "</tr>\n";
   echo "</table>\n";

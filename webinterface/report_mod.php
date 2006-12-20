@@ -57,7 +57,8 @@ if (isset($clean['userid'])) {
     $result_login = pg_query($pgconn, $sql_login);
     $numrows_login = pg_num_rows($result_login);
     if ($numrows_login == 0) {
-      echo "<p style='color:red;'><b>You don't have sufficient rights to perform the requested action.</b></p>\n";
+      $m = geterror(91);
+      echo $m;
       footer();
       exit;
     } else {
@@ -81,13 +82,13 @@ if ($err == 0) {
   $sql_mod = "UPDATE report_content ";
   if ($action == "d") {
     $sql_mod .= "SET active = 'f' ";
-    $m = 9;
+    $m = 2;
   } elseif ($action == "e") {
     $sql_mod .= "SET active = 't' ";
-    $m = 10;
+    $m = 3;
   } elseif ($action == "r") {
     $sql_mod .= "SET last_sent = NULL ";
-    $m = 11;
+    $m = 4;
   }
   $sql_mod .= "WHERE user_id = '$user_id'";
 

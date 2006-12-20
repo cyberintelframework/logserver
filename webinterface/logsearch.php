@@ -850,23 +850,23 @@ $last_result = number_format($last_result, 0, ".", ",");
 ### Navigation
 $nav = "Result page: ";
 $url = $_SERVER['REQUEST_URI'];
-$url = str_replace("&page=" . $clean["page"], "", $url);
+$url = str_replace("&int_page=" . $clean["page"], "", $url);
 for ($i = ($page_nr - 3); $i <= ($page_nr + 3); $i++) {
 	if (($i > 0) && ($i <= $last_page)) {
 		if ($i == $page_nr) $nav .= "<b>&laquo;$i&raquo;</b>&nbsp;";
-		else $nav .= "<a href=\"$url&page=$i\">$i</a>&nbsp;";
+		else $nav .= "<a href=\"$url&int_page=$i\">$i</a>&nbsp;";
 	}
 }
 $nav .= "<br />\n";
 if ($page_nr == 1) $nav .= "&lt;&lt;&nbsp;First&nbsp;&nbsp;";
-else $nav .= "<a href=\"$url&page=1\">&lt;&lt;&nbsp;First</a>&nbsp;&nbsp;";
+else $nav .= "<a href=\"$url&int_page=1\">&lt;&lt;&nbsp;First</a>&nbsp;&nbsp;";
 if ($page_nr == 1) $nav .= "&lt;&nbsp;Prev&nbsp;&nbsp;";
-else $nav .= "<a href=\"$url&page=" . ($page_nr - 1) . "\">&lt;&nbsp;Prev</a>&nbsp;&nbsp;";
+else $nav .= "<a href=\"$url&int_page=" . ($page_nr - 1) . "\">&lt;&nbsp;Prev</a>&nbsp;&nbsp;";
 $nav .= "<a href=\"search.php\">Search</a>";
-if ($page_nr < $last_page) $nav .= "&nbsp;&nbsp;<a href=\"$url&page=" . ($page_nr + 1) . "\">Next&nbsp;&gt;</a>\n";
+if ($page_nr < $last_page) $nav .= "&nbsp;&nbsp;<a href=\"$url&int_page=" . ($page_nr + 1) . "\">Next&nbsp;&gt;</a>\n";
 else $nav .= "&nbsp;&nbsp;Next&nbsp;&gt;\n";
 if ($page_nr == $last_page) $nav .= "&nbsp;&nbsp;Last&nbsp;&gt;&gt;";
-else $nav .= "&nbsp;&nbsp;<a href=\"$url&page=$last_page\">Last&nbsp;&gt;&gt;</a>";
+else $nav .= "&nbsp;&nbsp;<a href=\"$url&int_page=$last_page\">Last&nbsp;&gt;&gt;</a>";
 
 // XML IDMEF logging button
 $idmef_url = $_SERVER['REQUEST_URI'];

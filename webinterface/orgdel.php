@@ -38,7 +38,6 @@ $err = 0;
 
 $allowed_get = array(
                 "int_orgid",
-                "int_m",
 		"int_ident"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -51,12 +50,12 @@ if ($s_admin != 1) {
 
 if (!isset($clean['orgid'])) {
   $err = 1;
-  $m = 36;
+  $m = 92;
 }
 
 if (!isset($clean['ident'])) {
   $err = 1;
-  $m = 46;
+  $m = 93;
 }
 
 if ($err == 0) {
@@ -69,9 +68,9 @@ if ($err == 0) {
   if ($numrows_check != 0) {
     $sql_del = "DELETE FROM org_id WHERE id = $ident AND orgid = $orgid";
     $execute = pg_query($pgconn, $sql_del);
-    $m = 5;
+    $m = 2;
   } else {
-    $m = 35;
+    $m = 94;
   }
 }
 pg_close($pgconn);

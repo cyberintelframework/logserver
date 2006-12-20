@@ -46,7 +46,8 @@ if (isset($clean['userid'])) {
     $result_login = pg_query($pgconn, $sql_login);
     $numrows_login = pg_num_rows($result_login);
     if ($numrows_login == 0) {
-      echo "<p style='color:red;'><b>You don't have sufficient rights to perform the requested action.</b></p>\n";
+      $m = geterror(91);
+      echo $m;
       footer();
       exit;
     } else {
@@ -151,15 +152,17 @@ if (isset($clean["nextstep"])) {
         $query = pg_query($sql_threshold);
       }
       echo "<p style='color:green;'>Data saved!</p>\n";
-    } else { 
-      echo "<p style='color:red;'>Data couldn't be saved.</p>\n";
+    } else {
+      $m = geterror(92);
+      echo $m;
     }
   }
 }
 
 # Display error message
 if ($step != $request_step) {
-  echo "<p style='color:red;'><b>Please complete all fields.</b></p>\n";
+  $m = geterror(93);
+  echo $m;
 }
 
 echo "<h4>Step $step of 3</h4>\n";

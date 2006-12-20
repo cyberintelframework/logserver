@@ -40,7 +40,9 @@ debug_input();
 if (isset($clean['org']) && $s_access_search == 9) {
   $q_org = $clean['org'];
 } elseif ($s_access_search == 9) {
-  echo "No organisation given in the querystring.<br />\n";
+  $m = 91;
+  $m = geterror($m);
+  echo $m;
   $err = 1;
 } else {
   $q_org = intval($s_org);

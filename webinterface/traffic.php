@@ -38,7 +38,8 @@ $result_sensors = pg_query($pgconn, $sql_sensors);
 $numrows_result_sensors = pg_numrows($result_sensors);
 
 if ($numrows_result_sensors == 0) {
-  echo "You have no sensors active";
+  $m = geterror(92);
+  echo $m;
 } else { 
   if ($s_admin == 1) {
     echo "<h3>Traffic analysis for: All</h3>\n";

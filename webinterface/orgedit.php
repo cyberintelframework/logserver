@@ -48,9 +48,8 @@ if (!isset($clean['orgid'])) {
 
 if (isset($clean['m'])) {
   $m = $clean['m'];
-  $m = stripinput($errors[$m]);
-  $m = "<p>$m</p>";
-  echo "<font color='red'>" .$m. "</font>";
+  $m = geterror($m);
+  echo $m;
 }
 
 if ($err != 1) {
@@ -59,7 +58,7 @@ if ($err != 1) {
   $row = pg_fetch_assoc($result_orgs);
   $debuginfo[] = $sql_orgs;
 
-  $org = $row['organisation'];
+  $orgname = $row['organisation'];
   $ident = $row['identifier'];
   $ranges = $row['ranges'];
   $ranges = str_replace(";", "\n", $ranges);
@@ -72,7 +71,7 @@ if ($err != 1) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>Organisation</td>\n";
-        echo "<td class='datatd'><input type='text' name='strip_html_escape_org' value='$org' style='width: 99%;' /></td>\n";
+        echo "<td class='datatd'><input type='text' name='strip_html_escape_orgname' value='$orgname' style='width: 99%;' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd' valign='top'>Ranges</td>\n";
@@ -106,6 +105,7 @@ if ($err != 1) {
           echo "<td class='datatd'><a href='orgdel.php?int_orgid=$orgid&int_ident=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
         echo "</tr>\n";
       }
+
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>#</td>\n";
         echo "<td class='datatd' colspan='1'><input type='text' name='strip_html_escape_orgident' style='width: 99%;' /></td>\n";

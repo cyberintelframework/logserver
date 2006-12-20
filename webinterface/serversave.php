@@ -49,13 +49,13 @@ if ($s_admin != 1) {
 $f_server = $clean['server'];
 if ($f_server == "") {
   $err = 1;
-  $m = 31;
+  $m = 94;
 }
 
 if ($err != 1) {
   $sql_save = "INSERT INTO servers (server) VALUES ('$f_server')";
   $execute_save = pg_query($pgconn, $sql_save);
-  $m = 6;
+  $m = 1;
 }
 pg_close($pgconn);
 header("location: serveradmin.php?int_m=$m");

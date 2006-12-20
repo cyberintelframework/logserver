@@ -78,7 +78,9 @@ $debuginfo[] = $sql_bindet;
 
 if ($numrows_binhist == 0 && $numrows_bindet == 0) {
   $err = 1;
-  echo "<font color='red'>No record could be found for the given binary!</font>\n";
+  $m = 91;
+  $m = geterror($m);
+  echo $m;
 }
 
 if ($err == 0) {

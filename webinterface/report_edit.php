@@ -45,7 +45,8 @@ if (isset($clean['userid'])) {
     $result_login = pg_query($pgconn, $sql_login);
     $numrows_login = pg_num_rows($result_login);
     if ($numrows_login == 0) {
-      echo "<p style='color:red;'><b>You don't have sufficient rights to perform the requested action.</b></p>\n";
+      $m = geterror(91);
+      echo $m;
       footer();
       exit;
     } else {
@@ -111,7 +112,8 @@ if ($report_content_id > 0) {
         $subject = $clean['subject'];
         
         if (empty($title)) {
-          echo "<p style='color:red;'><b>Invalid title</b></p>\n";
+          $m = geterror(92);
+          echo $m;
         } else {
           // Save data
           $sql_update = "UPDATE report_content SET ";
@@ -138,10 +140,12 @@ if ($report_content_id > 0) {
               $result_report_content = pg_query($sql_report_content);
               $report_content = pg_fetch_assoc($result_report_content);
             } else {
-              echo "<p style='color:red;'>Data couldn't be saved (2).</p>\n";
+              $m = geterror(94);
+              echo $m;
             }
           } else {
-            echo "<p style='color:red;'>Data couldn't be saved (1).</p>\n";
+            $m = geterror(93);
+            echo $m;
           }
         }
       }
@@ -254,7 +258,8 @@ if ($report_content_id > 0) {
           $interval_db = $interval_week;
         }
         if (empty($title)) {
-          echo "<p style='color:red;'><b>Invalid title</b></p>\n";
+          $m = geterror(92);
+          echo $m;
         } else {
           // Save data
           $sql_update = "UPDATE report_content SET ";
@@ -275,7 +280,8 @@ if ($report_content_id > 0) {
             $result_report_content = pg_query($sql_report_content);
             $report_content = pg_fetch_assoc($result_report_content);
           } else {
-            echo "<p style='color:red;'>Data couldn't be saved (1).</p>\n";
+            $m = geterror(93);
+            echo $m;
           }
         }
       }
@@ -412,10 +418,12 @@ if ($report_content_id > 0) {
       echo "</form>\n";
     }
   } else {
-    echo "<p style='color:red;'><b>You don't have sufficient rights to edit this report</b>.</p>\n";
+    $m = geterror(95);
+    echo $m;
   }
 } else {
-  echo "<p style='color:red;'><b>Invalid report</b>.</p>\n";
+  $m = geterror(96);
+  echo $m;
 }
 
 function write_report_template_threshold_fields() {

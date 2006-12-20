@@ -70,7 +70,7 @@ if (isset($clean['confirm'])) {
 # Checking if the username was set.
 if (!isset($clean['username'])) {
   $err = 1;
-  $m = 22;
+  $m = 92;
 } else {
   $username = $clean['username'];
 }
@@ -82,7 +82,6 @@ $auser = $clean['auser'];
 $userid = $clean['userid'];
 $org = $clean['org'];
 $email = $clean['email'];
-$username = $clean['username'];
 $gpg = $clean['gpg'];
 
 # Setting default $access value
@@ -91,7 +90,7 @@ $access = "111";
 # Checking for access rights.
 if ($s_auser == 0) {
   $err = 1;
-  $m = 90;
+  $m = 91;
 } elseif ($s_auser == 1) {
   $userid = $s_userid;
   $org = $s_org;
@@ -100,13 +99,13 @@ if ($s_auser == 0) {
   $f_org = $s_org;
   if ($asensor >= 9) {
     $err = 1;
-    $m = 90;
+    $m = 91;
   } elseif ($asearch >= 9) {
     $err = 1;
-    $m = 90;
+    $m = 91;
   } elseif ($auser >= 9) {
     $err = 1;
-    $m = 90;
+    $m = 91;
   } else {
     $access = $asensor . $asearch . $auser;
   }
@@ -117,13 +116,13 @@ if ($s_auser == 0) {
 # Checking if the passwords were correct.
 if ($pass != $confirm) {
   $err = 1;
-  $m = 21;
+  $m = 94;
 }
 
 # Checking if the organisation is set correctly.
 if ($clean['org'] == 0) {
   $err = 1;
-  $m = 23;
+  $m = 95;
 }
 
 $sql = "SELECT username FROM login WHERE username = '$username' AND NOT id = $userid";
@@ -131,7 +130,7 @@ $debuginfo[] = $sql;
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
 if ($rows == 1) {
-  $m = 27;
+  $m = 92;
   $err = 1;
 }
 
@@ -150,8 +149,6 @@ if ($err != 1) {
   } elseif ($s_auser == 9) {
     $sql_save = "UPDATE login SET username = '$username', email = '$email', gpg = $gpg $passwordstring, access = '$access', organisation = '$org' WHERE id = $userid";
     $m = 3;
-  } else {
-    $m = 99;
   }
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);

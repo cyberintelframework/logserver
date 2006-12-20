@@ -334,7 +334,7 @@ echo "<table width='100%'>\n";
   $sql_topexp = "SELECT DISTINCT details.text, COUNT(details.id) as total ";
   $sql_topexp .= " FROM $sql_from ";
   $sql_topexp .= " $sql_where ";
-  $sql_topexp .= " GROUP BY details.text ORDER BY total DESC LIMIT $topexploits OFFSET 0 ";
+  $sql_topexp .= " GROUP BY details.text ORDER BY total DESC LIMIT $c_topexploits OFFSET 0 ";
   $result_topexp = pg_query($pgconn, $sql_topexp);
 
   $debuginfo[] = $sql_topexp;
@@ -353,7 +353,7 @@ echo "<table width='100%'>\n";
   $sql_topexp_org = "SELECT DISTINCT details.text, COUNT(details.id) as total ";
   $sql_topexp_org .= " FROM $sql_from ";
   $sql_topexp_org .= " $sql_where ";
-  $sql_topexp_org .= " GROUP BY details.text ORDER BY total DESC LIMIT $topexploits OFFSET 0 ";
+  $sql_topexp_org .= " GROUP BY details.text ORDER BY total DESC LIMIT $c_topexploits OFFSET 0 ";
 
   $debuginfo[] = $sql_topexp_org;
 
@@ -368,7 +368,7 @@ echo "<table width='100%'>\n";
       echo "<table width='100%'>\n";
         echo "<tr>\n";
           echo "<td width='45%'>\n";
-            echo "<b>Top $topexploits exploits of all sensors</b>\n";
+            echo "<b>Top $c_topexploits exploits of all sensors</b>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
@@ -397,7 +397,7 @@ echo "<table width='100%'>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
             if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
-              echo "<b>Top $topexploits exploits of your sensors</b>\n";
+              echo "<b>Top $c_topexploits exploits of your sensors</b>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td width='5%' class='datatd'>#</td>\n";
@@ -458,7 +458,7 @@ echo "<table width='100%'>\n";
   $sql_top_org = "SELECT DISTINCT sensors.keyname, COUNT(details.*) as total ";
   $sql_top_org .= " FROM $sql_from ";
   $sql_top_org .= " $sql_where ";
-  $sql_top_org .= " GROUP BY sensors.keyname ORDER BY total DESC LIMIT $topsensors OFFSET 0";
+  $sql_top_org .= " GROUP BY sensors.keyname ORDER BY total DESC LIMIT $c_topsensors OFFSET 0";
 
   $debuginfo[] = $sql_top_org;
 
@@ -474,7 +474,7 @@ echo "<table width='100%'>\n";
       echo "<table width='100%'>\n";
         echo "<tr>\n";
           echo "<td width='45%' valign='top'>\n";
-            echo "<b>Top $topsensors sensors</b>\n";
+            echo "<b>Top $c_topsensors sensors</b>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td class='datatd' width='5%'>#</td>\n";
@@ -495,7 +495,7 @@ echo "<table width='100%'>\n";
                 $keyname = $row['keyname'];
                 $total = $row['total'];
                 $rank_ar[$keyname] = $i;
-                if ($i <= $topsensors) {
+                if ($i <= $c_topsensors) {
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
                     if ($s_admin == 1) {
@@ -515,7 +515,7 @@ echo "<table width='100%'>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
             if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
-              echo "<b>Top $topsensors sensors of $orgname</b>\n";
+              echo "<b>Top $c_topsensors sensors of $orgname</b>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td class='datatd' width='5%'>#</td>\n";
@@ -728,33 +728,28 @@ echo "<table width='100%'>\n";
   echo "</tr>\n";
 
  ########################## Top 10 Filenames
-  add_db_table("details");
-  $where[] = "$tsquery";
-  $where[] = "type = 4";
-  prepare_sql();
-  $sql_topfiles = "SELECT DISTINCT text, COUNT(details.text) as total ";
-  $sql_topfiles .= " FROM $sql_from ";
-  $sql_topfiles .= " $sql_where ";
-  $sql_topfiles .= " GROUP BY text ORDER BY total DESC OFFSET 0";
+#  add_db_table("details");
+#  $where[] = "$tsquery";
+#  $where[] = "type = 4";
+#  prepare_sql();
+
+  $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
+    $sql_topfiles .= "(SELECT split_part(details.text, '/', 4) as file ";
+    $sql_topfiles .= "FROM details, attacks WHERE ";
+    $sql_topfiles .= "$tsquery ";
+    $sql_topfiles .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
+  $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC";
   $result_topfiles = pg_query($pgconn, $sql_topfiles);
 
   $debuginfo[] = $sql_topfiles;
 
-  # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
-
-  add_db_table("details");
-  add_db_table("sensors");
-  $where[] = "sensors.id = details.sensorid";
-  $where[] = "sensors.organisation = $q_org";
-  $where[] = "type = 4";
-  $where[] = "$tsquery";
-  prepare_sql();
-  $sql_topfiles_org = "SELECT DISTINCT text, COUNT(details.text) as total ";
-  $sql_topfiles_org .= " FROM $sql_from ";
-  $sql_topfiles_org .= " $sql_where ";
-  $sql_topfiles_org .= " GROUP BY text ORDER BY total DESC OFFSET 0";
+  $sql_topfiles_org = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
+    $sql_topfiles_org .= "(SELECT split_part(details.text, '/', 4) as file ";
+    $sql_topfiles_org .= "FROM details, attacks, sensors WHERE ";
+    $sql_topfiles_org .= "$tsquery ";
+    $sql_topfiles_org .= "sensors.id = details.sensorid AND sensors.organisation = $q_org ";
+    $sql_topfiles_org .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
+  $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC";
   $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);
 
   $debuginfo[] = $sql_topfiles_org;
@@ -771,57 +766,26 @@ echo "<table width='100%'>\n";
             echo "<b>Top 10 filenames of all sensors</b>\n"; // change this into variable to be read from conf
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
-                echo "<td width='5%' class='datatd'>#</td>\n";
-                echo "<td width='20%' class='datatd'>Filename</td>\n";
-                echo "<td width='65%' class='datatd'>Binary</td>\n";
+                echo "<td width='10%' class='datatd'>#</td>\n";
+                echo "<td width='80%' class='datatd'>Filename</td>\n";
                 echo "<td width='10%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
-              $filenameArray = array();
+              $i = 0;
               while ($row = pg_fetch_assoc($result_topfiles)) {
-                $url = $row['text'];
+                if ($i == $c_topfilenames) {
+                  break;
+                }
+                $url = $row['file'];
                 $total = $row['total'];
                 $array = @parse_url($url);
                 $filename = trim($array['path'],'/');
-                
-                if (strlen($filename) > 0 && !array_key_exists($filename, $filenameArray)) {
-                  $filenameArray[$filename] = $total;
-                }
-                elseif (array_key_exists($filename, $filenameArray)) {
-                  $filenameArray[$filename] += $total;
-                }
-              }
-              arsort($filenameArray);
-              $i=1;
-              foreach ($filenameArray as $file => $count) {
-                if ($i==11) break; // change this into variable+1 to be read from conf
-                
-                # Query preparation                
-                add_db_table("details");
-                $where[] = "$tsquery";
-                $where[] = "type = 8";
-                $where[] = "attackid in (SELECT attackid FROM details WHERE type = 4 AND text LIKE '%$file')";
-                prepare_sql();
-                $sql_topbin = "SELECT DISTINCT text ";
-                $sql_topbin .= " FROM $sql_from ";
-                $sql_topbin .= " $sql_where ";
-                $result_topbin = pg_query($pgconn, $sql_topbin);
+                $i++;
 
-                $debuginfo[] = $sql_topbin;
-                
-                # Resetting the sql generation arrays
-                $where = array();
-                $db_table = array();
-                
-                $row = pg_fetch_assoc($result_topbin);
-                $bin = $row['text'];
-                                 
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$file&orderm=DESC$dateqs'>$file</a></td>\n";
-                  echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
-                  echo "<td class='datatd'>$count</td>\n";
+                  echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$filename</a></td>\n";
+                  echo "<td class='datatd'>$total</td>\n";
                 echo "</tr>\n";
-               $i++;
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -838,47 +802,21 @@ echo "<table width='100%'>\n";
                 echo "</tr>\n";
                  $filenameArray = array();
                   while ($row = pg_fetch_assoc($result_topfiles_org)) {
-                    $url = $row['text'];
+                    if ($i == $c_topfilenames) {
+                      break;
+                    }
+                    $url = $row['file'];
                     $total = $row['total'];
                     $array = @parse_url($url);
                     $filename = trim($array['path'],'/');
-                    if (strlen($filename) > 0 && !array_key_exists($filename, $filenameArray)) {
-                      $filenameArray[$filename] = $total;
-                    } elseif (array_key_exists($filename, $filenameArray)) {
-                      $filenameArray[$filename] += $total;
-                    }
-                  }
-                  arsort($filenameArray);
-                  $i=1;
-                  foreach ($filenameArray as $file => $count) {
-                    if ($i==11) break;  // change this into variable to be read from conf
-                    
-                    # Query preparation                
-                    add_db_table("details");
-                    $where[] = "$tsquery";
-                    $where[] = "type = 8";
-                    $where[] = "attackid in (SELECT attackid FROM details WHERE type = 4 AND text LIKE '%$file')";
-                    prepare_sql();
-                    $sql_topbin_org = "SELECT DISTINCT text ";
-                    $sql_topbin_org .= " FROM $sql_from ";
-                    $sql_topbin_org .= " $sql_where ";
-                    $result_topbin_org = pg_query($pgconn, $sql_topbin_org);
+                    $i ++;
 
-                    $debuginfo[] = $sql_topbin_org;
-
-                    # Resetting the sql generation arrays
-                    $where = array();
-                    $db_table = array();
-                
-                    $row = pg_fetch_assoc($result_topbin_org);
-                    $bin = $row['text'];
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$file&orderm=DESC$dateqs'>$file</a></td>\n";
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$file</a></td>\n";
                       echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
                       echo "<td class='datatd'>$count</td>\n";
                     echo "</tr>\n";
-                  $i++;
                   }
               echo "</table>\n";
             }
@@ -899,7 +837,7 @@ echo "<table width='100%'>\n";
   $sql_organisation = "SELECT sensors.organisation, COUNT(attacks.*) as total ";
   $sql_organisation .= " FROM $sql_from ";
   $sql_organisation .= " $sql_where ";
-  $sql_organisation .= " GROUP BY sensors.organisation ORDER BY total DESC LIMIT $toporgs OFFSET 0";
+  $sql_organisation .= " GROUP BY sensors.organisation ORDER BY total DESC LIMIT $c_toporgs OFFSET 0";
 
   $debuginfo[] = $sql_organisation;
 
@@ -907,7 +845,7 @@ echo "<table width='100%'>\n";
 
   echo "<tr>\n";
     echo "<td>\n";
-      echo "<b>Top $toporgs organisations</b>\n";
+      echo "<b>Top $c_toporgs organisations</b>\n";
       echo "<table class='datatable' width='45%'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader' width='5%'>#</td>\n";
@@ -927,7 +865,7 @@ echo "<table width='100%'>\n";
 
           $count = $row['total'];
           echo "<tr>\n";
-            echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
+            echo "<td class='datatd'>$i</td>\n";
             if ($s_admin == 1) {
               echo "<td class='datatd'>$db_org_name</td>\n";
             } elseif ($q_org == $db_org) {

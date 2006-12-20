@@ -48,7 +48,7 @@ if ($s_admin != 1) {
 
 if (!isset($clean['serverid'])) {
   $err = 1;
-  $m = 30;
+  $m = 92;
 }
 
 $sql_check = "SELECT count(id) as total FROM servers";
@@ -57,7 +57,7 @@ $row_check = pg_fetch_assoc($result_check);
 $numrows_check = $row_check['total'];
 if ($numrows_check == 1) {
   $err = 1;
-  $m = 32;
+  $m = 93;
 }
 
 if ($err == 0) {

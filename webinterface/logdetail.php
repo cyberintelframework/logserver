@@ -34,7 +34,9 @@ debug_input();
 if (isset($clean['id'])) {
   $id = $clean['id'];
 } else {
-  echo "Wrong or missing attack ID in the querystring.<br />\n";
+  $m = 91;
+  $m = geterror($m);
+  echo $m;
   echo "<a href='logindex.php'>Logging Overview</a>\n";
   $err = 1;
 }

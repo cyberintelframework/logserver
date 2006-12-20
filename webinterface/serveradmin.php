@@ -41,16 +41,15 @@ if (isset($clean['m'])) {
   if ($m == 100) { 
     $count = $clean['c'];
     if ($count == 0) {
-      $m = "<p>Successfully deleted a server!</p>";
+      $m = "<font color='red'><p>Successfully deleted a server!</p></font>";
     } else {
-      $m = "<p>Successfully deleted a server!<br />Reset " .ngettext("$count sensor", "$count sensors", $count). " to default server!</p>";
+      $m = "<font color='red'><p>Successfully deleted a server!<br />";
+      $m .= "Reset " .ngettext("$count sensor", "$count sensors", $count). " to default server!</p></font>";
     }
   } else {
-    $m = $clean['m'];
-    $m = $errors[$m];
-    $m = "<p>$m</p>\n";
+    $m = geterror($m);
   }
-  echo "<font color='red'>" .$m. "</font>";
+  echo $m;
 }
 
 if ($err == 0) {

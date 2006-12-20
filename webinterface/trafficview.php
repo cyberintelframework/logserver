@@ -70,7 +70,8 @@ if (isset($clean['imgid'])) {
     echo "</tr>\n";
   echo "</table>\n";
 } else {
-  echo "<h2>No sensor given.</h2>";
+  $m = geterror(92);
+  echo $m;
 }
 pg_close($pgconn);
 debug_sql();

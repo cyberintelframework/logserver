@@ -19,7 +19,7 @@
 
 $s_admin = intval($_SESSION['s_admin']);
 
-if ( $s_admin == 0 ) {
+if ($s_admin != 1) {
   $err = 1;
   $m = 91;
   pg_close($pgconn);

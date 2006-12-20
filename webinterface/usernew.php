@@ -33,7 +33,7 @@ $access_user = 0;
 
 if ($s_access_user < 2) {
   $err = 1;
-  $m = 90;
+  $m = 91;
   pg_close($pgconn);
   header("location: useradmin.php?int_m=$m");
   exit;

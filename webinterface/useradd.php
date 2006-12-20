@@ -69,8 +69,8 @@ if (isset($clean['confirm'])) {
 
 # Checking if the username was set.
 if (!isset($clean['username'])) {
+  $m = 92;
   $err = 1;
-  $m = 22;
 } else {
   $username = $clean['username'];
 }
@@ -82,38 +82,34 @@ $auser = $clean['auser'];
 $userid = $clean['userid'];
 $org = $clean['org'];
 $email = $clean['email'];
-$username = $clean['username'];
 $gpg = $clean['gpg'];
 
 ### Password check
 if (empty($pass) || empty($confirm)) { 
-  $m = 20;
+  $m = 93;
   $err = 1;
 } elseif ($pass != $confirm) {
-  $m = 21;
-  $err = 1;
-} elseif (empty($username)) {
-  $m = 22;
+  $m = 94;
   $err = 1;
 } elseif (empty($org) || $org == 0) {
-  $m = 23;
+  $m = 95;
   $err = 1;
 }
 
 if ($s_access_user < 2) {
-  $m = 90;
+  $m = 91;
   $err = 1;
 } elseif ($s_access_user == 2) {
   $org = $s_org;
   if ($asensor >= 9) {
     $err = 1;
-    $m = 90;
+    $m = 91;
   } elseif ($asearch >= 9) {
     $err = 1;
-    $m = 90;
+    $m = 91;
   } elseif ($auser >= 9) {
     $err = 1;
-    $m = 90;
+    $m = 91;
   } else {
     $access = $asensor . $asearch . $auser;
   }
@@ -126,7 +122,7 @@ $debuginfo[] = $sql;
 $result_user = pg_query($pgconn, $sql);
 $rows = pg_num_rows($result_user);
 if ($rows == 1) {
-  $m = 27;
+  $m = 92;
   $err = 1;
 }
 

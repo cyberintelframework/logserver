@@ -30,9 +30,8 @@ debug_input();
 
 if (isset($clean['m'])) {
   $m = $clean['m'];
-  $m = $errors[$m];
-  $m = "<p>$m</p>\n";
-  echo "<font color='red'>" .$m. "</font>";
+  $m = geterror($m);
+  echo $m;
 }
 
 if (isset($tainted['sort'])) {
