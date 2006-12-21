@@ -213,53 +213,117 @@ $org_ident_type_ar = array(
 		4 => "SURFnet SOAP"
 );
 
-$errors = array (
-	1 => "Successfully added a new user!",
-	2 => "Successfully deleted the user!",
-	3 => "Successfully modified the user!",
-	4 => "Successfully saved the organisation details!",
-	5 => "Successfully deleted this identifier!",
-	6 => "Successfully added a new server!",
-	7 => "Successfully updated the sensor information",
-	8 => "Successfully saved mail settings!",
-	9 => "Disabled all reports!",
-	10 => "Enabled all reports!",
-	11 => "Reset all report timestamps!",
-	12 => "Successfully deleted scanner!",
-	13 => "Successfully updated scanner!",
-	14 => "Successfully added scanner!",
-	20 => "One of the password fields was empty!",
-	21 => "The passwords did not match!",
-	22 => "The username field was empty!",
-	23 => "The organisation was not set!",
-	24 => "The email address was not set!",
-	27 => "This username is already in use!",
-	28 => "You can only delete users from your own organisation!",
-	29 => "User ID was not set!",
-	30 => "Server ID was not set!",
-	31 => "Server field was empty!",
-	32 => "There has to be at least 1 server. Create one first before deleting this one!",
-	33 => "This is a read-only account. Remote administration of the sensor is not possible!",
-	34 => "The organisation already exists!",
-	35 => "Identifier ID was not set!",
-	36 => "Organisation ID was not set!",
-	37 => "There was no record with this ID!",
-	38 => "Organisation name was not set!",
-	39 => "No user with this user ID!",
-	40 => "Wrong update type!",
-	41 => "No severity was given!",
-	42 => "No attack ID given!",
-	43 => "Wrong username or password!",
-	44 => "Wrong action!",
-	45 => "Identifier type was not set!",
-	46 => "Identifier name was not set!",
-	47 => "Wrong access variable given!",
-	48 => "No scanner ID was given!",
-	49 => "Scanner name was missing!",
-	50 => "Scanner command was missing!",
-	51 => "Scanner status was missing!",
-	90 => "Not enough rights to access this page!",
-	91 => "Admin rights are required to access this page!",
-	99 => "Unknown error!"
-      );
+$v_errors = array(
+	binaryhist.php => array(
+				91 => "No info could be found for the given binary!"
+			),
+	logdetail.php => array(
+				91 => "Wrong or missing ID!"
+			),
+	login.php => array(
+				91 => "Username or password was incorrect!"
+			),
+	loglist.php => array(
+				91 => "No organisation was given!"
+			),
+	mailadmin.php => array(
+				1 => "Updated mail settings!",
+				2 => "Disabled all reports!",
+				3 => "Enabled all reports!",
+				4 => "Reset all timestamps!",
+				90 => "You don't have sufficient rights to perform the requested action!"
+			),
+	orgadmin.php => array(
+				1 => "Successfully added the organisation!",
+				91 => "Admin rights are required to access this page!",
+				95 => "Invalid update type!",
+				96 => "Invalid or missing organisation name!",
+				99 => "Organisation already exist!"
+			),
+	orgedit.php => array(
+				1 => "Successfully saved the organisation details!",
+				2 => "Successfully deleted the organisation identifier!",
+				91 => "Admin rights are required to access this page!",
+				92 => "Organisation ID was not set!",
+				93 => "Identifier ID was not set!",
+				94 => "The organisations supplied doesn't exist!",
+				95 => "Invalid update type!",
+				96 => "Invalid or missing organisation name!",
+				97 => "Invalid or missing identifier!",
+				98 => "Invalid or missing identifier type!",
+				99 => "Organisation already exist!"
+			),
+	report_add.php => array(
+				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Data couldn't be saved (1)!",
+				93 => "Please complete all fields!"
+			),
+	report_edit.php => array(
+				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Invalid title!",
+				93 => "Data couldn't be saved (1)!",
+				94 => "Data couldn't be saved (2)!",
+				95 => "You don't have sufficient rights to edit this report!",
+				96 => "Invalid report!"
+			),
+	report_mod.php => array(
+				91 => "You don't have sufficient rights to perform the requested action!",
+			),
+	searchtemplate.php => array(
+				1 => "Successfully saved searchtemplate!",
+				92 => "Invalid user!",
+				93 => "Invalid title!",
+				94 => "Searchtemplate not saved!"
+			),
+	sensorstatus.php => array(
+				1 => "Successfully saved the sensor status!",
+				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Invalid or missing action!",
+				93 => "Invalid or missing sensor ID!",
+				94 => "Invalid or missing tap IP address!"
+			),
+	serveradmin.php => array(
+				1 => "Successfully added a new server!",
+				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Invalid or missing server ID!",
+				93 => "There has to be at least 1 server. Create one first before deleting this one!",
+				94 => "Invalid or missing server!"
+			),
+	traffic.php => array(
+				92 => "There are no active sensors!"
+			),
+	trafficview.php => array(
+				92 => "Invalid or missing sensor ID!"
+			),
+	useradmin.php => array(
+				1 => "Successfully added new user!",
+				2 => "Successfully deleted the user!",
+				3 => "Successfully saved the user details!",
+				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Invalid or missing username!",
+				93 => "Invalid or missing password or confirmation!",
+				94 => "Supplied password did not match the confirmation password!",
+				95 => "Invalid or missing organisation!",
+				96 => "Invalid or missing user ID!"
+			),
+	useredit.php => array(
+				96 => "Invalid or missing User ID!"
+			)
+);
+
+$v_plottertypes = array(
+				1 => "bars",
+				2 => "lines",
+				3 => "linepoints",
+				4 => "area",
+				5 => "points",
+				6 => "pie",
+				7 => "thinbarline",
+				8 => "squared"
+);
+
+$ipregexp = '^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$';
 ?>

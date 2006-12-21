@@ -25,35 +25,127 @@
 # 1.02.03 Initial release
 #############################################
 
-function extractvars($ar) {
-  if (!is_array($ar)) {
-    return "error";
-  } else {
-    echo "Check<br />\n";
-    foreach ($ar as $key => $var) {
-      $explodedkey = explode("_", $key);
-      $temp = array_pop($explodedkey);
-      global $$temp;
-      foreach ($explodedkey as $check) {
-        $var = trim(htmlentities(strip_tags($var)));
-        if ($var == "int") {
-          $var = intval($var);
-        } elseif ($var == "str") {
-          $var = $var;
-        } elseif ($var == "bool") {
-          $var = $var;
-        }
-      }
-      $$temp = $var;
-    }
-  }
-  return "ok";
+function geterror($m) {
+  global $v_errors;
+  $e_file = $_SERVER['SCRIPT_NAME'];
+  $e_file = basename($e_file);
+  $e_file = str_replace(".", "", $e_file);
+  $m = $v_errors[$e_file][$m];
+  $m = "<p>$m</p>\n";
+  $m = "<font color='red'>" .$m. "</font>";
+  return $m;
 }
 
-function debug() {
-  global $debug;
+function printer($printvar) {
+  echo "<pre>";
+  print_r($printvar);
+  echo "</pre>\n";
+}
+
+function extractvars($source, $allowed) {
+  if (!is_array($source)) {
+    return 1;
+  } else {
+    global $clean;
+    global $tainted;
+
+    # Setting up the regular expression for an IP address
+    $ipregexp = '/^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+    $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+    $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+    $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$/';
+
+    foreach ($source as $key => $var) {
+      if (!is_array($var)) {
+        $var = trim($var);
+        if ($var != "") {
+          if (in_array($key, $allowed)) {
+            $explodedkey = explode("_", $key);
+            $temp = array_pop($explodedkey);
+            $count = count($explodedkey);
+            if ($count != 0) {
+              foreach ($explodedkey as $check) {
+                if ($check == "int") {
+                  $var = intval($var);
+                  $clean[$temp] = $var;
+                } elseif ($check == "escape") {
+                  $var = pg_escape_string($var);
+                  $clean[$temp] = $var;
+                } elseif ($check == "html") {
+                  $var = htmlentities($var);
+                  $clean[$temp] = $var;
+                } elseif ($check == "strip") {
+                  $var = strip_tags($var);
+                  $clean[$temp] = $var;
+                } elseif ($check == "md5") {
+                  $md5pattern = '/^[a-zA-Z0-9]{32}$/';
+                  if (!preg_match($md5pattern, $var)) {
+                    $tainted[$temp] = $var;
+                  } else {
+                    $clean[$temp] = $var;
+                  }
+                } elseif ($check == "bool") {
+                  $var = strtolower($var);
+	          $pattern = '/^(t|true|f|false)$/';
+                  if (!preg_match($pattern, $var)) {
+                    $var = "f";
+                  } else {
+                    if ($var == "true" || $var == "false") {
+                      $var = pgboolval($var);
+                    }
+                  }
+                  $clean[$temp] = $var;
+                } elseif ($check == "ip") {
+                  if (!preg_match($ipregexp, $var)) {
+                    $tainted[$temp] = $var;
+                  } else {
+                    $clean[$temp] = $var;
+                  }
+                } elseif ($check == "net") {
+                  $ar_test = explode("/", $var);
+                  $ip_test = $ar_test[0];
+                  $mask_test = intval($ar_test[1]);
+                  if (preg_match($ipregexp, $ip_test) && $mask_test >= 0 && $mask_test <= 32) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif (!in_array($temp, $clean)) {
+                  $tainted[$temp] = $var;
+                }
+              }
+            } else {
+              $tainted[$temp] = $var;
+            } // $count != 0
+          } // in_array($key, $allowed)
+        } // $var != ""
+      } else {
+        $tainted[$key] = $var;
+      } // !is_array($var)
+    } // foreach
+  } // !is_array($source)
+  return 0;
+}
+
+function debug_input() {
+  global $c_debug_input;
+  global $clean;
+  global $tainted;
+  if ($c_debug_input == 1) {
+    echo "<pre>";
+    echo "TAINTED:\n";
+    print_r($tainted);
+    echo "\n";
+    echo "CLEAN:\n";
+    print_r($clean);
+    echo "</pre><br />\n";
+  }
+}
+
+function debug_sql() {
+  global $c_debug_sql;
   global $debuginfo;
-  if ($debug == 1) {
+  if ($c_debug_sql == 1) {
     echo "<br /><br />\n";
     echo "<textarea cols=138 rows=20>";
     if (is_array($debuginfo)) {
