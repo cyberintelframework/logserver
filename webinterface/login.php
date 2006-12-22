@@ -48,7 +48,7 @@ if (isset($clean['m'])) {
 ##################
 # LOGIN METHOD 2
 ##################
-if ($login_method == 2) {
+if ($c_login_method == 2) {
   if (isset($clean['user'])) {
     $f_user = $clean['user'];
     $sql_user = "SELECT count(id) as total, password FROM login WHERE username = '$f_user' GROUP BY password";

@@ -747,7 +747,7 @@ echo "<table width='100%'>\n";
     $sql_topfiles_org .= "(SELECT split_part(details.text, '/', 4) as file ";
     $sql_topfiles_org .= "FROM details, attacks, sensors WHERE ";
     $sql_topfiles_org .= "$tsquery ";
-    $sql_topfiles_org .= "sensors.id = details.sensorid AND sensors.organisation = $q_org ";
+    $sql_topfiles_org .= "AND sensors.id = details.sensorid AND sensors.organisation = $q_org ";
     $sql_topfiles_org .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
   $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC";
   $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);

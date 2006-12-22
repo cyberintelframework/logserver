@@ -63,6 +63,7 @@ use POSIX qw(floor);
 # Variables used
 ####################
 do '/etc/surfnetids/surfnetids-log.conf';
+$logfile = $c_logfile;
 $logfile =~ s|.*/||;
 if ($logstamp == 1) {
   $day = localtime->mday();
@@ -74,12 +75,12 @@ if ($logstamp == 1) {
     $month = "0" . $month;
   }
   $year = localtime->year() + 1900;
-  if ( ! -d "$surfidsdir/log/$day$month$year" ) {
-    mkdir("$surfidsdir/log/$day$month$year");
+  if ( ! -d "$c_surfidsdir/log/$day$month$year" ) {
+    mkdir("$c_surfidsdir/log/$day$month$year");
   }
-  $logfile = "$surfidsdir/log/$day$month$year/$logfile";
+  $logfile = "$c_surfidsdir/log/$day$month$year/$logfile";
 } else {
-  $logfile = "$surfidsdir/log/$logfile";
+  $logfile = "$c_surfidsdir/log/$logfile";
 }
 
 ##################
@@ -138,7 +139,7 @@ open(LOG, ">> $logfile");
 $ts_now = time;
 
 # Connect to the database (dbh = DatabaseHandler or linkserver)
-$dbh = DBI->connect($dsn, $pgsql_user, $pgsql_pass)
+$dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
         or die $DBI::errstr;
 
 # ts_ means timestamp
@@ -479,7 +480,7 @@ while (@row = $email_query->fetchrow_array) {
 						print MAIL "$printcheck\n";
 						print MAIL "\n";
 						print MAIL "Use next link to view related attacks:\n";
-						print MAIL $webinterface_prefix . "/logsearch.php?from=$ts_start&to=$ts_end&f_reptype=multi&f_sev=$target&f_submit=Search";
+						print MAIL $c_webinterface_prefix . "/logsearch.php?from=$ts_start&to=$ts_end&f_reptype=multi&f_sev=$target&f_submit=Search";
 						print MAIL "\n";
 					} else {
 						# Free file
@@ -558,7 +559,7 @@ sub sendmail {
 	
 	$maildata = "/tmp/" .$id. ".mail";
 	$sigmaildata = "$maildata" . ".sig";
-	$from_address = $from_address;
+	$c_from_address = $from_address;
 	$to_address = "$email";
 	$mail_host = 'localhost';
 	
@@ -575,19 +576,19 @@ sub sendmail {
 	$subject =~ s/%time%/$sub_time/;
 	$subject =~ s/%hour%/$sub_hour/;
 	$subject =~ s/%day%/$sub_day/;
-	$subject = $subject_prefix . $subject;
+	$subject = $c_subject_prefix . $subject;
 
 	if ($gpg_enabled == 1) {
 		# Encrypt the mail with gnupg 
 		$gpg = new GnuPG();
 		$gpg->clearsign( plaintext => "$maildata", output => "$sigmaildata",
-	                     armor => 1, passphrase => $passphrase
+	                     armor => 1, passphrase => $c_passphrase
 	                     );
 	}
 	
 	#### Create the multipart container
 	$msg = MIME::Lite->new (
-		From => $from_address,
+		From => $c_from_address,
 		To => $to_address,
 		Subject => $subject,
 		Type => 'multipart/mixed'

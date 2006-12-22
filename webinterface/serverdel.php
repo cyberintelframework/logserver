@@ -26,7 +26,7 @@ header("Cache-control: private");
 
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
-  $address = getaddress($web_port);
+  $address = getaddress();
   header("location: ${address}login.php");
   exit;
 }

@@ -64,8 +64,8 @@ if (isset($tainted['sort'])) {
 
 if (isset($clean['selview'])) {
   $selview = $clean['selview'];
-} elseif (isset($selview)) {
-  $selview = intval($selview);
+} elseif (isset($c_selview)) {
+  $selview = intval($c_selview);
 }
 
 if (isset($clean['m'])) {

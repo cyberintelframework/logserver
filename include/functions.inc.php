@@ -313,10 +313,8 @@ function genpass($length = 8) {
     $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
 
     # we don't want this character if it's already in the password
-    if (!strstr($password, $char)) {
-      $password .= $char;
-      $i++;
-    }
+    $password .= $char;
+    $i++;
   }
   # done!
   return $password;

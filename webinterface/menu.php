@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 16-11-2006                       #
+# Version 1.04.05                  #
+# 21-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Fixed a redirection bug with the $url variable
 # 1.04.04 Added server info page
 # 1.04.03 Changed REQUEST_URI to SCRIPT_NAME for $url
 # 1.04.02 Added JavaScript functions submitSearchTemplate(), submitSearchTemplateFromResults(), URLDecode()
@@ -31,7 +32,7 @@ include '../include/variables.inc.php';
 
 $absfile = $_SERVER['SCRIPT_NAME'];
 $file = basename($absfile);
-$address = getaddress($web_port);
+$address = getaddress();
 
 if ($file != "login.php") {
   if (isset($_SESSION['s_admin'])) {
@@ -42,7 +43,7 @@ if ($file != "login.php") {
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);
-      header("location: ${address}login.php?url=$url");
+      header("location: ${address}login.php?strip_html_url=$url");
       exit;
     }
   } else {
@@ -72,149 +73,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
   echo "<head>\n";
     echo "<title>SURFnet IDS</title>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
-    echo "<script src='${address}include/md5.js' type='text/javascript'>\n";
-    echo "</script>\n";
+    echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
-    echo "<script type='text/javascript' language='javascript'>\n";
-?>
-    function changeId(id) {
-      if (document.getElementById(id).style.display == 'none') {
-        // Make this element visible
-        document.getElementById(id).style.display='';
-        document.getElementById(id+'_img').src='<?=${address};?>images/minus.gif';
-      } else {
-        // Make this element invisible
-        document.getElementById(id).style.display='none';
-        document.getElementById(id+'_img').src='<?=${address};?>images/plus.gif';
-      }
-    }
-    function updateThreshold() {
-                var target = document.getElementById('threshold_user');
-                target.innerHTML = 'Threshold: <br />\n';
-                target.innerHTML += 'if [ ';
-                target.innerHTML += document.getElementById('target')[document.getElementById('target').selectedIndex].innerHTML;
-                target.innerHTML += ' ' + document.getElementById('operator')[document.getElementById('operator').selectedIndex].innerHTML + ' ';
-                if (document.getElementById('value').selectedIndex == 0) {
-                        target.innerHTML += 'Average';
-                } else {
-                        target.innerHTML += (document.getElementById('value_user').value * 1); // Numeric value
-                }
-                target.innerHTML += ' ] for ';
-                target.innerHTML += document.getElementById('timespan')[document.getElementById('timespan').selectedIndex].innerHTML;
-                target.innerHTML += ' with a deviation of ';
-                target.innerHTML += (document.getElementById('deviation').value * 1) + ' %'; // Numeric value
-                target.innerHTML += '<br />\n';
-                target.innerHTML += '&nbsp;then send e-mail report with priority ';
-                target.innerHTML += document.getElementById('priority')[document.getElementById('priority').selectedIndex].innerHTML + '';
-    }
-
-    function showTab(sel) {
-      var x;
-      var mytabs = new Array();
-      mytabs[0] = "arp_stats";
-      mytabs[1] = "arp_cache";
-      mytabs[2] = "arp_logstats";
-      mytabs[3] = "arp_poison";
-      for (x in mytabs)
-      {
-        if (sel == mytabs[x]) {
-          var but = 'button_' + sel;
-          document.getElementById(sel).style.display='';
-          document.getElementById(but).className='tabsel';
-        } else {
-          var but = 'button_' + mytabs[x];
-          document.getElementById(mytabs[x]).style.display='none';
-          document.getElementById(but).className='tab';
-        }
-        document.getElementById(but).blur();
-      }
-    }
-    
-    function submitSearchTemplate() {
-    	var form = document.getElementById('searchform');
-    	//searchtemplate_title
-    	var title = prompt('Please submit a title for this searchtemplate');
-    	if ((title == '') || (title == null) || (title == 'undefined')) {
-    		alert('Invalid title.');
-    		return false;
-    	}
-    	if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
-    		document.getElementById('searchtemplate_title').value = title;
-		alert('test');
-    		document.searchform.action = 'searchtemplate.php';
-    		document.searchform.submit();
-    	} else return false;
-    }
-    
-    function submitSearchTemplateFromResults(url) {
-    	//searchtemplate_title
-    	var title = prompt('Please submit a title for this searchtemplate');
-    	if ((title == '') || (title == null) || (title == 'undefined')) {
-    		alert('Invalid title.');
-    		return false;
-    	}
-    	if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
-    		url = '/searchtemplate.php?' + url + '&searchtemplate_title=' + title;
-    		url = URLDecode(url);
-			window.location.href = url;
-    		return true;
-    	} else return false;
-    }
-    
-    function URLDecode(encoded)
-	{
-	   // Replace + with ' '
-	   // Replace %xx with equivalent character
-	   // Put [ERROR] in output if %xx is invalid.
-	   var HEXCHARS = "0123456789ABCDEFabcdef"; 
-	   var plaintext = "";
-	   var i = 0;
-	   while (i < encoded.length) {
-	       var ch = encoded.charAt(i);
-		   if (ch == "+") {
-		       plaintext += " ";
-			   i++;
-		   } else if (ch == "%") {
-				if (i < (encoded.length-2) 
-						&& HEXCHARS.indexOf(encoded.charAt(i+1)) != -1 
-						&& HEXCHARS.indexOf(encoded.charAt(i+2)) != -1 ) {
-					plaintext += unescape( encoded.substr(i,3) );
-					i += 3;
-				} else {
-					alert( 'Bad escape combination near ...' + encoded.substr(i) );
-					plaintext += "%[ERROR]";
-					i++;
-				}
-			} else {
-			   plaintext += ch;
-			   i++;
-			}
-		} // while
-	   return plaintext;
-	}
-
-        function show_hide_column(col_no) {
-          var stl;
-
-          var tbl  = document.getElementById('malwaretable');
-          var rows = tbl.getElementsByTagName('tr');
-
-          for (var row=0; row<rows.length;row++) {
-            var cels = rows[row].getElementsByTagName('td');
-            var status = cels[col_no].style.display;
-            var but = 'scanner_' + col_no;
-            if (status == '') {
-              cels[col_no].style.display='none';
-              document.getElementById(but).className='tab';
-            } else {
-              cels[col_no].style.display='';
-              document.getElementById(but).className='tabsel';
-            }
-          }
-        }
-
-<?php
-    echo "</script>\n";
+    echo "<script type='text/javascript' src='${address}include/surfnetids.js'></script>\n";
   echo "</head>\n";
   echo "<body>\n";
     echo "<div id='overDiv' style='position:absolute; visibility:hidden; z-index:1000;'></div>\n";

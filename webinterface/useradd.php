@@ -30,7 +30,7 @@ header("Cache-control: private");
 
 # Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
-  $address = getaddress($web_port);
+  $address = getaddress();
   pg_close($pgconn);
   header("location: ${address}login.php");
   exit;
@@ -132,7 +132,7 @@ if ($err != 1) {
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
-  if ($default_mail_sensor == 1) {
+  if ($c_default_mail_sensor == 1) {
     $sql_getuid = "SELECT id FROM login WHERE username = '$username'";
     $debuginfo[] = $sql_getuid;
     $result_getuid = pg_query($pgconn, $sql_getuid);

@@ -50,8 +50,9 @@ use GnuPG qw( :algo );
 # Variables used
 ####################
 do '/etc/surfnetids/surfnetids-log.conf';
+$c_logfile = $logfile;
 $logfile =~ s|.*/||;
-if ($logstamp == 1) {
+if ($c_logstamp == 1) {
   $day = localtime->mday();
   if ($day < 10) {
     $day = "0" . $day;
@@ -61,13 +62,12 @@ if ($logstamp == 1) {
     $month = "0" . $month;
   }
   $year = localtime->year() + 1900;
-  if ( ! -d "$surfidsdir/log/$day$month$year" ) {
-    mkdir("$surfidsdir/log/$day$month$year");
+  if ( ! -d "$c_surfidsdir/log/$day$month$year" ) {
+    mkdir("$c_surfidsdir/log/$day$month$year");
   }
-  $logfile = "$surfidsdir/log/$day$month$year/$logfile";
-}
-else {
-  $logfile = "$surfidsdir/log/$logfile";
+  $logfile = "$c_surfidsdir/log/$day$month$year/$logfile";
+} else {
+  $logfile = "$c_surfidsdir/log/$logfile";
 }
 
 ##################

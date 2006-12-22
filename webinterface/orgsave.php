@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-12-2006                       #
-# Kees Trippelvitz                 #
+# Version 1.04.05                  #
+# 22-12-2006                       #
+# Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added more checks on the ranges
 # 1.04.04 Changed data input handling
 # 1.04.03 Fixed a bug where it wouldn't save organisation changes
 # 1.04.02 Added identifier type
@@ -28,7 +29,7 @@ header("Cache-control: private");
 
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
-  $address = getaddress($web_port);
+  $address = getaddress();
   header("location: ${address}login.php");
   exit;
 }
@@ -114,7 +115,8 @@ if ($type == "ident") {
 } elseif ($type == "md5") {
   if (isset($clean['orgid'])) {
     $orgid = $clean['orgid'];
-    $ident = genpass(16);
+    $ident = genpass(32);
+    $ident = md5($ident);
     $identtype = 1;
   } else {
     $err = 1;
@@ -125,7 +127,15 @@ if ($type == "ident") {
 if ($err != 1) {
   if ($type == "ident") {
     $ranges = str_replace("\r", ";", $ranges);
-    $ranges = str_replace("\n", "", $ranges);
+    $ranges = str_replace("\n", ";", $ranges);
+    $ranges = preg_replace("/;+/", ";", $ranges);
+    $ranges = preg_replace("/ +;/", ";", $ranges);
+    $ranges = preg_replace("/; +/", ";", $ranges);
+    $ranges = preg_replace("/^ +/", "", $ranges);
+    $ranges = preg_replace("/ +$/", "", $ranges);
+    $ranges = preg_replace("/^;+/", "", $ranges);
+    $ranges = preg_replace("/;+$/", "", $ranges);
+
     $sql = "UPDATE organisations SET organisation = '" .$orgname. "', ranges = '" .$ranges. "' WHERE id = $orgid";
     $execute = pg_query($pgconn, $sql);
 
@@ -151,7 +161,7 @@ if ($err != 1) {
     $sql = "INSERT INTO organisations (organisation) VALUES ('$orgname')";
     $execute = pg_query($pgconn, $sql);
   } elseif ($type == "md5") {
-    $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $identftype)";
+    $sql = "INSERT INTO org_id (identifier, orgid, type) VALUES ('$ident', $orgid, $identtype)";
     $execute = pg_query($pgconn, $sql);
   }
   $m = 1;

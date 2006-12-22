@@ -270,34 +270,6 @@ function check_byte(b_val,next_field) {
 	  ?>
 </div>
 </div>
-<?
-   $sql_templates = "SELECT * FROM search_templates";
-   $debuginfo[] = $sql_templates;
-    $result_templates = pg_query($pgconn, $sql_templates);
-    
-    echo "</td>\n";
-    echo "<td width='50'></td>\n";
-    echo "<td valign='top'>\n";
-#      echo "<table class='datatable'>\n";
-#        echo "<tr>\n";
-#          echo "<td width='450'><h4>Templates</h4></td>\n";
-#        echo "</tr>\n";
-#        echo "<tr>\n";
-#          echo "<td>\n";
-#            echo "<select name='templates' style='width: 300px;'>\n";
-#              while ($row = pg_fetch_assoc($result_templates)) {
-#                $id = $row['id'];
-#                $name = $row['name'];
-#                echo "<option value='$id'>$name</option>\n";
-#              }
-#            echo "</select>\n";
-#          echo "</td>\n";
-#        echo "</tr>\n";
-#      echo "</table>\n";
-    echo "</td>\n";
-  echo "</tr>\n";
-echo "</table>\n";
-?>
 <script type="text/javascript">
 function change_form(index) {
 	if (index == 0) {

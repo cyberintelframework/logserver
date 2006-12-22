@@ -117,7 +117,7 @@ if ($err == 0) {
     echo "<tr class='datatr'>\n";
       echo "<td class='dataheader' width='100'>Binary</td><td class='datatd'>";
         echo "$bin_name";
-        if (file_exists("$surfidsdir/binaries/$bin_name") && $s_admin == 1) {
+        if (file_exists("$c_surfidsdir/binaries/$bin_name") && $s_admin == 1) {
           echo "&nbsp;&nbsp;[<a href='download.php?md5_binname=$bin_name'>download</a>]\n";
         }
       echo "</td>\n";

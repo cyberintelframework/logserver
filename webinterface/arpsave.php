@@ -23,7 +23,7 @@ header("Cache-control: private");
 
 # Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
-  $address = getaddress($web_port);
+  $address = getaddress();
   header("location: ${address}login.php");
   exit;
 }
@@ -66,7 +66,7 @@ if (!preg_match("/^..:..:..:..:..:..$/", $f_mac)) {
 
 # a check
 if (isset($_GET['a'])) {
-  $a = stripinput($_GET['a']);
+  $a = $_GET['a'];
   if (empty($a)) {
     $err = 1;
     $m = 84;

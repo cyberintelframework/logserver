@@ -34,9 +34,9 @@ if (!in_array ("gd", $phpext)){
     echo "</p>\n";
   }
 }
-?>
 
-<h4>SURFnet IDS 1.02</h4>
+echo "<h4>SURFnet IDS $c_version</h4>\n";
+?>
 <ul>
   <li>Enhanced search engine</li>
   <li>Enhanced administration interface</li>

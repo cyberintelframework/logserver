@@ -44,7 +44,7 @@ do '/etc/surfnetids/surfnetids-log.conf';
 ##################
 
 # Connect to the database (dbh = DatabaseHandler or linkserver)
-$dbh = DBI->connect($dsn, $pgsql_user, $pgsql_pass);
+$dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass);
 # Check if the connection to the database did not fail.
 if (! $dbh eq "") {
   # Update Dialogues:

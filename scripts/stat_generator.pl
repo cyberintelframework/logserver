@@ -40,8 +40,10 @@ use Time::Local;
 # Variables used
 ##################
 do '/etc/surfnetids/surfnetids-log.conf';
+
+$logfile = $c_logfile;
 $logfile =~ s|.*/||;
-if ($logstamp == 1) {
+if ($c_logstamp == 1) {
   $day = localtime->mday();
   if ($day < 10) {
     $day = "0" . $day;
@@ -51,13 +53,12 @@ if ($logstamp == 1) {
     $month = "0" . $month;
   }
   $year = localtime->year() + 1900;
-  if ( ! -d "$surfidsdir/log/$day$month$year" ) {
-    mkdir("$surfidsdir/log/$day$month$year");
+  if ( ! -d "$c_surfidsdir/log/$day$month$year" ) {
+    mkdir("$c_surfidsdir/log/$day$month$year");
   }
-  $logfile = "$surfidsdir/log/$day$month$year/$logfile";
-}
-else {
-  $logfile = "$surfidsdir/log/$logfile";
+  $logfile = "$c_surfidsdir/log/$day$month$year/$logfile";
+} else {
+  $logfile = "$c_surfidsdir/log/$logfile";
 }
 
 $gen_year = $ARGV[0];
@@ -116,11 +117,11 @@ $ts = getts();
 print LOG "[$ts] Starting stat_generator.pl for year $gen_year and month $gen_month\n";
 
 # Connect to the database (dbh = DatabaseHandler or linkserver)
-$dbh = DBI->connect($dsn, $pgsql_user, $pgsql_pass);
+$dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass);
 $ts = getts();
 # Check if the connection to the database did not fail.
 if (! $dbh eq "") {
-  print LOG "[$ts] Connecting to $pgsql_dbname with DSN: $dsn\n";
+  print LOG "[$ts] Connecting to $c_pgsql_dbname with DSN: $c_dsn\n";
   print LOG "[$ts] Connect result: $dbh\n";
   
   # First check if this month/year isn't used for backup already
@@ -305,10 +306,9 @@ if (! $dbh eq "") {
        }
      }
   }
-}
-else {
+} else {
   $ts = getts();
-  print LOG "[$ts] Error connecting to database with DSN: $dsn\n";
+  print LOG "[$ts] Error connecting to database with DSN: $c_dsn\n";
 }
 # Closing database connection.
 #$dbh->disconnect;

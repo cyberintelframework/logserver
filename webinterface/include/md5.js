@@ -8,50 +8,6 @@
  */
 
 /*
- * SURFnet added functions for useradmin.php
-*/
-
-function encrypt_pass() {
-  var password1 = document.usermodify.elements[1].value;
-  var password2 = document.usermodify.elements[3].value;
-  if (password1 == password2) {
-    if (password1 != "" || (password1 == "" && password2 == "")) {
-      if (password1 != '') {
-        var pass1 = document.usermodify.elements[2].value=hex_md5(document.usermodify.elements[1].value);
-      }
-      if (password2 != '') {
-        var pass2 = document.usermodify.elements[4].value=hex_md5(document.usermodify.elements[3].value);
-      }
-      return true;
-    }
-    else {
-      alert('Password field was empty!');
-      document.usermodify.elements[1].value = "";
-      document.usermodify.elements[2].value = "";
-      document.usermodify.elements[3].value = "";
-      document.usermodify.elements[4].value = "";
-      return false;
-    }
-  }
-  else {
-    alert('Passwords did not match');
-    document.usermodify.elements[1].value = "";
-    document.usermodify.elements[2].value = "";
-    document.usermodify.elements[3].value = "";
-    document.usermodify.elements[4].value = "";
-    return false;
-  }
-}
-
-function generatep() {
-  var pass = hex_md5(document.login.elements[0].value);
-  var serverhash = document.login.elements[1].value;
-  var check = pass + serverhash;
-
-  document.login.md5_pass.value = hex_md5(check);
-}
-
-/*
  * Configurable variables. You may need to tweak these to be compatible with
  * the server-side, but the defaults work in most cases.
  */

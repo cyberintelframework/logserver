@@ -35,6 +35,12 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
+$allowed_get = array(
+		"strip_html_url"
+);
+$check = extractvars($_GET, $allowed_get);
+#debug_input();
+
 $f_user = $clean['user'];
 $f_pass = $clean['pass'];
 
@@ -48,7 +54,7 @@ if ($numrows_user == 1) {
   $access = $row['access'];
   $pass = $row['password'];
 
-  if ($login_method == 1) {
+  if ($c_login_method == 1) {
     $checkstring = $pass;
   } else {
     $serverhash = $row['serverhash'];
@@ -102,7 +108,7 @@ if ($numrows_user == 1) {
     while ($row = pg_fetch_assoc($result_session)) {
       $db_ts = $row['ts'];
       $db_id = $row['id'];
-      $ts_check = $timestamp - $conf_session_timeout;
+      $ts_check = $timestamp - $c_session_timeout;
       if ($db_ts < $ts_check) {
         $sql_del_session = "DELETE FROM sessions WHERE id = '$db_id'";
         $result_del = pg_query($sql_del_session);
@@ -120,7 +126,7 @@ if ($numrows_user == 1) {
     if (isset($clean['url'])) {
       $url = $clean['url'];
       pg_close($pgconn);
-      $address = getaddress($web_port);
+      $address = getaddress();
       header("location: $address$url");
     } else {
       pg_close($pgconn);

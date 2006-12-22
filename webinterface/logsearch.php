@@ -61,6 +61,12 @@ if (in_array($rapport, $ar_non_headers)) {
 } else {
   include("menu.php");
   set_title("Search");
+
+  ### GEOIP STUFF
+  if ($c_geoip_enable == 1) {
+    include '../include/' .$c_geoip_module;
+    $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
+  }
 }
 
 $allowed_get = array(
@@ -93,12 +99,13 @@ $allowed_get = array(
 		"order",
 		"orderm",
 		"int_page",
-		"int_c"
+		"int_c",
+		"int_binid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
-if (($rapport != "chart_sensor") && ($rapport != "chart_attack") && (!in_array($rapport, $ar_non_headers))) {
+if (($rapport != "chart_sensor") && ($rapport != "chart_attack") && (!in_array($rapport, $ar_non_headers)) && $rapport != "idmef") {
 	echo "<div id=\"search_wait\">Search is being processed...<br /><br />Please be patient.</div>\n";
 }
 
@@ -233,8 +240,8 @@ if (in_array($ts_select, $ar_valid_values)) {
 	$ts_start = date("d-m-Y H:i:s", $dt);
 	$ts_end = date("d-m-Y H:i:s", time());
 } else {
-	$ts_start = trim(pg_escape_string(strip_tags($tainted["tsstart"])));
-	$ts_end = trim(pg_escape_string(strip_tags($tainted["tsend"])));
+	$ts_start = $clean["tsstart"];
+	$ts_end = $clean["tsend"];
 }
 
 ####################
@@ -250,11 +257,16 @@ if (isset($clean['sev'])) {
 # Binary name
 ####################
 $bin_pattern = '/^[a-zA-Z0-9%]{1,33}$/';
-if (preg_match($bin_pattern, $tainted['bin'])) {
-  $f_bin = $tainted['bin'];
+if (preg_match($bin_pattern, $tainted['binname'])) {
+  $f_bin = $tainted['binname'];
 } else {
   $f_bin = "";
 }
+
+####################
+# Binary ID
+####################
+$f_binid = $clean['binid'];
 
 ####################
 # Attack type
@@ -350,6 +362,7 @@ if ($full_destination_ip > 0) {
 # Start timestamp
 ####################
 if (!empty($ts_start)) {
+	printer($ts_start);
 	// Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
 	list($date, $time) = explode(" ", $ts_start);
 	list($day, $mon, $year) = explode("-", $date);
@@ -461,14 +474,25 @@ if (!empty($f_filename)) {
 }
 
 ####################
-# Filename
+# Binary Name
 ####################
-if (!empty($f_bin)) {
+if (!empty($f_binname)) {
 	add_db_table("details");
         add_db_table("uniq_binaries");
 	$where[] = "details.type = 8";
         $where[] = "details.text = uniq_binaries.name";
-	$where[] = "uniq_binaries.name LIKE '$f_bin'";
+	$where[] = "uniq_binaries.name LIKE '$f_binname'";
+}
+
+####################
+# Binary ID
+####################
+if (!empty($f_binid)) {
+	add_db_table("details");
+        add_db_table("uniq_binaries");
+	$where[] = "details.type = 8";
+        $where[] = "details.text = uniq_binaries.name";
+	$where[] = "uniq_binaries.id = $f_binid";
 }
 
 if ($rapport == "idmef") {
@@ -512,14 +536,12 @@ if ($rapport == "idmef") {
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
           $attack = $attacks_ar[$text]["Attack"];
-        }
-        elseif ($sev == 16) {
+        } elseif ($sev == 16) {
           $dia_ar = array('attackid' => $id);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
           $malware = basename($text);
-        }
-        elseif ($sev == 32) {
+        } elseif ($sev == 32) {
           $dia_ar = array('attackid' => $id, 'type' => 8);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $bin = $dia_result_ar[0]['text'];
@@ -635,14 +657,12 @@ if ($rapport == "pdf") {
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
           $attack = $attacks_ar[$text]["Attack"];
-        }
-        elseif ($sev == 16) {
+        } elseif ($sev == 16) {
           $dia_ar = array('attackid' => $id);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
           $malware = basename($text);
-        }
-        elseif ($sev == 32) {
+        } elseif ($sev == 32) {
           $dia_ar = array('attackid' => $id, 'type' => 8);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $bin = $dia_result_ar[0]['text'];
@@ -806,7 +826,7 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
 	// Don't use pg_num_rows, slow's down factor 2-4!
 	$num_rows = pg_result($query_count, 0);
     ### Check for config option.
-    if ($search_cache == 1) {
+    if ($c_search_cache == 1) {
     	$_SESSION["search_num_rows"] = $num_rows;
     }
 }
@@ -940,7 +960,7 @@ while ($row = pg_fetch_assoc($result)) {
   $result_details = pg_query($pgconn, $sql_details);
   $numrows_details = pg_num_rows($result_details);
 
-  if ($enable_pof == 1) {
+  if ($c_enable_pof == 1) {
     $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "'";
     $result_finger = pg_query($pgconn, $sql_finger);
     $numrows_finger = pg_num_rows($result_finger);
@@ -960,17 +980,31 @@ while ($row = pg_fetch_assoc($result)) {
     }
     echo "<td class='datatd'>$ts</td>\n";
     echo "<td class='datatd'>$severity</td>\n";
+    echo "<td class='datatd'>";
     if ($numrows_finger != 0) {
-      $img = "$surfidsdir/webinterface/images/$os.gif";
-      if (file_exists($img)) {
-        echo "<td class='datatd'><img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
+      $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
+      if (file_exists($osimg)) {
+        echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
       } else {
-        echo "<td class='datatd'><img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
+        echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
       }
     } else {
-      echo "<td class='datatd'><img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
+      echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
     }
-    if ($hide_dest_ip == 1 && $s_admin == 0) {
+
+    if ($c_geoip_enable == 1) {
+      $countryid = geoip_country_id_by_addr($gi, $source);
+      $countrycode = strtolower($gi->GEOIP_COUNTRY_CODES[$countryid]);
+      $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+      if (file_exists($cimg)) {
+        $country = $gi->GEOIP_COUNTRY_NAMES[$countryid];
+        echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+      } else {
+        echo "<img src='images/worldflags/flag.gif' onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
+      }
+    }
+    echo "<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
+    if ($c_hide_dest_ip == 1 && $s_admin == 0) {
       $range_check = matchCIDR($dest, $ranges_ar);
       if ($range_check == 1) {
         echo "<td class='datatd'>$dest:$dport</td>\n";
@@ -1053,11 +1087,11 @@ pg_close($pgconn);
 
 debug_sql();
 
-if ($searchtime == 1) {
+if ($c_searchtime == 1) {
   $timeend = microtime_float();
   $gen = $timeend - $timestart;
   $mili_gen = number_format(($gen * 1000), 0);
-  echo "<br />Page rendered in  $mili_gen ms.<br />";
+  echo "<br />Page rendered in $mili_gen ms.<br />";
 }
 
 ?>
