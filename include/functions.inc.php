@@ -9,6 +9,7 @@
 
 #############################################
 # Changelog:
+# 1.04.05 Removed the stripinput function
 # 1.04.04 Changed the debug function
 # 1.04.03 Added getPortDescr() function
 # 1.04.02 Added showSearchTemplates() function
@@ -237,11 +238,12 @@ function cleansql($s_sql) {
 }
 
 function checkSID(){
-  global $c_checksession;
+  global $c_checksession_ua;
+  global $c_checksession_ip;
   $err = 0;
   if ($c_chksession_ip == 1) {
     $sid = session_id();
-    $sql_checksid = "SELECT ip FROM sessions WHERE sid = '$sid'";
+    $sql_checksid = "SELECT ip, useragent FROM sessions WHERE sid = '$sid'";
     $result_check = pg_query($sql_checksid);
     $numrows_check = pg_num_rows($result_check);
     if ($numrows_check != 0) {
@@ -278,7 +280,8 @@ function checkSID(){
   }
 }
 
-function getaddress($web_port) {
+function getaddress() {
+  global $c_web_port;
   $absfile = $_SERVER['SCRIPT_NAME'];
   $file = basename($absfile);
   $dir = str_replace($file, "", $absfile);
@@ -290,17 +293,8 @@ function getaddress($web_port) {
     $http = "https";
   }
   $servername = $_SERVER['SERVER_NAME'];
-  $address = "$http://$servername:$web_port/$dir";
+  $address = "$http://$servername:$c_web_port/$dir";
   return $address;
-}
-
-# Removes certain strings from the input. This is used to prevent XSS attacks.
-function stripinput($input) {
-  $pattern_ar = array("<script>", "</script>", "<", "</", ">", "%");
-  foreach($pattern_ar as $pattern) {
-    $input = str_replace($pattern, '', $input);
-  }
-  return $input;
 }
 
 # generates a random string of 8 characters

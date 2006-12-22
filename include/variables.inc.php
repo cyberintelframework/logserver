@@ -308,6 +308,9 @@ $v_errors = array(
 			),
 	useredit.php => array(
 				96 => "Invalid or missing User ID!"
+			),
+	virusadmin.php => array(
+				91 => "You don't have sufficient rights to perform the requested action!"
 			)
 );
 
