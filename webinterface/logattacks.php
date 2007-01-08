@@ -151,7 +151,7 @@ if ($err != 1) {
     $sql_down .= " $sql_where ";
     $sql_down .= " GROUP BY uniq_binaries.id, details.text ";
     $sql_down .= " ORDER BY total DESC ";
-    $debuginfo[] = "$sql_down";
+#    $debuginfo[] = "$sql_down";
     $result_down = pg_query($pgconn, $sql_down);
     $numrows_down = pg_num_rows($result_down);
 
@@ -205,6 +205,11 @@ if ($err != 1) {
 
               # Starting the count for the viri.
               $virus_count_ar[$virus] = $virus_count_ar[$virus] + $count;
+#              if ($scanner_id == 4) {
+#                $debuginfo[] = "$sql_virus";
+#                echo "VIRUS: <br />";
+#                printer($virus);
+#              }
 
               if ($virus == "Not scanned") {
                 $ignore[$scanner_id]++;
@@ -229,8 +234,11 @@ if ($err != 1) {
             $name = $scanners['name'];
 
             if ($total[$id] == 0) {
-            echo "<td class='dataheader'>0 scanned</td>\n";
+              echo "<td class='dataheader'>0 scanned</td>\n";
             } else {
+              if (!$found[$id]) {
+                $found[$id] = 0;
+              }
               $perc[$id] = floor($found[$id] / $total[$id] * 100);
               echo "<td class='dataheader'>$found[$id] / $total[$id] = $perc[$id] %</td>\n";
             }
@@ -242,8 +250,13 @@ if ($err != 1) {
   }
 }
 
+#echo "FOUND: <br />\n";
+#printer($found);
+#echo "TOTAL: <br />\n";
+#printer($total);
+
 # Debug info
-debug_sql();
+#debug_sql();
 
 pg_close($pgconn);
 ?>

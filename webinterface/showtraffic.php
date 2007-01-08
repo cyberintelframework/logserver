@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 15-12-2006                       #
-# Kees Trippelvitz                 #
+# Version 1.04.03                  #
+# 05-01-2007                       #
+# Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.03 Added header content-disposition
 # 1.04.02 Changed data input handling
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Released as part of the 1.03 package
@@ -38,6 +39,7 @@ $check = extractvars($_GET, $allowed_get);
 header("Content-type: image/png");
 header("Cache-control: no-cache");
 header("Pragma: no-cache");
+header("Content-disposition: attachment; filename=trafficstats.jpg");
 
 if (isset($clean['imgid'])) {
   $imgid = $clean['imgid'];

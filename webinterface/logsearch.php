@@ -9,6 +9,7 @@
 
 #########################################################################
 # Changelog:
+# 1.04.09 Changed strip_html_escape_bin to strip_html_escape_binname
 # 1.04.08 Changed data input handling
 # 1.04.07 Bugfix with binaries table linking
 # 1.04.06 Changed debug stuff
@@ -87,7 +88,7 @@ $allowed_get = array(
 		"strip_html_escape_tsstart",
 		"strip_html_escape_tsend",
 		"int_sev",
-		"strip_html_escape_bin",
+		"strip_html_escape_binname",
 		"int_attack",
 		"int_virus",
 		"strip_html_escape_virustxt",
@@ -257,10 +258,10 @@ if (isset($clean['sev'])) {
 # Binary name
 ####################
 $bin_pattern = '/^[a-zA-Z0-9%]{1,33}$/';
-if (preg_match($bin_pattern, $tainted['binname'])) {
-  $f_bin = $tainted['binname'];
+if (preg_match($bin_pattern, $clean['binname'])) {
+  $f_binname = $clean['binname'];
 } else {
-  $f_bin = "";
+  $f_binname = "";
 }
 
 ####################
@@ -477,6 +478,7 @@ if (!empty($f_filename)) {
 # Binary Name
 ####################
 if (!empty($f_binname)) {
+	echo "BLA<br />\n";
 	add_db_table("details");
         add_db_table("uniq_binaries");
 	$where[] = "details.type = 8";
@@ -993,11 +995,14 @@ while ($row = pg_fetch_assoc($result)) {
     }
 
     if ($c_geoip_enable == 1) {
-      $countryid = geoip_country_id_by_addr($gi, $source);
-      $countrycode = strtolower($gi->GEOIP_COUNTRY_CODES[$countryid]);
+#      $countryid = geoip_country_id_by_addr($gi, $source);
+#      $countrycode = strtolower($gi->GEOIP_COUNTRY_CODES[$countryid]);
+      $record = geoip_record_by_addr($gi, $source);
+      $countrycode = strtolower($record->country_code);
       $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
       if (file_exists($cimg)) {
-        $country = $gi->GEOIP_COUNTRY_NAMES[$countryid];
+        $country = $record->country_name;
+#        $country = $gi->GEOIP_COUNTRY_NAMES[$countryid];
         echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
       } else {
         echo "<img src='images/worldflags/flag.gif' onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
@@ -1041,8 +1046,8 @@ while ($row = pg_fetch_assoc($result)) {
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $bin = $dia_result_ar[0]['text'];
 
-        $sql_bin = "SELECT binaries.bin, binaries.info FROM binaries, uniq_binaries, scanners WHERE uniq_binaries.name = '$bin' ";
-        $sql_bin .= " AND binaries.bin = uniq_binaries.id AND binaries.scanner = scanners.id AND scanners.name = 'ClamAV' ";
+        $sql_bin = "SELECT uniq_binaries.id, uniq_binaries.name FROM binaries, uniq_binaries WHERE uniq_binaries.name = '$bin' ";
+        $sql_bin .= " AND binaries.bin = uniq_binaries.id ";
         $sql_bin .= " ORDER BY timestamp LIMIT 1";
         $result_bin = pg_query($pgconn, $sql_bin);
         $numrows_bin = pg_num_rows($result_bin);
@@ -1050,8 +1055,8 @@ while ($row = pg_fetch_assoc($result)) {
 
         echo "<td class='datatd'>";
         if ($numrows_bin != 0) {
-          $info = $row_bin['bin'];
-          echo "<a href='binaryhist.php?int_binid=$bin'>$info</a>";
+          $binid = $row_bin['id'];
+          echo "<a href='binaryhist.php?int_binid=$binid'>Info</a>";
         } else {
           echo "Suspicious";
         }

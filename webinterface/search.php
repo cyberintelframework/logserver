@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 15-12-2006                       #
+# Version 1.04.06                  #
+# 04-01-2007                       #
 # Peter Arts                       #
 # Modified by Jan van Lith         #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Changed strip_html_escape_bin to strip_html_escape_binname
 # 1.04.05 Changed data input handling
 # 1.04.04 Query tuning
 # 1.04.03 Added Searchtemplates
@@ -228,7 +229,7 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr id="what_5" name="what_5">
   <td class="datatd">Binary:</td>
-  <td class="datatd"><input type="text" name="strip_html_escape_bin" value="<?=$f_bin;?>" /> *</td>
+  <td class="datatd"><input type="text" name="strip_html_escape_binname" value="<?=$f_bin;?>" /> *</td>
  </tr>
  <tr id="what_c2" name="what_c2" style="display:none;">
   <td class="datatd">Chart type:</td>

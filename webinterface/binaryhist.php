@@ -65,22 +65,24 @@ if (isset($tainted['show'])) {
   $show = "top";
 }
 
-$sql_binhist = "SELECT DISTINCT timestamp FROM binaries WHERE bin = $bin_id ORDER BY timestamp";
-$result_binhist = pg_query($pgconn, $sql_binhist);
-$numrows_binhist = pg_num_rows($result_binhist);
+if ($err == 0) {
+  $sql_binhist = "SELECT DISTINCT timestamp FROM binaries WHERE bin = $bin_id ORDER BY timestamp";
+  $result_binhist = pg_query($pgconn, $sql_binhist);
+  $numrows_binhist = pg_num_rows($result_binhist);
 
-$sql_bindet = "SELECT id FROM binaries_detail WHERE bin = $bin_id";
-$result_bindet = pg_query($pgconn, $sql_bindet);
-$numrows_bindet = pg_num_rows($result_bindet);
+  $sql_bindet = "SELECT id FROM binaries_detail WHERE bin = $bin_id";
+  $result_bindet = pg_query($pgconn, $sql_bindet);
+  $numrows_bindet = pg_num_rows($result_bindet);
 
-$debuginfo[] = $sql_binhist;
-$debuginfo[] = $sql_bindet;
+  $debuginfo[] = $sql_binhist;
+  $debuginfo[] = $sql_bindet;
 
-if ($numrows_binhist == 0 && $numrows_bindet == 0) {
-  $err = 1;
-  $m = 91;
-  $m = geterror($m);
-  echo $m;
+  if ($numrows_binhist == 0 && $numrows_bindet == 0) {
+    $err = 1;
+    $m = 91;
+    $m = geterror($m);
+    echo $m;
+  }
 }
 
 if ($err == 0) {
