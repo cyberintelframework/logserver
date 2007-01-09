@@ -154,9 +154,6 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           if ($s_admin == 1) {
             echo "<li><a href='${address}serverstats.php' onmouseover='return overlib(\"$popup_stats\");' onmouseout='return nd();'>Server Info</a></li>\n";
           }
-          if ($s_admin == 1) {
-            echo "<li><a href='${address}virusadmin.php' onmouseover='return overlib(\"$popup_scanner\");' onmouseout='return nd();'>Scanner Admin</a></li>\n";
-          }
         echo "</ul>\n";
       echo "</div>\n";
       echo "<div class='filler'></div>\n";

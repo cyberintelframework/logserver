@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 09-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.04 Fixed a bug when selecting all data and with top filenames for organisation
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
@@ -99,7 +100,7 @@ if ($b == "all") {
   $tsquery = "";
 } else {
   $dateqs = "&amp;int_from=$start&amp;int_to=$end";
-  $tsquery = "timestamp >= $start AND timestamp <= $end";
+  $tsquery = " timestamp >= $start AND timestamp <= $end";
 }
 
 echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br />\n";
@@ -735,8 +736,10 @@ echo "<table width='100%'>\n";
 
   $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles .= "(SELECT split_part(details.text, '/', 4) as file ";
-    $sql_topfiles .= "FROM details, attacks WHERE ";
-    $sql_topfiles .= "$tsquery ";
+    $sql_topfiles .= "FROM details, attacks WHERE 1 = 1 ";
+    if ($tsquery != "") {
+      $sql_topfiles .= " AND $tsquery ";
+    }
     $sql_topfiles .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
   $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC";
   $result_topfiles = pg_query($pgconn, $sql_topfiles);
@@ -745,8 +748,10 @@ echo "<table width='100%'>\n";
 
   $sql_topfiles_org = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles_org .= "(SELECT split_part(details.text, '/', 4) as file ";
-    $sql_topfiles_org .= "FROM details, attacks, sensors WHERE ";
-    $sql_topfiles_org .= "$tsquery ";
+    $sql_topfiles_org .= "FROM details, attacks, sensors WHERE 1 = 1 ";
+    if ($tsquery != "") {
+      $sql_topfiles_org .= " AND $tsquery ";
+    }
     $sql_topfiles_org .= "AND sensors.id = details.sensorid AND sensors.organisation = $q_org ";
     $sql_topfiles_org .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
   $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC";
@@ -766,8 +771,8 @@ echo "<table width='100%'>\n";
             echo "<b>Top 10 filenames of all sensors</b>\n"; // change this into variable to be read from conf
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
-                echo "<td width='10%' class='datatd'>#</td>\n";
-                echo "<td width='80%' class='datatd'>Filename</td>\n";
+                echo "<td width='5%' class='datatd'>#</td>\n";
+                echo "<td width='85%' class='datatd'>Filename</td>\n";
                 echo "<td width='10%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
               $i = 0;
@@ -796,11 +801,12 @@ echo "<table width='100%'>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                    echo "<td width='5%' class='datatd'>#</td>\n";
-                   echo "<td width='20%' class='datatd'>Filename</td>\n";
-                   echo "<td width='65%' class='datatd'>Binary</td>\n";
+                   echo "<td width='85%' class='datatd'>Filename</td>\n";
                    echo "<td width='10%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
-                 $filenameArray = array();
+
+                  $filenameArray = array();
+                  $i = 0;
                   while ($row = pg_fetch_assoc($result_topfiles_org)) {
                     if ($i == $c_topfilenames) {
                       break;
@@ -813,9 +819,8 @@ echo "<table width='100%'>\n";
 
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$file</a></td>\n";
-                      echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$bin'>$bin</a></td>\n";
-                      echo "<td class='datatd'>$count</td>\n";
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$filename</a></td>\n";
+                      echo "<td class='datatd'>$total</td>\n";
                     echo "</tr>\n";
                   }
               echo "</table>\n";

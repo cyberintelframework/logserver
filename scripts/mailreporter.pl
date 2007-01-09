@@ -560,6 +560,7 @@ sub sendmail {
 	$maildata = "/tmp/" .$id. ".mail";
 	$sigmaildata = "$maildata" . ".sig";
 	$c_from_address = $from_address;
+	$replyto = "ids-bounces@surfnet.nl";
 	$to_address = "$email";
 	$mail_host = 'localhost';
 	
@@ -590,6 +591,7 @@ sub sendmail {
 	$msg = MIME::Lite->new (
 		From => $c_from_address,
 		To => $to_address,
+\\		Reply-To => $replyto,
 		Subject => $subject,
 		Type => 'multipart/mixed'
 	) or die "Error creating multipart container: $!\n";
