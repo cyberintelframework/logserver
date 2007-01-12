@@ -53,7 +53,7 @@ $allowed_post = array(
 		"int_gpg"
 );
 $check = extractvars($_POST, $allowed_post);
-debug_input();
+#debug_input();
 
 # Checking MD5sums
 if (isset($clean['pass'])) {
@@ -154,6 +154,6 @@ if ($err != 1) {
   $execute_save = pg_query($pgconn, $sql_save);
 }
 pg_close($pgconn);
-debug_sql();
+#debug_sql();
 header("location: useradmin.php?int_m=$m");
 ?>

@@ -104,7 +104,9 @@ $allowed_get = array(
 		"int_binid"
 );
 $check = extractvars($_GET, $allowed_get);
-debug_input();
+if ($rapport != "idmef" && $rapport != "pdf") {
+  debug_input();
+}
 
 if (($rapport != "chart_sensor") && ($rapport != "chart_attack") && (!in_array($rapport, $ar_non_headers)) && $rapport != "idmef") {
 	echo "<div id=\"search_wait\">Search is being processed...<br /><br />Please be patient.</div>\n";
@@ -363,7 +365,6 @@ if ($full_destination_ip > 0) {
 # Start timestamp
 ####################
 if (!empty($ts_start)) {
-	printer($ts_start);
 	// Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
 	list($date, $time) = explode(" ", $ts_start);
 	list($day, $mon, $year) = explode("-", $date);
@@ -1090,7 +1091,7 @@ if ($rapport == "multi") {
 
 pg_close($pgconn);
 
-debug_sql();
+#debug_sql();
 
 if ($c_searchtime == 1) {
   $timeend = microtime_float();

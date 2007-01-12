@@ -53,7 +53,7 @@ $allowed_post = array(
                 "int_gpg"
 );
 $check = extractvars($_POST, $allowed_post);
-debug_input();
+#debug_input();
 
 # Checking MD5sums
 if (isset($clean['pass'])) {
@@ -62,7 +62,7 @@ if (isset($clean['pass'])) {
   $pass = "";
 }
 if (isset($clean['confirm'])) {
-  $confirm = $clean['confim'];
+  $confirm = $clean['confirm'];
 } else {
   $confirm = "";
 }
@@ -84,6 +84,10 @@ $org = $clean['org'];
 $email = $clean['email'];
 $gpg = $clean['gpg'];
 
+
+if (empty($confirm)) { 
+echo "test";
+}
 ### Password check
 if (empty($pass) || empty($confirm)) { 
   $m = 93;
@@ -148,6 +152,6 @@ if ($err != 1) {
   }
 }
 pg_close($pgconn);
-debug_sql();
+#debug_sql();
 header("location: useradmin.php?int_m=$m");
 ?>

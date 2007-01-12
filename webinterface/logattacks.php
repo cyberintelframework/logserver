@@ -215,7 +215,7 @@ if ($err != 1) {
                 $ignore[$scanner_id]++;
               } elseif ($virus == "Suspicious") {
                 $total[$scanner_id]++;
-                $virus = "<font color='red'>$virus</font>";
+                $virus = "$virus";
               } else {
                 $found[$scanner_id]++;
                 $total[$scanner_id]++;
