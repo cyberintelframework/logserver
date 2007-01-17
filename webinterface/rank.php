@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 09-01-2007                       #
+# Version 1.04.05                  #
+# 17-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.05 Changed some text
 # 1.04.04 Fixed a bug when selecting all data and with top filenames for organisation
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
@@ -230,7 +231,7 @@ echo "<table width='100%'>\n";
           echo "<td width='45%' valign='top'>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
-                echo "<td class='datatd' width='90%'>Total malicious attacks</td>\n";
+                echo "<td class='datatd' width='90%'>Total malicious attacks of all sensors</td>\n";
                 echo "<td class='datatd' width='10%' align='right'>" . nf($total_attacks) . "&nbsp;</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
@@ -238,7 +239,7 @@ echo "<table width='100%'>\n";
                 echo "<td class='datatd'>&nbsp;</td>\n";
               echo "</tr>\n";
               echo "<tr class='dataheader'>\n";
-                echo "<td class='datatd'>Total downloaded malware</td>\n";
+                echo "<td class='datatd'>Total downloaded malware of all sensors</td>\n";
                 echo "<td class='datatd' align='right'>" . nf($total_downloads) . "&nbsp;</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
