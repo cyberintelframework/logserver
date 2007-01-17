@@ -64,7 +64,6 @@ $groupbysensorid = "";
 $groupbyattacks = "";
 $selectattacks = "";
 $selectsensorid = "";
-$typecheck = 0;
 $where = "";
 
 ########################
@@ -77,7 +76,6 @@ if (@is_array($tainted['severity'])) {
     if ($sev == 99) {
       $title .= "All attacks";
       $allsev = 1;
-      $typecheck = 1;
     } else {
       $title .= $severity_ar[$sev];
       $where .= " AND attacks.severity = $sev";
@@ -103,7 +101,6 @@ if (@is_array($tainted['severity'])) {
   if ($sev == 99) {
     $title .= "All attacks";
     $allsev = 1;
-    $typecheck = 1;
   } else {
     $title .= $severity_ar[$sev];
     $where .= " AND attacks.severity = $sev";
@@ -113,7 +110,7 @@ if (@is_array($tainted['severity'])) {
 ########################
 # Attack Types
 ########################
-if ($typecheck == 1) {
+if ($allsev == 1) {
   if (@is_array($tainted['attack'])) {
     $count = count($tainted['attack']);
     if ($count == 1) {
@@ -131,8 +128,8 @@ if ($typecheck == 1) {
         $attackname = str_replace("Dialogue", "", $dianame);
         $title .= " ($attackname)";
         $where .= " AND details.text = '$dianame'";
+        $where .= " AND attacks.severity = 1 ";
       } else {
-        echo "E<br />\n";
         $allattacks = 1;
       }
     } else {
@@ -178,11 +175,11 @@ if ($typecheck == 1) {
 
       $title .= " ($attackname)";
       $where .= " AND details.text = $dianame";
+      $where .= " AND attacks.severity = 1 ";
     } else {
       $allattacks = 1;
     }
   }
-  $where .= " AND attacks.severity = 1 ";
 }
 
 ########################
@@ -285,7 +282,7 @@ $title .= "\n From $textstart to $textend";
 # PHPlot stuff
 ##############
 require_once '/usr/share/phplot/phplot.php';  // here we include the PHPlot code 
-$plot =& new PHPlot(1000,600);    // here we define the variable
+$plot =& new PHPlot(990,600);    // here we define the variable
 $plot->SetTitle($title);
 $plot->SetXTitle('Time');
 $plot->SetYTitle('Attacks');
@@ -320,11 +317,10 @@ while ($i != $tssteps) {
       $datestring = "Week\n" .date("W", $date);
     }
     $point[] = $datestring;
-#    printer($row);
     while($row = pg_fetch_assoc($result)) {
       $count = $row['total'];
       $sev = $row['severity'];
-      if ($typecheck == 1) {
+      if ($allsev == 1 && $allattacks == 0) {
         $type = $row['text'];
       }
       $legend = "";
@@ -337,7 +333,7 @@ while ($i != $tssteps) {
       } else {
         $legend .= "All sensors";
       }
-      if ($allattacks == 0 && $typecheck == 1) {
+      if ($allattacks == 0 && $allsev == 1) {
         $attack = str_replace("Dialogue", "", $row['text']);
         $legend .= " - ". $attack;
       }
@@ -353,6 +349,8 @@ while ($i != $tssteps) {
 }
 
 #printer($data);
+
+#debug_sql();
 
 if (!empty($data)) {
 #  printer($maxcount);
@@ -372,7 +370,6 @@ if (!empty($data)) {
 #  printer($pertick);
 #  printer($ytick);
 
-#  debug_sql();
   $plot->SetYTickIncrement($ytick);
   $plot->SetDataValues($data);
   #$plot->SetXTickLabelPos('none');

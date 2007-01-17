@@ -194,7 +194,7 @@ echo "<table class='datatable' width='100%'>\n";
 
     echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview'>\n";
       echo "<tr>\n";
-        echo "<td class='datatd' valign='top' style='padding-top: 10px;'><a href='trafficview.php?int_sid=$sid'>$sensor</a></td>\n";
+        echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$sensor</td>\n";
         echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$remote</td>\n";
         echo "<td class='datatd' valign='top' style='padding-top: 10px;'>$local</td>\n";
         # Tap device

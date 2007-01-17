@@ -17,38 +17,22 @@
 <script type="text/javascript" src="./calendar/js/calendar.js"></script>
 <script type="text/javascript" src="./calendar/js/calendar-en.js"></script>
 <script type="text/javascript" src="./calendar/js/calendar-setup.js"></script>
+<script>
+
+var mytabs = new Array();
+mytabs[0] = "attack";
+mytabs[1] = "severity";
+
+</script>
 
 <?
 
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
-function getepoch($stamp) {
-  list($date, $time) = explode(" ", $stamp);
-  list($day, $mon, $year) = explode("-", $date);
-  list($hour, $min) = explode(":", $time);
-  // Date MUST BE valid
-  $day = intval($day);
-  $mon = intval($mon);
-  $year = intval($year);
-  if (($day > 0) && ($mon > 0) && ($year > 0)) {
-    if (checkdate($mon, $day, $year)) {
-      // Valid date, check time
-      $hour = intval($hour);
-      $min = intval($min);
-      if (!(($minute >= 0) && ($min < 60) && ($hour >= 0) && ($hour < 24))) {
-        // Invalid time, generate midnight (0:00)
-        $hour = $min = 0;
-      }
-      $epoch = mktime($hour, $min, 0, $mon, $day, $year);
-      return $epoch;
-    }
-  }
-}
-
 if ($_GET) {
   $qs = $_SERVER['QUERY_STRING'];
-  echo "<img src='showplot.php?$qs'><br />\n";
+  echo "<img src='plotshow.php?$qs'><br />\n";
 } else {
   if ($s_admin == 1) {
     $where = "";
@@ -60,6 +44,12 @@ if ($_GET) {
   $debuginfo[] = $sql_getsensors;
   $result_getsensors = pg_query($sql_getsensors);
 
+  echo "<div class='tabselect' align='left' style='float: left;'>\n";
+    echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='Severity' onclick='javascript: showTab(\"severity\");' />\n";
+    echo "<input class='tab' id='button_attack' type='button' name='button_attack' value='Attack' onclick='javascript: showTab(\"attack\");' />\n";
+  echo "</div>\n";
+
+  echo "<div class='tabcontent' id='severity' style='z-index: 9;'>\n";
   echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
@@ -81,7 +71,7 @@ if ($_GET) {
         echo "<td class='datatd'>Sensors:</td>\n";
         echo "<td class='datatd'>\n";
           echo "<select name='sensorid[]' style='background-color:white;' size='4' multiple='true'>\n";
-            echo printOption(0, "All sensors", $sensorid);
+            echo printOption("", "All sensors", "");
             while ($sensor_data = pg_fetch_assoc($result_getsensors)) {
               $sid = $sensor_data['id'];
               $label = $sensor_data["keyname"];
@@ -100,9 +90,93 @@ if ($_GET) {
         echo "<td class='datatd'>Severity:</td>\n";
         echo "<td class='datatd'>\n";
           echo "<select name='severity[]' style='background-color:white;' size='5' multiple='true'>\n";
-            echo printOption(99, "All attacks", 99);
+            echo printOption("", "All attacks", "");
             foreach ($severity_ar as $key => $val) {
               echo printOption($key, $val, 99);
+            }
+           echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      # ATTACKS
+#      $sql_getattacks = "SELECT * FROM stats_dialogue";
+#      $debuginfo[] = $sql_getattacks;
+#      $result_getattacks = pg_query($sql_getattacks);
+
+#      echo "<tr>\n";
+#        echo "<td class='datatd'>Attack:</td>\n";
+#        echo "<td class='datatd'>\n";
+#          echo "<select name='attack[]' style='background-color:white;' size='5' multiple='true'>\n";
+#            echo printOption("", "All attacks", "");
+#            while ($attack_data = pg_fetch_assoc($result_getattacks)) {
+#              $id = $attack_data['id'];
+#              $name = $attack_data['name'];
+#              $name = str_replace("Dialogue", "", $name);
+#              echo printOption($id, $name, 99); 
+#            }
+#           echo "</select>\n";
+#        echo "</td>\n";
+#      echo "</tr>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>Interval</td>\n";
+        echo "<td class='datatd'>\n";
+          echo "<select name='int_interval'>\n";
+            echo printOption(0, "", 0);
+            echo printOption(3600, "Hour", 0);
+            echo printOption(86400, "Day", 0);
+            echo printOption(604800, "Week", 0);
+          echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>Plot type</td>\n";
+        echo "<td class='datatd'>\n";
+          echo "<select name='int_type'>\n";
+            echo printOption(0, "", 0);
+            foreach ($v_plottertypes as $key => $val) {
+              echo printOption($key, $val, 0);
+            }
+          echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr>\n";
+        echo "<td colspan='2' align='right'><input type='submit' name='submit' value='Show' class='button' /></td>\n";
+      echo "</tr>\n";
+    echo "</table>\n";
+  echo "</form>\n";
+  echo "</div>\n";
+
+  echo "<div class='tabcontent' id='attack' style='z-index: 9; display: none;'>\n";
+  echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
+    echo "<table class='datatable'>\n";
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='100'>From:</td>\n";
+        echo "<td class='datatd' width='300'>";
+          echo "<input type='text' name='strip_html_escape_tsstart' id='ts_start' value='' />\n";
+          echo "<input type='button' value='...' name='ts_start_trigger' id='ts_start_trigger' />\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>To:</td>\n";
+        echo "<td class='datatd'>";
+          echo "<input type='text' name='strip_html_escape_tsend' id='ts_end' value='' />\n";
+          echo "<input type='button' value='...' name='ts_end_trigger' id='ts_end_trigger' />\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      # SENSORS
+      echo "<tr>\n";
+        echo "<td class='datatd'>Sensors:</td>\n";
+        echo "<td class='datatd'>\n";
+          echo "<select name='sensorid[]' style='background-color:white;' size='4' multiple='true'>\n";
+            echo printOption("", "All sensors", "");
+            while ($sensor_data = pg_fetch_assoc($result_getsensors)) {
+              $sid = $sensor_data['id'];
+              $label = $sensor_data["keyname"];
+              $vlanid = $sensor_data["vlanid"];
+              $org = $sensor_data["organisation"];
+              if ($vlanid != 0 ) {
+                $label .=  "-" .$vlanid;
+              }
+              echo printOption($sid, $label, $sensorid);
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -116,12 +190,12 @@ if ($_GET) {
         echo "<td class='datatd'>Attack:</td>\n";
         echo "<td class='datatd'>\n";
           echo "<select name='attack[]' style='background-color:white;' size='5' multiple='true'>\n";
-            echo printOption(99, "All attacks", 99);
+            echo printOption("", "All attacks", "");
             while ($attack_data = pg_fetch_assoc($result_getattacks)) {
               $id = $attack_data['id'];
               $name = $attack_data['name'];
               $name = str_replace("Dialogue", "", $name);
-              echo printOption($id, $name, 99); 
+              echo printOption($id, $name, 99);
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -153,6 +227,9 @@ if ($_GET) {
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
+  echo "</div>\n";
+
+
   debug_sql();
 ?>
 <script>

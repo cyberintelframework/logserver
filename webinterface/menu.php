@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 21-12-2006                       #
+# Version 1.04.06                  #
+# 15-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Fixed another redirection bug with the $url variable
 # 1.04.05 Fixed a redirection bug with the $url variable
 # 1.04.04 Added server info page
 # 1.04.03 Changed REQUEST_URI to SCRIPT_NAME for $url
@@ -48,7 +49,7 @@ if ($file != "login.php") {
     }
   } else {
     $url = basename($_SERVER['SCRIPT_NAME']);
-    header("location: ${address}login.php?url=$url");
+    header("location: ${address}login.php?strip_html_url=$url");
     exit;
   }
   $s_org = intval($_SESSION['s_org']);
@@ -103,18 +104,22 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     $popup_history = "Summarized data per month!";
     $popup_check = "Check for attacks originating from your own networks!";
     $popup_traffic = "Statistics about the traffic going through the sensors!";
+    $popup_googlemap = "Mapping of malicious attacks!";
+    $popup_plotter = "Plot attacks!";
     echo "<div class='nav-menu'>\n";
       echo "<ul>\n";
         echo "<li><a href='${address}sensorstatus.php' onmouseover='return overlib(\"$popup_sensor\");' onmouseout='return nd();'>Sensor Status</a></li>\n";
         echo "<li><a href='${address}rank.php' onmouseover='return overlib(\"$popup_rank\");' onmouseout='return nd();'>Ranking</a></li>\n";
         echo "<li><a href='${address}search.php' onmouseover='return overlib(\"$popup_search\");' onmouseout='return nd();'>Search</a></li>\n";
         echo "<li><a href='${address}logindex.php' onmouseover='return overlib(\"$popup_logindex\");' onmouseout='return nd();'>Log Overview</a></li>\n";
-        echo "<li><a href='${address}loghistory.php' onmouseover='return overlib(\"$popup_history\");' onmouseout='return nd();'>Log History</a></li>\n";
+    #    echo "<li><a href='${address}loghistory.php' onmouseover='return overlib(\"$popup_history\");' onmouseout='return nd();'>Log History</a></li>\n";
         echo "<li><a href='${address}logcheck.php' onmouseover='return overlib(\"$popup_check\");' onmouseout='return nd();'>Check</a></li>\n";
 #        if ($enable_arpwatch == 1) {
 #          echo "<li><a href='${address}arpindex.php'>ARP Monitor</a></li>\n";
 #        }
         echo "<li><a href='${address}traffic.php' onmouseover='return overlib(\"$popup_traffic\");' onmouseout='return nd();'>Traffic</a></li>\n";
+        echo "<li><a href='${address}plotter.php' onmouseover='return overlib(\"$popup_plotter\");' onmouseout='return nd();'>Plotter</a></li>\n";
+        echo "<li><a href='${address}googlemap.php' onmouseover='return overlib(\"$popup_googlemap\");' onmouseout='return nd();'>Map</a></li>\n";
         echo "<li><a href='${address}logout.php'>Logout</a></li>\n";
       echo "</ul>\n";
     echo "</div>\n";

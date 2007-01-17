@@ -132,7 +132,7 @@ echo "<form name='selectorg' method='get' action='googlemap.php'>\n";
   }
 echo "</form>\n";
 echo "<br />\n";
-
+echo "Parsing could take some time. Please be patient<br />\n";
 if ($b == "daily") {
       $datestart = date("d-m-Y", $start);
       echo "<h4>Results from $datestart</h4>\n";

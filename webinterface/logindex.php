@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 17-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Added ORDER BY for organisation select box
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
@@ -129,7 +130,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?int_org=$q_org'>\
     if (!isset($clean['org'])) {
       $err = 1;
     }
-    $sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
     $debuginfo[] = $sql_orgs;
     $result_orgs = pg_query($pgconn, $sql_orgs);
     echo "<select name='int_org' onChange='javascript: this.form.submit();'>\n";

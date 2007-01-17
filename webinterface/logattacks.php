@@ -178,7 +178,7 @@ if ($err != 1) {
             echo "<td class='datatd'><b>$name</b></td>\n";
           }
           pg_result_seek($result_scanners, 0);
-          echo "<td class='dataheader'>Statistics</td>\n";
+          echo "<td class='dataheader'>Stats</td>\n";
         echo "</tr>\n";
 
         while ($row = pg_fetch_assoc($result_down)) {
