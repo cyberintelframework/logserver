@@ -151,21 +151,28 @@ if ($err != 1) {
   ######### Table for Downloaded Malware (SEV: 32) #############
   
   elseif ($sev == 32) {
-    add_where("attacks.severity = 32");
-    add_where("attacks.sensorid = sensors.id");
-    add_where("details.type = 8");
-    add_where("details.text = uniq_binaries.name");
-    add_db_table("sensors");
-    add_db_table("details");
-    add_db_table("uniq_binaries");
+    add_to_sql("DISTINCT uniq_binaries.id", "select");
+    add_to_sql("details.text", "select");
+    add_to_sql("COUNT(details.id) as total", "select");
+    add_to_sql("sensors", "table");
+    add_to_sql("details", "table");
+    add_to_sql("uniq_binaries", "table");
+    add_to_sql("attacks.severity = 32", "where");
+    add_to_sql("attacks.sensorid = sensors.id", "where");
+    add_to_sql("attacks.id = details.attackid", "where");
+    add_to_sql("details.type = 8", "where");
+    add_to_sql("details.text = uniq_binaries.name", "where");
+    add_to_sql("uniq_binaries.id", "group");
+    add_to_sql("details.text", "group");
+    add_to_sql("total DESC", "order");
     prepare_sql();
 
-    $sql_down = "SELECT DISTINCT uniq_binaries.id, details.text, count(details.id) as total ";
+    $sql_down = "SELECT $sql_select ";
     $sql_down .= "FROM $sql_from ";
     $sql_down .= " $sql_where ";
-    $sql_down .= " GROUP BY uniq_binaries.id, details.text ";
-    $sql_down .= " ORDER BY total DESC ";
-    $debuginfo[] = "$sql_down";
+    $sql_down .= " GROUP BY $sql_group ";
+    $sql_down .= " ORDER BY $sql_order ";
+    $debuginfo[] = $sql_down;
     $result_down = pg_query($pgconn, $sql_down);
     $numrows_down = pg_num_rows($result_down);
 

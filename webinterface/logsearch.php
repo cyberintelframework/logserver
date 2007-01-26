@@ -651,8 +651,6 @@ if ($rapport == "pdf") {
       else $ar["Additional_Info"] = "";
       $data[] = $ar;
     }
-    printer($data);
-    exit;
     $pdf->ezTable($data, '', '', array( 'fontSize' => 8));
     $pdf->ezText('__________________________________________________________', 15);
     $pdf->ezText($space . 'http://ids.surfnet.nl', 10);
