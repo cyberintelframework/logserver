@@ -16,7 +16,7 @@ if (!isset($_SESSION['s_admin'])) {
 header('Content-Type: text/xml');
 
 if ($c_geoip_enable == 1) {
-    include '../include/' .$c_geoip_module;
+    include ('../include/' .$c_geoip_module);
     $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
 
@@ -39,10 +39,6 @@ if (isset($clean['org'])) {
 } else {
   $int_org = intval($s_org);
 }
-
-//print "int_org: $int_org";
-//print "s_admin: $s_admin";
-//print "s_org: $s_org";
 
 if ($int_org == 0 && $s_admin == 1) {$orgquery = "";}
 elseif ($int_org != 0 && $s_org == $int_org) {$orgquery = "sensors.organisation = '$int_org' AND";}
@@ -95,7 +91,6 @@ if ($b == "weekly") {
 
 $tsquery = "timestamp >= $start AND timestamp <= $end AND";
 
-
 $query = false;
  
 if ( ($st = @stat("data.cache.xml")) != false )
@@ -109,17 +104,18 @@ if ( ($st = @stat("data.cache.xml")) != false )
         $query = true;
 }
  
-//print "error: $err<br />"; 
 if ( $query == true && $err == 0)
 {
         $f = fopen("/tmp/data.cache.xml","w+");  // change this path
 	$mytime = time(0) - 24 * 3600 * 9;
 
 	$query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1'  AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC"; 
-//	print "query: $query";	   
+	
 	$r_hit = pg_query($pgconn, $query);
         if( pg_num_rows($r_hit) )
         {
+                fwrite($f,'<?xml version="1.0" encoding="ISO-8859-1"?>');
+                fwrite($f,"\n");
                 fwrite($f,"<markers>\n");
                 while( $hit = pg_fetch_assoc($r_hit) )
                 {
@@ -147,9 +143,8 @@ else {
 }
 
 $f = fopen("/tmp/data.cache.xml","r");
-$contents = '';
-while (!feof($f)) {
-  echo fread($f, 8192);
-}
+$contents = fread($f, filesize("/tmp/data.cache.xml"));
+trim($contents);
+echo $contents;
 fclose($f);
 ?>

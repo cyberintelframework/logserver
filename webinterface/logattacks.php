@@ -3,14 +3,17 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.06                  #
+# 26-01-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 add_to_sql()
+# 1.04.05 Replaced $where[] with add_where()
+# 1.04.04 Changed some sql stuff
 # 1.04.03 Changed data input handling
 # 1.04.02 Added extra check on severity in sql query when sev = 1
 # 1.04.01 Rereleased as 1.04.01
@@ -57,48 +60,58 @@ if ($s_access_search == 9) {
   if (isset($clean['org'])) {
     if ($clean['org'] != 0) {
       $q_org = $clean['org'];
-      add_db_table("sensors");
-      $where[] = "sensors.organisation = $q_org";
+      add_to_sql("sensors", "table");
+      add_to_sql("sensors.organisation = $q_org", "where");
       $querystring = $querystring . "&amp;int_org=$q_org";
     } else {
       $q_org = 0;
     }
   }
 } else {
-  add_db_table("sensors");
-  $where[] = "sensors.organisation = $q_org";
+  add_to_sql("sensors", "table");
+  add_to_sql("sensors.organisation = $q_org", "where");
 }
 
 ### Checking for period.
 if (isset($clean['to']) && isset($clean['from'])) {
   $start = $clean['from'];
   $end = $clean['to'];
-  add_db_table("attacks");
-  $where[] = "attacks.id = details.attackid";
-  $where[] = "attacks.timestamp >= $start";
-  $where[] = "attacks.timestamp <= $end";
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("attacks.timestamp >= $start", "where");
+  add_to_sql("attacks.timestamp <= $end", "where");
   $dateqs = "&amp;int_from=$start&amp;int_to=$end";
 }
 
 if ($err != 1) {
   ######### Table for Malicious attacks (SEV: 1) #############
-
   if ($sev == 1) {
-
-    $where[] = " attacks.severity = 1 ";
-    $where[] = " details.type = 1 ";
-    $where[] = " details.text = stats_dialogue.name ";
-    add_db_table("stats_dialogue");
-    add_db_table("sensors");
-    add_db_table("details");
+    add_to_sql("attacks.severity = 1", "where");
+    add_to_sql("attacks.sensorid = sensors.id", "where");
+    add_to_sql("details.type = 1", "where");
+    add_to_sql("details.text = stats_dialogue.name", "where");
+    add_to_sql("stats_dialogue", "table");
+    add_to_sql("sensors", "table");
+    add_to_sql("details", "table");
+    add_to_sql("COUNT(DISTINCT details.attackid) as total", "select");
+    add_to_sql("details.text", "select");
+    add_to_sql("stats_dialogue.id", "select");
+    add_to_sql("details.text", "group");
+    add_to_sql("stats_dialogue.id", "group");
+    add_to_sql("total", "order");
     prepare_sql();
 
     ### Admin check.
-    $sql_count = "SELECT count(DISTINCT details.attackid) as total, details.text, stats_dialogue.id ";
+#    $sql_count = "SELECT count(DISTINCT details.attackid) as total, details.text, stats_dialogue.id ";
+    $sql_count = "SELECT $sql_select ";
     $sql_count .= "FROM $sql_from ";
     $sql_count .= " $sql_where ";
-    $sql_count .= " GROUP BY details.text, stats_dialogue.id ";
-    $sql_count .= " ORDER BY total DESC ";
+    if ($sql_group) {
+      $sql_count .= " GROUP BY $sql_group ";
+    }
+    if ($sql_order) {
+      $sql_count .= " ORDER BY $sql_order DESC ";
+    }
     $debuginfo[] = "$sql_count";
     $result_count = pg_query($pgconn, $sql_count);
     $numrows_count = pg_num_rows($result_count);
@@ -138,9 +151,10 @@ if ($err != 1) {
   ######### Table for Downloaded Malware (SEV: 32) #############
   
   elseif ($sev == 32) {
-    $where[] = " attacks.severity = 32 ";
-    $where[] = " details.type = 8 ";
-    $where[] = " details.text = uniq_binaries.name ";
+    add_where("attacks.severity = 32");
+    add_where("attacks.sensorid = sensors.id");
+    add_where("details.type = 8");
+    add_where("details.text = uniq_binaries.name");
     add_db_table("sensors");
     add_db_table("details");
     add_db_table("uniq_binaries");
@@ -151,7 +165,7 @@ if ($err != 1) {
     $sql_down .= " $sql_where ";
     $sql_down .= " GROUP BY uniq_binaries.id, details.text ";
     $sql_down .= " ORDER BY total DESC ";
-#    $debuginfo[] = "$sql_down";
+    $debuginfo[] = "$sql_down";
     $result_down = pg_query($pgconn, $sql_down);
     $numrows_down = pg_num_rows($result_down);
 
@@ -205,11 +219,6 @@ if ($err != 1) {
 
               # Starting the count for the viri.
               $virus_count_ar[$virus] = $virus_count_ar[$virus] + $count;
-#              if ($scanner_id == 4) {
-#                $debuginfo[] = "$sql_virus";
-#                echo "VIRUS: <br />";
-#                printer($virus);
-#              }
 
               if ($virus == "Not scanned") {
                 $ignore[$scanner_id]++;
@@ -250,13 +259,8 @@ if ($err != 1) {
   }
 }
 
-#echo "FOUND: <br />\n";
-#printer($found);
-#echo "TOTAL: <br />\n";
-#printer($total);
-
 # Debug info
-#debug_sql();
+debug_sql();
 
 pg_close($pgconn);
 ?>

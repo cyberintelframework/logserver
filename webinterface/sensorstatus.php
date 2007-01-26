@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-12-2006                       #
+# Version 1.04.05                  #
+# 19-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Fixed bug where 2 error messages where shown
 # 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
 # 1.04.02 Added VLAN support 
@@ -83,10 +84,7 @@ if (isset($clean['m'])) {
   if ($m == 101) { $m = "<p>IP address for $key is already in use. Changes not saved!</p>"; }
   elseif ($m == 102) { $m = "<p>Incorrect IP address for $key. Changes not saved!</p>"; }
   elseif ($m == 103) { $m = "<p>Invalid sensor name returned!</p>"; }
-  else {
-    $m = geterror($m);
-    echo $m;
-  }
+  else { $m = geterror($m); }
 }
 
 echo "<table width='100%'>\n";
@@ -301,9 +299,8 @@ echo "<table class='datatable' width='100%'>\n";
               }
               echo "" . printOption("STOP", "Stop", $action) . "\n";
               echo "" . printOption("START", "Start", $action) . "\n";
-              echo "" . printOption("RESTART", "Restart", $action) . "\n";
-              echo "" . printOption("BLOCK", "Disable", $action) . "\n";
-              echo "" . printOption("UNBLOCK", "Enable", $action) . "\n";
+              echo "" . printOption("DISABLE", "Disable", $action) . "\n";
+              echo "" . printOption("ENABLE", "Enable", $action) . "\n";
             echo "</select>\n";
             echo "<td colspan='12' class='datatd' align='right'>\n";
               echo "<input type='submit' name='submit' value='Update' class='button' />";

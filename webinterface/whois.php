@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 15-12-2006                       #
+# Version 1.04.03                  #
+# 19-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Added KRNIC and flush()
 # 1.04.02 Changed data input handling
 # 1.04.01 pg_close added
 # 1.03.01 Released as part of the 1.03 package
@@ -29,7 +30,7 @@ if (isset($clean['ip'])) {
 
   if (isset($clean['s'])) {
     $serv = $clean['s'];
-    $pattern = '/^(arin|lacnic|apnic|ripe|afrinic)$/';
+    $pattern = '/^(arin|lacnic|apnic|ripe|afrinic|krnic)$/';
     if (preg_match($pattern, $serv) != 1) {
       $server = "whois.ripe.net";
     } else {
@@ -48,6 +49,8 @@ if (isset($clean['ip'])) {
   echo "<a href='whois.php?strip_html_s=afrinic&ip_ip=$ip'>AFRINIC</a>";
   echo "&nbsp;|&nbsp;";
   echo "<a href='whois.php?strip_html_s=apnic&ip_ip=$ip'>APNIC</a>\n";
+  echo "&nbsp;|&nbsp;";
+  echo "<a href='whois.php?strip_html_s=krnic&ip_ip=$ip'>KRNIC</a>\n";
   echo "<br><h4>WHOIS Query at $server for $ip</h4>\n";
   echo "<blockquote>\n";
   echo "<pre>\n";
@@ -63,6 +66,7 @@ if (isset($clean['ip'])) {
     fputs($fp, "$ip\r\n");
     while(!feof($fp)) {
       echo fgets($fp, 256);
+      flush();
     }
     fclose($fp);
     echo "Connection closed.<br>\n";

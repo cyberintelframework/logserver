@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 17-01-2007                       #
+# Version 1.04.08                  #
+# 26-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,9 @@
 
 ####################################
 # Changelog:
+# 1.04.08 Added protocols ranking; add_to_sql();
+# 1.04.07 Replaced $where[] with add_where()
+# 1.04.06 Changed some sql stuff
 # 1.04.05 Changed some text
 # 1.04.04 Fixed a bug when selecting all data and with top filenames for organisation
 # 1.04.03 Changed data input handling
@@ -180,12 +183,12 @@ $debuginfo[] = $sql_getorg;
 
 echo "<table width='100%'>\n";
 ##########################
-  add_db_table("attacks");
-  add_db_table("sensors");
-  $where[] = "attacks.severity = 1";
-  $where[] = "$tsquery";
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.severity = 1", "where");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
   prepare_sql();
-  $sql_attacks = "SELECT DISTINCT COUNT(attacks.severity) as total ";
+  $sql_attacks = "SELECT $sql_select ";
   $sql_attacks .= " FROM $sql_from ";
   $sql_attacks .= " $sql_where ";
 
@@ -197,14 +200,15 @@ echo "<table width='100%'>\n";
 
   # Resetting the sql generation arrays
   $where = array();
-  $db_table = array();
+  $table = array();
+  $select = array();
 
-  add_db_table("attacks");
-  add_db_table("sensors");
-  $where[] = "attacks.severity = 32";
-  $where[] = "$tsquery";
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.severity = 32", "where");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
   prepare_sql();
-  $sql_downloads = "SELECT DISTINCT COUNT(attacks.severity) as total ";
+  $sql_downloads = "SELECT $sql_select ";
   $sql_downloads .= " FROM $sql_from ";
   $sql_downloads .= " $sql_where ";
 
@@ -216,7 +220,8 @@ echo "<table width='100%'>\n";
 
   # Resetting the sql generation arrays
   $where = array();
-  $db_table = array();
+  $table = array();
+  $select = array();
 
   if ($total_sensors != 0) {
     $avg_perc = floor(100 / $total_sensors);
@@ -251,14 +256,15 @@ echo "<table width='100%'>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%'>\n";
             if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
-              add_db_table("attacks");
-              add_db_table("sensors");
-              $where[] = "attacks.severity = 1";
-              $where[] = "sensors.organisation = $q_org";
-              $where[] = "sensors.id = attacks.sensorid";
-              $where[] = "$tsquery";
+              add_to_sql("attacks", "table");
+              add_to_sql("sensors", "table");
+              add_to_sql("attacks.severity = 1", "where");
+              add_to_sql("sensors.organisation = $q_org", "where");
+              add_to_sql("sensors.id = attacks.sensorid", "where");
+              add_to_sql("$tsquery", "where");
+              add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
               prepare_sql();
-              $sql_attacks = "SELECT DISTINCT COUNT(attacks.severity) as total ";
+              $sql_attacks = "SELECT $sql_select ";
               $sql_attacks .= " FROM $sql_from ";
               $sql_attacks .= " $sql_where ";
               $result_attacks = pg_query($pgconn, $sql_attacks);
@@ -267,7 +273,8 @@ echo "<table width='100%'>\n";
 
               # Resetting the sql generation arrays
               $where = array();
-              $db_table = array();
+              $table = array();
+              $select = array();
 
               $row = pg_fetch_assoc($result_attacks);
               $org_attacks = $row['total'];
@@ -277,14 +284,15 @@ echo "<table width='100%'>\n";
                 $org_attacks_perc = floor(($org_attacks / $total_attacks) * 100);
               }
 
-              add_db_table("attacks");
-              add_db_table("sensors");
-              $where[] = "attacks.severity = 32";
-              $where[] = "sensors.organisation = $q_org";
-              $where[] = "sensors.id = attacks.sensorid";
-              $where[] = "$tsquery";
+              add_to_sql("attacks", "table");
+              add_to_sql("sensors", "table");
+              add_to_sql("attacks.severity = 32", "where");
+              add_to_sql("sensors.organisation = $q_org", "where");
+              add_to_sql("sensors.id = attacks.sensorid", "where");
+              add_to_sql("$tsquery", "where");
+              add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
               prepare_sql();
-              $sql_downloads = "SELECT DISTINCT COUNT(attacks.severity) as total ";
+              $sql_downloads = "SELECT $sql_select ";
               $sql_downloads .= " FROM $sql_from ";
               $sql_downloads .= " $sql_where ";
               $result_downloads = pg_query($pgconn, $sql_downloads);
@@ -293,7 +301,8 @@ echo "<table width='100%'>\n";
 
               # Resetting the sql generation arrays
               $where = array();
-              $db_table = array();
+              $table = array();
+              $select = array();
 
               $row = pg_fetch_assoc($result_downloads);
               $org_downloads = $row['total'];
@@ -328,34 +337,32 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 ##########################
-  add_db_table("attacks");
-  add_db_table("details");
-  $where[] = "details.type = 1";
-  $where[] = "$tsquery";
+  add_to_sql("attacks", "table");
+  add_to_sql("details", "table");
+  add_to_sql("details.type = 1", "where");
+  add_to_sql("details.attackid = attacks.id", "where");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("DISTINCT details.text", "select");
+  add_to_sql("COUNT(details.id) as total", "select");
+  add_to_sql("details.text", "group");
+  add_to_sql("total DESC LIMIT $c_topexploits OFFSET 0", "order");
   prepare_sql();
-  $sql_topexp = "SELECT DISTINCT details.text, COUNT(details.id) as total ";
+  $sql_topexp = "SELECT $sql_select ";
   $sql_topexp .= " FROM $sql_from ";
   $sql_topexp .= " $sql_where ";
-  $sql_topexp .= " GROUP BY details.text ORDER BY total DESC LIMIT $c_topexploits OFFSET 0 ";
+  $sql_topexp .= " GROUP BY $sql_group ORDER BY $sql_order ";
   $result_topexp = pg_query($pgconn, $sql_topexp);
 
   $debuginfo[] = $sql_topexp;
 
-  # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
-
-  add_db_table("attacks");
-  add_db_table("details");
-  add_db_table("sensors");
-  $where[] = "details.type = 1";
-  $where[] = "sensors.organisation = $q_org";
-  $where[] = "$tsquery";
+  add_to_sql("sensors", "table");
+  add_to_sql("sensors.organisation = $q_org", "where");
+  add_to_sql("sensors.id = attacks.sensorid", "where");
   prepare_sql();
-  $sql_topexp_org = "SELECT DISTINCT details.text, COUNT(details.id) as total ";
+  $sql_topexp_org = "SELECT $sql_select ";
   $sql_topexp_org .= " FROM $sql_from ";
   $sql_topexp_org .= " $sql_where ";
-  $sql_topexp_org .= " GROUP BY details.text ORDER BY total DESC LIMIT $c_topexploits OFFSET 0 ";
+  $sql_topexp_org .= " GROUP BY $sql_group ORDER BY $sql_order ";
 
   $debuginfo[] = $sql_topexp_org;
 
@@ -363,7 +370,10 @@ echo "<table width='100%'>\n";
 
   # Resetting the sql generation arrays
   $where = array();
-  $db_table = array();
+  $table = array();
+  $select = array();
+  $group = array();
+  $order = array();
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -431,36 +441,34 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 ########################## Top 10 sensors
-  add_db_table("attacks");
-  add_db_table("details");
-  add_db_table("sensors");
-  $where[] = "details.type = 1";
-  $where[] = "$tsquery";
+  add_to_sql("DISTINCT sensors.organisation", "select");
+  add_to_sql("sensors.keyname", "select");
+  add_to_sql("COUNT(details.*) as total", "select");
+  add_to_sql("attacks", "table");
+  add_to_sql("details", "table");
+  add_to_sql("sensors", "table");
+  add_to_sql("details.type = 1", "where");
+  add_to_sql("sensors.id = attacks.sensorid", "where");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("sensors.keyname", "group");
+  add_to_sql("sensors.organisation", "group");
+  add_to_sql("total DESC LIMIT $c_topsensors OFFSET 0", "order");
   prepare_sql();
-  $sql_top = "SELECT DISTINCT sensors.organisation, sensors.keyname, COUNT(details.*) as total ";
+  $sql_top = "SELECT $sql_select";
   $sql_top .= " FROM $sql_from ";
   $sql_top .= " $sql_where ";
-  $sql_top .= " GROUP BY sensors.keyname, sensors.organisation ORDER BY total DESC";
+  $sql_top .= " GROUP BY $sql_group ORDER BY $sql_order";
 
   $debuginfo[] = $sql_top;
-
   $result_top = pg_query($pgconn, $sql_top);
 
-  # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
-
-  add_db_table("attacks");
-  add_db_table("details");
-  add_db_table("sensors");
-  $where[] = "details.type = 1";
-  $where[] = "sensors.organisation = $q_org";
-  $where[] = "$tsquery";
+  add_to_sql("sensors.organisation = $q_org", "where");
   prepare_sql();
-  $sql_top_org = "SELECT DISTINCT sensors.keyname, COUNT(details.*) as total ";
+  $sql_top_org = "SELECT $sql_select ";
   $sql_top_org .= " FROM $sql_from ";
   $sql_top_org .= " $sql_where ";
-  $sql_top_org .= " GROUP BY sensors.keyname ORDER BY total DESC LIMIT $c_topsensors OFFSET 0";
+  $sql_top_org .= " GROUP BY $sql_group ORDER BY $sql_order";
 
   $debuginfo[] = $sql_top_org;
 
@@ -468,8 +476,7 @@ echo "<table width='100%'>\n";
   $numrows_top_org = pg_num_rows($result_top_org);
 
   # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
+  reset_sql();
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -546,40 +553,39 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 
- ########################## Top 10 ports // START of modification by bjou
-  add_db_table("attacks");
-  $where[] = "$tsquery";
+ ########################## Top 10 ports // Contribution by bjou
+
+  add_to_sql("DISTINCT attacks.dport", "select");
+  add_to_sql("COUNT(attacks.dport) as total", "select");
+  add_to_sql("attacks", "table");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("NOT attacks.dport = 0", "where");
+  add_to_sql("attacks.dport", "group");
+  add_to_sql("total DESC LIMIT 10 OFFSET 0", "order");
   prepare_sql();
-  $sql_topports = "SELECT DISTINCT attacks.dport, COUNT(attacks.dport) as total ";
+  $sql_topports = "SELECT $sql_select ";
   $sql_topports .= " FROM $sql_from ";
   $sql_topports .= " $sql_where ";
-  $sql_topports .= " GROUP BY attacks.dport ORDER BY total DESC LIMIT 10 OFFSET 0 "; // change LIMIT into variable to be read from conf
+  $sql_topports .= " GROUP BY $sql_group ORDER BY $sql_order ";
   $result_topports = pg_query($pgconn, $sql_topports);
 
   $debuginfo[] = $sql_topports;
 
-  # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
-
-  add_db_table("attacks");
-  add_db_table("sensors");
-  $where[] = "sensors.id = attacks.sensorid";
-  $where[] = "sensors.organisation = $q_org";
-  $where[] = "$tsquery";
+  add_to_sql("sensors", "table");
+  add_to_sql("sensors.id = attacks.sensorid", "where");
+  add_to_sql("sensors.organisation = $q_org", "where");
   prepare_sql();
-  $sql_topports_org = "SELECT DISTINCT attacks.dport, COUNT(attacks.dport) as total ";
+  $sql_topports_org = "SELECT $sql_select ";
   $sql_topports_org .= " FROM $sql_from ";
   $sql_topports_org .= " $sql_where ";
-  $sql_topports_org .= " GROUP BY attacks.dport ORDER BY total DESC LIMIT 10 OFFSET 0 ";  // change LIMIT into variable to be read from conf
+  $sql_topports_org .= " GROUP BY $sql_group ORDER BY $sql_order";
 
   $debuginfo[] = $sql_topports_org;
 
   $result_topports_org = pg_query($pgconn, $sql_topports_org);
 
   # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
+  reset_sql();
 
   echo "<tr>\n";
     echo "<td>\n";
@@ -640,47 +646,44 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 
- ########################## Top 10 source addresses
-  add_db_table("attacks");
-  $where[] = "$tsquery";
+ ########################## Top 10 source addresses // Contribution by bjou
+  add_to_sql("DISTINCT attacks.source", "select");
+  add_to_sql("COUNT(attacks.source) as total", "select");
+  add_to_sql("attacks", "table");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("attacks.source", "group");
+  add_to_sql("total DESC LIMIT $c_topsourceips", "order");
   prepare_sql();
-  $sql_topsource = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
+  $sql_topsource = "SELECT $sql_select ";
   $sql_topsource .= " FROM $sql_from ";
   $sql_topsource .= " $sql_where ";
-  $sql_topsource .= " GROUP BY attacks.source ORDER BY total DESC LIMIT 10 OFFSET 0 "; // change LIMIT into variable to be read from conf
+  $sql_topsource .= " GROUP BY $sql_group ORDER BY $sql_order ";
   $result_topsource = pg_query($pgconn, $sql_topsource);
 
   $debuginfo[] = $sql_topsource;
 
-  # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
-
-  add_db_table("attacks");
-  add_db_table("sensors");
-  $where[] = "sensors.id = attacks.sensorid";
-  $where[] = "sensors.organisation = $q_org";
-  $where[] = "$tsquery";
+  add_to_sql("sensors", "table");
+  add_to_sql("sensors.id = attacks.sensorid", "where");
+  add_to_sql("sensors.organisation = $q_org", "where");
   prepare_sql();
-  $sql_topsource_org = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
+  $sql_topsource_org = "SELECT $sql_select ";
   $sql_topsource_org .= " FROM $sql_from ";
   $sql_topsource_org .= " $sql_where ";
-  $sql_topsource_org .= " GROUP BY attacks.source ORDER BY total DESC LIMIT 10 OFFSET 0 ";  // change LIMIT into variable to be read from conf
+  $sql_topsource_org .= " GROUP BY $sql_group ORDER BY $sql_order";
 
   $debuginfo[] = $sql_topsource_org;
 
   $result_topsource_org = pg_query($pgconn, $sql_topsource_org);
 
   # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
+  reset_sql();
 
   echo "<tr>\n";
     echo "<td>\n";
       echo "<table width='100%'>\n";
         echo "<tr>\n";
           echo "<td width='45%'>\n";
-            echo "<b>Top 10 source addresses of all sensors</b>\n";// change this into variable to be read from conf
+            echo "<b>Top $c_topsourceips source addresses of all sensors</b>\n";// change this into variable to be read from conf
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
@@ -703,7 +706,7 @@ echo "<table width='100%'>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
             if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
-              echo "<b>Top 10 source addresses of your sensors</b>\n";  // change this into variable to be read from conf
+              echo "<b>Top $c_topsourceips source addresses of your sensors</b>\n";  // change this into variable to be read from conf
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td width='5%' class='datatd'>#</td>\n";
@@ -729,11 +732,7 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 
- ########################## Top 10 Filenames
-#  add_db_table("details");
-#  $where[] = "$tsquery";
-#  $where[] = "type = 4";
-#  prepare_sql();
+ ########################## Top 10 Filenames // Contribution by bjou
 
   $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles .= "(SELECT split_part(details.text, '/', 4) as file ";
@@ -742,7 +741,7 @@ echo "<table width='100%'>\n";
       $sql_topfiles .= " AND $tsquery ";
     }
     $sql_topfiles .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
-  $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC";
+  $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
   $result_topfiles = pg_query($pgconn, $sql_topfiles);
 
   $debuginfo[] = $sql_topfiles;
@@ -755,21 +754,17 @@ echo "<table width='100%'>\n";
     }
     $sql_topfiles_org .= "AND sensors.id = details.sensorid AND sensors.organisation = $q_org ";
     $sql_topfiles_org .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
-  $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC";
+  $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
   $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);
 
   $debuginfo[] = $sql_topfiles_org;
-  
-  # Resetting the sql generation arrays
-  $where = array();
-  $db_table = array();
         
   echo "<tr>\n";
     echo "<td>\n";
       echo "<table width='100%'>\n";
         echo "<tr>\n";
           echo "<td width='45%'>\n";
-            echo "<b>Top 10 filenames of all sensors</b>\n"; // change this into variable to be read from conf
+            echo "<b>Top $c_topfilenames filenames of all sensors</b>\n"; // change this into variable to be read from conf
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
@@ -798,7 +793,7 @@ echo "<table width='100%'>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
             if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
-              echo "<b>Top 10 filenames of your sensors</b>\n";// change this into variable to be read from conf
+              echo "<b>Top $c_topfilenames filenames of your sensors</b>\n";// change this into variable to be read from conf
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                    echo "<td width='5%' class='datatd'>#</td>\n";
@@ -832,18 +827,207 @@ echo "<table width='100%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
 
+ ########################## Top 10 Protocols
+
+  $sql_topproto = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM ";
+    $sql_topproto .= "(SELECT split_part(details.text, '/', 1) as proto ";
+    $sql_topproto .= "FROM details, attacks WHERE 1 = 1 ";
+    if ($tsquery != "") {
+      $sql_topproto .= " AND $tsquery ";
+    }
+    $sql_topproto .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
+  $sql_topproto .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
+  $result_topproto = pg_query($pgconn, $sql_topproto);
+
+  $debuginfo[] = $sql_topproto;
+
+  $sql_topproto_org = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM ";
+    $sql_topproto_org .= "(SELECT split_part(details.text, '/', 1) as proto ";
+    $sql_topproto_org .= "FROM details, attacks, sensors WHERE 1 = 1 ";
+    if ($tsquery != "") {
+      $sql_topproto_org .= " AND $tsquery ";
+    }
+    $sql_topproto_org .= "AND sensors.id = details.sensorid AND sensors.organisation = $q_org ";
+    $sql_topproto_org .= "AND type = 4  AND details.attackid = attacks.id) as sub ";
+  $sql_topproto_org .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
+  $result_topproto_org = pg_query($pgconn, $sql_topproto_org);
+
+  $debuginfo[] = $sql_topproto_org;
+        
+  echo "<tr>\n";
+    echo "<td>\n";
+      echo "<table width='100%'>\n";
+        echo "<tr>\n";
+          echo "<td width='45%'>\n";
+            echo "<b>Top $c_topprotocols download protocols of all sensors</b>\n";
+            echo "<table class='datatable' width='100%'>\n";
+              echo "<tr class='dataheader'>\n";
+                echo "<td width='5%' class='datatd'>#</td>\n";
+                echo "<td width='85%' class='datatd'>Protocol</td>\n";
+                echo "<td width='10%' class='datatd'>Total</td>\n";
+              echo "</tr>\n";
+              $i = 0;
+              while ($row = pg_fetch_assoc($result_topproto)) {
+                if ($i == $c_topprotocols) {
+                  break;
+                }
+                $tempproto = $row['proto'];
+                $total = $row['total'];
+                $proto = str_replace(":", "", $tempproto);
+                $i++;
+
+                echo "<tr class='datatr'>\n";
+                  echo "<td class='datatd'>$i</td>\n";
+                  echo "<td class='datatd'>$proto</td>\n";
+                  echo "<td class='datatd'>$total</td>\n";
+                echo "</tr>\n";
+              }
+            echo "</table>\n";
+          echo "</td>\n";
+          echo "<td width='10%'></td>\n";
+          echo "<td width='45%' valign='top'>\n";
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
+              echo "<b>Top $c_topprotocols download protocols of your sensors</b>\n";
+              echo "<table class='datatable' width='100%'>\n";
+                echo "<tr class='dataheader'>\n";
+                   echo "<td width='5%' class='datatd'>#</td>\n";
+                   echo "<td width='85%' class='datatd'>Protocol</td>\n";
+                   echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "</tr>\n";
+
+                  $i = 0;
+                  while ($row = pg_fetch_assoc($result_topfiles_org)) {
+                    if ($i == $c_topprotocols) {
+                      break;
+                    }
+                    $tempproto = $row['proto'];
+                    $total = $row['total'];
+                    $proto = str_replace(":", "", $tempproto);
+                    $i ++;
+
+                    echo "<tr class='datatr'>\n";
+                      echo "<td class='datatd'>$i</td>\n";
+                      echo "<td class='datatd'>$proto</td>\n";
+                      echo "<td class='datatd'>$total</td>\n";
+                    echo "</tr>\n";
+                  }
+              echo "</table>\n";
+            }
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    echo "</td>\n";
+  echo "</tr>\n";
+
+ ########################## Top 10 attacker OS's
+
+  $sql_topos = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
+    $sql_topos .= "(SELECT split_part(system.name, ' ', 1) as os ";
+    $sql_topos .= "FROM system, attacks WHERE 1 = 1 ";
+    if ($tsquery != "") {
+      $sql_topos .= " AND $tsquery ";
+    }
+    $sql_topos .= " AND attacks.source = system.ip_addr) as sub ";
+  $sql_topos .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
+  $result_topos = pg_query($pgconn, $sql_topos);
+
+  $debuginfo[] = $sql_topos;
+
+  $sql_topos_org = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
+    $sql_topos_org .= "(SELECT split_part(system.name, ' ', 1) as os ";
+    $sql_topos_org .= "FROM system, attacks, sensors WHERE 1 = 1 ";
+    if ($tsquery != "") {
+      $sql_topos_org .= " AND $tsquery ";
+    }
+    $sql_topos_org .= "AND sensors.id = attacks.sensorid AND sensors.organisation = $q_org ";
+    $sql_topos_org .= "AND attacks.source = system.ip_addr) as sub ";
+  $sql_topos_org .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
+  $result_topos_org = pg_query($pgconn, $sql_topos_org);
+
+  $debuginfo[] = $sql_topos_org;
+        
+  echo "<tr>\n";
+    echo "<td>\n";
+      echo "<table width='100%'>\n";
+        echo "<tr>\n";
+          echo "<td width='45%'>\n";
+            echo "<b>Top $c_topos attacker OS's of all sensors</b>\n";
+            echo "<table class='datatable' width='100%'>\n";
+              echo "<tr class='dataheader'>\n";
+                echo "<td width='5%' class='datatd'>#</td>\n";
+                echo "<td width='85%' class='datatd'>OS</td>\n";
+                echo "<td width='10%' class='datatd'>Total</td>\n";
+              echo "</tr>\n";
+              $i = 0;
+              while ($row = pg_fetch_assoc($result_topos)) {
+                if ($i == $c_topos) {
+                  break;
+                }
+                $os = $row['os'];
+                $total = $row['total'];
+                $i++;
+
+                echo "<tr class='datatr'>\n";
+                  echo "<td class='datatd'>$i</td>\n";
+                  echo "<td class='datatd'>$os</td>\n";
+                  echo "<td class='datatd'>$total</td>\n";
+                echo "</tr>\n";
+              }
+            echo "</table>\n";
+          echo "</td>\n";
+          echo "<td width='10%'></td>\n";
+          echo "<td width='45%' valign='top'>\n";
+            if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
+              echo "<b>Top $c_topos attacker OS's of your sensors</b>\n";
+              echo "<table class='datatable' width='100%'>\n";
+                echo "<tr class='dataheader'>\n";
+                   echo "<td width='5%' class='datatd'>#</td>\n";
+                   echo "<td width='85%' class='datatd'>OS</td>\n";
+                   echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "</tr>\n";
+
+                  $i = 0;
+                  while ($row = pg_fetch_assoc($result_topos_org)) {
+                    if ($i == $c_topos) {
+                      break;
+                    }
+                    $os = $row['os'];
+                    $total = $row['total'];
+                    $i ++;
+
+                    echo "<tr class='datatr'>\n";
+                      echo "<td class='datatd'>$i</td>\n";
+                      echo "<td class='datatd'>$os</td>\n";
+                      echo "<td class='datatd'>$total</td>\n";
+                    echo "</tr>\n";
+                  }
+              echo "</table>\n";
+            }
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    echo "</td>\n";
+  echo "</tr>\n";
+
 // END of modification by bjou
 
 ########################## Top 5 Organisations
-  add_db_table("attacks");
-  add_db_table("sensors");
-  $where[] = "attacks.severity = 1";
-  $where[] = "$tsquery";
+  add_to_sql("organisations.organisation", "select");
+  add_to_sql("COUNT(attacks.id) as total", "select");
+  add_to_sql("attacks", "table");
+  add_to_sql("sensors", "table");
+  add_to_sql("organisations", "table");
+  add_to_sql("attacks.severity = 1", "where");
+  add_to_sql("attacks.sensorid = sensors.id", "where");
+  add_to_sql("sensors.organisation = organisations.id", "where");
+  add_to_sql("$tsquery", "where");
+  add_to_sql("organisations.organisation", "group");
+  add_to_sql("total DESC LIMIT $c_toporgs OFFSET 0", "order");
   prepare_sql();
-  $sql_organisation = "SELECT sensors.organisation, COUNT(attacks.*) as total ";
+  $sql_organisation = "SELECT $sql_select ";
   $sql_organisation .= " FROM $sql_from ";
   $sql_organisation .= " $sql_where ";
-  $sql_organisation .= " GROUP BY sensors.organisation ORDER BY total DESC LIMIT $c_toporgs OFFSET 0";
+  $sql_organisation .= " GROUP BY $sql_group ORDER BY $sql_order";
 
   $debuginfo[] = $sql_organisation;
 
@@ -861,13 +1045,7 @@ echo "<table width='100%'>\n";
         $i = 0;
         while ($row = pg_fetch_assoc($result_organisation)) {
           $i++;
-          $db_org = $row['organisation'];
-
-          $sql_getorg = "SELECT organisation FROM organisations WHERE id = $db_org";
-          $result_getorg = pg_query($pgconn, $sql_getorg);
-          $db_org_name = pg_result($result_getorg, 0);
-
-          $debuginfo[] = $sql_getorg;
+          $db_org_name = $row['organisation'];
 
           $count = $row['total'];
           echo "<tr>\n";

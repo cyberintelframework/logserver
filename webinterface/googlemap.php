@@ -142,9 +142,14 @@ if ($b == "daily") {
       echo "<h4>Results from $datestart to $dateend</h4>\n";
 }
 ?>
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQJKZ06EWvfKMP5kGyHVOFxR92r57Drdz9zRk5SL-UEoIUpGwwxTX0mavcetxUMB7JfXcFMFSzogMnw" type="text/javascript"></script>
+
+
 <div id="map" style="width: 800px; height: 400px">
 </div>
+
+</div>
+
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQJKZ06EWvfKMP5kGyHVOFxR92r57Drdz9zRk5SL-UEoIUpGwwxTX0mavcetxUMB7JfXcFMFSzogMnw" type="text/javascript"></script>
 <script type="text/javascript">
 //<![CDATA[
  
@@ -155,7 +160,6 @@ map.addControl(new GLargeMapControl());
 map.centerAndZoom(new GPoint(0.0, 18.0), 15);
 //]]>
  
- 
 var yellowicon = new GIcon();
 yellowicon.image = "http://labs.google.com/ridefinder/images/mm_20_yellow.png";
 yellowicon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
@@ -164,7 +168,6 @@ yellowicon.shadowSize = new GSize(22, 20);
 yellowicon.iconAnchor = new GPoint(6, 20);
 yellowicon.infoWindowAnchor = new GPoint(5, 1);
  
- 
 var orangeicon = new GIcon();
 orangeicon.image = "http://labs.google.com/ridefinder/images/mm_20_orange.png";
 orangeicon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
@@ -172,8 +175,6 @@ orangeicon.iconSize = new GSize(12, 20);
 orangeicon.shadowSize = new GSize(22, 20);
 orangeicon.iconAnchor = new GPoint(6, 20);
 orangeicon.infoWindowAnchor = new GPoint(5, 1);
- 
- 
  
 var redicon = new GIcon();
 redicon.image = "http://labs.google.com/ridefinder/images/mm_20_red.png";
@@ -219,10 +220,11 @@ function createMarker(point,country,city,count)
  
  
 var request = GXmlHttp.create();
+
 <?
 echo "request.open('GET', 'googlemapdata.xml.php$xmlquery', true);";
-//echo "request.open("GET", "googlemapdata.xml.php?b=$b&amp;i=$prev&amp;int_org=$q_org", true);";
 ?>
+
 request.onreadystatechange = function() {
     if (request.readyState == 4) {
         var xmlDoc = request.responseXML;
@@ -241,5 +243,11 @@ request.onreadystatechange = function() {
 }
 request.send(null);
 </script>
+
+
+
 </body>
+
+
 </html>
+

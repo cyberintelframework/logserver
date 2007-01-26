@@ -1,14 +1,18 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 15-12-2006                       #
+# Version 1.04.13                  #
+# 26-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.13 add_to_sql()
+# 1.04.12 Fixed bug with timestamps and multiple sensors
+# 1.04.11 Fixed bug with rendering time
+# 1.04.10 Fixed a bug with severity 1 and additional info; Added ORDER BY for pof
 # 1.04.09 Changed strip_html_escape_bin to strip_html_escape_binname
 # 1.04.08 Changed data input handling
 # 1.04.07 Bugfix with binaries table linking
@@ -51,6 +55,7 @@ if (in_array($rapport, $ar_non_headers)) {
         include '../include/config.inc.php';
         include '../include/connect.inc.php';
         include '../include/functions.inc.php';
+        include '../include/variables.inc.php';
 
     if ($rapport == "idmef") {
 		header("Content-type: text/xml");
@@ -90,7 +95,6 @@ $allowed_get = array(
 		"int_sev",
 		"strip_html_escape_binname",
 		"int_attack",
-		"int_virus",
 		"strip_html_escape_virustxt",
 		"strip_html_escape_filename",
 		"int_from",
@@ -117,7 +121,7 @@ if (($rapport != "chart_sensor") && ($rapport != "chart_attack") && (!in_array($
 #include 'include/functions.inc.php';
 #include 'include/variables.inc.php';
 
-if ($searchtime == 1) {
+if ($c_searchtime == 1) {
   $timestart = microtime_float();
 }
  
@@ -126,23 +130,32 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 $search = $clean['search'];
-$where = array();
+reset_sql();
 
 ### Set organisation
 if ($s_access_search == 9) {
-	if (isset($clean['org'])) $q_org = $clean['org'];
+  if (isset($clean['org'])) {
+    $q_org = $clean['org'];
+  }
 }
 
 ### Checking for admin.
-if ($s_access_search < 9) $where[] = "sensors.organisation = '" . intval($s_org) . "'";
-elseif ($q_org > 0) $where[] = "sensors.organisation = '" . intval($q_org) . "'";
+if ($s_access_search < 9) {
+  add_to_sql("sensors.organisation = '" . intval($s_org) . "'", "where");
+} elseif ($q_org > 0) {
+  add_to_sql("sensors.organisation = '" . intval($q_org) . "'", "where");
+}
 
 ### Setting values from searchform
 if (@is_array($tainted["sensorid"])) {
-	$sensorid = -1;
-	$ar_sensorid = array();
-	foreach ($tainted["sensorid"] as $sid) {
-		$ar_sensorid[] = intval($sid);
+	if ($tainted['sensorid'][0] != 0) {
+		$sensorid = -1;
+		$ar_sensorid = array();
+		foreach ($tainted["sensorid"] as $sid) {
+			$ar_sensorid[] = intval($sid);
+		}
+	} else {
+		$sensorid = 0;
 	}
 } else $sensorid = intval($tainted['sensorid']);
 
@@ -279,7 +292,6 @@ $f_attack = $clean['attack'];
 ####################
 # Virus type
 ####################
-$f_virus = $clean['virus'];
 $f_virus_txt = $clean['virustxt'];
 
 ####################
@@ -292,221 +304,193 @@ $f_filename = $clean['filename'];
 ####################
 $f_reptype = $rapport;
 
-$db_table = array("sensors", "attacks");
-$where[] = "attacks.sensorid = sensors.id";
-
 ####################
 # Sensor ID's
 ####################
 if ($sensorid > 0) {
-	add_db_table("sensors");
-	$where[] = "sensors.id = '$sensorid'";
+	add_to_sql("sensors", "table");
+	add_to_sql("sensors.id = '$sensorid'", "where");
 } elseif ($sensorid == -1) {
 	// multiple sensors
-	if (!((@count($ar_sensorid) == 1) && ($ar_sensorid[0] == 0))) {
-		add_db_table("sensors");
-		$tmp_where = "sensors.id = '" . $ar_sensorid[0] . "'";
-		for ($i = 1; $i < count($ar_sensorid); $i++) {
-			$tmp_where .= " OR sensors.id = '" . $ar_sensorid[$i] . "'";
+	add_to_sql("sensors", "table");
+	$count = count($ar_sensorid);
+	$tmp_where = "sensors.id IN (";
+	for ($i = 0; $i < $count; $i++) {
+		if ($i != ($count - 1)) {
+			$tmp_where .= "$ar_sensorid[$i], ";
+		} else {
+			$tmp_where .= "$ar_sensorid[$i]";
 		}
-		$where[] = $tmp_where;
-	} // else: all sensors
+	}
+	$tmp_where .= ")";
+	add_to_sql($tmp_where, "where");
 }
 
 ####################
 # Source IP address
 ####################
 if ($full_source_ip > 0) {
-	add_db_table("attacks");
-	if ($source_mask > 0) {
-		// Network address
-		$source_ip = $full_source_ip . "/" . $source_mask;
-		$where[] = "attacks.source <<= '$source_ip'";
-	} else {
-		$source_ip = $full_source_ip;
-		$where[] = "attacks.source = '$source_ip'";
-		if ($source_port > 0) $where[] = "attacks.sport = '$source_port'";
-	}
+  add_to_sql("attacks", "table");
+  if ($source_mask > 0) {
+    // Network address
+    $source_ip = $full_source_ip . "/" . $source_mask;
+    add_to_sql("attacks.source <<= '$source_ip'", "where");
+  } else {
+    $source_ip = $full_source_ip;
+    add_to_sql("attacks.source = '$source_ip'", "where");
+    if ($source_port > 0) {
+      add_to_sql("attacks.sport = '$source_port'", "where");
+    }
+  }
 } elseif ($source_port > 0) {
-	add_db_table("attacks");
-	$where[] = "attacks.sport = '$source_port'"; // Just search for portnumber
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.sport = '$source_port'", "where");
 } elseif (isset($clean['searchnet'])) {
-	// Input from other page
-	$input = $clean['searchnet'];
-	add_db_table("attacks");
-	$where[] = "attacks.source <<= '$input'";
+  // Input from other page
+  $input = $clean['searchnet'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.source <<= '$input'", "where");
 } elseif (isset($clean['searchip'])) {
-	// Input from other page
-	$input = $clean['searchip'];
-	add_db_table("attacks");
-	$where[] = "attacks.source = '$input'";
+  // Input from other page
+  $input = $clean['searchip'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.source = '$input'", "where");
 }
 
 ####################
 # Destination IP address
 ####################
 if ($full_destination_ip > 0) {
-	add_db_table("attacks");
-	if ($destination_mask > 0) {
-		// Network address
-		$destination_ip = $full_destination_ip . "/" . $destination_mask;
-		$where[] = "attacks.dest <<= '$destination_ip'";
-	} else {
-		$destination_ip = $full_destination_ip;
-		$where[] = "attacks.dest = '$destination_ip'";
-		if ($destination_port > 0) $where[] = "attacks.dport = '$destination_port'";
-	}
+  add_to_sql("attacks", "table");
+  if ($destination_mask > 0) {
+    // Network address
+    $destination_ip = $full_destination_ip . "/" . $destination_mask;
+    add_to_sql("attacks.dest <<= '$destination_ip'", "where");
+  } else {
+    $destination_ip = $full_destination_ip;
+    add_to_sql("attacks.dest = '$destination_ip'", "where");
+    if ($destination_port > 0) {
+      add_to_sql("attacks.dport = '$destination_port'", "where");
+    }
+  }
 } elseif ($destination_port > 0) {
-	add_db_table("attacks");
-	$where[] = "attacks.dport = '$destination_port'"; // Just search for portnumber
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.dport = '$destination_port'", "where");
 }
 
 ####################
 # Start timestamp
 ####################
 if (!empty($ts_start)) {
-	// Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
-	list($date, $time) = explode(" ", $ts_start);
-	list($day, $mon, $year) = explode("-", $date);
-	list($hour, $min) = explode(":", $time);
-	// Date MUST BE valid
-	$day = intval($day);
-	$mon = intval($mon);
-	$year = intval($year);
-	if (($day > 0) && ($mon > 0) && ($year > 0)) {
-		if (checkdate($mon, $day, $year)) {
-			// Valid date, check time
-			$hour = intval($hour);
-			$min = intval($min);
-			if (!(($minute >= 0) && ($min < 60) && ($hour >= 0) && ($hour < 24))) {
-				// Invalid time, generate midnight (0:00)
-				$hour = $min = 0;
-			}
-			$ts_start = mktime($hour, $min, 0, $mon, $day, $year);
-			add_db_table("attacks");
-			$where[] = "attacks.timestamp >= '$ts_start'";
-			//echo date("d-m-y H:i", $ts_start);
-		}		
-		// else: Incomplete date, ignore this timestamp
-	}
+  $ts_start = getepoch($ts_start);
+  // Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.timestamp >= '$ts_start'", "where");
 } elseif (isset($clean['from'])) {
-	add_db_table("attacks");
-	$ts_start = $clean['from'];
-	$where[] = "attacks.timestamp >= '$ts_start'";
+  add_to_sql("attacks", "table");
+  $ts_start = $clean['from'];
+  add_to_sql("attacks.timestamp >= '$ts_start'", "where");
 }
 
 ####################
 # End timestamp
 ####################
 if (!empty($ts_end)) {
-	// Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
-	list($date, $time) = explode(" ", $ts_end);
-	list($day, $mon, $year) = explode("-", $date);
-	list($hour, $min) = explode(":", $time);
-	// Date MUST BE valid
-	$day = intval($day);
-	$mon = intval($mon);
-	$year = intval($year);
-	if (($day > 0) && ($mon > 0) && ($year > 0)) {
-		if (checkdate($mon, $day, $year)) {
-			// Valid date, check time
-			$hour = intval($hour);
-			$min = intval($min);
-			if (!(($minute >= 0) && ($min < 60) && ($hour >= 0) && ($hour < 24))) {
-				// Invalid time, generate midnight-1 (23:59)
-				$hour = 23;
-				$min = 59;
-			}
-			$ts_end = mktime($hour, $min, 0, $mon, $day, $year);
-			add_db_table("attacks");
-			$where[] = "attacks.timestamp <= '$ts_end'";
-		}		
-		// else: Incomplete date, ignore this timestamp
-	}
+  // Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
+  $ts_end = getepoch($ts_end);
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.timestamp <= '$ts_end'", "where");
 } elseif (isset($clean['to'])) {
-	add_db_table("attacks");
-	$ts_end = $clean['to'];
-	$where[] = "attacks.timestamp <= '$ts_end'";
+  add_to_sql("attacks", "table");
+  $ts_end = $clean['to'];
+  add_to_sql("attacks.timestamp <= '$ts_end'", "where");
 }
 
 ####################
 # Severity
 ####################
 if (isset($f_sev)) {
-	add_db_table("attacks");
-	$where[] = "attacks.severity = '$f_sev'";
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.severity = '$f_sev'", "where");
 }
 
 ####################
 # Type of attack
 ####################
 if ($f_attack > 0) {
-	add_db_table("details");
-	add_db_table("stats_dialogue");
-	$where[] = "details.type = 1";
-	$where[] = "details.text = stats_dialogue.name";
-	$where[] = "stats_dialogue.id = '$f_attack'";
+  add_to_sql("details", "table");
+  add_to_sql("stats_dialogue", "table");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("details.type = 1", "where");
+  add_to_sql("details.text = stats_dialogue.name", "where");
+  add_to_sql("stats_dialogue.id = '$f_attack'", "where");
 }
 
 ####################
 # Type of virus
 ####################
-if ($f_virus > 0) {
-	// From selectbox
-	add_db_table("binaries");
-	add_db_table("details"); // for binaries, don't remove!
-	add_db_table("stats_virus");
-        $where[] = "binaries.info = $f_virus";
-} elseif (!empty($f_virus_txt)) {
-	// From inputbox
-	add_db_table("binaries");
-	add_db_table("details"); // for binaries, don't remove!
-        add_db_table("stats_virus");
-        $where[] = "binaries.info = stats_virus.id";
-	$where[] = "stats_virus.name LIKE '%$f_virus_txt%'";
+if (!empty($f_virus_txt)) {
+  add_to_sql("binaries", "table");
+  add_to_sql("details", "table");
+  add_to_sql("stats_virus", "table");
+  add_to_sql("uniq_binaries", "table");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("details.type = 8", "where");
+  add_to_sql("details.text = uniq_binaries.name", "where");
+  add_to_sql("uniq_binaries.id = binaries.bin", "where");
+  add_to_sql("binaries.info = stats_virus.id", "where");
+  add_to_sql("stats_virus.name LIKE '$f_virus_txt'", "where");
+  add_to_sql("details.text", "select");
 }
 
 ####################
 # Filename
 ####################
 if (!empty($f_filename)) {
-	add_db_table("details");
-	$where[] = "details.type = 4";
-	$where[] = "details.text LIKE '%$f_filename%'";
+  add_to_sql("details", "table");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("details.type = 4", "where");
+  add_to_sql("details.text LIKE '%$f_filename%'", "where");
+  add_to_sql("details.text", "select");
 }
 
 ####################
 # Binary Name
 ####################
 if (!empty($f_binname)) {
-	echo "BLA<br />\n";
-	add_db_table("details");
-        add_db_table("uniq_binaries");
-	$where[] = "details.type = 8";
-        $where[] = "details.text = uniq_binaries.name";
-	$where[] = "uniq_binaries.name LIKE '$f_binname'";
+  add_to_sql("details", "table");
+  add_to_sql("uniq_binaries", "table");
+  add_to_sql("details.type = 8", "where");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("details.text = uniq_binaries.name", "where");
+  add_to_sql("uniq_binaries.name LIKE '$f_binname'", "where");
 }
 
 ####################
 # Binary ID
 ####################
 if (!empty($f_binid)) {
-	add_db_table("details");
-        add_db_table("uniq_binaries");
-	$where[] = "details.type = 8";
-        $where[] = "details.text = uniq_binaries.name";
-	$where[] = "uniq_binaries.id = $f_binid";
+  add_to_sql("details", "table");
+  add_to_sql("uniq_binaries", "table");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("details.type = 8", "where");
+  add_to_sql("details.text = uniq_binaries.name", "where");
+  add_to_sql("uniq_binaries.id = $f_binid", "where");
 }
 
 if ($rapport == "idmef") {
+    add_to_sql("sensors.keyname", "select");
+    add_to_sql("attacks.*", "select");
+    add_to_sql("sensors", "table");
+    add_to_sql("attacks", "table");
+    add_to_sql("sensors.id = attacks.sensorid", "where");
     prepare_sql();
 
-    $select = "SELECT * ";
     ### Prepare final SQL query
-    $sql =  $select;
+    $sql = "SELECT $sql_select ";
     $sql .= " FROM $sql_from ";
     $sql .= " $sql_where ";
-    $sql .= $group_by;
+    $sql .= " $sql_group ";
     
     $result = pg_query($sql);
 
@@ -544,15 +528,6 @@ if ($rapport == "idmef") {
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
           $malware = basename($text);
-        } elseif ($sev == 32) {
-          $dia_ar = array('attackid' => $id, 'type' => 8);
-          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-          $bin = $dia_result_ar[0]['text'];
-
-          $sql_getbin = "SELECT * FROM binaries WHERE bin = '$bin' AND scanner = 'ClamAV' ORDER BY timestamp DESC LIMIT 1";
-          $result_getbin = pg_query($sql_getbin);
-          $row_getbin = pg_fetch_assoc($result_getbin);
-          $clamav = $row_getbin['info'];
         }
       }
       echo "<idmef:Alert messageid=\"$id\">\n";
@@ -591,11 +566,6 @@ if ($rapport == "idmef") {
       echo "    <idmef:string>$malware</idmef:string>\n";
       echo "  </idmef:AdditionalData>\n";
       }
-      elseif ($sev == 32 && $clamav != "") {
-      echo "  <idmef:AdditionalData type=\"string\" meaning=\"ClamAV-scaninfo\">\n";
-      echo "    <idmef:string>$clamav</idmef:string>\n";
-      echo "  </idmef:AdditionalData>\n";
-      }
       echo "</idmef:Alert>\n";
     }
     echo "</idmef:IDMEF-Message>\n";
@@ -605,12 +575,13 @@ if ($rapport == "idmef") {
 if ($rapport == "pdf") {
     prepare_sql();
 
-    $select = "SELECT * ";
     ### Prepare final SQL query
-    $sql =  $select;
+    $sql = "SELECT $sql_select ";
     $sql .= " FROM $sql_from ";
     $sql .= " $sql_where ";
-    $sql .= $group_by;
+    if ($sql_group) {
+      $sql .= " GROUP BY $sql_group ";
+    }
     
     $result = pg_query($sql);
 
@@ -665,15 +636,6 @@ if ($rapport == "pdf") {
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
           $malware = basename($text);
-        } elseif ($sev == 32) {
-          $dia_ar = array('attackid' => $id, 'type' => 8);
-          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-          $bin = $dia_result_ar[0]['text'];
-
-          $sql_getbin = "SELECT * FROM binaries WHERE bin = '$bin' AND scanner = 'ClamAV' ORDER BY timestamp DESC LIMIT 1";
-          $result_getbin = pg_query($sql_getbin);
-          $row_getbin = pg_fetch_assoc($result_getbin);
-          $clamav = $row_getbin['info'];
         }
       }
       //ID 	Timestamp 	Severity 	Source 	Destination 	Sensor 	Additional Info
@@ -686,10 +648,11 @@ if ($rapport == "pdf") {
       $ar["Sensor"] = $sensorname;
       if ($sev == 1 && $attack != "") $ar["Additional_Info"] = $attack;
       elseif ($sev == 16 && $malware != "") $ar["Additional_Info"] = $malware;
-      elseif ($sev == 32 && $clamav != "") $ar["Additional_Info"] = $clamav;
       else $ar["Additional_Info"] = "";
       $data[] = $ar;
     }
+    printer($data);
+    exit;
     $pdf->ezTable($data, '', '', array( 'fontSize' => 8));
     $pdf->ezText('__________________________________________________________', 15);
     $pdf->ezText($space . 'http://ids.surfnet.nl', 10);
@@ -710,26 +673,40 @@ if ($rapport == "chart_sensor") {
           exit("Invalid data supplied");
         } else {
           if ($f_chart_of == "attack") {
-		$select = " SELECT DISTINCT details.text, COUNT(details.*) as total ";
-		add_db_table("details");
-		$where[] = "details.type = 1";
-		$group_by = " GROUP BY details.text, details.type";
+#		$select = " SELECT DISTINCT details.text, COUNT(details.*) as total ";
+		add_to_sql("DISTINCT details.text", "select");
+		add_to_sql("COUNT(details.*) as total", "select");
+		add_to_sql("details", "table");
+		add_to_sql("details.type = 1", "where");
+		add_to_sql("attacks.id = details.attackid", "where");
+		add_to_sql("details.text", "group");
+		add_to_sql("details.type", "group");
+#		$group_by = " GROUP BY details.text, details.type";
 		$label = "Attacks";
           } elseif ($f_chart_of == "severity") {
-		$select = "SELECT DISTINCT severity.txt, COUNT(attacks.*) as total";
-		add_db_table("severity");
-		$where[] = "attacks.severity = severity.val";
-		$group_by = "GROUP BY severity.txt";
+		add_to_sql("DISTINCT severity.txt", "select");
+		add_to_sql("COUNT(attacks.*) as total", "select");
+#		$select = "SELECT DISTINCT severity.txt, COUNT(attacks.*) as total";
+		add_to_sql("severity", "table");
+		add_to_sql("attacks.severity = severity.val", "where");
+		add_to_sql("severity.txt", "group");
+#		$group_by = "GROUP BY severity.txt";
 		$label = "Severity";
           } elseif ($f_chart_of == "virus") {
-		$select = "SELECT DISTINCT stats_virus.name, count(binaries.info) as total";
-		add_db_table("binaries");
-		add_db_table("stats_virus");
-		add_db_table("details");
-		$where[] = "binaries.info = stats_virus.name";
-		$where[] = "stats_virus.name NOT LIKE 'Suspicious'";
-		$group_by = "GROUP BY stats_virus.name ORDER BY total DESC LIMIT 15 OFFSET 0";
-		
+		add_to_sql("DISTINCT stats_virus.name", "select");
+		add_to_sql("COUNT(binaries.info) as total", "select");
+#		$select = "SELECT DISTINCT stats_virus.name, count(binaries.info) as total";
+		add_to_sql("binaries", "table");
+		add_to_sql("stats_virus", "table");
+		add_to_sql("uniq_binaries", "table");
+		add_to_sql("details", "table");
+		add_to_sql("uniq_binaries.id = binaries.bin", "where");
+		add_to_sql("uniq_binaries.name = details.text", "where");
+		add_to_sql("binaries.info = stats_virus.name", "where");
+		add_to_sql("stats_virus.name NOT LIKE 'Suspicious'", "where");
+		add_to_sql("stats_virus.name", "group");
+		add_to_sql("total DESC LIMIT 15 OFFSET 0", "order");
+#		$group_by = "GROUP BY stats_virus.name ORDER BY total DESC LIMIT 15 OFFSET 0";
           } else exit("Invalid data supplied");
         }
 	
@@ -743,10 +720,12 @@ if ($rapport == "chart_sensor") {
 	prepare_sql();
 	
 	### Prepare final SQL query
-	$sql =  $select;
+	$sql = "SELECT $sql_select ";
 	$sql .= " FROM $sql_from ";
 	$sql .= " $sql_where ";
-	$sql .= $group_by;
+        if ($sql_group) {
+          $sql .= " GROUP BY $sql_group ";
+        }
         $_SESSION['chartsql'] = $sql;
 	
         $title = "Searchresults: $label";
@@ -761,11 +740,16 @@ if ($rapport == "chart_attack") {
 	$type = $clean['charttype'];
 	if ($type > 2) $type = 0;
 	$chartorg = $s_org;
-	
-	$select = " SELECT DISTINCT sensors.keyname, COUNT(details.*) AS total ";
-	add_db_table("details");
-	$where[] = "details.type = 1";
-	$group_by = " GROUP BY sensors.keyname";
+
+	add_to_sql("DISTINCT sensors.keyname", "select");
+	add_to_sql("COUNT(details.id) AS total", "select");
+	add_to_sql("sensors", "table");
+	add_to_sql("attacks", "table");
+	add_to_sql("details", "table");
+	add_to_sql("details.type = 1", "where");
+	add_to_sql("sensors.id = attacks.sensorid", "where");
+	add_to_sql("attacks.id = details.attackid", "where");
+	add_to_sql("sensors.keyname", "group");
 	
 	if ($f_attack <= 0) $label .= "ALL attacks";
 	else {
@@ -779,10 +763,12 @@ if ($rapport == "chart_attack") {
 	prepare_sql();
 	
 	### Prepare final SQL query
-	$sql =  $select;
+	$sql = "SELECT $sql_select ";
 	$sql .= " FROM $sql_from ";
 	$sql .= " $sql_where ";
-	$sql .= $group_by;
+        if ($sql_group) {
+          $sql .= " GROUP BY $sql_group ";
+        }
         $_SESSION['chartsql'] = $sql;
 	
         $title = "Searchresults: $label";
@@ -790,16 +776,21 @@ if ($rapport == "chart_attack") {
         // Personal search templates
 		echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br></div>\n";
 
-//        require_once("../libchart/libchart.php");
-//        $img = makeChart($type, $title, $sql, $chartorg);
-//        echo "<img alt='Chart' src='$img' />\n";
 	footer();
 	exit;
 }
 
+add_to_sql("attacks", "table");
+add_to_sql("sensors", "table");
+add_to_sql("attacks.sensorid = sensors.id", "where");
+add_to_sql("attacks.*", "select");
+add_to_sql("sensors.keyname", "select");
+
 prepare_sql();
 
+#########################
 ### Prepare sql-ORDER BY
+#########################
 $order_by_tbl = array(	"id"		=> "attacks.id", 
 						"timestamp"	=> "attacks.timestamp", 
 						"severity"	=> "attacks.severity", 
@@ -816,10 +807,14 @@ if (isset($tainted['orderm'])) {
 	else $asc_desc = "ASC";
 } else $asc_desc = "ASC";
 if ($asc_desc == "ASC") $order_m_url[$tainted['order']] = "&orderm=DESC";
+add_to_sql($sql_order_by, "order");
+
+#########################
 
 if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]) == 0) || ($clean['page'] == 0)) {
 	### Prepare count SQL query
-	$sql_count =  " SELECT COUNT(attacks.id) AS total ";
+	$sql_select = "COUNT(attacks.id) AS total";
+	$sql_count = "SELECT $sql_select ";
 	$sql_count .= " FROM $sql_from ";
 	$sql_count .= " $sql_where ";
         $debuginfo[] = $sql_count;
@@ -908,16 +903,17 @@ echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTe
 
 flush();
 
+prepare_sql();
 
 ### Prepare final SQL query
-$sql =  " SELECT DISTINCT attacks.id AS attacks_id, *";
+$sql =  " SELECT $sql_select";
 $sql .= " FROM $sql_from ";
 $sql .= " $sql_where ";
-$sql .= " ORDER BY $sql_order_by $asc_desc ";
+if ($sql_order) {
+  $sql .= " ORDER BY $sql_order $asc_desc ";
+}
 $sql .= " $sql_limit ";
-
 $debuginfo[] = $sql;
-
 $result = pg_query($sql);
 
 if ($last_page > 1) $page_lbl = "pages";
@@ -945,7 +941,7 @@ echo "<table class='datatable' width='100%'>\n";
 
 while ($row = pg_fetch_assoc($result)) {
   flush();
-  $id = pg_escape_string($row['attacks_id']);
+  $id = pg_escape_string($row['id']);
   $ts = date("d-m-Y H:i:s", $row['timestamp']);
   $sev = $row['severity'];
   $severity = $severity_ar[$sev];
@@ -964,7 +960,7 @@ while ($row = pg_fetch_assoc($result)) {
   $numrows_details = pg_num_rows($result_details);
 
   if ($c_enable_pof == 1) {
-    $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "'";
+    $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
     $result_finger = pg_query($pgconn, $sql_finger);
     $numrows_finger = pg_num_rows($result_finger);
 
@@ -996,14 +992,11 @@ while ($row = pg_fetch_assoc($result)) {
     }
 
     if ($c_geoip_enable == 1) {
-#      $countryid = geoip_country_id_by_addr($gi, $source);
-#      $countrycode = strtolower($gi->GEOIP_COUNTRY_CODES[$countryid]);
       $record = geoip_record_by_addr($gi, $source);
       $countrycode = strtolower($record->country_code);
       $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
       if (file_exists($cimg)) {
         $country = $record->country_name;
-#        $country = $gi->GEOIP_COUNTRY_NAMES[$countryid];
         echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
       } else {
         echo "<img src='images/worldflags/flag.gif' onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
@@ -1028,11 +1021,18 @@ while ($row = pg_fetch_assoc($result)) {
         $text = $dia_result_ar[0]['text'];
         $attack = $attacks_ar[$text]["Attack"];
         $attack_url = $attacks_ar[$text]["URL"];
-        if ($smac != "") {
-          echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a><br />$smac</td>\n";
-        } else {
-          echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
+        echo "<td class='datatd'>";
+        if ($attack_url != "") {
+          echo "<a $ahref target='new'>";
         }
+        echo "$attack";
+        if ($attack_url != "") {
+          echo "</a>";
+        }
+        if ($smac != "") {
+          echo "<br />$smac";
+        }
+        echo "</td>\n";
       } elseif ($sev == 16) {
         $row_details = pg_fetch_assoc($result_details);
         $text = $row_details['text'];
@@ -1091,7 +1091,7 @@ if ($rapport == "multi") {
 
 pg_close($pgconn);
 
-#debug_sql();
+debug_sql();
 
 if ($c_searchtime == 1) {
   $timeend = microtime_float();

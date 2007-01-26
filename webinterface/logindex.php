@@ -3,14 +3,17 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 17-01-2007                       #
+# Version 1.04.07                  #
+# 26-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 add_to_sql()
+# 1.04.06 Replaced $where[] with add_where()
+# 1.04.05 Changed some sql stuff
 # 1.04.04 Added ORDER BY for organisation select box
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
@@ -174,18 +177,22 @@ echo "<table class='datatable'>\n";
     echo "<td class='dataheader' width='100'>Statistics</td>\n";
   echo "</tr>\n";
 
-  add_db_table("attacks");
-  add_db_table("sensors");
-  $where[] = "$tsquery";
+  add_to_sql("attacks", "table");
+  add_to_sql("$tsquery", "where");
   if ($s_access_search != 9 || ($s_access_search == 9 && $q_org != 0)) {
-    $where[] = " sensors.organisation = $q_org ";
+    add_to_sql("sensors", "table");
+    add_to_sql("attacks.sensorid = sensors.id", "where");
+    add_to_sql("sensors.organisation = $q_org", "where");
   }
+  add_to_sql("DISTINCT attacks.severity", "select");
+  add_to_sql("COUNT(attacks.severity) as total", "select");
+  add_to_sql("attacks.severity", "group");
   prepare_sql();
 
-  $sql_severity = "SELECT DISTINCT attacks.severity, COUNT(attacks.severity) as total ";
+  $sql_severity = "SELECT $sql_select ";
   $sql_severity .= " FROM $sql_from ";
   $sql_severity .= " $sql_where ";
-  $sql_severity .= " GROUP BY attacks.severity ";
+  $sql_severity .= " GROUP BY $sql_group ";
 
   $debuginfo[] = $sql_severity;
 

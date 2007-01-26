@@ -1,14 +1,17 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 11-12-2006                       #
+# Version 1.04.08                  #
+# 26-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Added add_to_sql, reset_sql
+# 1.04.07 Bugfix in getEndWeek()
+# 1.04.06 Added getepoch() function
 # 1.04.05 Removed the stripinput function
 # 1.04.04 Changed the debug function
 # 1.04.03 Added getPortDescr() function
@@ -25,6 +28,58 @@
 # 1.02.04 Modified prepare_sql_where function. Renamed to prepare_sql with a hook to prepare_sql_from()
 # 1.02.03 Initial release
 #############################################
+
+// Function to reset all SQL arrays
+function reset_sql() {
+  global $select, $table, $where, $group, $order;
+  global $sql_select, $sql_from, $sql_where, $sql_group, $sql_order;
+  $select = array();
+  $sql_select = "";
+  $table = array();
+  $sql_from = "";
+  $where = array();
+  $sql_where = "";
+  $group = array();
+  $sql_group = "";
+  $order = array();
+  $sql_order = "";
+}
+
+// Function for adding a WHERE clause to the $where array
+function add_to_sql($add, $ar) {
+  global ${$ar};
+  if (empty(${$ar})) {
+    ${$ar} = array();
+  }
+  if (trim($add) != "") {
+    if (!in_array($add, ${$ar})) {
+      ${$ar}[] = $add;
+    }
+  }
+}
+
+function getepoch($stamp) {
+  list($date, $time) = explode(" ", $stamp);
+  list($day, $mon, $year) = explode("-", $date);
+  list($hour, $min) = explode(":", $time);
+  // Date MUST BE valid
+  $day = intval($day);
+  $mon = intval($mon);
+  $year = intval($year);
+  if (($day > 0) && ($mon > 0) && ($year > 0)) {
+    if (checkdate($mon, $day, $year)) {
+      // Valid date, check time
+      $hour = intval($hour);
+      $min = intval($min);
+      if (!(($minute >= 0) && ($min < 60) && ($hour >= 0) && ($hour < 24))) {
+        // Invalid time, generate midnight (0:00)
+        $hour = $min = 0;
+      }
+      $epoch = mktime($hour, $min, 0, $mon, $day, $year);
+      return $epoch;
+    }
+  }
+}
 
 function geterror($m) {
   global $v_errors;
@@ -349,47 +404,84 @@ function add_db_table($tbl) {
         }
 }
 
+// Function for adding a SELECT clause to the $select array
+function add_select($addselect) {
+  global $select;
+  if (empty($select)) {
+    $select = array();
+  }
+  if (!in_array($addselect, $select)) {
+    $select[] = $addselect;
+  }
+}
+
+// Function for adding a WHERE clause to the $where array
+function add_where($addwhere) {
+  global $where;
+  if (empty($where)) {
+    $where = array();
+  }
+  if (!in_array($addwhere, $where)) {
+    $where[] = $addwhere;
+  }
+}
+
 // Function for creating sql-WHERE (used by searchresults)
 function prepare_sql() {
-	global $db_table, $where, $sql_where;
-        if (empty($db_table)) {
-          $db_table = array();
-        }
-	
-	# Creating link between sensors and attacks table.
-	if (in_array("attacks", $db_table)) {
-          add_db_table("sensors");
-          $where[] = "sensors.id = attacks.sensorid";
-        }
-        # Creating link between attacks and details table.
-	if (in_array("details", $db_table) || in_array("binaries", $db_table)) {
-          add_db_table("details");
-          add_db_table("attacks");
-          $where[] = "details.attackid = attacks.id";
-        }
-        # Creating link between binaries and details table.
-	if (in_array("binaries", $db_table)) {
-          add_db_table("binaries");
-          $where[] = "binaries.bin = details.text";
-        }
-        # Creating link between details and sensors table
-        if (in_array("details", $db_table) && in_array("sensors", $db_table)) {
-          $where[] = "sensors.id = details.sensorid";
-        }
-	
-	$sql_where = "";
-	foreach ($where as $val) {
-		if ($val != "") {
-			if (empty($sql_where)) {
-				$sql_where .= " WHERE ";
-			} else {
-				$sql_where .= " AND ";
-			}
-        	        check_where_table($val);
-			$sql_where .= $val . " ";
-		}
-	}
-	prepare_sql_from();
+  # Defining the global source arrays
+  global $table, $where, $select, $order, $group;
+  # Defining the global result strings
+  global $sql_from, $sql_where, $sql_select, $sql_order, $sql_group;
+
+  if ($where) {
+    $sql_where = "";
+    if (@count($where > 0)) {
+      $sql_where = " WHERE $where[0] ";
+      for ($i = 1; $i < count($where); $i++) {
+        $sql_where .= " AND " . $where[$i];
+      }
+    }
+  }
+
+  $sql_from = "";
+  if (@count($table > 0)) {
+    $sql_from = $table[0];
+    for ($i = 1; $i < count($table); $i++) {
+      $sql_from .= ", " . $table[$i];
+    }
+  }
+
+  if ($select) {
+    $sql_select = "";
+    if (@count($db_table > 0)) {
+      $sql_select = $select[0];
+      for ($i = 1; $i < count($select); $i++) {
+        $sql_select .= ", " . $select[$i];
+      }
+    }
+  } else {
+    $sql_select = " * ";
+  }
+
+  if ($group) {
+    $sql_group = "";
+    if (@count($group > 0)) {
+      $sql_group = $group[0];
+      for ($i = 1; $i < count($group); $i++) {
+        $sql_group .= ", " . $group[$i];
+      }
+    }
+  }
+
+  if ($order) {
+    $sql_order = "";
+    if (@count($order > 0)) {
+      $sql_order = $order[0];
+      for ($i = 1; $i < count($order); $i++) {
+        $sql_order .= ", " . $order[$i];
+      }
+    }
+  }
 }
 
 function check_where_table($ch_val) {
@@ -405,15 +497,14 @@ function check_where_table($ch_val) {
 
 // Function for creating sql-FROM (used by searchresults)
 function prepare_sql_from() {
-	global $db_table, $sql_from;
-	
-	$sql_from = "";
-	if (@count($db_table > 0)) {
-		$sql_from = $db_table[0];
-		for ($i = 1; $i < count($db_table); $i++) {
-			$sql_from .= ", " . $db_table[$i];
-		}
-	}
+  global $db_table, $sql_from;
+  $sql_from = "";
+  if (@count($db_table > 0)) {
+    $sql_from = $db_table[0];
+    for ($i = 1; $i < count($db_table); $i++) {
+      $sql_from .= ", " . $db_table[$i];
+    }
+  }
 }
 
 # Function to convert amount of bytes into human readable format.
@@ -548,7 +639,7 @@ function getStartWeek($day = '', $month = '', $year = '') {
 # Function used to determine the end of a week. Returns timestamp in epoch format.
 function getEndWeek($day = '', $month = '', $year = '') {
   $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek;
+  $startofweek = $day - $dayofweek + 1;
   $endofweek = $startofweek + 6;
   $stamp = mktime(23,59,59,$month,$endofweek,$year);
   return $stamp;

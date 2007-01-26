@@ -3,14 +3,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.05                  #
+# 26-12-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 add_to_sql()
+# 1.04.04 Replaced $where[] with add_where()
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
@@ -119,18 +121,27 @@ if (isset($clean['range'])) {
 if ($err != 1) {
   ### retrieving organisation ranges.
 
-  add_db_table("attacks");
-  $where[] = "$tsquery";
-#  $where[] = "sensors.organisation = $q_org";
-  $where[] = "attacks.source <<= '$range'";
-  $where[] = "attacks.severity = 1";
+  add_to_sql("attacks", "table");
+  add_to_sql("$tsquery", "where");
+# add_where("sensors.organisation = $q_org");
+  add_to_sql("attacks.source <<= '$range'", "where");
+  add_to_sql("attacks.severity = 1", "where");
+  add_to_sql("DISTINCT attacks.source", "select");
+  add_to_sql("COUNT(attacks.source) as total", "select");
+  add_to_sql("attacks.source", "group");
+  add_to_sql("$orderby", "order");
   prepare_sql();
 
-  $sql_uniq = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
+#  $sql_uniq = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
+  $sql_uniq = "SELECT $sql_select ";
   $sql_uniq .= " FROM $sql_from ";
   $sql_uniq .= " $sql_where ";
-  $sql_uniq .= " GROUP BY attacks.source ";
-  $sql_uniq .= " $orderby ";
+  if ($sql_group) {
+    $sql_uniq .= " GROUP BY $sql_group ";
+  }
+  if ($sql_order) {
+    $sql_uniq .= " $sql_order ";
+  }
   $result_uniq = pg_query($pgconn, $sql_uniq);
 
   $debuginfo[] = $sql_uniq;

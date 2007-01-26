@@ -22,9 +22,9 @@ if (intval(@strlen($_SESSION["s_user"])) == 0) {
   exit;
 }
 
-header("Content-type: image/png");
-header("Cache-control: no-cache");
-header("Pragma: no-cache");
+#header("Content-type: image/png");
+#header("Cache-control: no-cache");
+#header("Pragma: no-cache");
 
 include '../include/config.inc.php';
 include '../include/connect.inc.php';

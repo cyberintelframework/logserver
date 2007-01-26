@@ -3,14 +3,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.05                  #
+# 26-01-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 add_to_sql()
+# 1.04.04 Changed some sql stuff
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
@@ -185,47 +187,49 @@ if ($err != 1) {
   $ranges_ar = explode(";", $row['ranges']);
 
   foreach ($ranges_ar as $range) {
-    add_db_table("attacks");
-    $where[] = "attacks.source <<= '$range'";
-    $where[] = "attacks.severity = 1";
-    $where[] = "sensors.organisation = '$q_org'";
-    $where[] = "$tsquery";
-    prepare_sql();
+    if (trim($range) != "") {
+      add_to_sql("attacks", "table");
+      add_to_sql("sensors", "table");
+      add_to_sql("attacks.source <<= '$range'", "where");
+      add_to_sql("attacks.severity = 1", "where");
+      add_to_sql("$tsquery", "where");
+      prepare_sql();
 
-    $sql_total = "SELECT COUNT(attacks.id) as total ";
-    $sql_total .= " FROM $sql_from ";
-    $sql_total .= " $sql_where ";
+      $sql_total = "SELECT COUNT(attacks.id) as total ";
+      $sql_total .= " FROM $sql_from ";
+      $sql_total .= " $sql_where ";
 
-    $sql_uniq = "SELECT DISTINCT source ";
-    $sql_uniq .= " FROM $sql_from ";
-    $sql_uniq .= " $sql_where ";
+      $sql_uniq = "SELECT DISTINCT source ";
+      $sql_uniq .= " FROM $sql_from ";
+      $sql_uniq .= " $sql_where ";
 
-    $debuginfo[] = $sql_total;
-    $debuginfo[] = $sql_uniq;
+      $debuginfo[] = $sql_total;
+      $debuginfo[] = $sql_uniq;
 
-    $result_total = pg_query($pgconn, $sql_total);
-    $row_total = pg_fetch_assoc($result_total);
-    $count_total = $row_total['total'];
+      $result_total = pg_query($pgconn, $sql_total);
+      $row_total = pg_fetch_assoc($result_total);
+      $count_total = $row_total['total'];
 
-    $result_uniq = pg_query($pgconn, $sql_uniq);
-    $count_uniq = pg_num_rows($result_uniq);
+      $result_uniq = pg_query($pgconn, $sql_uniq);
+      $count_uniq = pg_num_rows($result_uniq);
 
-    $where = array();
+      reset_sql();
 
-    echo "<tr>\n";
-      echo "<td class='datatd'>$range</td>\n";
-      if ($count_total > 0) {
-        echo "<td class='datatd' align='right'><a href='logsearch.php?net_searchnet=$range&amp;int_sev=1&amp;int_org=$q_org$dateqs'>" . nf($count_total) . "</a>&nbsp;</td>\n";
-        if ($s_access_search == 9) {
-          echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org&b=$b'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+      echo "<tr>\n";
+        echo "<td class='datatd'>$range</td>\n";
+        if ($count_total > 0) {
+          echo "<td class='datatd' align='right'><a href='logsearch.php?net_searchnet=$range&amp;int_sev=1&amp;int_org=$q_org$dateqs'>" . nf($count_total) . "</a>&nbsp;</td>\n";
+          if ($s_access_search == 9) {
+            echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org&b=$b'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+          } else {
+            echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+          }
         } else {
-          echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'>" . nf($count_total) . "&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'>" . nf($count_uniq) . "&nbsp;</td>\n";
         }
-      } else {
-        echo "<td class='datatd' align='right'>" . nf($count_total) . "&nbsp;</td>\n";
-        echo "<td class='datatd' align='right'>" . nf($count_uniq) . "&nbsp;</td>\n";
-      }
-    echo "</tr>\n";
+      echo "</tr>\n";
+    }
   }
   echo "</table>\n";
 }

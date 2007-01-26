@@ -20,8 +20,25 @@
 <script>
 
 var mytabs = new Array();
-mytabs[0] = "attack";
+mytabs[0] = "attacks";
 mytabs[1] = "severity";
+
+function shlinks(id) {
+  var status = document.getElementById(id).style.display;
+
+  for (i=0;i<mytabs.length;i++) {
+    var tab = mytabs[i];
+    var but = 'button_' + tab;
+    if (tab == id) {
+      document.getElementById(but).className='tabsel';
+      document.getElementById(id).style.display='block';
+    } else {
+      document.getElementById(but).className='tab';
+      document.getElementById(tab).style.display='none';
+    }
+  }
+  document.getElementById(id).blur();
+}
 
 </script>
 
@@ -45,25 +62,26 @@ if ($_GET) {
   $result_getsensors = pg_query($sql_getsensors);
 
   echo "<div class='tabselect' align='left' style='float: left;'>\n";
-    echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='Severity' onclick='javascript: showTab(\"severity\");' />\n";
-    echo "<input class='tab' id='button_attack' type='button' name='button_attack' value='Attack' onclick='javascript: showTab(\"attack\");' />\n";
+    echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='Severity' onclick='javascript: shlinks(\"severity\", mytabs);' />\n";
+    echo "<input class='tab' id='button_attacks' type='button' name='button_attacks' value='Attack' onclick='javascript: shlinks(\"attacks\");' />\n";
   echo "</div>\n";
+  echo "<br /><br />\n";
 
-  echo "<div class='tabcontent' id='severity' style='z-index: 9;'>\n";
+  echo "<div class='tabcontent' id='severity' style='z-index: 9; display: block;'>\n";
   echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='100'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
-          echo "<input type='text' name='strip_html_escape_tsstart' id='ts_start' value='' />\n";
-          echo "<input type='button' value='...' name='ts_start_trigger' id='ts_start_trigger' />\n";
+          echo "<input type='text' name='strip_html_escape_tsstart' id='ts_start_sev' value='' />\n";
+          echo "<input type='button' value='...' name='ts_start_sev_trigger' id='ts_start_sev_trigger' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>To:</td>\n";
         echo "<td class='datatd'>";
-          echo "<input type='text' name='strip_html_escape_tsend' id='ts_end' value='' />\n";
-          echo "<input type='button' value='...' name='ts_end_trigger' id='ts_end_trigger' />\n";
+          echo "<input type='text' name='strip_html_escape_tsend' id='ts_end_sev' value='' />\n";
+          echo "<input type='button' value='...' name='ts_end_sev_trigger' id='ts_end_sev_trigger' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       # SENSORS
@@ -97,25 +115,6 @@ if ($_GET) {
            echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
-      # ATTACKS
-#      $sql_getattacks = "SELECT * FROM stats_dialogue";
-#      $debuginfo[] = $sql_getattacks;
-#      $result_getattacks = pg_query($sql_getattacks);
-
-#      echo "<tr>\n";
-#        echo "<td class='datatd'>Attack:</td>\n";
-#        echo "<td class='datatd'>\n";
-#          echo "<select name='attack[]' style='background-color:white;' size='5' multiple='true'>\n";
-#            echo printOption("", "All attacks", "");
-#            while ($attack_data = pg_fetch_assoc($result_getattacks)) {
-#              $id = $attack_data['id'];
-#              $name = $attack_data['name'];
-#              $name = str_replace("Dialogue", "", $name);
-#              echo printOption($id, $name, 99); 
-#            }
-#           echo "</select>\n";
-#        echo "</td>\n";
-#      echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>Interval</td>\n";
         echo "<td class='datatd'>\n";
@@ -145,21 +144,21 @@ if ($_GET) {
   echo "</form>\n";
   echo "</div>\n";
 
-  echo "<div class='tabcontent' id='attack' style='z-index: 9; display: none;'>\n";
+  echo "<div class='tabcontent' id='attacks' style='z-index: 9; display: none;'>\n";
   echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='100'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
-          echo "<input type='text' name='strip_html_escape_tsstart' id='ts_start' value='' />\n";
-          echo "<input type='button' value='...' name='ts_start_trigger' id='ts_start_trigger' />\n";
+          echo "<input type='text' name='strip_html_escape_tsstart' id='ts_start_att' value='' />\n";
+          echo "<input type='button' value='...' name='ts_start_att_trigger' id='ts_start_att_trigger' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td class='datatd'>To:</td>\n";
         echo "<td class='datatd'>";
-          echo "<input type='text' name='strip_html_escape_tsend' id='ts_end' value='' />\n";
-          echo "<input type='button' value='...' name='ts_end_trigger' id='ts_end_trigger' />\n";
+          echo "<input type='text' name='strip_html_escape_tsend' id='ts_end_att' value='' />\n";
+          echo "<input type='button' value='...' name='ts_end_att_trigger' id='ts_end_att_trigger' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       # SENSORS
@@ -168,6 +167,7 @@ if ($_GET) {
         echo "<td class='datatd'>\n";
           echo "<select name='sensorid[]' style='background-color:white;' size='4' multiple='true'>\n";
             echo printOption("", "All sensors", "");
+            pg_result_seek($result_getsensors, 0);
             while ($sensor_data = pg_fetch_assoc($result_getsensors)) {
               $sid = $sensor_data['id'];
               $label = $sensor_data["keyname"];
@@ -195,7 +195,7 @@ if ($_GET) {
               $id = $attack_data['id'];
               $name = $attack_data['name'];
               $name = str_replace("Dialogue", "", $name);
-              echo printOption($id, $name, 99);
+              echo printOption($id, $name, 99); 
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -229,7 +229,6 @@ if ($_GET) {
   echo "</form>\n";
   echo "</div>\n";
 
-
   debug_sql();
 ?>
 <script>
@@ -245,9 +244,9 @@ function catcalc(cal) {
 
 Calendar.setup(
   {
-      inputField  : "ts_start",
+      inputField  : "ts_start_att",
       ifFormat    : "%d-%m-%Y %H:%M",
-      button      : "ts_start_trigger",
+      button      : "ts_start_att_trigger",
       showsTime   : true,
       singleClick : false,
       onUpdate    : catcalc
@@ -255,9 +254,28 @@ Calendar.setup(
 );
 Calendar.setup(
   {
-      inputField  : "ts_end",
+      inputField  : "ts_start_sev",
       ifFormat    : "%d-%m-%Y %H:%M",
-      button      : "ts_end_trigger",
+      button      : "ts_start_sev_trigger",
+      showsTime   : true,
+      singleClick : false,
+      onUpdate    : catcalc
+  }
+);
+Calendar.setup(
+  {
+      inputField  : "ts_end_sev",
+      ifFormat    : "%d-%m-%Y %H:%M",
+      button      : "ts_end_sev_trigger",
+      showsTime   : true,
+      singleClick : false
+  }
+);
+Calendar.setup(
+  {
+      inputField  : "ts_end_att",
+      ifFormat    : "%d-%m-%Y %H:%M",
+      button      : "ts_end_att_trigger",
       showsTime   : true,
       singleClick : false
   }
