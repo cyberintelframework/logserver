@@ -167,6 +167,9 @@ echo "<table class='datatable' width='100%'>\n";
     $server = $row['server'];
     $netconf = $row['netconf'];
     $vlanid = $row['vlanid'];
+    if ($vlanid != 0) {
+      $sensor = "$sensor-$vlanid";
+    }
     $laststart = "";
     $lastupdate = "";
     $diffstart = 0;

@@ -40,6 +40,7 @@ $result_getorg = pg_query($pgconn, $sql_getorg);
 
 $debuginfo[] = $sql_getorg;
 
+
 ### Default browse method is weekly.
 if (isset($tainted['b'])) {
   $b = $tainted['b'];
@@ -91,6 +92,8 @@ $tsquery = "timestamp >= $start AND timestamp <= $end";
 
 ### BROWSE MENU
 $today = date("U");
+
+
 echo "<form name='selectorg' method='get' action='googlemap.php'>\n";
   if ($b != "all") {
     echo "<input type='button' value='Prev' class='button' onClick=window.location='googlemap.php?b=$b&amp;i=$prev&amp;int_org=$q_org';>\n";
@@ -142,6 +145,7 @@ if ($b == "daily") {
       echo "<h4>Results from $datestart to $dateend</h4>\n";
 }
 ?>
+
 
 
 <div id="map" style="width: 800px; height: 400px">
@@ -243,6 +247,12 @@ request.onreadystatechange = function() {
 }
 request.send(null);
 </script>
+<div id="search_wait">Search is being processed...<br /><br />Please be patient.</div>
+
+<script language="javascript" type="text/javascript">
+document.getElementById('search_wait').style.display='none';
+</script>
+
 
 
 

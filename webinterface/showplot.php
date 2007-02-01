@@ -17,11 +17,7 @@ include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 
-#header("Content-type: image/png");
-#header("Cache-control: no-cache");
-#header("Pragma: no-cache");
-#header("Content-disposition: attachment; filename=plot.jpg");
-
+/*
 function getepoch($stamp) {
   list($date, $time) = explode(" ", $stamp);
   list($day, $mon, $year) = explode("-", $date);
@@ -44,7 +40,9 @@ function getepoch($stamp) {
     }
   }
 }
+*/
 
+$drawerr = 0;
 $allowed_get = array(
                 "int_interval",
                 "strip_html_escape_tsstart",
@@ -52,92 +50,98 @@ $allowed_get = array(
 		"int_type",
 		"sensorid",
 		"severity",
-		"attack"
+		"attack",
+		"strip_html_escape_ports"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
-$allattacks = 0;
-$allsensors = 0;
-$allsev = 0;
-$groupbysensorid = "";
-$groupbyattacks = "";
-$selectattacks = "";
-$selectsensorid = "";
-$where = "";
+if (!isset($clean['tsstart']) || empty($clean['tsstart'])) {
+  $drawerr = 1;
+} elseif (!isset($clean['tsend']) || empty($clean['tsend'])) {
+  $drawerr = 1;
+}
+
+if ($drawerr = 1) {
+  header("Content-type: image/png");
+  header("Cache-control: no-cache");
+  header("Pragma: no-cache");
+  header("Content-disposition: attachment; filename=plot.jpg");
+  readfile("images/nodata.gif");
+  exit;
+}
+
+########################
+# Interval
+########################
+if (!isset($clean['interval']) || empty($clean['interval'])) {
+  $interval = 86400;
+} else {
+  $interval = $clean['interval'];
+}
+
+########################
+# Type
+########################
+if (!isset($clean['type']) || empty($clean['type'])) {
+  $type = $v_plottertypes[1];
+} else {
+  $type = $clean['type'];
+  $type = $v_plottertypes[$type];
+}
+
+add_to_sql("sensors", "table");
+add_to_sql("DISTINCT attacks.severity", "select");
+add_to_sql("attacks", "table");
+add_to_sql("attacks.sensorid = sensors.id", "where");
 
 ########################
 # Severity
 ########################
-if (@is_array($tainted['severity'])) {
-  $count = count($tainted['severity']);
-  if ($count == 1) {
-    $sev = intval($tainted['severity'][0]);
-    if ($sev == 99) {
+if ($tainted['severity']) {
+  if (@is_array($tainted['severity'])) {
+    if (intval($tainted['severity'][0]) == 99) {
       $title .= "All attacks";
-      $allsev = 1;
     } else {
       $title .= $severity_ar[$sev];
-      $where .= " AND attacks.severity = $sev";
-    }
-  } else {
-    $where .= " AND attacks.severity IN (";
-    $check = 0;
-    foreach ($tainted['severity'] as $sev) {
-      $check++;
-      $sev = intval($sev);
-      if ($check != count($tainted['severity'])) {
-        $where .= $sev .", ";
-        $title .= $severity_ar[$sev] . ", ";
-      } else {
-        $where .= $sev;
-        $title .= $severity_ar[$sev];
+      $tempwhere .= "attacks.severity IN (";
+      $check = 0;
+      foreach ($tainted['severity'] as $sev) {
+        $check++;
+        $sev = intval($sev);
+        if ($check != count($tainted['severity'])) {
+          $tempwhere .= $sev .", ";
+          $title .= $severity_ar[$sev] . ", ";
+        } else {
+          $tempwhere .= $sev;
+          $title .= $severity_ar[$sev];
+        }
       }
+      $tempwhere .= ") ";
+      add_to_sql("$tempwhere", "where");
     }
-    $where .= ") ";
   }
 } else {
-  $sev = intval($tainted['severity']);
-  if ($sev == 99) {
-    $title .= "All attacks";
-    $allsev = 1;
-  } else {
-    $title .= $severity_ar[$sev];
-    $where .= " AND attacks.severity = $sev";
-  }
+  $title .= "All attacks";
 }
+add_to_sql("attacks.severity", "group");
+$tempwhere = "";
 
 ########################
 # Attack Types
 ########################
-if ($allsev == 1) {
+if ($tainted['attack']) {
   if (@is_array($tainted['attack'])) {
-    $count = count($tainted['attack']);
-    if ($count == 1) {
-      $attack = intval($tainted['attack'][0]);
-      if ($attack != 99) {
-        $groupbyattacks = "details.text, ";
-        $selectattacks = "details.text, ";
+    if (intval($tainted['attack'][0]) != 99) {
+      add_to_sql("details", "table");
+      add_to_sql("attacks", "table");
+      add_to_sql("attacks.id = details.attackid", "where");
 
-        $sql_getattack = "SELECT name FROM stats_dialogue WHERE id = $attack";
-        $debuginfo[] = $sql_getattack;
-        $result_getattack = pg_query($sql_getattack);
-        $row_attack = pg_fetch_assoc($result_getattack);
-        $dianame = $row_attack['name'];
-
-        $attackname = str_replace("Dialogue", "", $dianame);
-        $title .= " ($attackname)";
-        $where .= " AND details.text = '$dianame'";
-        $where .= " AND attacks.severity = 1 ";
-      } else {
-        $allattacks = 1;
-      }
-    } else {
-      $where .= " AND details.text IN (";
       $check = 0;
-      $groupbyattacks = "details.text, ";
-      $selectattacks = "details.text, ";
+      add_to_sql("details.text", "group");
+      add_to_sql("details.text", "select");
       $title .= " (";
+      $tempwhere .= "details.text IN (";
       foreach ($tainted['attack'] as $attack) {
         $check++;
         $attack = intval($attack);
@@ -150,42 +154,26 @@ if ($allsev == 1) {
         $attackname = str_replace("Dialogue", "", $dianame);
 
         if ($check != count($tainted['attack'])) {
-          $where .= "'" .$dianame. "', ";
+          $tempwhere .= "'" .$dianame. "', ";
           $title .= $attackname .", ";
         } else {
-          $where .= "'" .$dianame. "'";
+          $tempwhere .= "'" .$dianame. "'";
           $title .= $attackname;
         }
       }
-      $where .= ") ";
+      $tempwhere .= ") ";
+      add_to_sql($tempwhere, "where");
+      add_to_sql("details.text", "group");
       $title .= ") ";
-    }
-  } else {
-    $attack = intval($tainted['attack']);
-    if ($attack != 99) {
-      $groupbyattacks = "details.text, ";
-      $selectattacks = "details.text, ";
-
-      $sql_getattack = "SELECT name FROM stats_dialogue WHERE id = $attack";
-      $debuginfo[] = $sql_getattack;
-      $result_getattack = pg_query($sql_getattack);
-      $row_attack = pg_fetch_assoc($result_getattack);
-      $dianame = $row_attack['name'];
-      $attackname = str_replace("Dialogue", "", $dianame);
-
-      $title .= " ($attackname)";
-      $where .= " AND details.text = $dianame";
-      $where .= " AND attacks.severity = 1 ";
-    } else {
-      $allattacks = 1;
+      add_to_sql("details.text", "select");
     }
   }
 }
+$tempwhere = "";
 
 ########################
 # Interval & Timestamps
 ########################
-$interval = $clean['interval'];
 if ($interval == 3600) {
   $title .= " per hour";
 } elseif ($interval == 86400) {
@@ -207,72 +195,61 @@ $tsperiod = $tsend - $tsstart;
 $tssteps = intval($tsperiod / $interval);
 
 ########################
-# Type
-########################
-$type = $clean['type'];
-$type = $v_plottertypes[$type];
-
-########################
 # Sensor ID
 ########################
-if (@is_array($tainted["sensorid"])) {
-  $count = count($tainted['sensorid']);
-  if ($count == 1) {
-    $sid = intval($tainted['sensorid'][0]);
-    if ($sid == 0) {
-      $groupbysensorid = "";
-      $selectsensorid = "";
+if ($tainted['sensorid']) {
+  if (@is_array($tainted['sensorid'])) {
+    if ($tainted['sensorid'][0] == 0) {
       $title .= " for all sensors";
       $allsensors = 1;
     } else {
-      $groupbysensorid = "sensors.keyname, ";
-      $selectsensorid = "sensors.keyname, ";
-      $sql_gs = "SELECT keyname FROM sensors WHERE id = $sid";
-      $result_gs = pg_query($pgconn, $sql_gs);
-      $row_gs = pg_fetch_assoc($result_gs);
-      $keyname = $row_gs['keyname'];
-      $title .= " for $keyname";
-      $where .= " AND sensors.id = $sid";
-    }
-  } else {
-    $groupbysensorid = "sensors.keyname, ";
-    $selectsensorid = "sensors.keyname, ";
-    $title .= " for sensors: ";
-    $where .= " AND sensors.id IN (";
-    $check = 0;
-    foreach ($tainted['sensorid'] as $sid) {
-      $check++;
-      $sid = intval($sid);
-      $sql_gs = "SELECT keyname FROM sensors WHERE id = $sid";
-      $result_gs = pg_query($pgconn, $sql_gs);
-      $row_gs = pg_fetch_assoc($result_gs);
-      $keyname = $row_gs['keyname'];
-      if ($check != count($tainted['sensorid'])) {
-        $where .= $sid .", ";
-        $title .= "$keyname, ";
-      } else {
-        $where .= $sid;
-        $title .= $keyname;
+      add_to_sql("sensors.keyname", "group");
+      add_to_sql("sensors.vlanid", "group");
+      add_to_sql("sensors.keyname", "select");
+      add_to_sql("sensors.vlanid", "select");
+      $title .= " for sensors: ";
+      $tempwhere .= "sensors.id IN (";
+      $check = 0;
+      foreach ($tainted['sensorid'] as $sid) {
+        $check++;
+        $sid = intval($sid);
+        $sql_gs = "SELECT keyname, vlanid FROM sensors WHERE id = $sid";
+        $result_gs = pg_query($pgconn, $sql_gs);
+        $row_gs = pg_fetch_assoc($result_gs);
+        $keyname = $row_gs['keyname'];
+        $vlanid = $row_gs['vlanid'];
+        if ($vlanid != 0) {
+          $keytitle = "$keyname-$vlanid";
+        } else {
+          $keytitle = $keyname;
+        }
+        if ($check != count($tainted['sensorid'])) {
+          $tempwhere .= $sid .", ";
+          $title .= "$keytitle, ";
+        } else {
+          $tempwhere .= $sid;
+          $title .= $keytitle;
+        }
       }
+      $tempwhere .= ") ";
+      add_to_sql("$tempwhere", "where");
     }
-    $where .= ") ";
   }
-} else {
-  $sid = intval($tainted['sensorid']);
-  if ($sid == 0) {
-    $groupbysensorid = "";
-    $selectsensorid = "";
-    $title .= " for all sensors";
-    $allsensors = 1;
-  } else {
-    $groupbysensorid = "sensors.keyname, ";
-    $selectsensorid = "sensors.keyname, ";
-    $sql_gs = "SELECT keyname FROM sensors WHERE id = $sid";
-    $result_gs = pg_query($pgconn, $sql_gs);
-    $row_gs = pg_fetch_assoc($result_gs);
-    $keyname = $row_gs['keyname'];
-    $title .= " for $keyname";
-    $where .= " AND sensors.id = $sid";
+}
+$tempwhere = "";
+
+########################
+# Ports
+########################
+if (isset($clean['ports'])) {
+  $ports = $clean['ports'];
+  $ports = trim($ports, ",");
+  $pattern = '/^([0-9]+,?)+$/';
+  if (preg_match($pattern, $ports)) {
+    add_to_sql("attacks.dport IN ($ports)", "where");
+    add_to_sql("attacks.dport", "select");
+    add_to_sql("attacks.dport", "group");
+    $title .= " with attack port ($ports)  ";
   }
 }
 
@@ -294,14 +271,30 @@ $i = 0;
 $check_ar = array();
 $maxcount = 0;
 
+add_to_sql("severity", "order");
+add_to_sql("COUNT(attacks.severity) as total", "select");
+prepare_sql();
+
 while ($i != $tssteps) {
   $a = $i;
   $i++;
   $point = array();
-  $sql = "SELECT DISTINCT $selectattacks $selectsensorid attacks.severity, COUNT(attacks.severity) as total FROM attacks, sensors, details ";
-  $sql .= "WHERE details.attackid = attacks.id AND timestamp >= $tsstart + ($interval * $a) AND timestamp <= $tsstart + ($interval * $i) ";
-  $sql .= "AND sensors.id = attacks.sensorid $where ";
-  $sql .= "GROUP BY $groupbysensorid $groupbyattacks attacks.severity ORDER BY severity";
+#  $sql = "SELECT DISTINCT $selectattacks $selectsensorid attacks.severity, COUNT(attacks.severity) as total FROM attacks, sensors, details ";
+#  $sql .= "WHERE details.attackid = attacks.id AND timestamp >= $tsstart + ($interval * $a) AND timestamp <= $tsstart + ($interval * $i) ";
+#  $sql .= "AND sensors.id = attacks.sensorid $where ";
+#  $sql .= "GROUP BY $groupbysensorid $groupbyattacks attacks.severity ORDER BY severity";
+  $sql = "SELECT $sql_select ";
+  $sql .= "FROM $sql_from";
+  $sql .= "$sql_where";
+  if ($sql_where != "") {
+    $sql .= " AND ";
+  } else {
+    $sql .= " WHERE ";
+  }
+  $sql .= " timestamp >= $tsstart + ($interval * $a) ";
+  $sql .= " AND timestamp <= $tsstart + ($interval * $i) ";
+  $sql .= " GROUP BY $sql_group ";
+  $sql .= " ORDER BY $sql_order ";
 #  printer($sql);
   $debuginfo[] = $sql;
 
@@ -320,22 +313,32 @@ while ($i != $tssteps) {
     while($row = pg_fetch_assoc($result)) {
       $count = $row['total'];
       $sev = $row['severity'];
-      if ($allsev == 1 && $allattacks == 0) {
+      if (isset($row['text'])) {
         $type = $row['text'];
       }
       $legend = "";
       if ($maxcount < $count) {
         $maxcount = $count;
       }
-      if ($allsensors == 0) {
+      if (isset($row['keyname'])) {
+        $vlanid = $row['vlanid'];
         $keyname = $row['keyname'];
-        $legend .= $keyname;
+        if ($vlanid != 0) {
+          $keytitle = "$keyname-$vlanid";
+        } else {
+          $keytitle = $keyname;
+        }
+        $legend .= $keytitle;
       } else {
         $legend .= "All sensors";
       }
-      if ($allattacks == 0 && $allsev == 1) {
+      if (isset($row['text'])) {
         $attack = str_replace("Dialogue", "", $row['text']);
         $legend .= " - ". $attack;
+      }
+      if (isset($row['dport'])) {
+        $port = $row['dport'];
+        $legend .= " - ". $port;
       }
       $legend .= " - " .$severity_ar[$sev];
       if (!in_array($legend, $check_ar)) {
@@ -375,5 +378,7 @@ if (!empty($data)) {
   #$plot->SetXTickLabelPos('none');
   #$plot->SetXTickPos('none');
   $plot->DrawGraph();
+} else {
+  readfile("images/nodata.gif");
 }
 ?>

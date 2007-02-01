@@ -479,97 +479,101 @@ if (!empty($f_binid)) {
 }
 
 if ($rapport == "idmef") {
-    add_to_sql("sensors.keyname", "select");
-    add_to_sql("attacks.*", "select");
-    add_to_sql("sensors", "table");
-    add_to_sql("attacks", "table");
-    add_to_sql("sensors.id = attacks.sensorid", "where");
-    prepare_sql();
+  add_to_sql("sensors.keyname", "select");
+  add_to_sql("sensors.vlanid", "select");
+  add_to_sql("attacks.*", "select");
+  add_to_sql("sensors", "table");
+  add_to_sql("attacks", "table");
+  add_to_sql("sensors.id = attacks.sensorid", "where");
+  prepare_sql();
 
-    ### Prepare final SQL query
-    $sql = "SELECT $sql_select ";
-    $sql .= " FROM $sql_from ";
-    $sql .= " $sql_where ";
-    $sql .= " $sql_group ";
+  ### Prepare final SQL query
+  $sql = "SELECT $sql_select ";
+  $sql .= " FROM $sql_from ";
+  $sql .= " $sql_where ";
+  $sql .= " $sql_group ";
     
-    $result = pg_query($sql);
+  $result = pg_query($sql);
 
-    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    echo "<!DOCTYPE IDMEF-Message PUBLIC \"-//IETF//DTD RFC XXXX IDMEF v1.0//EN\" \"idmef-message.dtd\">\n";
-    echo "<idmef:IDMEF-Message version=\"1.0\" xmlns:idmef=\"http://iana.org/idmef\">\n";
+  echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+  echo "<!DOCTYPE IDMEF-Message PUBLIC \"-//IETF//DTD RFC XXXX IDMEF v1.0//EN\" \"idmef-message.dtd\">\n";
+  echo "<idmef:IDMEF-Message version=\"1.0\" xmlns:idmef=\"http://iana.org/idmef\">\n";
+  flush();
+  while ($row = pg_fetch_assoc($result)) {
     flush();
-    while ($row = pg_fetch_assoc($result)) {
-      flush();
-      $id = intval($row['id']);
-      $keyname = $row['keyname'];
-      $timestamp = $row['timestamp'];
-      $source = $row['source'];
-      $sport = intval($row['sport']);
-      $dest = $row['dest'];
-      $dport = intval($row['dport']);
-      $sev = intval($row['severity']);
-      $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
-      $result_details = pg_query($pgconn, $sql_details);
-      $numrows_details = pg_num_rows($result_details);
+    $id = intval($row['id']);
+    $keyname = $row['keyname'];
+    $vlanid = $row['vlanid'];
+    if ($vlanid != 0) {
+      $keyname = "$keyname-$vlanid";
+    }
+    $timestamp = $row['timestamp'];
+    $source = $row['source'];
+    $sport = intval($row['sport']);
+    $dest = $row['dest'];
+    $dport = intval($row['dport']);
+    $sev = intval($row['severity']);
+    $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
+    $result_details = pg_query($pgconn, $sql_details);
+    $numrows_details = pg_num_rows($result_details);
 
-      $sql_sev = "SELECT txt FROM severity WHERE val = '$sev'";
-      $result_sev = pg_query($pgconn, $sql_sev);
-      $row_sev = pg_fetch_assoc($result_sev);
-      $sev_text = $row_sev['txt'];
+    $sql_sev = "SELECT txt FROM severity WHERE val = '$sev'";
+    $result_sev = pg_query($pgconn, $sql_sev);
+    $row_sev = pg_fetch_assoc($result_sev);
+    $sev_text = $row_sev['txt'];
 
-      if ($numrows_details != 0) {
-        if ($sev == 1) {
-          $dia_ar = array('attackid' => $id, 'type' => 1);
-          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-          $text = $dia_result_ar[0]['text'];
-          $attack = $attacks_ar[$text]["Attack"];
-        } elseif ($sev == 16) {
-          $dia_ar = array('attackid' => $id);
-          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-          $text = $dia_result_ar[0]['text'];
-          $malware = basename($text);
-        }
+    if ($numrows_details != 0) {
+      if ($sev == 1) {
+        $dia_ar = array('attackid' => $id, 'type' => 1);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $text = $dia_result_ar[0]['text'];
+        $attack = $attacks_ar[$text]["Attack"];
+      } elseif ($sev == 16) {
+        $dia_ar = array('attackid' => $id);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $text = $dia_result_ar[0]['text'];
+        $malware = basename($text);
       }
-      echo "<idmef:Alert messageid=\"$id\">\n";
-      echo "  <idmef:Analyzer analyzerid=\"$keyname\">\n";
-      echo "  </idmef:Analyzer>\n";
-      echo "  <idmef:CreateTime>$timestamp</idmef:CreateTime>\n";
-      echo "  <idmef:Classification ident=\"$sev\" text=\"$sev_text\"></idmef:Classification>\n";
-      echo "  <idmef:Source>\n";
-      echo "    <idmef:Node>\n";
-      echo "      <idmef:Address category=\"ipv4-addr\">\n";
-      echo "        <idmef:address>$source</idmef:address>\n";
-      echo "      </idmef:Address>\n";
-      echo "    </idmef:Node>\n";
-      echo "    <idmef:Service>\n";
-      echo "      <idmef:port>$sport</idmef:port>\n";
-      echo "    </idmef:Service>\n";
-      echo "  </idmef:Source>\n";
-      echo "  <idmef:Target>\n";
-      echo "    <idmef:Node>\n";
-      echo "      <idmef:Address category=\"ipv4-addr\">\n";
-      echo "        <idmef:address>$dest</idmef:address>\n";
-      echo "      </idmef:Address>\n";
-      echo "    </idmef:Node>\n";
-      echo "    <idmef:Service>\n";
-      echo "      <idmef:port>$dport</idmef:port>\n";
-      echo "    </idmef:Service>\n";
-      echo "  </idmef:Target>\n";
+    }
+    echo "<idmef:Alert messageid=\"$id\">\n";
+    echo "  <idmef:Analyzer analyzerid=\"$keyname\">\n";
+    echo "  </idmef:Analyzer>\n";
+    echo "  <idmef:CreateTime>$timestamp</idmef:CreateTime>\n";
+    echo "  <idmef:Classification ident=\"$sev\" text=\"$sev_text\"></idmef:Classification>\n";
+    echo "  <idmef:Source>\n";
+    echo "    <idmef:Node>\n";
+    echo "      <idmef:Address category=\"ipv4-addr\">\n";
+    echo "        <idmef:address>$source</idmef:address>\n";
+    echo "      </idmef:Address>\n";
+    echo "    </idmef:Node>\n";
+    echo "    <idmef:Service>\n";
+    echo "      <idmef:port>$sport</idmef:port>\n";
+    echo "    </idmef:Service>\n";
+    echo "  </idmef:Source>\n";
+    echo "  <idmef:Target>\n";
+    echo "    <idmef:Node>\n";
+    echo "      <idmef:Address category=\"ipv4-addr\">\n";
+    echo "        <idmef:address>$dest</idmef:address>\n";
+    echo "      </idmef:Address>\n";
+    echo "    </idmef:Node>\n";
+    echo "    <idmef:Service>\n";
+    echo "      <idmef:port>$dport</idmef:port>\n";
+    echo "    </idmef:Service>\n";
+    echo "  </idmef:Target>\n";
 
-      if ($sev == 1 && $attack != "") {
+    if ($sev == 1 && $attack != "") {
       echo "  <idmef:AdditionalData type=\"string\" meaning=\"attack-type\">\n";
       echo "    <idmef:string>$attack</idmef:string>\n";
       echo "  </idmef:AdditionalData>\n";
-      }
-      elseif ($sev == 16 && $malware != "") {
+    } elseif ($sev == 16 && $malware != "") {
       echo "  <idmef:AdditionalData type=\"string\" meaning=\"file-offered\">\n";
       echo "    <idmef:string>$malware</idmef:string>\n";
       echo "  </idmef:AdditionalData>\n";
-      }
-      echo "</idmef:Alert>\n";
     }
-    echo "</idmef:IDMEF-Message>\n";
-    exit;
+    echo "</idmef:Alert>\n";
+  }
+  echo "</idmef:IDMEF-Message>\n";
+  exit;
 }
 
 if ($rapport == "pdf") {
@@ -612,8 +616,12 @@ if ($rapport == "pdf") {
       $dport = intval($row['dport']);
       $sensorid = intval($row['sensorid']);
       if ($sensorid > 0) {
-      	$query = pg_query("SELECT keyname FROM sensors WHERE id = '" . $sensorid . "'");
+      	$query = pg_query("SELECT keyname, vlanid FROM sensors WHERE id = '" . $sensorid . "'");
       	$sensorname = pg_result($query, 0);
+        $vlanid = pg_result($query, 1);
+        if ($vlanid != 0) {
+          $sensorname = "$sensorname-$vlanid";
+        }
       }
       $sev = intval($row['severity']);
       $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
@@ -783,6 +791,7 @@ add_to_sql("sensors", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
 add_to_sql("attacks.*", "select");
 add_to_sql("sensors.keyname", "select");
+add_to_sql("sensors.vlanid", "select");
 
 prepare_sql();
 
@@ -950,7 +959,7 @@ while ($row = pg_fetch_assoc($result)) {
   $sensorid = $row['sensorid'];
   $vlanid = $row['vlanid'];
   $sensorname = $row['keyname'];
-  if ($vlanid != 0) $sensorname = "$sensorname-$vlanid";
+  if ($vlanid != 0){ $sensorname = "$sensorname-$vlanid";}
   $smac = $row['src_mac'];
 
   $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;

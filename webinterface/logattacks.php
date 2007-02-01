@@ -93,6 +93,7 @@ if ($err != 1) {
     add_to_sql("stats_dialogue", "table");
     add_to_sql("sensors", "table");
     add_to_sql("details", "table");
+    add_to_sql("attacks", "table");
     add_to_sql("COUNT(DISTINCT details.attackid) as total", "select");
     add_to_sql("details.text", "select");
     add_to_sql("stats_dialogue.id", "select");
@@ -157,6 +158,7 @@ if ($err != 1) {
     add_to_sql("sensors", "table");
     add_to_sql("details", "table");
     add_to_sql("uniq_binaries", "table");
+    add_to_sql("attacks", "table");
     add_to_sql("attacks.severity = 32", "where");
     add_to_sql("attacks.sensorid = sensors.id", "where");
     add_to_sql("attacks.id = details.attackid", "where");

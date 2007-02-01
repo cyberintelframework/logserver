@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 11-12-2006                       #
+# Version 1.04.04                  #
+# 29-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Added online/offline status selector
 # 1.04.03 Changed debug stuff
 # 1.04.02 Added vlan support 
 # 1.04.01 Rereleased as 1.04.01
@@ -25,7 +26,7 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_access_search = intval($_SESSION['s_access_search']);
 
 $allowed_get = array(
-                "int_onoff",
+	"int_onoff"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -36,67 +37,71 @@ if ($s_access_search == 9) {
   $q_org = intval($s_org);
 }
 
-echo "QORG: $q_org\n";
-echo "s_access_search: $s_access_search\n";
-echo "s_admin: $s_admin\n";
+if (isset($clean['onoff'])) {
+  $onoff = $clean['onoff'];
+} else {
+  $onoff = 1;
+}
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 
 $debuginfo[] = $sql_getorg;
 
-echo "<form name='selectorg' method='get' action='traffic.php'>\n";
-    echo "<select name='int_onoff' onChange='javascript: this.form.submit();'>\n";
-      echo printOption(0, "Online", $q_org) . "\n";
-      echo printOption(1, "Offline", $q_org) . "\n";
-      echo printOption(2, "All", $q_org) . "\n";
-    echo "</select>&nbsp;\n";
+echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
+  echo "<select name='int_onoff' onChange='javascript: this.form.submit();'>\n";
+    echo printOption(1, "Online", $onoff) . "\n";
+    echo printOption(0, "Offline", $onoff) . "\n";
+    echo printOption(2, "All", $onoff) . "\n";
+  echo "</select>&nbsp;\n";
 echo "</form>\n";
-
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $s_org";
 $debuginfo[] = $sql_getorg;
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $db_org_name = pg_result($result_getorg, 0);
 
+add_to_sql("organisation", "select");
+add_to_sql("keyname", "select");
+add_to_sql("vlanid", "select");
+add_to_sql("sensors", "table");
+add_to_sql("keyname", "order");
+
 if ($s_admin == 1) {
   echo "<h3>Traffic analysis for: All</h3>\n";
-  $sql_getactive = "SELECT organisation, keyname, vlanid  FROM sensors WHERE status = 1";
 } else {
   echo "<h3>Traffic analysis for: $db_org_name</h3>\n";
-  $sql_getactive = "SELECT organisation, keyname, vlanid  FROM sensors WHERE status = 1 AND organisation = $s_org";
+  add_to_sql("organisqation = $s_org", "where");
 }
 
+if ($onoff != 2) {
+  add_to_sql("status = $onoff", "where");
+}
+
+prepare_sql();
+$sql_getactive = "SELECT $sql_select FROM $sql_from $sql_where ORDER BY $sql_order";
 
 $debuginfo[] = $sql_getactive;
 $result_getactive = pg_query($pgconn, $sql_getactive);
 while ($rowactive = pg_fetch_assoc($result_getactive)) {
+  $db_orgid = $rowactive['organisation'];
+  $db_orgkeyname = $rowactive['keyname'];
+  $db_orgvlanid = $rowactive['vlanid'];
 
-$db_orgid = $rowactive['organisation'];
-$db_orgkeyname = $rowactive['keyname'];
-$db_orgvlanid = $rowactive['vlanid'];
+  if ($db_orgvlanid != 0) {
+    $label = "$db_orgkeyname-$db_orgvlanid";
+  } else {
+    $label = "$db_orgkeyname";
+  }
 
-if ($db_orgvlanid != 0) {
-$label = "$db_orgkeyname-$db_orgvlanid";
-}
-else {
-$label = "$db_orgkeyname";
-}
-
-if ($s_admin == 1) {
-  $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE type = 'day' AND label = '$label'";
-} else {
-  $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE orgid = $s_org AND type = 'day' AND label = '$label'";
-}
-$debuginfo[] = $sql_sensors;
-$result_sensors = pg_query($pgconn, $sql_sensors);
-$numrows_result_sensors = pg_numrows($result_sensors);
-
-if ($numrows_result_sensors == 0) {
-  $m = geterror(92);
-  echo $m;
-}  
-else {
+  if ($s_admin == 1) {
+    $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE type = 'day' AND label = '$label'";
+  } else {
+    $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE orgid = $s_org AND type = 'day' AND label = '$label'";
+  }
+  $debuginfo[] = $sql_sensors;
+  $result_sensors = pg_query($pgconn, $sql_sensors);
+  $numrows_result_sensors = pg_numrows($result_sensors);
 
   echo "<table>\n";
   while ($row = pg_fetch_assoc($result_sensors)) {
@@ -111,7 +116,6 @@ else {
   echo "</table>\n";
 }
 
-}
 pg_close($pgconn);
 debug_sql();
 ?>
