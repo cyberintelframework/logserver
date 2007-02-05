@@ -147,13 +147,17 @@ if ($b == "daily") {
 ?>
 
 
+      
+
+
 
 <div id="map" style="width: 800px; height: 400px">
 </div>
 
 </div>
-
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQJKZ06EWvfKMP5kGyHVOFxR92r57Drdz9zRk5SL-UEoIUpGwwxTX0mavcetxUMB7JfXcFMFSzogMnw" type="text/javascript"></script>
+<?php
+echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=$c_googlemap_key' type='text/javascript'></script>";
+?>
 <script type="text/javascript">
 //<![CDATA[
  
@@ -230,8 +234,10 @@ echo "request.open('GET', 'googlemapdata.xml.php$xmlquery', true);";
 ?>
 
 request.onreadystatechange = function() {
+    
     if (request.readyState == 4) {
-        var xmlDoc = request.responseXML;
+     if (request.status == 200) {
+	var xmlDoc = request.responseXML;
         var markers = xmlDoc.documentElement.getElementsByTagName("marker");
  
         for (var i = 0; i < markers.length; i++) {
@@ -243,15 +249,13 @@ request.onreadystatechange = function() {
             var marker = new createMarker(point,country,city,count);
             map.addOverlay(marker);
         }
+     }
     }
 }
 request.send(null);
-</script>
-<div id="search_wait">Search is being processed...<br /><br />Please be patient.</div>
 
-<script language="javascript" type="text/javascript">
-document.getElementById('search_wait').style.display='none';
 </script>
+
 
 
 
