@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 29-11-2006                       #
+# Version 1.04.04                  #
+# 01-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Added v_ prefix to the variables
 # 1.04.03 Added a few more error messages
 # 1.04.02 Added org_ident_type_ar
 # 1.04.01 Released as 1.04.01
@@ -18,7 +19,7 @@
 #############################################
 
 # The array with dialogue name, exploit name and additional info. Desc is not used at the moment.
-$attacks_ar = array(
+$v_attacks_ar = array(
 		'SMBDialogue'		=> array(
 						'Attack'	=> 'ASN1',
 						'Desc'		=> 'ASN1 exploit',
@@ -125,7 +126,7 @@ $attacks_ar = array(
 );
 
 # Array with the severity as assigned by Nepenthes. The integers are set by Nepenthes, the text can be modified.
-$severity_ar = array(
+$v_severity_ar = array(
 		'0'	=> 'Possible malicious attack',
 		'1'	=> 'Malicious attack',
 		'16'	=> 'Malware offered',
@@ -133,7 +134,7 @@ $severity_ar = array(
 );
 
 # Array with the type of attack as assigned by Nepenthes. The integers are set by Nepenthes, the text can be modified.
-$attacktype_ar = array(
+$v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
 		'2'	=> 'Shellcodehandler',
 		'4'	=> 'Download url',
@@ -141,14 +142,14 @@ $attacktype_ar = array(
 );
 
 # Array with the different types of access for the search engine.
-$access_ar_search = array(
+$v_access_ar_search = array(
 		'0'	=> 'No access',				# Disables search engine for that user.
                 '1'	=> 'Organisation records',		# User can search all records of his organisation.
                 '9'	=> 'All records (admin)'		# User can search all records.
 );
 
 # Array with the different types of access for the sensor remote control options.
-$access_ar_sensor = array(
+$v_access_ar_sensor = array(
 		'0'	=> 'Read only access',			# User can view all sensors of his organisation.
                 '1'	=> 'Remote control access',		# User can view and control all sensors of his organisation.
                 '2'	=> 'ARP Monitor access',		# User can add ARP monitoring entries.
@@ -156,7 +157,7 @@ $access_ar_sensor = array(
 );
 
 # Array with the different types of access for the user administration.
-$access_ar_user = array(
+$v_access_ar_user = array(
 		'0'	=> 'No access',				# User cannot modify any user accounts.
                 '1'	=> 'Own account',			# User can modify only his own account.
                 '2'	=> 'Organisation accounts',		# User can modify and add user accounts for his organisation.
@@ -164,14 +165,14 @@ $access_ar_user = array(
 );
 
 # Array with the maillog options.
-$maillog_ar = array (
+$v_maillog_ar = array (
 		'0'	=> 'None',
 		'1'	=> 'All attacks',
 		'2'	=> 'Only from own ranges'
 );
 
 # Array with the mailreporting templates
-$mail_template_ar = array(
+$v_mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
 		3 => "Threshold",
@@ -179,14 +180,14 @@ $mail_template_ar = array(
 );
 
 # Array with the mailreporting priorities
-$mail_priority_ar = array(
+$v_mail_priority_ar = array(
 		1 => "Low",
 		2 => "Normal",
 		3 => "High"
 );
 
 # Array with the mailreporting targets
-$mail_target_ar = array(
+$v_mail_target_ar = array(
 		0 => "Possible malicious attacks",
 		1 => "Malicious attacks",
 		16 => "Malware offered",
@@ -194,14 +195,14 @@ $mail_target_ar = array(
 );
 
 # Array with the mailreporting timespans
-$mail_timespan_ar = array(
+$v_mail_timespan_ar = array(
 		1 => "Last hour",
 		2 => "Last day",
 		3 => "Last week"
 );
 
 # Array with the mailreporting operators
-$mail_operator_ar = array(
+$v_mail_operator_ar = array(
 		1 => "<",
 		2 => ">",
 		3 => "<=",
@@ -211,14 +212,14 @@ $mail_operator_ar = array(
 );
 
 # Array with the mailreporting frequency
-$mail_frequency_ar = array(
+$v_mail_frequency_ar = array(
 		1 => "Every hour",
 		2 => "Every day",
 		3 => "Every week"
 );
 
 # Array with the organisation identifier types
-$org_ident_type_ar = array(
+$v_org_ident_type_ar = array(
 		1 => "Random Identifier String",
 		2 => "WHOIS netname",
 		3 => "Domain name",
@@ -337,8 +338,8 @@ $v_plottertypes = array(
 				8 => "squared"
 );
 
-$ipregexp = '^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
-$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
-$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
-$ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$';
+$v_ipregexp = '^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+$v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$';
 ?>

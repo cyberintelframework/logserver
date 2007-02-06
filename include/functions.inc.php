@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 26-01-2007                       #
+# Version 1.04.09                  #
+# 01-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Removed unused sql functions and added INDEX
 # 1.04.08 Added add_to_sql, reset_sql
 # 1.04.07 Bugfix in getEndWeek()
 # 1.04.06 Added getepoch() function
@@ -29,7 +30,50 @@
 # 1.02.03 Initial release
 #############################################
 
-// Function to reset all SQL arrays
+#############################################
+# INDEX
+#
+# 1 SQL Functions
+# 1.01		reset_sql
+# 1.02		add_to_sql
+# 1.03		prepare_sql
+#
+# 2 Date & Time Functions
+# 2.01		getepoch
+# 2.02		getstartweek
+# 2.03		getendweek
+# 2.04		getstartmonth
+# 2.05		getendmonth
+# 2.06		getstartday
+# 2.07		getendday
+#
+# 3 Miscellaneous
+# 3.01		extractvars
+# 3.02		geterror
+# 3.03		showsearchtemplates
+# 3.04		cleansql
+# 3.05		checkSID
+# 3.06		getaddress
+# 3.07		genpass
+# 3.08		pgboolval
+# 3.09		validate_email
+# 3.10		nf
+# 3.11		size_hum_read
+# 3.12		printradio
+# 3.13		printcheckbox
+# 3.14		printoption
+# 3.15		microtime_float
+# 3.16		matchCIDR
+# 3.17		getportdescr
+#
+# 4 Debug Functions
+# 4.01		printer
+# 4.02		debug_input
+# 4.03		debug_sql
+#############################################
+
+# 1.01 reset_sql
+# Function to reset all the SQL variables
 function reset_sql() {
   global $select, $table, $where, $group, $order;
   global $sql_select, $sql_from, $sql_where, $sql_group, $sql_order;
@@ -45,7 +89,8 @@ function reset_sql() {
   $sql_order = "";
 }
 
-// Function for adding a WHERE clause to the $where array
+# 1.02 add_to_sql
+# Function to add a variable to the SQL arrays
 function add_to_sql($add, $ar) {
   global ${$ar};
   if (empty(${$ar})) {
@@ -58,6 +103,68 @@ function add_to_sql($add, $ar) {
   }
 }
 
+# 1.03 prepare_sql
+# Function to convert the SQL arrays to SQL strings
+function prepare_sql() {
+  # Defining the global source arrays
+  global $table, $where, $select, $order, $group;
+  # Defining the global result strings
+  global $sql_from, $sql_where, $sql_select, $sql_order, $sql_group;
+
+  if ($where) {
+    $sql_where = "";
+    if (@count($where > 0)) {
+      $sql_where = " WHERE $where[0] ";
+      for ($i = 1; $i < count($where); $i++) {
+        $sql_where .= " AND " . $where[$i];
+      }
+    }
+  }
+
+  $sql_from = "";
+  if (@count($table > 0)) {
+    $sql_from = $table[0];
+    for ($i = 1; $i < count($table); $i++) {
+      $sql_from .= ", " . $table[$i];
+    }
+  }
+
+  if ($select) {
+    $sql_select = "";
+    if (@count($db_table > 0)) {
+      $sql_select = $select[0];
+      for ($i = 1; $i < count($select); $i++) {
+        $sql_select .= ", " . $select[$i];
+      }
+    }
+  } else {
+    $sql_select = " * ";
+  }
+
+  if ($group) {
+    $sql_group = "";
+    if (@count($group > 0)) {
+      $sql_group = $group[0];
+      for ($i = 1; $i < count($group); $i++) {
+        $sql_group .= ", " . $group[$i];
+      }
+    }
+  }
+
+  if ($order) {
+    $sql_order = "";
+    if (@count($order > 0)) {
+      $sql_order = $order[0];
+      for ($i = 1; $i < count($order); $i++) {
+        $sql_order .= ", " . $order[$i];
+      }
+    }
+  }
+}
+
+# 2.01 getepoch
+# Function to convert a regular datetime string to epoch format
+# Example input: 29-01-2007 00:11:31
 function getepoch($stamp) {
   list($date, $time) = explode(" ", $stamp);
   list($day, $mon, $year) = explode("-", $date);
@@ -81,23 +188,70 @@ function getepoch($stamp) {
   }
 }
 
-function geterror($m) {
-  global $v_errors;
-  $e_file = $_SERVER['SCRIPT_NAME'];
-  $e_file = basename($e_file);
-  $e_file = str_replace(".", "", $e_file);
-  $m = $v_errors[$e_file][$m];
-  $m = "<p>$m</p>\n";
-  $m = "<font color='red'>" .$m. "</font>";
-  return $m;
+# 2.02 getstartweek
+# Function used to determine the start of a week. Returns timestamp in epoch format.
+function getStartWeek($day = '', $month = '', $year = '') {
+  $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
+  $startofweek = $day - $dayofweek + 1;
+  $stamp = mktime(0,0,0,$month,$startofweek,$year);
+  return $stamp;
 }
 
-function printer($printvar) {
-  echo "<pre>";
-  print_r($printvar);
-  echo "</pre>\n";
+# 2.03 getendweek
+# Function used to determine the end of a week. Returns timestamp in epoch format.
+function getEndWeek($day = '', $month = '', $year = '') {
+  $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
+  $startofweek = $day - $dayofweek + 1;
+  $endofweek = $startofweek + 6;
+  $stamp = mktime(23,59,59,$month,$endofweek,$year);
+  return $stamp;
 }
 
+# 2.04 getstartmonth
+# Function used to determine the start of a month. Returns timestamp in epoch format.
+function getStartMonth($month = '', $year = '') {
+  $stamp = mktime(0,0,0,$month,1,$year);
+  return $stamp;
+}
+
+# 2.05 getendmonth
+# Function used to determine the end of a month. Returns timestamp in epoch format.
+function getEndMonth($month = '', $year = '') {
+  $endofmonth = date("t", mktime(0,0,0,$month,1,$year));
+  $stamp = mktime(23,59,59,$month,$endofmonth,$year);
+  return $stamp;
+}
+
+# 2.06 getstartday
+# Function used to determine the start of the day. Returns timestamp in epoch format.
+function getStartDay($day = '', $month = '', $year = '') {
+  $stamp = mktime(0,0,0,$month,$day,$year);
+  return $stamp;
+}
+
+# 2.07 getendday
+# Function used to determine the end of the day. Returns timestamp in epoch format.
+function getEndDay($day = '', $month = '', $year = '') {
+  $stamp = mktime(23,59,59,$month,$day,$year);
+  return $stamp;
+}
+
+# 3.01 extractvars
+# Function to extract the variables from input arrays like GET and POST
+# Input validation is done based on the variable names
+# Possible checks are:
+#   int - intval()
+#   escape - pg_escape_string()
+#   html - htmlentities()
+#   strip - strip_tags()
+#   md5 - md5 regexp
+#   bool - boolean regexp
+#   ip - ip address regexp
+#   net - network range regexp
+# These checks should be prepended to the variable name separated by a _ character
+# Examples:
+# int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
+# ip_ip - Checks if the variable is a valid IP address, if so result will be put in $clean['ip'] else $tainted['ip']
 function extractvars($source, $allowed) {
   if (!is_array($source)) {
     return 1;
@@ -183,36 +337,21 @@ function extractvars($source, $allowed) {
   return 0;
 }
 
-function debug_input() {
-  global $c_debug_input;
-  global $clean;
-  global $tainted;
-  if ($c_debug_input == 1) {
-    echo "<pre>";
-    echo "TAINTED:\n";
-    print_r($tainted);
-    echo "\n";
-    echo "CLEAN:\n";
-    print_r($clean);
-    echo "</pre><br />\n";
-  }
+# 3.02 geterror
+# Function to retrieve the error message given the error number
+function geterror($m) {
+  global $v_errors;
+  $e_file = $_SERVER['SCRIPT_NAME'];
+  $e_file = basename($e_file);
+  $e_file = str_replace(".", "", $e_file);
+  $m = $v_errors[$e_file][$m];
+  $m = "<p>$m</p>\n";
+  $m = "<font color='red'>" .$m. "</font>";
+  return $m;
 }
 
-function debug_sql() {
-  global $c_debug_sql;
-  global $debuginfo;
-  if ($c_debug_sql == 1) {
-    echo "<br /><br />\n";
-    echo "<textarea cols=138 rows=20>";
-    if (is_array($debuginfo)) {
-      foreach ($debuginfo as $val) {
-        echo "$val\n\n";
-      }
-    }
-    echo "</textarea>\n";
-  }
-}
-
+# 3.03 showsearchtemplates
+# Function to handle searchtemplates
 function showSearchTemplates($sql) {
   $query = pg_query($sql);
   while ($row = pg_fetch_assoc($query)) {
@@ -282,6 +421,8 @@ function showSearchTemplates($sql) {
   }
 }
 
+# 3.04 cleansql
+# Function to cleanup a SQL statement with unwanted SQL commands
 function cleansql($s_sql) {
   $pattern_ar = array("UNION", "JOIN", "INNER", "OUTER", "INSERT", "DELETE", "UPDATE", "INTO", "login");
   $s_sql = strtolower($s_sql);
@@ -292,6 +433,8 @@ function cleansql($s_sql) {
   return $s_sql;
 }
 
+# 3.05 checkSID
+# Function to compare the current session ID to the session ID in the database
 function checkSID(){
   global $c_checksession_ua;
   global $c_checksession_ip;
@@ -335,6 +478,8 @@ function checkSID(){
   }
 }
 
+# 3.06 getaddress
+# Function to get the current URL with the correct port and directory
 function getaddress() {
   global $c_web_port;
   $absfile = $_SERVER['SCRIPT_NAME'];
@@ -352,7 +497,8 @@ function getaddress() {
   return $address;
 }
 
-# generates a random string of 8 characters
+# 3.07 genpass
+# Function to generate a random string of a certain length
 function genpass($length = 8) {
   # start with a blank password
   $password = "";
@@ -375,138 +521,28 @@ function genpass($length = 8) {
   return $password;
 }
 
-// Return the PostgreSQL value for a boolean ('t' (TRUE) or 'f' (FALSE)), default FALSE 
+# 3.08 pgboolval
+# Function to return the PostgreSQL value for a boolean
 function pgboolval($val) {
 	$val = strtolower($val);
 	if ($val == "t") return $val;
 	else return "f";
 }
 
-// Return true if submitted e-mail address is valid (something@domain.ext)
+# 3.09 validate_email
+# Function to check if the given email is a valid email address
 function validate_email($email) {
 	$regex = '/^([a-zA-Z0-9_\-\.,]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
 	return preg_match($regex, $email);
 }
 
-// Format a number (number_format)
+# 3.10 nf
+# Function to format a number with a given amount of decimal places
 function nf($nr, $num_decimal_places = 0) {
 	return number_format($nr, $num_decimal_places, ".", ",");
 }
 
-// Function to add tables to sql-FROM (used by searchresults)
-function add_db_table($tbl) {
-	global $db_table;
-
-        if (!empty($db_table)) {
-          if (!in_array($tbl, $db_table)) $db_table[] = $tbl;
-        } else {
-          $db_table[] = $tbl;
-        }
-}
-
-// Function for adding a SELECT clause to the $select array
-function add_select($addselect) {
-  global $select;
-  if (empty($select)) {
-    $select = array();
-  }
-  if (!in_array($addselect, $select)) {
-    $select[] = $addselect;
-  }
-}
-
-// Function for adding a WHERE clause to the $where array
-function add_where($addwhere) {
-  global $where;
-  if (empty($where)) {
-    $where = array();
-  }
-  if (!in_array($addwhere, $where)) {
-    $where[] = $addwhere;
-  }
-}
-
-// Function for creating sql-WHERE (used by searchresults)
-function prepare_sql() {
-  # Defining the global source arrays
-  global $table, $where, $select, $order, $group;
-  # Defining the global result strings
-  global $sql_from, $sql_where, $sql_select, $sql_order, $sql_group;
-
-  if ($where) {
-    $sql_where = "";
-    if (@count($where > 0)) {
-      $sql_where = " WHERE $where[0] ";
-      for ($i = 1; $i < count($where); $i++) {
-        $sql_where .= " AND " . $where[$i];
-      }
-    }
-  }
-
-  $sql_from = "";
-  if (@count($table > 0)) {
-    $sql_from = $table[0];
-    for ($i = 1; $i < count($table); $i++) {
-      $sql_from .= ", " . $table[$i];
-    }
-  }
-
-  if ($select) {
-    $sql_select = "";
-    if (@count($db_table > 0)) {
-      $sql_select = $select[0];
-      for ($i = 1; $i < count($select); $i++) {
-        $sql_select .= ", " . $select[$i];
-      }
-    }
-  } else {
-    $sql_select = " * ";
-  }
-
-  if ($group) {
-    $sql_group = "";
-    if (@count($group > 0)) {
-      $sql_group = $group[0];
-      for ($i = 1; $i < count($group); $i++) {
-        $sql_group .= ", " . $group[$i];
-      }
-    }
-  }
-
-  if ($order) {
-    $sql_order = "";
-    if (@count($order > 0)) {
-      $sql_order = $order[0];
-      for ($i = 1; $i < count($order); $i++) {
-        $sql_order .= ", " . $order[$i];
-      }
-    }
-  }
-}
-
-function check_where_table($ch_val) {
-  $ch_val = trim($ch_val);
-  $arguments = explode(" ", $ch_val);
-  $left = trim($arguments[0]);
-  $pat = "/^.*\..*$/";
-  if (preg_match($pat, $left)) {
-    $ch_table = explode(".", $left);
-    add_db_table($ch_table[0]);
-  }
-}
-
-// Function for creating sql-FROM (used by searchresults)
-function prepare_sql_from() {
-  global $db_table, $sql_from;
-  $sql_from = "";
-  if (@count($db_table > 0)) {
-    $sql_from = $db_table[0];
-    for ($i = 1; $i < count($db_table); $i++) {
-      $sql_from .= ", " . $db_table[$i];
-    }
-  }
-}
-
+# 3.11 size_hum_read
 # Function to convert amount of bytes into human readable format.
 function size_hum_read($size) {
   /*
@@ -521,6 +557,7 @@ function size_hum_read($size) {
   return str_replace(".", ",", substr($size,0,strpos($size,'.')+3)." ".$iec[$i]);
 }
 
+# 3.12 printradio
 # Function to print a radio button
 function printRadio($desc, $radio_name, $value, $data) {
   // prints a <input type='radio'>
@@ -537,6 +574,7 @@ function printRadio($desc, $radio_name, $value, $data) {
   return $return;
 }
 
+# 3.13 printcheckbox
 # Function to print a checkbox
 function printCheckBox($desc, $cb_name, $value, $data) {
   // prints a <input type='checkbox'>
@@ -552,6 +590,7 @@ function printCheckBox($desc, $cb_name, $value, $data) {
   return $return;
 }
 
+# 3.14 printoption
 # Function to print a select option
 function printOption($value, $text, $val) {
   $return = "<option value=\"$value\"";
@@ -562,12 +601,15 @@ function printOption($value, $text, $val) {
   return $return;
 }
 
+# 3.15 microtime_float
 # Function used to calculate rendering time of the search pages.
+# Returns current time in microseconds
 function microtime_float() {
    list($usec, $sec) = explode(" ", microtime());
    return ((float)$usec + (float)$sec);
 }
 
+# 3.16 matchCIDR
 # Function used to check if an ip address is inside the CIDR range specified.
 function matchCIDR($addr, $cidr) {
   // $addr should be an ip address in the format '0.0.0.0'
@@ -589,87 +631,7 @@ function matchCIDR($addr, $cidr) {
   return $output;
 }
 
-# Function used to generate a chart image.
-function makeChart($charttype, $title, $result_chart, $org) {
-  global $pgconn;
-//  $result_chart = pg_query($pgconn, $sql);
-
-  if ($charttype == 0) {
-    $chart =  new PieChart();
-  } elseif ($charttype == 1) {
-    $chart = new HorizontalChart();
-  } elseif ($charttype == 2) {
-    $chart = new VerticalChart();
-  } else {
-    echo "Wrong type selected<br />\n";
-    $siderr = 1;
-  }
-
-  if ($siderr != 1) {
-   $totalrows = pg_num_rows($result_chart);
-   if ($totalrows == 0) { $drawerr = 1; echo "No data to process "; }
-   else {
-    $chart->setTitle($title);
-    while ($row = pg_fetch_row($result_chart)) {
-      $key = $row[0];
-      $value = $row[1];
-      $dia = substr_count($key, "Dialogue");
-      if ($dia > 0) {
-        global $attacks_ar;
-        $key = $attacks_ar[$key]["Attack"];
-      }
-      $chart->addPoint(new Point("$key ($value)", $value));
-    }
-    $chart->render("charts/$org.png");
-    return "charts/$org.png";
-   }
-  } else {
-    return "false";
-  }
-}
-
-# Function used to determine the start of a week. Returns timestamp in epoch format.
-function getStartWeek($day = '', $month = '', $year = '') {
-  $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek + 1;
-  $stamp = mktime(0,0,0,$month,$startofweek,$year);
-  return $stamp;
-}
-
-# Function used to determine the end of a week. Returns timestamp in epoch format.
-function getEndWeek($day = '', $month = '', $year = '') {
-  $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek + 1;
-  $endofweek = $startofweek + 6;
-  $stamp = mktime(23,59,59,$month,$endofweek,$year);
-  return $stamp;
-}
-
-# Function used to determine the start of a month. Returns timestamp in epoch format.
-function getStartMonth($month = '', $year = '') {
-  $stamp = mktime(0,0,0,$month,1,$year);
-  return $stamp;
-}
-
-# Function used to determine the end of a month. Returns timestamp in epoch format.
-function getEndMonth($month = '', $year = '') {
-  $endofmonth = date("t", mktime(0,0,0,$month,1,$year));
-  $stamp = mktime(23,59,59,$month,$endofmonth,$year);
-  return $stamp;
-}
-
-# Function used to determine the start of the day. Returns timestamp in epoch format.
-function getStartDay($day = '', $month = '', $year = '') {
-  $stamp = mktime(0,0,0,$month,$day,$year);
-  return $stamp;
-}
-
-# Function used to determine the end of the day. Returns timestamp in epoch format.
-function getEndDay($day = '', $month = '', $year = '') {
-  $stamp = mktime(23,59,59,$month,$day,$year);
-  return $stamp;
-}
-
+# 3.17 getportdescr
 # Function used to determine the description of a (well-known) port. To be extended...
 function getPortDescr($aPort) {
   switch ($aPort) {
@@ -702,6 +664,48 @@ function getPortDescr($aPort) {
       case  995: return "pop3s"; break;
       case 5000: return "UPnP"; break;
       default  : return "Port could not be determined"; break;
+  }
+}
+
+# 4.01 printer
+# Function to print variables in a readable format
+function printer($printvar) {
+  echo "<pre>";
+  print_r($printvar);
+  echo "</pre>\n";
+}
+
+# 4.02 debug_input
+# Function to print debug information about POST and GET variables
+function debug_input() {
+  global $c_debug_input;
+  global $clean;
+  global $tainted;
+  if ($c_debug_input == 1) {
+    echo "<pre>";
+    echo "TAINTED:\n";
+    print_r($tainted);
+    echo "\n";
+    echo "CLEAN:\n";
+    print_r($clean);
+    echo "</pre><br />\n";
+  }
+}
+
+# 4.03 debug_sql
+# Function to print debug information about the SQL queries done
+function debug_sql() {
+  global $c_debug_sql;
+  global $debuginfo;
+  if ($c_debug_sql == 1) {
+    echo "<br /><br />\n";
+    echo "<textarea cols=138 rows=20>";
+    if (is_array($debuginfo)) {
+      foreach ($debuginfo as $val) {
+        echo "$val\n\n";
+      }
+    }
+    echo "</textarea>\n";
   }
 }
 

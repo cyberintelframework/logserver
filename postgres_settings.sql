@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.05
--- 27-11-2006
+-- Version 1.04.06
+-- 01-02-2007
 --
 
 -- Version history
+-- 1.04.06 Updating sql file for 1.04beta
 -- 1.04.05 Changed constraint for report_content
 -- 1.04.04 Removed table report and modified login
 -- 1.04.03 Switched source and dest in the Nepenthes function surfnet_attack_by_id
