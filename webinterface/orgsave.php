@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 01-02-2007                       #
+# Version 1.04.07                  #
+# 06-02-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed bug with organisation existancy check. Case insensitive search.
 # 1.04.06 Removed orgname check when type = ident
 # 1.04.05 Added more checks on the ranges
 # 1.04.04 Changed data input handling
@@ -91,8 +92,9 @@ if ($type == "ident") {
 } elseif ($type == "org") {
   if (isset($clean['orgname'])) {
     $orgname = $clean['orgname'];
+    $orgcheck = strtoupper($orgname);
 
-    $sql_org = "SELECT organisation FROM organisations WHERE organisation = '$orgname'";
+    $sql_org = "SELECT organisation FROM organisations WHERE upper(organisation) = '$orgcheck'";
     $debuginfo[] = $sql_org;
     $result_org = pg_query($pgconn, $sql_org);
     $rows = pg_num_rows($result_org);
