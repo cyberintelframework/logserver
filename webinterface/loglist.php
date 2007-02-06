@@ -123,7 +123,6 @@ if ($err != 1) {
 
   add_to_sql("attacks", "table");
   add_to_sql("$tsquery", "where");
-# add_where("sensors.organisation = $q_org");
   add_to_sql("attacks.source <<= '$range'", "where");
   add_to_sql("attacks.severity = 1", "where");
   add_to_sql("DISTINCT attacks.source", "select");
@@ -132,7 +131,6 @@ if ($err != 1) {
   add_to_sql("$orderby", "order");
   prepare_sql();
 
-#  $sql_uniq = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as total ";
   $sql_uniq = "SELECT $sql_select ";
   $sql_uniq .= " FROM $sql_from ";
   $sql_uniq .= " $sql_where ";

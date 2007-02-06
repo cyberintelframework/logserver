@@ -69,7 +69,7 @@ if ($err != 1) {
       $value = $row[1];
       $dia = substr_count($key, "Dialogue");
       if ($dia > 0) {
-        $key = $attacks_ar[$key]["Attack"];
+        $key = $v_attacks_ar[$key]["Attack"];
       }
       $chart->addPoint(new Point("$key ($value)", $value));
     }

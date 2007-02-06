@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 01-02-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.04 Added sort option
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
@@ -31,7 +32,8 @@ $s_access_user = intval($s_access{2});
 $err = 0;
 
 $allowed_get = array(
-                "int_m"
+                "int_m",
+		"sort"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -48,11 +50,50 @@ if (isset($clean['m'])) {
 }
 
 if ($err == 0) {
-  if ($s_admin == 1) {
-    $sql_orgs = "SELECT * FROM organisations";
+  if (isset($tainted['sort'])) {
+    $sort = $tainted['sort'];
+    $pattern = '/^(oa|od|ia|id)$/';
+    if (!preg_match($pattern, $sort)) {
+      $sort = "oa";
+    }
+
+    $type = $sort{0};
+    $direction = $sort{1};
+    if ($direction == "a") {
+      $neworder = "d";
+      $direction = "ASC";
+    } else {
+      $neworder = "a";
+      $direction = "DESC";
+    }
+    if ($type == "o") {
+      $sqlsort = "organisations.organisation $direction";
+    } elseif ($type == "i") {
+      $sqlsort = "total $direction";
+    }
+    add_to_sql($sqlsort, "order");
   } else {
-    $sql_orgs = "SELECT * FROM organisations WHERE id = $s_org";
+    $neworder = "d";
+    add_to_sql("organisations.organisation", "order");
   }
+
+  add_to_sql("organisations.id", "select");
+  add_to_sql("organisations.organisation", "select");
+  add_to_sql("COUNT(org_id.id) as total", "select");
+  add_to_sql("organisations", "table");
+  add_to_sql("organisations.id", "group");
+  add_to_sql("organisations.organisation", "group");
+  if ($s_admin != 1) {
+    add_to_sql("organisations.id = $s_org", "where");
+  }
+  prepare_sql();
+  $sql_orgs = "SELECT $sql_select ";
+  $sql_orgs .= "FROM $sql_from ";
+  $sql_orgs .= " $sql_where ";
+  $sql_orgs .= " LEFT JOIN org_id ";
+  $sql_orgs .= " ON organisations.id = org_id.orgid ";
+  $sql_orgs .= " GROUP BY $sql_group ";
+  $sql_orgs .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_orgs;
   $result_orgs = pg_query($pgconn, $sql_orgs);
 
@@ -60,18 +101,15 @@ if ($err == 0) {
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td class='dataheader' width='50'>ID</td>\n";
-      echo "<td class='dataheader' width='200'>Organisation</td>\n";
-      echo "<td class='dataheader' width='100'># of identifiers</td>\n";
+      echo "<td class='dataheader' width='200'><a href='orgadmin.php?sort=o$neworder' title='Sort on organisation'>Organisation</a></td>\n";
+      echo "<td class='dataheader' width='100'><a href='orgadmin.php?sort=i$neworder' title='Sort on identifiers'># of identifiers</a></td>\n";
       echo "<td class='dataheader' width='100'>Actions</td>\n";
     echo "</tr>\n";
 
     while ($row = pg_fetch_assoc($result_orgs)) {
       $id = $row['id'];
       $org = $row['organisation'];
-      $sql_count = "SELECT id FROM org_id WHERE orgid = $id";
-      $debuginfo[] = $sql_count;
-      $result_count = pg_query($pgconn, $sql_count);
-      $count = pg_num_rows($result_count);
+      $count = $row['total'];
     
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>$id</td>\n";

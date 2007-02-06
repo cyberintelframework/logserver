@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 26-01-2006                       #
+# Version 1.04.07                  #
+# 05-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed sql bug
 # 1.04.06 add_to_sql()
 # 1.04.05 Replaced $where[] with add_where()
 # 1.04.04 Changed some sql stuff
@@ -86,6 +87,7 @@ if (isset($clean['to']) && isset($clean['from'])) {
 if ($err != 1) {
   ######### Table for Malicious attacks (SEV: 1) #############
   if ($sev == 1) {
+    add_to_sql("attacks.id = details.attackid", "where");
     add_to_sql("attacks.severity = 1", "where");
     add_to_sql("attacks.sensorid = sensors.id", "where");
     add_to_sql("details.type = 1", "where");
@@ -130,8 +132,8 @@ if ($err != 1) {
           $dia = $row['text'];
           $count = $row['total'];
           $total = $total + $count;
-          $attack = $attacks_ar[$dia]["Attack"];
-          $attack_url = $attacks_ar[$dia]["URL"];
+          $attack = $v_attacks_ar[$dia]["Attack"];
+          $attack_url = $v_attacks_ar[$dia]["URL"];
           echo "<tr>\n";
             if ($attack_url != "") {
               echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";

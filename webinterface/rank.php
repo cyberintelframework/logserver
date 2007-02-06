@@ -390,8 +390,8 @@ echo "<table width='100%'>\n";
               $i=1;
               while ($row = pg_fetch_assoc($result_topexp)) {
                 $exploit = $row['text'];
-                $attack = $attacks_ar[$exploit]["Attack"];
-                $attack_url = $attacks_ar[$exploit]["URL"];
+                $attack = $v_attacks_ar[$exploit]["Attack"];
+                $attack_url = $v_attacks_ar[$exploit]["URL"];
                 $total = $row['total'];
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
@@ -419,8 +419,8 @@ echo "<table width='100%'>\n";
                 $i = 1;
                 while ($row = pg_fetch_assoc($result_topexp_org)) {
                   $exploit = $row['text'];
-                  $attack = $attacks_ar[$exploit]["Attack"];
-                  $attack_url = $attacks_ar[$exploit]["URL"];
+                  $attack = $v_attacks_ar[$exploit]["Attack"];
+                  $attack_url = $v_attacks_ar[$exploit]["URL"];
                   $total = $row['total'];
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";

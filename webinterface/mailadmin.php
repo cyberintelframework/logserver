@@ -162,7 +162,7 @@ if ($s_access_user > 0) {
           echo "<a href='report_edit.php?int_userid=$user_id&int_rcid=$report_content_id'>" . $report_content["title"] . "</a>";
         echo "</td>\n";
         echo "<td class='datatd'>" . $last_sent . "</td>\n";
-        echo "<td class='datatd'>" . $mail_template_ar[$report_content["template"]] . "</td>\n";
+        echo "<td class='datatd'>" . $v_mail_template_ar[$report_content["template"]] . "</td>\n";
         echo "<td class='datatd'>" . $status . "</td>\n";
         echo "<td align='center'><a href='report_del.php?int_userid=$user_id&int_rcid=$report_content_id'><img src='images/icons/email_delete_20.gif' alt='Delete Report' title='Delete Report' /></a></td>\n";
       echo "</tr>\n";

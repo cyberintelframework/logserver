@@ -115,7 +115,7 @@ if ($_GET) {
         echo "<td class='datatd'>\n";
           echo "<select name='severity[]' style='background-color:white;' size='5' multiple='true'>\n";
             echo printOption(99, "All attacks", 99);
-            foreach ($severity_ar as $key => $val) {
+            foreach ($v_severity_ar as $key => $val) {
               echo printOption($key, $val, 99);
             }
            echo "</select>\n";
@@ -290,7 +290,7 @@ if ($_GET) {
         echo "<td class='datatd'>\n";
           echo "<select name='severity[]' style='background-color:white;' size='3' multiple='true'>\n";
             echo printOption(99, "All attacks", 99);
-            foreach ($severity_ar as $key => $val) {
+            foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
                 echo printOption($key, $val, 99);
               }

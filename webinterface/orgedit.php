@@ -101,7 +101,7 @@ if ($err != 1) {
         echo "<tr class='datatr'>\n";
           echo "<td class='datatd'>$id</td>\n";
           echo "<td class='datatd'>$identifier</td>\n";
-          echo "<td class='datatd'>$org_ident_type_ar[$type]</td>\n";
+          echo "<td class='datatd'>$v_org_ident_type_ar[$type]</td>\n";
           echo "<td class='datatd'><a href='orgdel.php?int_orgid=$orgid&int_ident=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
         echo "</tr>\n";
       }
@@ -112,7 +112,7 @@ if ($err != 1) {
         echo "<td class='datatd' colspan='2'>\n";
           echo "<select name='int_identtype' style='width: 99%;'>";
             echo printOption(0, "Select a type...", 0);
-            foreach ($org_ident_type_ar as $key => $val) {
+            foreach ($v_org_ident_type_ar as $key => $val) {
               if ($key != 1) {
                 echo printOption($key, $val, 0);
               }

@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 01-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.04 Minor bugfix + organisation name
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Code layout
@@ -36,14 +37,14 @@ if (isset($clean['m'])) {
 
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
-  $pattern = '/^(ua|ud|la|ld)$/';
+  $pattern = '/^(ua|ud|la|ld|oa|od)$/';
   if (!preg_match($pattern, $sort)) {
     $sort = "ua";
   }
 
   $type = $sort{0};
-  $order = $sort{1};
-  if ($order == "a") {
+  $direction = $sort{1};
+  if ($direction == "a") {
     $neworder = "d";
     $direction = "ASC";
   } else {
@@ -54,6 +55,8 @@ if (isset($tainted['sort'])) {
     $sqlsort = "ORDER BY username $direction";
   } elseif ($type == "l") {
     $sqlsort = "ORDER BY lastlogin $direction";
+  } elseif ($type == "o") {
+    $sqlsort = "ORDER BY organisations.organisation $direction";
   }
 } else {
   $neworder = "d";
@@ -65,6 +68,7 @@ if ($s_access_user > 1) {
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td width='150' class='dataheader'><a href='useradmin.php?sort=u$neworder' title='Sort on Username'>User</a></td>\n";
+      echo "<td width='150' class='dataheader'><a href='useradmin.php?sort=o$neworder' title='Sort on organisation'>Organisation</a></td>\n";
       echo "<td width='200' class='dataheader'><a href='useradmin.php?sort=l$neworder' title='Sort on Last login'>Last login</a></td>\n";
       echo "<td width='100' class='dataheader'>Access</td>\n";
       echo "<td width='50' class='dataheader'>Modify</td>\n";
@@ -73,9 +77,13 @@ if ($s_access_user > 1) {
     echo "</tr>\n";
 
     if ($s_access_user == 2) {
-      $sql_user = "SELECT DISTINCT * FROM login WHERE organisation = $s_org AND NOT access LIKE '%9%' $sqlsort";
+      $sql_user = "SELECT login.id, login.username, login.lastlogin, login.access, organisations.organisation ";
+      $sql_user .= "FROM login, organisations WHERE login.organisation = $s_org AND login.organisation = organisations.id ";
+      $sql_user .= "AND NOT login.access LIKE '%9%' $sqlsort";
     } elseif ($s_access_user == 9) {
-      $sql_user = "SELECT DISTINCT * FROM login $sqlsort";
+      $sql_user = "SELECT login.id, username, lastlogin, login.access, organisations.organisation ";
+      $sql_user .= "FROM login, organisations WHERE login.organisation = organisations.id ";
+      $sql_user .= " $sqlsort";
     }
     $debuginfo[] = $sql_user;
     $result_user = pg_query($pgconn, $sql_user);
@@ -85,6 +93,7 @@ if ($s_access_user > 1) {
       $username = $row['username'];
       $lastlogin = $row['lastlogin'];
       $access = $row['access'];
+      $orgname = $row['organisation'];
       if ( $lastlogin ) {
         $lastlogin = date("d-m-Y H:i:s", $lastlogin);
       } else {
@@ -92,6 +101,7 @@ if ($s_access_user > 1) {
       }
       echo "<tr>\n";
         echo "<td>$username</td>\n";
+        echo "<td>$orgname</td>\n";
         echo "<td>$lastlogin</td>\n";
         echo "<td>$access</td>\n";
         echo "<td align=center><a href='useredit.php?int_userid=$id'><img src='images/icons/user_info_20.gif' alt='Edit User' title='Edit User' /></a></td>\n";

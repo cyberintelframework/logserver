@@ -200,7 +200,7 @@ function check_byte(b_val,next_field) {
   <?
   $f_sev = -1;
   echo printOption(-1, "", $f_sev);
-  foreach ( $severity_ar as $index=>$severity ) echo printOption($index, $severity, $f_sev);
+  foreach ( $v_severity_ar as $index=>$severity ) echo printOption($index, $severity, $f_sev);
   ?>
    </select></td>
  </tr>

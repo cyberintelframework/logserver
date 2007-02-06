@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 22-12-2006                       #
+# Version 1.04.06                  #
+# 01-02-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Removed orgname check when type = ident
 # 1.04.05 Added more checks on the ranges
 # 1.04.04 Changed data input handling
 # 1.04.03 Fixed a bug where it wouldn't save organisation changes
@@ -76,15 +77,6 @@ if ($type == "ident") {
   $ranges = $clean['ranges'];
   $identtype = $clean['identtype'];
   $orgident = $clean['orgident'];
-
-  $sql_org = "SELECT organisation FROM organisations WHERE organisation = '$orgname'";
-  $debuginfo[] = $sql_org;
-  $result_org = pg_query($pgconn, $sql_org);
-  $rows = pg_num_rows($result_org);
-  if ($rows > 0) {
-    $m = 99;
-    $err = 1;
-  }
 
   if (empty($orgid)) {
     $err = 1;

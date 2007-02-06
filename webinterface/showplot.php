@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 08-01-2007                       #
+# Version 1.04.02                  #
+# 05-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Fixed typo
 # 1.04.01 Initial release
 #############################################
 
@@ -62,7 +63,7 @@ if (!isset($clean['tsstart']) || empty($clean['tsstart'])) {
   $drawerr = 1;
 }
 
-if ($drawerr = 1) {
+if ($drawerr == 1) {
   header("Content-type: image/png");
   header("Cache-control: no-cache");
   header("Pragma: no-cache");
@@ -103,7 +104,7 @@ if ($tainted['severity']) {
     if (intval($tainted['severity'][0]) == 99) {
       $title .= "All attacks";
     } else {
-      $title .= $severity_ar[$sev];
+      $title .= $v_severity_ar[$sev];
       $tempwhere .= "attacks.severity IN (";
       $check = 0;
       foreach ($tainted['severity'] as $sev) {
@@ -111,10 +112,10 @@ if ($tainted['severity']) {
         $sev = intval($sev);
         if ($check != count($tainted['severity'])) {
           $tempwhere .= $sev .", ";
-          $title .= $severity_ar[$sev] . ", ";
+          $title .= $v_severity_ar[$sev] . ", ";
         } else {
           $tempwhere .= $sev;
-          $title .= $severity_ar[$sev];
+          $title .= $v_severity_ar[$sev];
         }
       }
       $tempwhere .= ") ";
@@ -340,7 +341,7 @@ while ($i != $tssteps) {
         $port = $row['dport'];
         $legend .= " - ". $port;
       }
-      $legend .= " - " .$severity_ar[$sev];
+      $legend .= " - " .$v_severity_ar[$sev];
       if (!in_array($legend, $check_ar)) {
         $check_ar[] = $legend;
         $plot->SetLegend($legend);

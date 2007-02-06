@@ -201,7 +201,7 @@ echo "<table class='datatable'>\n";
   while($row = pg_fetch_assoc($result_severity)) {
     $severity = $row['severity'];
     $count = $row['total'];
-    $description = $severity_ar[$severity];
+    $description = $v_severity_ar[$severity];
     echo "<tr>\n";
       echo "<td class='datatd'>$description</td>\n";
       if ($severity == 0 || $severity == 16) {

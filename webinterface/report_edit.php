@@ -218,7 +218,7 @@ if ($report_content_id > 0) {
             echo "<td class='datatd'>Alert priority: </td>\n";
             echo "<td class='datatd'>";
               echo "<select name='int_priority' id='priority' style='background-color:white;'>\n";
-                foreach ($mail_priority_ar as $key=>$val) {
+                foreach ($v_mail_priority_ar as $key=>$val) {
                   echo "    " . printOption($key, $val, $priority);
                 }
               echo "</select>\n";
@@ -346,7 +346,7 @@ if ($report_content_id > 0) {
             echo "<td class='datatd'>Alert priority: </td>\n";
             echo "<td class='datatd'>";
               echo "<select name='int_priority' id='priority' style='background-color:white;'>\n";
-                foreach ($mail_priority_ar as $key=>$val) {
+                foreach ($v_mail_priority_ar as $key=>$val) {
                   echo "    " . printOption($key, $val, $priority);
                 }
               echo "</select>\n";
@@ -356,7 +356,7 @@ if ($report_content_id > 0) {
             echo "<td class='datatd'>Frequency: </td>\n";
             echo "<td class='datatd'>";
               echo "<select name='int_frequency' style='background-color:white;' onclick=\"if (this.selectedIndex == 0) {document.getElementById('frequency-interval-day').style.display='none';document.getElementById('frequency-interval-week').style.display='none';} if (this.selectedIndex == 1) {document.getElementById('frequency-interval-day').style.display='';document.getElementById('frequency-interval-week').style.display='none'; }if (this.selectedIndex == 2) {document.getElementById('frequency-interval-day').style.display='none';document.getElementById('frequency-interval-week').style.display='';} \">\n";
-                foreach ($mail_frequency_ar as $key=>$val) {
+                foreach ($v_mail_frequency_ar as $key=>$val) {
                   echo "    " . printOption($key, $val, $frequency);
                 }
               echo "</select>\n";
@@ -427,13 +427,13 @@ if ($report_content_id > 0) {
 }
 
 function write_report_template_threshold_fields() {
-  global $priority, $target, $timespan, $operator, $value, $value_user, $deviation, $mail_priority_ar, $mail_target_ar, $mail_timespan_ar, $mail_operator_ar;
+  global $priority, $target, $timespan, $operator, $value, $value_user, $deviation, $v_mail_priority_ar, $v_mail_target_ar, $v_mail_timespan_ar, $v_mail_operator_ar;
   # Target
   echo "<tr class='datatr'>";
     echo "<td class='datatd'>Target: </td>\n";
     echo "<td class='datatd'>";
       echo "<select name='int_target' id='target' style='background-color:white;'>\n";
-        foreach ($mail_target_ar as $key=>$val) {
+        foreach ($v_mail_target_ar as $key=>$val) {
           echo "    " . printOption($key, $val, $target);
         }
       echo "</select>\n";
@@ -444,7 +444,7 @@ function write_report_template_threshold_fields() {
     echo "<td class='datatd'>Timespan: </td>\n";
     echo "<td class='datatd'>";
       echo "<select name='int_timespan' id='timespan' style='background-color:white;'>\n";
-        foreach ($mail_timespan_ar as $key=>$val) {
+        foreach ($v_mail_timespan_ar as $key=>$val) {
           echo "    " . printOption($key, $val, $timespan);
         }
       echo "</select>\n";
@@ -455,7 +455,7 @@ function write_report_template_threshold_fields() {
     echo "<td class='datatd'>Operator: </td>\n";
     echo "<td class='datatd'>";
       echo "<select name='int_operator' id='operator' style='background-color:white;'>\n";
-        foreach ($mail_operator_ar as $key=>$val) {
+        foreach ($v_mail_operator_ar as $key=>$val) {
           echo "    " . printOption($key, htmlentities($val), $operator);
         }
       echo "</select>\n";

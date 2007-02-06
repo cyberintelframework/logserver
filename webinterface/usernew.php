@@ -100,10 +100,10 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: Sensor</td>\n";
         echo "<td class='datatd'>\n";
-          echo "" . printRadio("0 - $access_ar_sensor[0]", "int_asensor", 0, $access_sensor) . "<br />\n";
-          echo "" . printRadio("1 - $access_ar_sensor[1]", "int_asensor", 1, $access_sensor) . "<br />\n";
+          echo "" . printRadio("0 - $v_access_ar_sensor[0]", "int_asensor", 0, $access_sensor) . "<br />\n";
+          echo "" . printRadio("1 - $v_access_ar_sensor[1]", "int_asensor", 1, $access_sensor) . "<br />\n";
           if ($s_access_user == 9) {
-            echo "" . printRadio("9 - $access_ar_sensor[9]", "int_asensor", 9, $access_sensor) . "<br />\n";
+            echo "" . printRadio("9 - $v_access_ar_sensor[9]", "int_asensor", 9, $access_sensor) . "<br />\n";
           }
         echo "</td>\n";
       echo "</tr>\n";
@@ -111,9 +111,9 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: Search</td>\n";
         echo "<td class='datatd'>\n";
-          echo "" . printRadio("1 - $access_ar_search[1]", "int_asearch", 1, $access_search) . "<br />\n";
+          echo "" . printRadio("1 - $v_access_ar_search[1]", "int_asearch", 1, $access_search) . "<br />\n";
           if ($s_access_user == 9) {
-            echo "" . printRadio("9 - $access_ar_search[9]", "int_asearch", 9, $access_search) . "<br />\n";
+            echo "" . printRadio("9 - $v_access_ar_search[9]", "int_asearch", 9, $access_search) . "<br />\n";
           }
         echo "</td>\n";
       echo "</tr>\n";
@@ -121,13 +121,13 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' valign='top'>Access: User Admin</td>\n";
         echo "<td class='datatd'>\n";
-          echo "" . printRadio("0 - $access_ar_user[0]", "int_auser", 0, $access_user) . "<br />\n";
-          echo "" . printRadio("1 - $access_ar_user[1]", "int_auser", 1, $access_user) . "<br />\n";
+          echo "" . printRadio("0 - $v_access_ar_user[0]", "int_auser", 0, $access_user) . "<br />\n";
+          echo "" . printRadio("1 - $v_access_ar_user[1]", "int_auser", 1, $access_user) . "<br />\n";
           if ($s_access_user > 1) {
-            echo "" . printRadio("2 - $access_ar_user[2]", "int_access_user", 2, $access_user) . "<br />\n";
+            echo "" . printRadio("2 - $v_access_ar_user[2]", "int_access_user", 2, $access_user) . "<br />\n";
           }
           if ($s_access_user == 9) {
-            echo "" . printRadio("9 - $access_ar_user[9]", "int_auser", 9, $access_user) . "<br />\n";
+            echo "" . printRadio("9 - $v_access_ar_user[9]", "int_auser", 9, $access_user) . "<br />\n";
           }
         echo "</td>\n";
       echo "</tr>\n";

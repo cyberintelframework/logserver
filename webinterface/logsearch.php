@@ -527,7 +527,7 @@ if ($rapport == "idmef") {
         $dia_ar = array('attackid' => $id, 'type' => 1);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $text = $dia_result_ar[0]['text'];
-        $attack = $attacks_ar[$text]["Attack"];
+        $attack = $v_attacks_ar[$text]["Attack"];
       } elseif ($sev == 16) {
         $dia_ar = array('attackid' => $id);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
@@ -638,7 +638,7 @@ if ($rapport == "pdf") {
           $dia_ar = array('attackid' => $id, 'type' => 1);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
-          $attack = $attacks_ar[$text]["Attack"];
+          $attack = $v_attacks_ar[$text]["Attack"];
         } elseif ($sev == 16) {
           $dia_ar = array('attackid' => $id);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
@@ -951,7 +951,7 @@ while ($row = pg_fetch_assoc($result)) {
   $id = pg_escape_string($row['id']);
   $ts = date("d-m-Y H:i:s", $row['timestamp']);
   $sev = $row['severity'];
-  $severity = $severity_ar[$sev];
+  $severity = $v_severity_ar[$sev];
   $source = $row['source'];
   $sport = $row['sport'];
   $dest = $row['dest'];
@@ -1026,8 +1026,8 @@ while ($row = pg_fetch_assoc($result)) {
         $dia_ar = array('attackid' => $id, 'type' => 1);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $text = $dia_result_ar[0]['text'];
-        $attack = $attacks_ar[$text]["Attack"];
-        $attack_url = $attacks_ar[$text]["URL"];
+        $attack = $v_attacks_ar[$text]["Attack"];
+        $attack_url = $v_attacks_ar[$text]["URL"];
         echo "<td class='datatd'>";
         if ($attack_url != "") {
           echo "<a $ahref target='new'>";
