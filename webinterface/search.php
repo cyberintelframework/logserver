@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 04-01-2007                       #
+# Version 1.04.07                  #
+# 06-02-2007                       #
 # Peter Arts                       #
-# Modified by Jan van Lith         #
+# Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed a bug with the destination radiobutton
 # 1.04.06 Changed strip_html_escape_bin to strip_html_escape_binname
 # 1.04.05 Changed data input handling
 # 1.04.04 Query tuning
@@ -127,7 +128,10 @@ function check_byte(b_val,next_field) {
  <tr>
   <td class="datatd">Destination:</td>
   <td class="datatd">
-    <input type="radio" name="dradio" id="d_radioA" value="A" checked onclick="document.getElementById('destination_A').style.display='';document.getElementById('destination_N').style.display='none';"> <label for="d_radioA" style="cursor:pointer;">Address</label> &nbsp; <input type="radio" name="d_radio" id="d_radioN" value="N" onclick="document.getElementById('destination_N').style.display='';document.getElementById('destination_A').style.display='none';"> <label for="d_radioN" style="cursor:pointer;">Network</label><br />
+    <input type="radio" name="dradio" id="d_radioA" value="A" checked onclick="document.getElementById('destination_A').style.display='';document.getElementById('destination_N').style.display='none';">
+      <label for="d_radioA" style="cursor:pointer;">Address</label>&nbsp;
+    <input type="radio" name="dradio" id="d_radioN" value="N" onclick="document.getElementById('destination_N').style.display='';document.getElementById('destination_A').style.display='none';">
+      <label for="d_radioN" style="cursor:pointer;">Network</label><br />
     <input type="text" name="destip[]" id="destination_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip2');" /> . 
     <input type="text" name="destip[]" id="destination_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip3');" /> . 
     <input type="text" name="destip[]" id="destination_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip4');" />. 
