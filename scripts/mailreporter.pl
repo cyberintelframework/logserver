@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS          	           #
-# Version 1.04.01                  #
-# 28-11-2006          	           #
+# Version 1.04.02                  #
+# 09-02-2007          	           #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.02 Fixed a bug with daily reports at a certain time and sensor specific reports
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.07 Fixed a bug in the sensorstatus query
 # 1.03.06 Fixed a send bug with template 4
@@ -219,7 +220,19 @@ while (@row = $email_query->fetchrow_array) {
 		}
 	}
 
-	if ($last_sent ne '') {
+        if ($frequency == 2) {
+                $lt = localtime(time);
+                if ($interval != $lt->hour) {
+                        $last_sent = '';
+                }
+        } elsif ($frequency == 3) {
+                $lt = localtime(time);
+                if ($interval != $lt->wday) {
+                        $last_sent = '';
+                }
+        }
+
+	if ($last_sent ne '' || $template == 3) {
 		# Check if a report has to be send
 		# Frequency: 1 = every hour, 2 = every day, 3 = every week
 		if ($frequency == 1) { $timespan = $hour; }
@@ -438,7 +451,7 @@ while (@row = $email_query->fetchrow_array) {
 					
 					# Get current value for last timespan
 					$sql = "SELECT COUNT(attacks.id) FROM attacks, sensors ";
-					$sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid $andorg $sensorwhere ";
+					$sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid $andorg $sensor_where ";
 					$sql .= "AND timestamp >= '$ts_start' AND timestamp <= '$ts_end'";
 
 					$check_query = $dbh->prepare($sql);
@@ -486,6 +499,7 @@ while (@row = $email_query->fetchrow_array) {
 						# Free file
 						close(MAIL);
 						# Remove file
+						print "SEND: $send\n";
 						system "rm $mailfile";
 					}
 			} elsif ($template == 4) {
@@ -500,7 +514,7 @@ while (@row = $email_query->fetchrow_array) {
                                 }
 
 				$sql = "SELECT status, lastupdate, tap, tapip, keyname FROM sensors ";
-				$sql .= "WHERE sensors.id = sensors.id $andorg $sensorwhere";
+				$sql .= "WHERE sensors.id = sensors.id $andorg $sensor_where";
 				$sql .= "ORDER BY keyname";
                                 $sensors_query = $dbh->prepare($sql);
                                 $sensors_result = $sensors_query->execute();
@@ -535,6 +549,8 @@ while (@row = $email_query->fetchrow_array) {
 				print MAIL "\n";
 				close(MAIL);
 				
+				print "SEND: $send\n";
+				print "TEMPLATE: $template\n";
 				# Update last_sent
 				$last_sent = time;
 				$sql = "UPDATE report_content SET last_sent = '$last_sent' WHERE id = '$id'";
