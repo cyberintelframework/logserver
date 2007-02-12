@@ -3,7 +3,7 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
+# Version 1.04.06                  #
 # 26-01-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 1.04.06 wrong amount of attacks bug fixed
 # 1.04.05 add_to_sql()
 # 1.04.04 Changed some sql stuff
 # 1.04.03 Changed data input handling
@@ -106,6 +107,7 @@ if ($b == "all") {
 echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br />\n";
 ### BROWSE MENU
 $today = date("U");
+
 echo "<form name='selectorg' method='get' action='logcheck.php?int_org=$q_org'>\n";
 #  echo "<input type='hidden' name='int_org' value='$q_org' />\n";
   if ($b != "all") {
@@ -190,6 +192,7 @@ if ($err != 1) {
     if (trim($range) != "") {
       add_to_sql("attacks", "table");
       add_to_sql("sensors", "table");
+      add_to_sql("attacks.sensorid = sensors.id", "where");
       add_to_sql("attacks.source <<= '$range'", "where");
       add_to_sql("attacks.severity = 1", "where");
       add_to_sql("$tsquery", "where");
