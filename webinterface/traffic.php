@@ -48,6 +48,13 @@ $result_getorg = pg_query($pgconn, $sql_getorg);
 
 $debuginfo[] = $sql_getorg;
 
+if ($s_admin == 1) {
+  echo "<h3>Traffic analysis for: All</h3>\n";
+} else {
+  echo "<h3>Traffic analysis for: $db_org_name</h3>\n";
+  add_to_sql("organisqation = $s_org", "where");
+}
+
 echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
   echo "<select name='int_onoff' onChange='javascript: this.form.submit();'>\n";
     echo printOption(1, "Online", $onoff) . "\n";
@@ -55,6 +62,7 @@ echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
     echo printOption(2, "All", $onoff) . "\n";
   echo "</select>&nbsp;\n";
 echo "</form>\n";
+echo "<br />\n";
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $s_org";
 $debuginfo[] = $sql_getorg;
@@ -67,12 +75,7 @@ add_to_sql("vlanid", "select");
 add_to_sql("sensors", "table");
 add_to_sql("keyname", "order");
 
-if ($s_admin == 1) {
-  echo "<h3>Traffic analysis for: All</h3>\n";
-} else {
-  echo "<h3>Traffic analysis for: $db_org_name</h3>\n";
-  add_to_sql("organisqation = $s_org", "where");
-}
+
 
 if ($onoff != 2) {
   add_to_sql("status = $onoff", "where");

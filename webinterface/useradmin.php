@@ -63,8 +63,7 @@ if (isset($tainted['sort'])) {
 }
 
 if ($s_access_user > 1) {
-  echo "<a href='usernew.php'><img src='images/icons/user_add_48.gif' alt='Add User' title='Add User' /></a>\n";
-  echo "<br />\n";
+  echo "<h4><a href='usernew.php'>[Add User]</a></h4>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td width='150' class='dataheader'><a href='useradmin.php?sort=u$neworder' title='Sort on Username'>User</a></td>\n";
@@ -104,9 +103,9 @@ if ($s_access_user > 1) {
         echo "<td>$orgname</td>\n";
         echo "<td>$lastlogin</td>\n";
         echo "<td>$access</td>\n";
-        echo "<td align=center><a href='useredit.php?int_userid=$id'><img src='images/icons/user_info_20.gif' alt='Edit User' title='Edit User' /></a></td>\n";
-        echo "<td align=center><a href='userdel.php?int_userid=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this user?');\"><img src='images/icons/user_delete_20.gif' alt='Delete User' title='Delete User' /></a></td>\n";
-        echo "<td align=center><a href='mailadmin.php?int_userid=$id'><img src='images/icons/email_20.gif' alt='Edit Mailsetting' title='Edit Mailsettings' /></a></td>\n";
+        echo "<td align=center><a href='useredit.php?int_userid=$id'><font size=1>[Modify]</font></a></td>\n";
+        echo "<td align=center><a href='userdel.php?int_userid=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this user?');\"><font size=1>[Delete]</font></a></td>\n";
+        echo "<td align=center><a href='mailadmin.php?int_userid=$id'><font size=1>[Edit Mailsetting]</font></a></td>\n";
       echo "</tr>\n";
     }
   echo "</table>\n";

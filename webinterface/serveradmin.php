@@ -74,7 +74,7 @@ if ($err == 0) {
     echo "<tr>\n";
       echo "<td class='datatd'>$id</td>\n";
       echo "<td class='datatd'>$server</td>\n";
-      echo "<td class='datatd' align=center><a href='serverdel.php?int_serverid=$id' alt='Delete the server' class='linkbutton' onclick=\"javascript: return confirm('Are you sure you want to delete this server?');\"><img src='images/icons/delete.gif' title='Delete server' /></a></td>\n";
+      echo "<td class='datatd' align=center><a href='serverdel.php?int_serverid=$id' alt='Delete the server' class='linkbutton' onclick=\"javascript: return confirm('Are you sure you want to delete this server?');\"><font size=1>[Delete]</font></a></td>\n";
     echo "</tr>\n";
   }
   echo "</table>\n";

@@ -10,7 +10,7 @@
 
 #############################################
 # Changelog:
-# 1.04.00 
+# 1.04.00 initial release 
 #############################################
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
@@ -93,7 +93,7 @@ $tsquery = "timestamp >= $start AND timestamp <= $end";
 ### BROWSE MENU
 $today = date("U");
 
-
+echo "<div id=\"search_wait\"><center>Your request is being processed...<br /><br />Please be patient.<br /></center></div>\n";
 echo "<form name='selectorg' method='get' action='googlemap.php'>\n";
   if ($b != "all") {
     echo "<input type='button' value='Prev' class='button' onClick=window.location='googlemap.php?b=$b&amp;i=$prev&amp;int_org=$q_org';>\n";
@@ -135,7 +135,6 @@ echo "<form name='selectorg' method='get' action='googlemap.php'>\n";
   }
 echo "</form>\n";
 echo "<br />\n";
-echo "Parsing could take some time. Please be patient<br />\n";
 if ($b == "daily") {
       $datestart = date("d-m-Y", $start);
       echo "<h4>Results from $datestart</h4>\n";
@@ -237,6 +236,7 @@ request.onreadystatechange = function() {
     
     if (request.readyState == 4) {
      if (request.status == 200) {
+        document.getElementById('search_wait').style.display='none';
 	var xmlDoc = request.responseXML;
         var markers = xmlDoc.documentElement.getElementsByTagName("marker");
  

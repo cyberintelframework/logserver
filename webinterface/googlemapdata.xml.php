@@ -1,4 +1,17 @@
 <?php
+####################################
+# SURFnet IDS                      #
+# Version 1.04.00                  #
+# 05-01-2007                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
+
+#############################################
+# Changelog:
+# 1.04.00 initial release
+#############################################
+
+
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
@@ -117,7 +130,8 @@ if ( $query == true && $err == 0)
                 fwrite($f,'<?xml version="1.0" encoding="ISO-8859-1"?>');
                 fwrite($f,"\n");
                 fwrite($f,"<markers>\n");
-                while( $hit = pg_fetch_assoc($r_hit) )
+                $ar_latlng= array();
+		while( $hit = pg_fetch_assoc($r_hit) )
                 {
 			$source = $hit['source'];
 			$count = $hit['count'];
@@ -127,10 +141,28 @@ if ( $query == true && $err == 0)
 			if ($city == "") $city = "Unkown";
 			$lat = $record->latitude;
 			$lng = $record->longitude;
-			$line ='   <marker lat="'.$lat.'" lng="'.$lng.'" count="'.$count.'" country="'.$country.'" city="'.$city.'" />'."\n";
-                        fwrite($f,$line);
+			if ($ar_latlng["$lat+$lng"]) {
+				$count = $ar_latlng["$lat+$lng"]["count"] + $count;
+			}	
+			$ar_latlng["$lat+$lng"]= array (
+							count => "$count",
+							country => "$country",
+						        city => "$city",	
+						    );
+		       
+                        
                 }
-                fwrite($f,"</markers>\n");
+		foreach ($ar_latlng as $key=>$val){
+			$tmp = explode("+", $key);
+	 		$lat = $tmp[0];
+	 		$lng = $tmp[1];
+		        $count = $val["count"];
+		        $country = $val["country"];
+		        $city = $val["city"];
+		        $line ='   <marker lat="'.$lat.'" lng="'.$lng.'" count="'.$count.'" country="'.$country.'" city="'.$city.'" />'."\n";
+                        fwrite($f,$line);
+	       }		
+               fwrite($f,"</markers>\n");
         }
         fclose($f);
 }
@@ -145,6 +177,6 @@ else {
 $f = fopen("/tmp/data.cache.xml","r");
 $contents = fread($f, filesize("/tmp/data.cache.xml"));
 trim($contents);
-echo $contents;
+echo $contents; 
 fclose($f);
 ?>
