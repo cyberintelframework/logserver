@@ -118,3 +118,13 @@ ALTER TABLE sensors ADD COLUMN vlanid integer DEFAULT 0;
 -- SESSIONS
 --
 ALTER TABLE sessions ADD COLUMN useragent character varying;
+
+--
+-- LOGIN
+--
+ALTER TABLE login ADD COLUMN gpg integer DEFAULT 0;
+
+--
+-- REPORT_CONTENT
+--
+ALTER TABLE report_content ADD COLUMN user_id integer;
