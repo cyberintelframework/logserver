@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 12-02-2007                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Fixed a bug with weekday count
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
@@ -341,7 +342,7 @@ echo ">\n";
           echo "<td class='datatd'>";
             echo "<select name='int_intervalweek' style='background-color:white;'>\n";
               $j = (4 * 86400); // monday
-              for ($i = 0; $i < 7; $i++) {
+              for ($i = 1; $i < 8; $i++) {
                 // use php's date function to print the day
                 echo "    " . printOption($i, date("l", $j), $interval_week);
                 $j += 86400; // add one day
