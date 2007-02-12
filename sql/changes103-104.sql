@@ -80,7 +80,7 @@ GRANT SELECT,UPDATE ON TABLE serverstats_id_seq TO idslog;
 --
 -- UNIQ_BINARIES
 --
-SELECT DISTINCT text::character varying INTO TABLE uniq_binaries FROM details WHERE type = 8;
+SELECT DISTINCT name::character varying INTO TABLE uniq_binaries FROM details WHERE type = 8;
 ALTER TABLE uniq_binaries ADD COLUMN id serial NOT NULL;
 
 ALTER TABLE ONLY uniq_binaries
