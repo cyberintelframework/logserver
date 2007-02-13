@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.03                  #
-# 17-11-2006                       #
+# Version 1.03.04                  #
+# 13-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.04 Fixed a bug in getEndWeek()
 # 1.03.03 Added debug function
 # 1.03.02 Changed getStartWeek() to correctly display the start of the week
 # 1.03.01 Released as part of the 1.03 package
@@ -299,7 +300,7 @@ function getStartWeek($day = '', $month = '', $year = '') {
 # Function used to determine the end of a week. Returns timestamp in epoch format.
 function getEndWeek($day = '', $month = '', $year = '') {
   $dayofweek = date("w", mktime(0,0,0,$month,$day,$year));
-  $startofweek = $day - $dayofweek;
+  $startofweek = $day - $dayofweek + 1;
   $endofweek = $startofweek + 6;
   $stamp = mktime(23,59,59,$month,$endofweek,$year);
   return $stamp;
