@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.01
--- 01-02-2007
+-- Version: 1.04.02
+-- 13-02-2007
 
 -- Changelog
+-- 1.04.02 Added f-prot updater
 -- 1.04.01 Initial release
 
 --
@@ -35,12 +36,12 @@ ALTER TABLE ONLY scanners
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE scanners TO idslog;
 GRANT SELECT,UPDATE ON TABLE scanners_id_seq TO idslog;
 
-INSERT INTO scanners VALUES (2, 'Antivir', 'antivir -rs !bindir!/!file! | grep !file! | awk ''{print $2}'' | awk -F [ ''{print $2}''', 'antivir --update', 0);
-INSERT INTO scanners VALUES (5, 'F-Prot', 'f-prot !bindir!/!file! | grep !file! | grep -v Search: | grep -vi error | awk ''{print $NF}''', '', 0);
-INSERT INTO scanners VALUES (3, 'BitDefender', 'bdc --files !bindir!/!file! | grep !file! | awk ''{print $3}''', 'bdc --update', 0);
 INSERT INTO scanners VALUES (1, 'ClamAV', 'clamscan --no-summary !bindir!/!file! | grep !file! | awk ''{print $2}'' | grep -v ^OK$', 'freshclam', 0);
-INSERT INTO scanners VALUES (6, 'Kaspersky', '/home/kav/5.5/kav4unix/bin/kavscanner !bindir!/!file! | grep !file! | tail -n1 | awk ''{print $NF}'' | grep -v ^OK$', '/home/kav/5.5/kav4unix/bin/keepup2date', 0);
-INSERT INTO scanners VALUES (4, 'AVAST', '/home/avast4workstation-1.0.7/bin/avast !bindir!/!file! | grep !file! | grep -v "\\[OK\\]" | tail -n1 | awk -F "infected by:" ''{print $2}'' | awk ''{print $1}'' | awk -F "]" ''{print $1}''', '/home/avast4workstation-1.0.7/bin/avast-update', 0);
+INSERT INTO scanners VALUES (2, 'Antivir', 'antivir -rs !bindir!/!file! | grep !file! | awk ''{print $2}'' | awk -F [ ''{print $2}''', 'antivir --update', 0);
+INSERT INTO scanners VALUES (3, 'BitDefender', 'bdc --files !bindir!/!file! | grep !file! | awk ''{print $3}''', 'bdc --update', 0);
+INSERT INTO scanners VALUES (4, 'AVAST', '/opt/avast4workstation-1.0.7/bin/avast !bindir!/!file! | grep !file! | grep -v "\\[OK\\]" | tail -n1 | awk -F "infected by:" ''{print $2}'' | awk ''{print $1}'' | awk -F "]" ''{print $1}''', '/home/avast4workstation-1.0.7/bin/avast-update', 0);
+INSERT INTO scanners VALUES (5, 'F-Prot', 'f-prot !bindir!/!file! | grep !file! | grep -v Search: | grep -vi error | awk ''{print $NF}''', '/opt/f-prot/tools/check-updates.pl', 0);
+INSERT INTO scanners VALUES (6, 'Kaspersky', '/opt/kav/5.5/kav4unix/bin/kavscanner !bindir!/!file! | grep !file! | tail -n1 | awk ''{print $NF}'' | grep -v ^OK$', '/home/kav/5.5/kav4unix/bin/keepup2date', 0);
 
 --
 -- SEARCHTEMPLATE

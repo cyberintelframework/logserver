@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.06
--- 01-02-2007
+-- Version 1.04.07
+-- 13-02-2007
 --
 
 -- Version history
+-- 1.04.07 Removed arp stuff from sensors table
 -- 1.04.06 Updating sql file for 1.04beta
 -- 1.04.05 Changed constraint for report_content
 -- 1.04.04 Removed table report and modified login
@@ -35,8 +36,6 @@ CREATE TABLE sensors (
     netconf text,
     organisation integer DEFAULT 0 NOT NULL,
     server integer DEFAULT 1 NOT NULL,
-    arp integer DEFAULT 0 NOT NULL,
-    arp_threshold_perc integer DEFAULT 0 NOT NULL,
     netconfdetail text,
     vlanid integer DEFAULT 0
 );
