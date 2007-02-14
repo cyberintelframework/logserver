@@ -103,14 +103,9 @@ while (<CRONLOG>) {
 close(CRONTAB);
 close(CRONLOG);
 
-#$crontab = `cat /etc/crontab | grep cronlog | wc -l`;
-#chomp($crontab);
-#if ($crontab == 0) {
-#  `cat $targetdir/crontab.log >> /etc/crontab`;
-#  printmsg("Adding crontab rules:", $?);
-#  `/etc/init.d/cron restart`;
-#  printmsg("Restarting cron:", $?);
-#}
+printdelay("Restarting cron:");
+`/etc/init.d/cron restart`;
+printresult($?);
 
 ####################
 # Setting up Apache
