@@ -152,7 +152,7 @@ $v_access_ar_search = array(
 $v_access_ar_sensor = array(
 		'0'	=> 'Read only access',			# User can view all sensors of his organisation.
                 '1'	=> 'Remote control access',		# User can view and control all sensors of his organisation.
-                '2'	=> 'ARP Monitor access',		# User can add ARP monitoring entries.
+#                '2'	=> 'ARP Monitor access',		# User can add ARP monitoring entries.
                 '9'	=> 'Total access (admin)'		# User can view and control all sensors.
 );
 
