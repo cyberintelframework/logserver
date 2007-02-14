@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.13                  #
-# 26-01-2007                       #
+# Version 1.04.14                  #
+# 14-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.14 Fixed image href for searchtemplates
 # 1.04.13 add_to_sql()
 # 1.04.12 Fixed bug with timestamps and multiple sensors
 # 1.04.11 Fixed bug with rendering time
@@ -906,7 +907,7 @@ else $pdf_url = str_replace("reptype=" . $tainted["reptype"], "&reptype=pdf", $p
 echo "<div id=\"pdf_btn\" <a href=\"$pdf_url\" title=\"Download these results as PDF file\"><img src=\"./images/pdf.gif\" border=\"0\" width=\"48\" height=\"52\"></a><br>&nbsp;&nbsp; PDF</div>\n";
 
 // Personal search templates
-echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='/images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br>Search-<br>template</div>\n";
+echo "<div id=\"personal_searchtemplate\" <a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='./images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br>Search-<br>template</div>\n";
 
 flush();
 
