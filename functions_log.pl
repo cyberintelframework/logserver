@@ -40,6 +40,18 @@ sub getmac() {
   return $mac;
 }
 
+# 1.03 checkcron
+# Function to check if a certain cron rule is already in the crontab
+sub checkcron() {
+  my ($chk, $cronrule);
+  $cronrule = $_[0];
+  chomp($cronrule);
+  $chk = `cat /etc/crontab | grep $cronrule | wc -l`;
+  chomp($chk);
+  return $chk;
+}
+
+
 # 3.04 validip
 # Function to check if a given IP address is a valid IP address.
 # Returns 0 if the IP is a valid IP number

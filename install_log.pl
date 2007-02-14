@@ -21,6 +21,8 @@ $g = "\033[1;32m";
 $targetdir = "/opt/surfnetids";
 $configdir = "/etc/surfnetids";
 
+$geoiploc = "http://www.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
+
 ##########################
 # Includes
 ##########################
@@ -80,14 +82,35 @@ printmsg("Copying surfnetids files:", $?);
 # Setting up crontab
 ####################
 
-$crontab = `cat /etc/crontab | grep cronlog | wc -l`;
-chomp($crontab);
-if ($crontab == 0) {
-  `cat $targetdir/crontab.log >> /etc/crontab`;
-  printmsg("Adding crontab rules:", $?);
-  `/etc/init.d/cron restart`;
-  printmsg("Restarting cron:", $?);
+open(CRONTAB, ">> /etc/crontab");
+open(CRONLOG, "crontab.log");
+while (<CRONLOG>) {
+  $line = $_;
+  chomp($line);
+  if ($line ne "") {
+    @ar_line = split(/ /, $line);
+    $check = $ar_line[6];
+    chomp($check);
+    $file = `cat crontab.log | grep -F "$line" | awk '{print \$7}' | awk -F"/" '{print \$NF}'`;
+    chomp($file);
+    $chk = checkcron($file);
+    if ($chk == 0) {
+      print "Adding crontab rule\n";
+      print CRONTAB $line ."\n";
+    }
+  }
 }
+close(CRONTAB);
+close(CRONLOG);
+
+#$crontab = `cat /etc/crontab | grep cronlog | wc -l`;
+#chomp($crontab);
+#if ($crontab == 0) {
+#  `cat $targetdir/crontab.log >> /etc/crontab`;
+#  printmsg("Adding crontab rules:", $?);
+#  `/etc/init.d/cron restart`;
+#  printmsg("Restarting cron:", $?);
+#}
 
 ####################
 # Setting up Apache
@@ -423,6 +446,30 @@ if ($setup eq "single") {
       }
     }
   }
+}
+
+`wget -V >/dev/null`;
+if ($? == 0) {
+  print "\n"; 
+  $confirm = "a";
+  while ($confirm !~ /^(n|N|y|Y)$/) {
+    $confirm = &prompt("Do you want to download the latest GeoIP database? [y/n]: ");
+  }
+  if ($confirm =~ /^(Y|y)$/) {
+    printmsg("Downloading GeoIP database:", "info");
+    `wget $geoiploc`;
+    print "\n";
+
+    printdelay("Unzipping GeoIP database:");
+    `gunzip GeoLiteCity.dat.gz`;
+    printresult($?);
+
+    printdelay("Installing GeoIP database:");
+    `mv GeoLiteCity.dat $targetdir/include/`;
+    printresult($?);
+  }
+} else {
+  printmsg("Skipping GeoIP database download:", "info");
 }
 
 $ec = 0;
