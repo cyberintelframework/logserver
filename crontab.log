@@ -1,0 +1,16 @@
+####
+# SURFnet IDS logging server crontab rules
+# cronlog
+####
+
+* * 1 * * root /opt/surfnetids/scripts/stat_generator.pl >/dev/null
+1 * * * * root /opt/surfnetids/scripts/mailreporter.pl >/dev/null
+8 * * * * root /opt/surfnetids/scripts/fill_dialogues_viruses.pl >/dev/null
+0 1 * * * root /opt/surfnetids/scripts/getnorman.pl >/dev/null
+
+
+# These are only used when the tunnel package is not installed
+# Single sensor setup
+#*/5 * * * * root /opt/surfnetids/scripts/rrd_traffic.pl >/dev/null
+#59 23 * * * root /opt/surfnetids/scripts/scanbinaries.pl >/dev/null
+

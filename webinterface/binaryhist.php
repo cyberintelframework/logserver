@@ -3,13 +3,14 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.04.05                 #
-# 15-12-2006                      #
+# Version 1.04.06                 #
+# 13-02-2007                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.06 Added check for binary history info
 # 1.04.05 Added download option for binaries
 # 1.04.04 Changed data input handling
 # 1.04.03 Fixed typo
@@ -51,6 +52,11 @@ if (isset($clean['binid']) ){
   $debuginfo[] = $sql_binid;
 } else {
   $err = 1;
+}
+
+if ($bin_id == "") {
+  $err = 1;
+  echo "<font color='red'>No binary info found!</font><br />\n";
 }
 
 if (isset($tainted['show'])) {
