@@ -36,16 +36,20 @@ if (!in_array ("gd", $phpext)){
 }
 
 echo "<h4>SURFnet IDS $c_version</h4>\n";
+$day = date("d");
+$year = date("Y");
+$month = date("n");
+$start = getStartWeek($day, $month, $year);
+$end = getEndWeek($day, $month, $year);
+
+$startqs = date("d-m-Y+H", $start);
+$endqs = date("d-m-Y+H", $end);
+$startqsmin = date("i", $start);
+$endqsmin = date("i", $end);
+
+
+echo "<img src='showplot.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&sensorid%5B%5D=&severity%5B%5D=0&severity%5B%5D=1&int_interval=3600&int_type=2&int_width=990&int_heigth=400&submit=Show'>";
 ?>
-<ul>
-  <li>Enhanced search engine</li>
-  <li>Enhanced administration interface</li>
-  <li>Increased binary information</li>
-  <li>Support for BitDefender and Antivir virusscans</li>
-  <li>Passive TCP fingerprinting support</li>
-  <li>Added SSL security to the update mechanism</li>
-  <li>Static IP configuration support</li>
-  <li>Remote sensor control</li>
-</ul>
 <p>For more technical information you can surf to: <a href="http://ids.surfnet.nl/">http://ids.surfnet.nl/</a></p>
+
 <?php footer(); ?>

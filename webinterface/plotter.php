@@ -56,7 +56,7 @@ if ($_GET) {
   if ($s_admin == 1) {
     $where = "";
   } else {
-    $where = "organisations.id = $s_org";
+    $where = "AND organisations.id = $s_org";
   }
   $sql_getsensors = "SELECT sensors.id, sensors.keyname, sensors.vlanid, organisations.organisation FROM sensors, organisations ";
   $sql_getsensors .= "WHERE organisations.id = sensors.organisation $where ORDER BY sensors.keyname";

@@ -52,7 +52,9 @@ $allowed_get = array(
 		"sensorid",
 		"severity",
 		"attack",
-		"strip_html_escape_ports"
+		"strip_html_escape_ports",
+		"int_width",
+		"int_heigth"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -79,6 +81,20 @@ if (!isset($clean['interval']) || empty($clean['interval'])) {
   $interval = 86400;
 } else {
   $interval = $clean['interval'];
+}
+
+########################
+# width & heigth 
+########################
+if (!isset($clean['width']) || empty($clean['width'])) {
+  $width = "990";
+} else {
+  $width = $clean['width'];
+}
+if (!isset($clean['heigth']) || empty($clean['heigth'])) {
+  $heigth = "600";
+} else {
+  $heigth = $clean['heigth'];
 }
 
 ########################
@@ -260,7 +276,8 @@ $title .= "\n From $textstart to $textend";
 # PHPlot stuff
 ##############
 require_once '/usr/share/phplot/phplot.php';  // here we include the PHPlot code 
-$plot =& new PHPlot(990,600);    // here we define the variable
+#$plot =& new PHPlot(990,600);    // here we define the variable
+$plot =& new PHPlot($width,$heigth);    // here we define the variable
 $plot->SetTitle($title);
 $plot->SetXTitle('Time');
 $plot->SetYTitle('Attacks');
