@@ -32,7 +32,7 @@ header("Content-Disposition: inline; filename=\"" .$clean['binname']. ".bin\"");
 
 $s_admin = intval($_SESSION['s_admin']);
 
-if ($s_admin != 1) {
+if ($s_admin != 1 && $c_download_binaries == 1) {
   $absfile = $_SERVER['SCRIPT_NAME'];
   $file = basename($absfile);
   $address = getaddress();
