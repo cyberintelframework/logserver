@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 13-12-2006                       #
+# Version 1.04.04                  #
+# 16-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.04 Fixed wrong error code
 # 1.04.03 Changed data input handling
 # 1.04.02 Added support for user agent checking
 # 1.04.01 Released as 1.04.01
@@ -134,10 +135,10 @@ if ($numrows_user == 1) {
     }
   } else {
     pg_close($pgconn);
-    header("location: login.php?int_m=43");
+    header("location: login.php?int_m=91");
   }
 } else {
   pg_close($pgconn);
-  header("location: login.php?int_m=43");
+  header("location: login.php?int_m=91");
 }
 ?>
