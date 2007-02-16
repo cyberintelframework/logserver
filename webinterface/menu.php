@@ -114,9 +114,6 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         echo "<li><a href='${address}logindex.php' onmouseover='return overlib(\"$popup_logindex\");' onmouseout='return nd();'>Log Overview</a></li>\n";
     #    echo "<li><a href='${address}loghistory.php' onmouseover='return overlib(\"$popup_history\");' onmouseout='return nd();'>Log History</a></li>\n";
         echo "<li><a href='${address}logcheck.php' onmouseover='return overlib(\"$popup_check\");' onmouseout='return nd();'>Check</a></li>\n";
-#        if ($enable_arpwatch == 1) {
-#          echo "<li><a href='${address}arpindex.php'>ARP Monitor</a></li>\n";
-#        }
         echo "<li><a href='${address}traffic.php' onmouseover='return overlib(\"$popup_traffic\");' onmouseout='return nd();'>Traffic</a></li>\n";
         echo "<li><a href='${address}plotter.php' onmouseover='return overlib(\"$popup_plotter\");' onmouseout='return nd();'>Plotter</a></li>\n";
         echo "<li><a href='${address}googlemap.php' onmouseover='return overlib(\"$popup_googlemap\");' onmouseout='return nd();'>Map</a></li>\n";
@@ -153,9 +150,6 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           if ($s_admin == 1) {
             echo "<li><a href='${address}serveradmin.php' onmouseover='return overlib(\"$popup_server\");' onmouseout='return nd();'>Server Admin</a></li>\n";
           }
-#          if ($s_a_sensor > 1) {
-#            echo "<li><a href='${address}arpadmin.php' onmouseover='return overlib(\"$popup_arp\");' onmouseout='return nd();'>ARP Admin</a></li>\n";
-#          }
           if ($s_admin == 1) {
             echo "<li><a href='${address}serverstats.php' onmouseover='return overlib(\"$popup_stats\");' onmouseout='return nd();'>Server Info</a></li>\n";
           }
