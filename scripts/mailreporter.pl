@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 09-02-2007                       #
+# Version 1.04.03                  #
+# 16-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.03 Restructured the code
 # 1.04.02 Fixed a bug with daily reports at a certain time and sensor specific reports
 # 1.04.01 Rereleased as 1.04.01
 # 1.03.07 Fixed a bug in the sensorstatus query
@@ -236,7 +237,6 @@ while (@row = $email_query->fetchrow_array) {
       }
 
       # Get total of attacks and downloads and print to the mail
-      print "SQL 1\n";
       $sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total ";
       $sql .= "FROM attacks, sensors, severity WHERE attacks.severity = severity.val ";
       $sql .= "AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
@@ -244,7 +244,6 @@ while (@row = $email_query->fetchrow_array) {
       $sql .= "GROUP BY severity.txt, severity.val ORDER BY severity.val";
       $overview_query = $dbh->prepare($sql);
       $execute_result = $overview_query->execute();
-      print "SQL 1\n";
       $malattacks = $overview_query->rows;
       if ($execute_result == 0 ) {
         printmail("No malicious attacks detected for last timespan.");
@@ -260,7 +259,6 @@ while (@row = $email_query->fetchrow_array) {
         # Get details about the attacks and print them to mail.   
         # Printed in format: ip address attacker, time of attack, type of attack.   
         $message = "";
-        print "SQL 2\n";
         $sql = "SELECT DISTINCT attacks.source, attacks.timestamp, details.text, sensors.keyname ";
         $sql .= " FROM attacks, sensors, details WHERE details.attackid = attacks.id ";
         $sql .= " AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
@@ -269,7 +267,6 @@ while (@row = $email_query->fetchrow_array) {
         $sql .= " ORDER BY timestamp ASC";
         $ipview_query = $dbh->prepare($sql);
         $execute_result = $ipview_query->execute();
-        print "SQL 2\n";
         
         printmail("------ Malicious Attacks ------");
         printmail("");
@@ -294,11 +291,9 @@ while (@row = $email_query->fetchrow_array) {
       printmail("Results from " . getdatetime($ts_start) . " till " . getdatetime($ts_end));
       printmail("");
 
-      print "SQL 3\n";
       $sql = "SELECT DISTINCT ranges FROM organisations WHERE id = $org";
       $sql_ranges = $dbh->prepare($sql);
       $result_ranges = $sql_ranges->execute();
-      print "SQL 3\n";
       @rangerow = $sql_ranges->fetchrow_array;
       @rangerow = split(/;/, "@rangerow");
       $count = @rangerow;
@@ -307,7 +302,6 @@ while (@row = $email_query->fetchrow_array) {
           # Get details about the attacks and print them to mail.
           # Printed in format: ip address attacker, time of attack, type of attack.
           $message = "";
-          print "SQL 4\n";
           $sql = "SELECT DISTINCT source, timestamp, text FROM attacks, sensors, details ";
           $sql .= "WHERE attacks.source <<= '$range' AND details.attackid = attacks.id ";
           $sql .= "AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
@@ -315,7 +309,6 @@ while (@row = $email_query->fetchrow_array) {
           $sql .= "AND sensors.organisation = '$org' $sensor_where GROUP BY source, timestamp, text";
           $ipview_query = $dbh->prepare($sql);
           $execute_result = $ipview_query->execute();
-          print "SQL 4\n";
           if ($execute_result == 0 ) {
             printmail("No malicious attacks from range: $range");
           } else {
@@ -341,12 +334,10 @@ while (@row = $email_query->fetchrow_array) {
     # THRESHOLD:
     elsif ($template == 3) {
       # Get detailed data for threshold
-      print "SQL 5\n";
       $sql = "SELECT target, value, deviation, operator FROM report_template_threshold ";
       $sql .= "WHERE report_content_id = '$id'";
       $detail_query = $dbh->prepare($sql);
       $execute_result = $detail_query->execute();
-      print "SQL 5\n";
       @detail = $detail_query->fetchrow_array;
       $target = $detail[0];
       $db_timespan = $frequency;
@@ -372,7 +363,6 @@ while (@row = $email_query->fetchrow_array) {
           $andorg = "AND sensors.organisation = '$org'";
         }
         # Retrieving the total uptime for average calculation
-        print "SQL 6\n";
         $sql = "SELECT (sum(uptime + up)) as total_uptime ";
         $sql .= "FROM sensors, ";
         # Start subquery
@@ -382,18 +372,15 @@ while (@row = $email_query->fetchrow_array) {
         $sql .= "WHERE sensors.id = sensors.id $andorg $sensor_where ";
         $first_query = $dbh->prepare($sql);
         $er = $first_query->execute();
-        print "SQL 6\n";
         @first_result = $first_query->fetchrow_array;
         $uptime = $first_result[0];
 
         # Get the total amount of attacks
-        print "SQL 7\n";
         $sql = "SELECT COUNT(attacks.id) as total FROM attacks, sensors ";
         $sql .= "WHERE severity = $target AND sensors.id = attacks.sensorid ";
         $sql .= "$andorg $sensor_where";
         $total_query = $dbh->prepare($sql);
         $er = $total_query->execute();
-        print "SQL 7\n";
         @total_result = $total_query->fetchrow_array;
         $total = $total_result[0];
 
@@ -421,16 +408,12 @@ while (@row = $email_query->fetchrow_array) {
       }
       
       # Get current value for last timespan
-      print "SQL 8\n";
       $sql = "SELECT COUNT(attacks.id) FROM attacks, sensors ";
       $sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid $andorg $sensor_where ";
       $sql .= "AND timestamp >= '$ts_start' AND timestamp <= '$ts_end'";
-#      printdebug($sql);
-#      printdebug("");
 
       $check_query = $dbh->prepare($sql);
       $execute_result = $check_query->execute();
-      print "SQL 8\n";
       @db_row = $check_query->fetchrow_array;
       $cur_value = $db_row[0];
       
@@ -482,14 +465,11 @@ while (@row = $email_query->fetchrow_array) {
         $andorg = "AND sensors.organisation = '$org'";
       }
 
-      print "SQL 9\n";
       $sql = "SELECT status, lastupdate, tap, tapip, keyname FROM sensors ";
       $sql .= " WHERE sensors.id = sensors.id $andorg $sensor_where ";
       $sql .= " ORDER BY keyname";
-#      printdebug($sql);
       $sensors_query = $dbh->prepare($sql);
       $sensors_result = $sensors_query->execute();
-      print "SQL 9\n";
       while (@sensors = $sensors_query->fetchrow_array) {
         $status = $sensors[0];
         $lastupdate = $sensors[1];
