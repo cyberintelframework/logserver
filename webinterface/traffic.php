@@ -52,7 +52,7 @@ if ($s_admin == 1) {
   echo "<h3>Traffic analysis for: All</h3>\n";
 } else {
   echo "<h3>Traffic analysis for: $db_org_name</h3>\n";
-  add_to_sql("organisqation = $s_org", "where");
+  add_to_sql("organisation = $s_org", "where");
 }
 
 echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
