@@ -1,12 +1,20 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 ###########################################
-# Fill script for IDS server databas  e   #
+# Fill script for IDS server database     #
 # SURFnet IDS                             #
-# Version 1.02.01                         #
-# 17-05-2006                              #
+# Version 1.04.01                         #
+# 16-02-2007                              #
 # Peter Arts                              #
+# Kees Trippelvitz & Jan van Lith         #
 ###########################################
+
+#############################################
+# Changelog:
+# 1.04.01 Removed -w switch
+# 1.03.01 Released as part of the 1.03 package
+# 1.02.01 Initial release
+#############################################
 
 #########################################################################################
 # Copyright (C) 2005-2006 SURFnet                                                       #
