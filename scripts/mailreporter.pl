@@ -527,7 +527,7 @@ sub sendmail {
   
   $maildata = "/tmp/" .$id. ".mail";
   $sigmaildata = "$maildata" . ".sig";
-  $replyto = "ids-bounces@surfnet.nl";
+  $replyto = "";
   $to_address = "$email";
   $mail_host = 'localhost';
   
@@ -580,8 +580,6 @@ sub sendmail {
   # MIME::Lite->send('smtp', $mail_host, Timeout=>60, Hello=>"$mail_hello", From=>"$c_from_address");
   MIME::Lite->send('sendmail');
   $chk = $msg->send;
-
-#  print "CHK: $chk\n";
   
   # Update last_sent
   $last_sent = time;
