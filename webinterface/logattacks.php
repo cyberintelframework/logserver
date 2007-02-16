@@ -154,19 +154,19 @@ if ($err != 1) {
   ######### Table for Downloaded Malware (SEV: 32) #############
   
   elseif ($sev == 32) {
-    add_to_sql("DISTINCT uniq_binaries.id", "select");
+#    add_to_sql("DISTINCT uniq_binaries.id", "select");
     add_to_sql("details.text", "select");
     add_to_sql("COUNT(details.id) as total", "select");
-    add_to_sql("sensors", "table");
+#    add_to_sql("sensors", "table");
     add_to_sql("details", "table");
-    add_to_sql("uniq_binaries", "table");
+#    add_to_sql("uniq_binaries", "table");
     add_to_sql("attacks", "table");
     add_to_sql("attacks.severity = 32", "where");
-    add_to_sql("attacks.sensorid = sensors.id", "where");
+#    add_to_sql("attacks.sensorid = sensors.id", "where");
     add_to_sql("attacks.id = details.attackid", "where");
     add_to_sql("details.type = 8", "where");
-    add_to_sql("details.text = uniq_binaries.name", "where");
-    add_to_sql("uniq_binaries.id", "group");
+#    add_to_sql("details.text = uniq_binaries.name", "where");
+#    add_to_sql("uniq_binaries.id", "group");
     add_to_sql("details.text", "group");
     add_to_sql("total DESC", "order");
     prepare_sql();
@@ -207,7 +207,7 @@ if ($err != 1) {
         echo "</tr>\n";
 
         while ($row = pg_fetch_assoc($result_down)) {
-          $bin_id = $row['id'];
+#          $bin_id = $row['id'];
           $malware = $row['text'];
           $count = $row['total'];
 
@@ -215,8 +215,9 @@ if ($err != 1) {
             echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$malware'>$malware</a></td>\n";
             while ($scanners = pg_fetch_assoc($result_scanners)) {
               $scanner_id = $scanners['id'];
-              $sql_virus = "SELECT DISTINCT stats_virus.name as virusname, binaries.timestamp FROM binaries, stats_virus ";
-              $sql_virus .= "WHERE binaries.bin = $bin_id AND binaries.scanner = $scanner_id ";
+              $sql_virus = "SELECT DISTINCT stats_virus.name as virusname, binaries.timestamp FROM binaries, stats_virus, uniq_binaries ";
+              $sql_virus .= "WHERE binaries.scanner = $scanner_id ";
+              $sql_virus .= "AND uniq_binaries.id = binaries.bin AND uniq_binaries.name = '$malware' ";
               $sql_virus .= "AND binaries.info = stats_virus.id ORDER BY binaries.timestamp DESC LIMIT 1";
               $debuginfo[] = "$sql_virus";
               $result_virus = pg_query($pgconn, $sql_virus);
@@ -243,7 +244,7 @@ if ($err != 1) {
               }
               echo "<td class='datatd'>$virus</td>\n";
             }
-            echo "<td class='datatd'><a href='logsearch.php?int_org=" . $q_org . "&int_binid=$bin_id$dateqs'>$count</a></td>\n";
+            echo "<td class='datatd'><a href='logsearch.php?int_org=" . $q_org . "&md5_binname=$malware$dateqs'>$count</a></td>\n";
             pg_result_seek($result_scanners, 0);
           echo "</tr>\n";
         }

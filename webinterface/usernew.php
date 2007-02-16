@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 15-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Fixed a radio button name
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug info
 # 1.04.01 Rereleased as 1.04.01
@@ -124,7 +125,7 @@ if ($err == 0) {
           echo "" . printRadio("0 - $v_access_ar_user[0]", "int_auser", 0, $access_user) . "<br />\n";
           echo "" . printRadio("1 - $v_access_ar_user[1]", "int_auser", 1, $access_user) . "<br />\n";
           if ($s_access_user > 1) {
-            echo "" . printRadio("2 - $v_access_ar_user[2]", "int_access_user", 2, $access_user) . "<br />\n";
+            echo "" . printRadio("2 - $v_access_ar_user[2]", "int_auser", 2, $access_user) . "<br />\n";
           }
           if ($s_access_user == 9) {
             echo "" . printRadio("9 - $v_access_ar_user[9]", "int_auser", 9, $access_user) . "<br />\n";

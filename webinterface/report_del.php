@@ -26,7 +26,8 @@ $err = 0;
 
 $allowed_get = array(
                 "int_userid",
-		"int_rcid"
+		"int_rcid",
+		"submit"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();

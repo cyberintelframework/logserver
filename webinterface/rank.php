@@ -736,7 +736,7 @@ echo "<table width='100%'>\n";
 
   $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles .= "(SELECT split_part(details.text, '/', 4) as file ";
-    $sql_topfiles .= "FROM details, attacks WHERE 1 = 1 ";
+    $sql_topfiles .= "FROM details, attacks WHERE NOT split_part(details.text, '/', 4) = '' ";
     if ($tsquery != "") {
       $sql_topfiles .= " AND $tsquery ";
     }
@@ -748,7 +748,7 @@ echo "<table width='100%'>\n";
 
   $sql_topfiles_org = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles_org .= "(SELECT split_part(details.text, '/', 4) as file ";
-    $sql_topfiles_org .= "FROM details, attacks, sensors WHERE 1 = 1 ";
+    $sql_topfiles_org .= "FROM details, attacks, sensors WHERE NOT split_part(details.text, '/', 4) = '' ";
     if ($tsquery != "") {
       $sql_topfiles_org .= " AND $tsquery ";
     }
@@ -896,7 +896,7 @@ echo "<table width='100%'>\n";
                 echo "</tr>\n";
 
                   $i = 0;
-                  while ($row = pg_fetch_assoc($result_topfiles_org)) {
+                  while ($row = pg_fetch_assoc($result_topproto_org)) {
                     if ($i == $c_topprotocols) {
                       break;
                     }

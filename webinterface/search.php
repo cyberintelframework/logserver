@@ -63,10 +63,10 @@ function check_byte(b_val,next_field) {
     $select_size = 5;
     $s_org = intval($_SESSION['s_org']);
     $s_admin = intval($_SESSION['s_admin']);
-	if ($s_admin == 1) $where = "";
+	if ($s_admin == 1) $where = " ";
 	else $where = " AND organisation = '$s_org'";
 
-    $sql = "SELECT COUNT(*) FROM sensors $where";
+    $sql = "SELECT COUNT(*) FROM sensors WHERE 1=1 $where";
     $debuginfo[] = $sql;
 	$query = pg_query($sql);
 	$nr_rows = intval(@pg_result($query, 0));
