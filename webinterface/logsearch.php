@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.13                  #
-# 26-01-2007                       #
+# Version 1.04.14                  #
+# 21-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.14 Fixed a bug with md5_binname
 # 1.04.13 add_to_sql()
 # 1.04.12 Fixed bug with timestamps and multiple sensors
 # 1.04.11 Fixed bug with rendering time
@@ -93,7 +94,7 @@ $allowed_get = array(
 		"strip_html_escape_tsstart",
 		"strip_html_escape_tsend",
 		"int_sev",
-		"strip_html_escape_binname",
+		"md5_binname",
 		"int_attack",
 		"strip_html_escape_virustxt",
 		"strip_html_escape_filename",
