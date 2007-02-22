@@ -95,7 +95,7 @@ while (<CRONLOG>) {
     chomp($file);
     $chk = checkcron($file);
     if ($chk == 0) {
-      print "Adding crontab rule\n";
+      printmsg("Adding crontab rule for $file:", "info");
       print CRONTAB $line ."\n";
     }
   }
