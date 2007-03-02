@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 16-02-2007                       #
+# Version 1.04.05                  #
+# 02-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.05 Always add serverhash to be used for form validation
 # 1.04.04 Fixed wrong error code
 # 1.04.03 Changed data input handling
 # 1.04.02 Added support for user agent checking
@@ -116,14 +117,16 @@ if ($numrows_user == 1) {
       }
     }
 
-    if ($login_method == 1) {
-      $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp WHERE username = '" .$f_user. "'";
-      $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
-    } else {
+#    if ($login_method == 1) {
       $newserverhash = genpass();
       $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
+#      $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp WHERE username = '" .$f_user. "'";
       $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
-    }
+#    } else {
+#      $newserverhash = genpass();
+#      $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
+#      $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
+#    }
     if (isset($clean['url'])) {
       $url = $clean['url'];
       pg_close($pgconn);

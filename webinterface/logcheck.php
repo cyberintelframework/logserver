@@ -163,23 +163,27 @@ if ($err != 1) {
 
 if ($err != 1) {
   ### Showing period.
+  echo "<br />\n";
   echo "<table class='datatable'>\n";
     echo "<tr>\n";
       if ($b == "all") {
-        echo "<td class='dataheader' width='600' colspan='3'>All results</td>\n";
+        echo "<td class='dataheader' width='600' colspan='5'>All results</td>\n";
       } elseif ($b == "daily") {
         $datestart = date("d-m-Y", $start);
-        echo "<td class='datatitle' width='600' colspan='3'>Results from $datestart</td>\n";
+        echo "<td class='datatitle' width='600' colspan='5'>Results from $datestart</td>\n";
       } else {
         $datestart = date("d-m-Y", $start);
         $dateend = date("d-m-Y", $end);
-        echo "<td class='datatitle' width='600' colspan='3'>Results from $datestart to $dateend</td>\n";
+        echo "<td class='datatitle' width='600' colspan='5'>Results from $datestart to $dateend</td>\n";
       }
     echo "</tr>\n";
     echo "<tr>\n";
       echo "<td class='dataheader' width='300'>Range</td>\n";
       echo "<td class='dataheader' width='150'>Malicious Attacks</td>\n";
-      echo "<td class='dataheader' width='250'>Unique Source Addresses</td>\n";
+      echo "<td class='dataheader' width='150'>Unique Source Addresses</td>\n";
+      echo "<td class='dataheader' width='150'>Possible Malicious Attacks</td>\n";
+      echo "<td class='dataheader' width='150'>Unique Source Addresses</td>\n";
+      
     echo "</tr>\n";
 }
 
@@ -194,42 +198,66 @@ if ($err != 1) {
       add_to_sql("sensors", "table");
       add_to_sql("attacks.sensorid = sensors.id", "where");
       add_to_sql("attacks.source <<= '$range'", "where");
-      add_to_sql("attacks.severity = 1", "where");
       add_to_sql("$tsquery", "where");
       prepare_sql();
 
-      $sql_total = "SELECT COUNT(attacks.id) as total ";
-      $sql_total .= " FROM $sql_from ";
-      $sql_total .= " $sql_where ";
+      $sql_total1 = "SELECT COUNT(attacks.id) as total ";
+      $sql_total1 .= " FROM $sql_from ";
+      $sql_total1 .= " $sql_where AND attacks.severity = 1";
 
-      $sql_uniq = "SELECT DISTINCT source ";
-      $sql_uniq .= " FROM $sql_from ";
-      $sql_uniq .= " $sql_where ";
+      $sql_uniq1 = "SELECT DISTINCT source ";
+      $sql_uniq1 .= " FROM $sql_from ";
+      $sql_uniq1 .= " $sql_where AND attacks.severity = 1";
+      
+      $sql_total0 = "SELECT COUNT(attacks.id) as total ";
+      $sql_total0 .= " FROM $sql_from ";
+      $sql_total0 .= " $sql_where AND attacks.severity = 0";
 
-      $debuginfo[] = $sql_total;
-      $debuginfo[] = $sql_uniq;
+      $sql_uniq0 = "SELECT DISTINCT source ";
+      $sql_uniq0 .= " FROM $sql_from ";
+      $sql_uniq0 .= " $sql_where AND attacks.severity = 0";
 
-      $result_total = pg_query($pgconn, $sql_total);
-      $row_total = pg_fetch_assoc($result_total);
-      $count_total = $row_total['total'];
+      $debuginfo[] = $sql_total0;
+      $debuginfo[] = $sql_total1;
+      $debuginfo[] = $sql_uniq0;
+      $debuginfo[] = $sql_uniq1;
 
-      $result_uniq = pg_query($pgconn, $sql_uniq);
-      $count_uniq = pg_num_rows($result_uniq);
+      $result_total1 = pg_query($pgconn, $sql_total1);
+      $row_total1 = pg_fetch_assoc($result_total1);
+      $count_total1 = $row_total1['total'];
+
+      $result_uniq1 = pg_query($pgconn, $sql_uniq1);
+      $count_uniq1 = pg_num_rows($result_uniq1);
+      
+      $result_total0 = pg_query($pgconn, $sql_total0);
+      $row_total0 = pg_fetch_assoc($result_total0);
+      $count_total0 = $row_total0['total'];
+
+      $result_uniq0 = pg_query($pgconn, $sql_uniq0);
+      $count_uniq0 = pg_num_rows($result_uniq0);
+
 
       reset_sql();
 
       echo "<tr>\n";
         echo "<td class='datatd'>$range</td>\n";
-        if ($count_total > 0) {
-          echo "<td class='datatd' align='right'><a href='logsearch.php?net_searchnet=$range&amp;int_sev=1&amp;int_org=$q_org$dateqs'>" . nf($count_total) . "</a>&nbsp;</td>\n";
+        if ($count_total1 > 0) {
+          echo "<td class='datatd' align='right'><a href='logsearch.php?net_searchnet=$range&amp;int_sev=1&amp;int_org=$q_org$dateqs'>" . nf($count_total1) . "</a>&nbsp;</td>\n";
           if ($s_access_search == 9) {
-            echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org&b=$b'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+            echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org&b=$b'>" . nf($count_uniq1) . "</a>&nbsp;</td>\n";
           } else {
-            echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org'>" . nf($count_uniq) . "</a>&nbsp;</td>\n";
+            echo "<td class='datatd' align='right'><a href='loglist.php?net_range=$range$dateqs&amp;int_org=$q_org'>" . nf($count_uniq1) . "</a>&nbsp;</td>\n";
           }
         } else {
-          echo "<td class='datatd' align='right'>" . nf($count_total) . "&nbsp;</td>\n";
-          echo "<td class='datatd' align='right'>" . nf($count_uniq) . "&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'>" . nf($count_total1) . "&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'>" . nf($count_uniq1) . "&nbsp;</td>\n";
+        }
+        if ($count_total0 > 0) {
+          echo "<td class='datatd' align='right'><a href='logsearch.php?net_searchnet=$range&amp;int_sev=0&amp;int_org=$q_org$dateqs'>" . nf($count_total0) . "</a>&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'>" . nf($count_uniq0) . "&nbsp;</td>\n";
+        } else {
+          echo "<td class='datatd' align='right'>" . nf($count_total0) . "&nbsp;</td>\n";
+          echo "<td class='datatd' align='right'>" . nf($count_uniq0) . "&nbsp;</td>\n";
         }
       echo "</tr>\n";
     }

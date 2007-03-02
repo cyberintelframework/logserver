@@ -110,7 +110,7 @@ function check_byte(b_val,next_field) {
   <td class="datatd" width=140>Source:</td>
   <td class="datatd">
     <input type="radio" name="sradio" id="s_radioA" value="A" checked onclick="document.getElementById('source_A').style.display='';document.getElementById('source_N').style.display='none';"> 
-     <label for="s_radioA" style="cursor:pointer;">Address</label> &nbsp; 
+     <label for="s_radioA" style="cursor:pointer;">Address:Port</label> &nbsp; 
     <input type="radio" name="sradio" id="s_radioN" value="N" onclick="document.getElementById('source_N').style.display='';document.getElementById('source_A').style.display='none';"> 
      <label for="s_radioN" style="cursor:pointer;">Network</label><br />
     <input type="text" name="sourceip[]" id="source_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip2');" /> . 
@@ -129,7 +129,7 @@ function check_byte(b_val,next_field) {
   <td class="datatd">Destination:</td>
   <td class="datatd">
     <input type="radio" name="dradio" id="d_radioA" value="A" checked onclick="document.getElementById('destination_A').style.display='';document.getElementById('destination_N').style.display='none';">
-      <label for="d_radioA" style="cursor:pointer;">Address</label>&nbsp;
+      <label for="d_radioA" style="cursor:pointer;">Address:Port</label>&nbsp;
     <input type="radio" name="dradio" id="d_radioN" value="N" onclick="document.getElementById('destination_N').style.display='';document.getElementById('destination_A').style.display='none';">
       <label for="d_radioN" style="cursor:pointer;">Network</label><br />
     <input type="text" name="destip[]" id="destination_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip2');" /> . 
@@ -247,7 +247,7 @@ function check_byte(b_val,next_field) {
  </tr>
  </div>
  <tr>
-   <td colspan=2 align="right"><br /><input type="hidden" name="int_c" value=0><input type="hidden" name="strip_html_escape_sttitle" id="searchtemplate_title" value=""><input type="button" name="submittemplate" value="Save as template" class="button" style="cursor:pointer;" onclick="submitSearchTemplate();" /><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
+   <td colspan=2 align="right"><br /><input type="hidden" name="int_c" value=0><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
  </tr>
 </table>
 </form>

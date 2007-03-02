@@ -62,7 +62,8 @@ if ($_GET) {
   $sql_getsensors .= "WHERE organisations.id = sensors.organisation $where ORDER BY sensors.keyname";
   $debuginfo[] = $sql_getsensors;
   $result_getsensors = pg_query($sql_getsensors);
-
+  
+  
   echo "<div class='tabselect' align='left' style='float: left;'>\n";
     echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='Severity' onclick='javascript: shlinks(\"severity\", mytabs);' />\n";
     echo "<input class='tab' id='button_attacks' type='button' name='button_attacks' value='Attack' onclick='javascript: shlinks(\"attacks\");' />\n";
@@ -76,6 +77,19 @@ if ($_GET) {
   echo "<div class='tabcontent' id='severity' style='z-index: 9; display: block;'>\n";
   echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
     echo "<table class='datatable'>\n";
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='200'>Select:</td>\n";
+        echo "<td class='datatd' width='300'>";
+	echo "<select name='strip_html_escape_tsselect' style='background-color:white;'>
+	 <option value=''></option>
+	 <option value='D'>Last 24 hour</option>
+	 <option value='T'>Today</option>
+	 <option value='W'>Last week</option>
+	 <option value='M'>Last month</option>
+	 <option value='Y'>Last year</option>
+	</select>";
+        echo "</td>\n";
+      echo "</tr>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='200'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
@@ -156,6 +170,19 @@ if ($_GET) {
   echo "<div class='tabcontent' id='attacks' style='z-index: 9; display: none;'>\n";
   echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
     echo "<table class='datatable'>\n";
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='200'>Select:</td>\n";
+        echo "<td class='datatd' width='300'>";
+	echo "<select name='strip_html_escape_tsselect' style='background-color:white;'>
+	 <option value=''></option>
+	 <option value='D'>Last 24 hour</option>
+	 <option value='T'>Today</option>
+	 <option value='W'>Last week</option>
+	 <option value='M'>Last month</option>
+	 <option value='Y'>Last year</option>
+	</select>";
+        echo "</td>\n";
+      echo "</tr>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='200'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
@@ -245,6 +272,19 @@ if ($_GET) {
   echo "<form method='get' action='$_SELF' name='plotform' id='plotform'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='200'>Select:</td>\n";
+        echo "<td class='datatd' width='300'>";
+	echo "<select name='strip_html_escape_tsselect' style='background-color:white;'>
+	 <option value=''></option>
+	 <option value='D'>Last 24 hour</option>
+	 <option value='T'>Today</option>
+	 <option value='W'>Last week</option>
+	 <option value='M'>Last month</option>
+	 <option value='Y'>Last year</option>
+	</select>";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='200'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
           echo "<input type='text' name='strip_html_escape_tsstart' id='ts_start_por' value='' />\n";
@@ -279,7 +319,7 @@ if ($_GET) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td class='datatd'>Destination ports (comma separated):</td>\n";
+        echo "<td class='datatd'>Destination ports/ranges:<br />(example: 137-145,80,21 )</td>\n";
         echo "<td class='datatd'>\n";
           echo "<input type='text' name='strip_html_escape_ports' size='20' />\n";
         echo "</td>\n";
@@ -330,6 +370,9 @@ if ($_GET) {
   debug_sql();
 ?>
 <script>
+
+
+
 function catcalc(cal) {
     var date = cal.date;
     var time = date.getTime()

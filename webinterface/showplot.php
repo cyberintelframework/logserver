@@ -18,6 +18,8 @@ include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 
+session_start();
+
 /*
 function getepoch($stamp) {
   list($date, $time) = explode(" ", $stamp);
@@ -43,9 +45,20 @@ function getepoch($stamp) {
 }
 */
 
+$s_org = intval($_SESSION['s_org']);
+$s_access = $_SESSION['s_access'];
+$s_access_search = intval($s_access{1});
+
+if ($s_access_search == 9 && isset($clean['org'])) {
+     $q_org = $clean['org'];
+} else {
+    $q_org = intval($s_org);
+}
+
 $drawerr = 0;
 $allowed_get = array(
                 "int_interval",
+                "strip_html_escape_tsselect",
                 "strip_html_escape_tsstart",
                 "strip_html_escape_tsend",
 		"int_type",
@@ -54,14 +67,15 @@ $allowed_get = array(
 		"attack",
 		"strip_html_escape_ports",
 		"int_width",
-		"int_heigth"
+		"int_heigth",
+		"int_org"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
-if (!isset($clean['tsstart']) || empty($clean['tsstart'])) {
+if ((!isset($clean['tsstart']) || empty($clean['tsstart'])) && !isset($clean['tsselect'])) {
   $drawerr = 1;
-} elseif (!isset($clean['tsend']) || empty($clean['tsend'])) {
+} elseif ((!isset($clean['tsend']) || empty($clean['tsend'])) && !isset($clean['tsselect'])) {
   $drawerr = 1;
 }
 
@@ -74,6 +88,31 @@ if ($drawerr == 1) {
   exit;
 }
 
+########################
+#  Organisation 
+########################
+if (!isset($clean['org']) || empty($clean['org'])) {
+   	if ($s_admin == 1) { 
+		$q_org = ""; 
+	}
+	else {
+  		$org = $s_org;
+  		$q_org = " AND sensors.organisation = $org ";
+	}	
+} else {
+   $org = $clean['org']; 
+   if ($s_org == $org) {
+   	$q_org = " AND sensors.organisation = $org ";
+   }
+   elseif($s_admin == 1) {
+   	$q_org = " AND sensors.organisation = $org ";
+   } 	
+  else { echo "you are not allowed"; }
+}
+#echo "SORG: $s_org";
+#echo "ORG: $org";
+#echo "QORG: $q_org";
+########################
 ########################
 # Interval
 ########################
@@ -198,18 +237,60 @@ if ($interval == 3600) {
 } elseif ($interval == 604800) {
   $title .= " per week";
 }
-$tsstart = $clean['tsstart'];
-$tsend = $clean['tsend'];
-#$textstart = date("d-m-y H:m", $tsstart);
-#$textend = date("d-m-y H:m", $tsend);
-$textstart = $clean['tsstart'];
-$textend = $clean['tsend'];
+
+
+  $tsselect = $clean['tsselect'];
+  $ar_valid_values = array("H", "D", "T", "W", "M", "Y");
+  if (in_array($tsselect, $ar_valid_values)) {
+        $dt = time();
+        $date_min = 60;
+        $date_hour = 60 * $date_min;
+        $date_day = 24 * $date_hour;
+        $date_week = 7 * $date_day;
+        $date_month = 31 * $date_day;
+        $date_year = 365 * $date_day;
+        $dt_sub = 0;
+        // determine substitute value
+        //"H", "D", "T", "W", "M", "Y"
+        switch ($tsselect) {
+                case "Y":
+                        $dt_sub = $date_year;
+                        break;
+                case "M":
+                        $dt_sub = $date_month;
+                        break;
+                case "W":
+                        $dt_sub = $date_week;
+                        break;
+                case "D":
+                        $dt_sub = $date_day;
+                        break;
+                case "T":
+                        // today
+                        $dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
+                        break;
+        }
+        if ($dt_sub > 0) $dt -= $dt_sub;
+        $tsstart = date("d-m-Y H:i:s", $dt);
+        $tsend = date("d-m-Y H:i:s", time());
+  } else {
+        $tsstart = $clean["tsstart"];
+        $tsend = $clean["tsend"];
+        
+  }
+
+$textstart = $tsstart;
+$textend = $tsend;
 $tsstart = getepoch($tsstart);
 $tsend = getepoch($tsend);
 $tsperiod = $tsend - $tsstart;
 #echo "INTERVAL: $interval<br />\n";
-#echo "TSPERIOD: $tsperiod\n";
+#echo "TSSTART: $tsstart<br />";
+#echo "TSEND: $tsend<br />";
+#echo "TSPERIOD: $tsperiod<br />";
 $tssteps = intval($tsperiod / $interval);
+
+
 
 ########################
 # Sensor ID
@@ -261,15 +342,37 @@ $tempwhere = "";
 if (isset($clean['ports'])) {
   $ports = $clean['ports'];
   $ports = trim($ports, ",");
-  $pattern = '/^([0-9]+,?)+$/';
+  $pattern = '/^([0-9]+-?,?)+$/';
   if (preg_match($pattern, $ports)) {
-    add_to_sql("attacks.dport IN ($ports)", "where");
+    $ports_ar = explode(",", $ports);
+    
+    foreach ($ports_ar as $port) {
+      $count = substr_count($port, '-');
+      if ($count == 1) {
+        $portrange_ar = explode("-", $port);
+#	echo "PORTRANGE: $portrange_ar[0] - $portrange_ar[1]<br />";
+        $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
+      }
+      else { 
+        $portlist .= $port .","; 
+        
+      }
+  }
+    
+    #echo "PORT: $portlist<br />";
+    if ($portlist) { 
+    	$portlist = trim($portlist, ",");
+    	$sqlports .= "attacks.dport IN ($portlist)"; 
+    }
+    $sqlports = trim($sqlports);
+    $sqlports = trim($sqlports, "OR");
+    add_to_sql("NOT attacks.dport = 0", "where");
+    add_to_sql("($sqlports)", "where");
     add_to_sql("attacks.dport", "select");
     add_to_sql("attacks.dport", "group");
     $title .= " with attack port ($ports)  ";
-  }
+ }
 }
-
 $title .= "\n From $textstart to $textend";
 
 ##############
@@ -346,19 +449,21 @@ while ($i != $tssteps) {
         } else {
           $keytitle = $keyname;
         }
-        $legend .= $keytitle;
-      } else {
-        $legend .= "All sensors";
+        $legend .= "$keytitle -";
       }
+     
       if (isset($row['text'])) {
         $attack = str_replace("Dialogue", "", $row['text']);
-        $legend .= " - ". $attack;
+	if($legend == "") { $legend .= " ".$attack;}
+	else { $legend .= " - ".$attack; }
       }
       if (isset($row['dport'])) {
         $port = $row['dport'];
-        $legend .= " - ". $port;
+        $legend .= " $port";
       }
-      $legend .= " - " .$v_severity_ar[$sev];
+      $v_severity_ar[$sev] = substr($v_severity_ar[$sev], 0, 3);
+      if ($legend == "") {$legend .= " ".$v_severity_ar[$sev];}
+      else {$legend .= " - ".$v_severity_ar[$sev];}
       if (!in_array($legend, $check_ar)) {
         $check_ar[] = $legend;
         $plot->SetLegend($legend);
@@ -393,8 +498,8 @@ if (!empty($data)) {
 
   $plot->SetYTickIncrement($ytick);
   $plot->SetDataValues($data);
-  #$plot->SetXTickLabelPos('none');
-  #$plot->SetXTickPos('none');
+  $plot->SetLegendPixels(0, 0);
+  $plot->SetDefaultDashedStyle('4-3');
   $plot->DrawGraph();
 } else {
   readfile("images/nodata.gif");

@@ -33,7 +33,8 @@ $allowed_get = array(
                 "b",
 		"int_to",
 		"int_from",
-		"net_range"
+		"net_range",
+		"sort"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -97,19 +98,19 @@ if (isset($clean['range'])) {
   echo "<table class='datatable'>\n";
     echo "<tr>\n";
       if ($b == "all") {
-        echo "<td class='dataheader' width='600' colspan='2'>All results</td>\n";
+        echo "<td class='dataheader' width='400' colspan='2'>All results</td>\n";
       } elseif ($b == "daily") {
         $datestart = date("d-m-Y", $start);
-        echo "<td class='datatitle' width='600' colspan='2'>Results from $datestart</td>\n";
+        echo "<td class='datatitle' width='400' colspan='2'>Results from $datestart</td>\n";
       } else {
         $datestart = date("d-m-Y", $start);
         $dateend = date("d-m-Y", $end);
-        echo "<td class='datatitle' width='600' colspan='2'>Results from $datestart to $dateend</td>\n";
+        echo "<td class='datatitle' width='400' colspan='2'>Results from $datestart to $dateend</td>\n";
       }
     echo "</tr>\n";
     echo "<tr>\n";
-      echo "<td class='dataheader'><a href='loglist.php?strip_html_escape_range=$range&amp;int_org=$q_org&amp;b=$b&amp;sort=ip$dateqs'>Source IP Address</a></td>\n";
-      echo "<td class='dataheader'><a href='loglist.php?strip_html_escape_range=$range&amp;int_org=$q_org&amp;b=$b&amp;sort=count$dateqs'>Attacks</a></td>\n";
+      echo "<td class='dataheader' ><a href='loglist.php?net_range=$range&amp;int_org=$q_org&amp;b=$b&amp;sort=ip$dateqs'>Source IP Address</a></td>\n";
+      echo "<td class='dataheader' width='115'><a href='loglist.php?net_range=$range&amp;int_org=$q_org&amp;b=$b&amp;sort=count$dateqs'>Malicious Attacks</a></td>\n";
     echo "</tr>\n";
 } else {
   echo "No range was given to search.<br />\n";
@@ -149,7 +150,7 @@ if ($err != 1) {
     $count = $row['total'];
     echo "<tr>\n";
       echo "<td class='datatd'>$source</td>\n";
-      echo "<td class='datatd' align='right'><a href='logsearch.php?ip_searchip=$source&amp;int_sev=1$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+      echo "<td class='datatd' align='left'><a href='logsearch.php?ip_searchip=$source&amp;int_sev=1$dateqs'>" . nf($count) . "</a>&nbsp;</td>\n";
     echo "</tr>\n";
   }
 }

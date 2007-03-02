@@ -18,9 +18,10 @@
 $allowed_get = array(
                 "action",
                 "int_delete",
-		"tsstart",
-		"tsend",
-		"tsselect"
+		"strip_html_escape_tsstart",
+		"strip_html_escape_tsend",
+		"tsselect",
+		"strip_html_escape_sttitle",
 );
 $check = extractvars($_GET, $allowed_get);
 if (isset($tainted['tsstart'])) {
@@ -59,16 +60,15 @@ if ($action == "admin") {
 		// list current searchtemplates
  		echo " <tr class='datatr'>\n";
   		echo "  <td class='datatd'>" . $row["title"] . "</td>\n";
-  		echo "  <td class='datatd'>[ <a href=\"/searchtemplate.php?action=admin&delete=" . $row["id"] . "\" onclick=\"return confirm('Delete this searchtemplate?');\">delete</a> ]</td>\n";
+  		echo "  <td class='datatd'>[ <a href=\"/searchtemplate.php?action=admin&int_delete=" . $row["id"] . "\" onclick=\"return confirm('Delete this searchtemplate?');\">delete</a> ]</td>\n";
   		echo " </tr>\n";
 	}
 	echo "</table>\n";
 } else {
 	// get querystring
 	$querystring = urldecode($_SERVER['QUERY_STRING']);
-	
 	// remove date/time values from querystring
-	$search = array("|", "?", "&ts_start=", "&ts_end=", "&ts_select=", $tainted['tsstart'], $tainted['tsend'], $tainted['tsselect']);
+	$search = array("|", "?", "&strip_html_escape_tsstart=", "&strip_html_escape_tsend=", "&ts_select=", $tainted['tsstart'], $tainted['tsend'], $tainted['tsselect']);
 	$querystring = str_replace($search, "", $querystring);
 	
 	// check for selected value or user input
@@ -79,12 +79,12 @@ if ($action == "admin") {
 		$ts_end = "|%dt|";
 	} else {
 		// replace date/time values
-		$ts_start = $tainted["tsstart"];
+		$ts_start = $clean["tsstart"];
 		list($date, $time) = explode(" ", $ts_start);
 		list($day, $mon, $year) = explode("-", $date);
 		list($hour, $min) = explode(":", $time);
 		$ts_start = mktime($hour, $min, 0, $mon, $day, $year);
-		$ts_end = $tainted["tsend"];
+		$ts_end = $clean["tsend"];
 		list($date, $time) = explode(" ", $ts_end);
 		list($day, $mon, $year) = explode("-", $date);
 		list($hour, $min) = explode(":", $time);
@@ -108,9 +108,10 @@ if ($action == "admin") {
 	}
 	
 	// secure title input
-	$title = preg_replace('/[^a-z0-9 -_]+/i', '', $tainted["sttitle"]);
+	$title = preg_replace('/[^a-z0-9 -_]+/i', '', $clean["sttitle"]);
 	if (!empty($title)) {
-		$querystring = "ts_start=" . $ts_start . "&ts_end=" . $ts_end . "&" . $querystring;
+		$querystring = "strip_html_escape_tsstart=" . $ts_start . "&strip_html_escape_tsend=" . $ts_end . "&" . $querystring;
+ 		
 		// save the querystring for this user
 		$userid = intval($_SESSION["s_userid"]);
 		if ($userid > 0) {
