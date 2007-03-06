@@ -20,8 +20,11 @@ $g = "\033[1;32m";
 
 $targetdir = "/opt/surfnetids";
 $configdir = "/etc/surfnetids";
+$logfile = "install_log.pl.log";
 
 $geoiploc = "http://www.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
+
+$err = 0;
 
 ##########################
 # Includes
@@ -56,27 +59,32 @@ if (-e "$targetdir/webinterface/") {
 }
 
 if (! -e "$configdir/") {
-  `mkdir -p $configdir/`;
+  `mkdir -p $configdir/ 2>$logfile`;
   printmsg("Creating $configdir/:", $?);
+  if ($? != 0) { $err++; }
 }
 
 if (! -e "$targetdir/") {
-  `mkdir -p $targetdir/`;
+  `mkdir -p $targetdir/ 2>$logfile`;
   printmsg("Creating $targetdir/:", $?);
+  if ($? != 0) { $err++; }
 }
 
 if ( -e "$configdir/surfnetids-log.conf") {
   $ts = time();
-  `mv -f $configdir/surfnetids-log.conf $configdir/surfnetids-log.conf-$ts`;
+  `mv -f $configdir/surfnetids-log.conf $configdir/surfnetids-log.conf-$ts 2>$logfile`;
   printmsg("Creating backup of surfnetids-log.conf:", $?);
+  if ($? != 0) { $err++; }
 }
 
-`cp surfnetids-log.conf $configdir/`;
+`cp surfnetids-log.conf $configdir/ 2>$logfile`;
 printmsg("Copying configuration file:", $?);
+if ($? != 0) { $err++; }
 
-`cp -r ./* $targetdir/`;
+`cp -r ./* $targetdir/ 2>$logfile`;
 printmsg("Copying surfnetids files:", $?);
-`rm $targetdir/surfnetids-log.conf`;
+if ($? != 0) { $err++; }
+`rm $targetdir/surfnetids-log.conf 2>$logfile`;
 
 ####################
 # Setting up crontab
@@ -104,7 +112,7 @@ close(CRONTAB);
 close(CRONLOG);
 
 printdelay("Restarting cron:");
-`/etc/init.d/cron restart`;
+`/etc/init.d/cron restart 2>$logfile`;
 printresult($?);
 
 ####################
@@ -143,16 +151,19 @@ while (! -d $apachedir) {
 
 if ( -e "$apachedir/surfnetids-log-apache.conf") {
   $ts = time();
-  `mv -f $apachedir/surfnetids-log-apache.conf $targetdir/surfnetids-log-apache.conf-$ts`;
+  `mv -f $apachedir/surfnetids-log-apache.conf $targetdir/surfnetids-log-apache.conf-$ts 2>$logfile`;
   printmsg("Creating backup of surfnetids-log-apache.conf:", $?);
+  if ($? != 0) { $err++; }
 }
 
-`cp $targetdir/surfnetids-log-apache.conf $apachedir`;
+`cp $targetdir/surfnetids-log-apache.conf $apachedir 2>$logfile`;
 printmsg("Setting up $apachev configuration:", $?);
+if ($? != 0) { $err++; }
 
 printdelay("Restarting the $apachev server:");
-`/etc/init.d/$apachev restart 2>/dev/null`;
+`/etc/init.d/$apachev restart 2>$logfile`;
 printresult($?);
+if ($? != 0) { $err++; }
 
 print "\n";
 
@@ -193,18 +204,19 @@ print "\n";
 
 if ($confirm =~ /^(n|N)$/) {
   printmsg("Creating SURFnet IDS database:", "info");
-  $err = 1;
-  while ($err != 0) {
-    `sudo -u postgres createdb -q -U $dbuser -W -O $dbuser $dbname`;
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres createdb -q -U $dbuser -W -O $dbuser $dbname 2>$logfile`;
     printmsg("Creating SURFnet IDS database:", $?);
-    $err = $?;
+    if ($? != 0) { $err++; }
+    $e = $?;
     if ($? != 0) {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
         $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
       }
       if ($confirm =~ /^(n|N)$/) {
-        $err = 0;
+        $e = 0;
       }
     }
   }
@@ -212,18 +224,19 @@ if ($confirm =~ /^(n|N)$/) {
   print "\n";
 
   printmsg("Creating webinterface database user:", "info");
-  $err = 1;
-  while ($err != 0) {
-    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W $webuser`;
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W $webuser 2>$logfile`;
     printmsg("Creating webinterface database user:", $?);
-    $err = $?;
+    if ($? != 0) { $err++; }
+    $e = $?;
     if ($? != 0) {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
         $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
       }
       if ($confirm =~ /^(n|N)$/) {
-        $err = 0;
+        $e = 0;
       }
     }
   }
@@ -231,18 +244,19 @@ if ($confirm =~ /^(n|N)$/) {
   print "\n";
 
   printmsg("Creating nepenthes database user:", "info");
-  $err = 1;
-  while ($err != 0) {
-    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W nepenthes`;
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W nepenthes 2>$logfile`;
     printmsg("Creating nepenthes database user:", $?);
-    $err = $?;
+    if ($? != 0) { $err++; }
+    $e = $?;
     if ($? != 0) {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
         $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
       }
       if ($confirm =~ /^(n|N)$/) {
-        $err = 0;
+        $e = 0;
       }
     }
   }
@@ -250,18 +264,19 @@ if ($confirm =~ /^(n|N)$/) {
   print "\n";
 
   printmsg("Creating p0f database user:", "info");
-  $err = 1;
-  while ($err != 0) {
-    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W pofuser`;
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W pofuser 2>$logfile`;
     printmsg("Creating p0f database user:", $?);
-    $err = $?;
+    if ($? != 0) { $err++; }
+    $e = $?;
     if ($? != 0) {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
         $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
       }
       if ($confirm =~ /^(n|N)$/) {
-        $err = 0;
+        $e = 0;
       }
     }
   }
@@ -269,18 +284,19 @@ if ($confirm =~ /^(n|N)$/) {
   print "\n";
 
   printmsg("Creating SURFnet IDS tables:", "info");
-  $err = 1;
-  while ($err != 0) {
-    `sudo -u postgres psql -q -f $targetdir/sql/postgres_settings.sql -U $dbuser -W $dbname 2>/dev/null`;
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres psql -q -f $targetdir/sql/postgres_settings.sql -U $dbuser -W $dbname 2>$logfile`;
     printmsg("Creating SURFnet IDS tables:", $?);
-    $err = $?;
+    if ($? != 0) { $err++; }
+    $e = $?;
     if ($? != 0) {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
         $confirm = &prompt("Database creation failed. Try again? [y/n]: ");
       }
       if ($confirm =~ /^(n|N)$/) {
-        $err = 0;
+        $e = 0;
       }
     }
   }
@@ -309,18 +325,19 @@ if ($confirm =~ /^(n|N)$/) {
 
   print "\n";
 
-  $err = 1;
-  while ($err != 0) {
-    `sudo -u postgres psql -q -f $targetdir/sql/postgres_insert.sql -U $dbuser -W $dbname 2>/dev/null`;
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres psql -q -f $targetdir/sql/postgres_insert.sql -U $dbuser -W $dbname 2>$logfile`;
     printmsg("Adding necessary records to the database:", $?);
-    $err = $?;
+    if ($? != 0) { $err++; }
+    $e = $?;
     if ($? != 0) {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
         $confirm = &prompt("Insert query failed. Try again? [y/n]: ");
       }
       if ($confirm =~ /^(n|N)$/) {
-        $err = 0;
+        $e = 0;
       }
     }
   }
@@ -332,49 +349,52 @@ if ($confirm =~ /^(n|N)$/) {
 
   if ($confirm =~ /^(1\.02|1\.03)$/) {
     if ($confirm eq "1.02") {
-      $err = 1;
-      while ($err != 0) {
-        `sudo -u postgres psql -q -f $targetdir/sql/changes102-103.sql -U $dbuser -W $dbname 2>/dev/null`;
+      $e = 1;
+      while ($e != 0) {
+        `sudo -u postgres psql -q -f $targetdir/sql/changes102-103.sql -U $dbuser -W $dbname 2>$logfile`;
         printmsg("Upgrading the database from 1.02 to 1.03:", $?);
-        $err = $?;
+        if ($? != 0) { $err++; }
+        $e = $?;
         if ($? != 0) {
           $confirm = "a";
           while ($confirm !~ /^(n|N|y|Y)$/) {
             $confirm = &prompt("Upgrade failed. Try again? [y/n]: ");
           }
           if ($confirm =~ /^(n|N)$/) {
-            $err = 0;
+            $e = 0;
           }
         }
       }
-      $err = 1;
-      while ($err != 0) {
-        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U $dbuser -W $dbname 2>/dev/null`;
+      $e = 1;
+      while ($e != 0) {
+        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U $dbuser -W $dbname 2>$logfile`;
         printmsg("Upgrading the database from 1.03 to 1.04:", $?);
-        $err = $?;
+        if ($? != 0) { $err++; }
+        $e = $?;
         if ($? != 0) {
           $confirm = "a";
           while ($confirm !~ /^(n|N|y|Y)$/) {
             $confirm = &prompt("Upgrade failed. Try again? [y/n]: ");
           }
           if ($confirm =~ /^(n|N)$/) {
-            $err = 0;
+            $e = 0;
           }
         }
       }
     } elsif ($confirm eq "1.03") {
-      $err = 1;
-      while ($err != 0) {
-        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U $dbuser -W $dbname 2>/dev/null`;
+      $e = 1;
+      while ($e != 0) {
+        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U $dbuser -W $dbname 2>$logfile`;
         printmsg("Upgrading the database from 1.03 to 1.04:", $?);
-        $err = $?;
+        if ($? != 0) { $err++; }
+        $e = $?;
         if ($? != 0) {
           $confirm = "a";
           while ($confirm !~ /^(n|N|y|Y)$/) {
             $confirm = &prompt("Upgrade failed. Try again? [y/n]: ");
           }
           if ($confirm =~ /^(n|N)$/) {
-            $err = 0;
+            $e = 0;
           }
         }
       }
@@ -425,25 +445,26 @@ if ($setup eq "single") {
     print SQL "INSERT INTO sensors (keyname, remoteip, localip, tap, mac, tapip, laststart, status, organisation) VALUES ('sensor', '$sensorip', '$sensorip', '$if', '$mac', '$sensorip', $ts, 1, (SELECT id FROM organisations WHERE organisation = 'NEPENTHES'))";
     close(SQL);
 
-    $err = 1;
-    while ($err != 0) {
-      `sudo -u postgres psql -q -f $targetdir/sql/singlesensor.sql -U $dbuser -W $dbname 2>/dev/null`;
+    $e = 1;
+    while ($e != 0) {
+      `sudo -u postgres psql -q -f $targetdir/sql/singlesensor.sql -U $dbuser -W $dbname 2>$logfile`;
       printmsg("Adding necessary records to the database:", $?);
-      $err = $?;
+      if ($? != 0) { $err++; }
+      $e = $?;
       if ($? != 0) {
         $confirm = "a";
         while ($confirm !~ /^(n|N|y|Y)$/) {
           $confirm = &prompt("Insert query failed. Try again? [y/n]: ");
         }
         if ($confirm =~ /^(n|N)$/) {
-          $err = 0;
+          $e = 0;
         }
       }
     }
   }
 }
 
-`wget -V >/dev/null`;
+`wget -V >/dev/null 2>/dev/null`;
 if ($? == 0) {
   print "\n"; 
   $confirm = "a";
@@ -453,14 +474,17 @@ if ($? == 0) {
   if ($confirm =~ /^(Y|y)$/) {
     printmsg("Downloading GeoIP database:", "info");
     `wget $geoiploc`;
+    if ($? != 0) { $err++; }
     print "\n";
 
     printdelay("Unzipping GeoIP database:");
-    `gunzip GeoLiteCity.dat.gz`;
+    `gunzip GeoLiteCity.dat.gz 2>$logfile`;
+    if ($? != 0) { $err++; }
     printresult($?);
 
     printdelay("Installing GeoIP database:");
-    `mv GeoLiteCity.dat $targetdir/include/`;
+    `mv GeoLiteCity.dat $targetdir/include/ 2>$logfile`;
+    if ($? != 0) { $err++; }
     printresult($?);
   }
 } else {
@@ -468,22 +492,30 @@ if ($? == 0) {
 }
 
 $ec = 0;
-`rm -f $targetdir/crontab.log`;
+`rm -f $targetdir/crontab.log 2>/dev/null`;
 if ($? != 0) { $ec++; }
-`rm -f $targetdir/surfnetids-log-apache.conf`;
+`rm -f $targetdir/surfnetids-log-apache.conf 2>/dev/null`;
 if ($? != 0) { $ec++; }
-#`rm -f $targetdir/postgres_insert.sql`;
+#`rm -f $targetdir/postgres_insert.sql 2>/dev/null`;
 #if ($? != 0) { $ec++; }
-#`rm -f $targetdir/postgres_settings.sql`;
+#`rm -f $targetdir/postgres_settings.sql 2>/dev/null`;
 #if ($? != 0) { $ec++; }
-#`rm -f $targetdir/singlesensor.sql`;
+#`rm -f $targetdir/singlesensor.sql 2>/dev/null`;
 #if ($? != 0) { $ec++; }
-`rm -f $targetdir/install_log.pl`;
+`rm -f $targetdir/install_log.pl 2>/dev/null`;
 if ($? != 0) { $ec++; }
-`rm -f $targetdir/functions_log.pl`;
+`rm -f $targetdir/functions_log.pl 2>/dev/null`;
+if ($? != 0) { $ec++; }
+`rm -f $targetdir/install_log.pl.log 2>/dev/null`;
 if ($? != 0) { $ec++; }
 printmsg("Cleaning up the temporary files:", $ec);
 $ec = 0;
+
+print "\n";
+if ($err > 0) {
+  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_tn.pl.log'.\n";
+  print "\n";
+}
 
 print "#####################################\n";
 print "# ${g}SURFnet IDS installation complete${n} #\n";
