@@ -513,7 +513,7 @@ $ec = 0;
 
 print "\n";
 if ($err > 0) {
-  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_tn.pl.log'.\n";
+  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_tn.pl.log' for more info.\n";
   print "\n";
 }
 
