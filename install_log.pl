@@ -58,6 +58,10 @@ if (-e "$targetdir/webinterface/") {
   }
 }
 
+if (-e "./install_log.pl.log") {
+  `rm -f ./install_log.pl.log 2>/dev/null`;
+}
+
 if (! -e "$configdir/") {
   `mkdir -p $configdir/ 2>>$logfile`;
   printmsg("Creating $configdir/:", $?);
