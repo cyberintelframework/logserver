@@ -247,46 +247,45 @@ if ($interval == 3600) {
   $title .= " per week";
 }
 
-
-  $tsselect = $clean['tsselect'];
-  $ar_valid_values = array("H", "D", "T", "W", "M", "Y");
-  if (in_array($tsselect, $ar_valid_values)) {
-        $dt = time();
-        $date_min = 60;
-        $date_hour = 60 * $date_min;
-        $date_day = 24 * $date_hour;
-        $date_week = 7 * $date_day;
-        $date_month = 31 * $date_day;
-        $date_year = 365 * $date_day;
-        $dt_sub = 0;
-        // determine substitute value
-        //"H", "D", "T", "W", "M", "Y"
-        switch ($tsselect) {
-                case "Y":
-                        $dt_sub = $date_year;
-                        break;
-                case "M":
-                        $dt_sub = $date_month;
-                        break;
-                case "W":
-                        $dt_sub = $date_week;
-                        break;
-                case "D":
-                        $dt_sub = $date_day;
-                        break;
-                case "T":
-                        // today
-                        $dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
-                        break;
-        }
-        if ($dt_sub > 0) $dt -= $dt_sub;
-        $tsstart = date("d-m-Y H:i:s", $dt);
-        $tsend = date("d-m-Y H:i:s", time());
-  } else {
-        $tsstart = $clean["tsstart"];
-        $tsend = $clean["tsend"];
-        
+$tsselect = $clean['tsselect'];
+$ar_valid_values = array("H", "D", "T", "W", "M", "Y");
+if (in_array($tsselect, $ar_valid_values)) {
+  $dt = time();
+  $date_min = 60;
+  $date_hour = 60 * $date_min;
+  $date_day = 24 * $date_hour;
+  $date_week = 7 * $date_day;
+  $date_month = 31 * $date_day;
+  $date_year = 365 * $date_day;
+  $dt_sub = 0;
+  // determine substitute value
+  //"H", "D", "T", "W", "M", "Y"
+  switch ($tsselect) {
+    case "Y":
+      $dt_sub = $date_year;
+      break;
+    case "M":
+      $dt_sub = $date_month;
+      break;
+    case "W":
+      $dt_sub = $date_week;
+      break;
+    case "D":
+      $dt_sub = $date_day;
+      break;
+    case "T":
+      // today
+      $dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
+      break;
   }
+  if ($dt_sub > 0) $dt -= $dt_sub;
+    $tsstart = date("d-m-Y H:i:s", $dt);
+    $tsend = date("d-m-Y H:i:s", time());
+  } else {
+    $tsstart = $clean["tsstart"];
+    $tsend = $clean["tsend"];
+  }
+
 
 $textstart = $tsstart;
 $textend = $tsend;
@@ -298,8 +297,6 @@ $tsperiod = $tsend - $tsstart;
 #echo "TSEND: $tsend<br />";
 #echo "TSPERIOD: $tsperiod<br />";
 $tssteps = intval($tsperiod / $interval);
-
-
 
 ########################
 # Sensor ID
@@ -355,45 +352,38 @@ if (isset($clean['ports'])) {
     add_to_sql("attacks.dport", "group");
     prepare_sql();
   } else {
-   $ports = trim($ports, ",");
-   $pattern = '/^(\!?[0-9]+-?,?)+$/';
-   if (preg_match($pattern, $ports)) {
-    $ports_ar = explode(",", $ports);
-     foreach ($ports_ar as $port) {
-       $count = substr_count($port, '-');
-       if ($count == 1) {
-         if ($port{0} == "!") {
-	   $port = substr($port, 1); 
-	   $portrange_ar = explode("-", $port);
-#	   echo "NOT PORTRANGE: $portrange_ar[0] - $portrange_ar[1]<br />";
-	   $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) AND ";
-	 }
-	 else { 
-	   $portrange_ar = explode("-", $port);
- #  	   echo "PORTRANGE: $portrange_ar[0] - $portrange_ar[1]<br />";
-           $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
-       	 }
-       }
-       else { 
-         if ($port{0} == "!") {
-	   $port = substr($port, 1); 
-	   $notportlist .= "0,". $port .",";
-	 }
-         else {
-	   $portlist .= $port .","; 
-       	 }
-       }
-   }
-  }  
-#   echo "PORT: $portlist<br />";
-#   echo "NOT PORT: $notportlist<br />";
+    $ports = trim($ports, ",");
+    $pattern = '/^(\!?[0-9]+-?,?)+$/';
+    if (preg_match($pattern, $ports)) {
+      $ports_ar = explode(",", $ports);
+       foreach ($ports_ar as $port) {
+         $count = substr_count($port, '-');
+         if ($count == 1) {
+           if ($port{0} == "!") {
+	     $port = substr($port, 1); 
+	     $portrange_ar = explode("-", $port);
+             $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) AND ";
+	   } else { 
+	     $portrange_ar = explode("-", $port);
+             $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
+       	   }
+         } else { 
+           if ($port{0} == "!") {
+	     $port = substr($port, 1); 
+	     $notportlist .= "0,". $port .",";
+	   } else {
+	     $portlist .= $port .","; 
+       	   }
+         }
+      }
+    }  
     if ($portlist) { 
-    	$portlist = trim($portlist, ",");
-    	$sqlports .= "attacks.dport IN ($portlist)"; 
+      $portlist = trim($portlist, ",");
+      $sqlports .= "attacks.dport IN ($portlist)"; 
     }
     if ($notportlist) { 
-    	$notportlist = trim($notportlist, ",");
-    	$notsqlports .= "attacks.dport NOT IN ($notportlist)"; 
+      $notportlist = trim($notportlist, ",");
+      $notsqlports .= "attacks.dport NOT IN ($notportlist)"; 
     }
     
     $sqlports = trim($sqlports);
@@ -406,7 +396,7 @@ if (isset($clean['ports'])) {
     add_to_sql("attacks.dport", "group");
     $title .= " with attack port ($ports)  ";
     prepare_sql();
- }
+  }
 }
 $title .= "\n From $textstart to $textend";
 
@@ -438,7 +428,7 @@ while ($i != $tssteps) {
   $a = $i;
   $i++;
   foreach ($point as $key => $value) {
-  	$point[$key]=0;
+    $point[$key] = 0;
   }
 #  $sql = "SELECT DISTINCT $selectattacks $selectsensorid attacks.severity, COUNT(attacks.severity) as total FROM attacks, sensors, details ";
 #  $sql .= "WHERE details.attackid = attacks.id AND timestamp >= $tsstart + ($interval * $a) AND timestamp <= $tsstart + ($interval * $i) ";
