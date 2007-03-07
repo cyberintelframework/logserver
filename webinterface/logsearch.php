@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.14                  #
-# 21-02-2007                       #
+# Version 1.04.15                  #
+# 05-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.15 Fixed some layout stuff
 # 1.04.14 Fixed a bug with md5_binname
 # 1.04.13 add_to_sql()
 # 1.04.12 Fixed bug with timestamps and multiple sensors
@@ -1031,14 +1032,16 @@ while ($row = pg_fetch_assoc($result)) {
         $attack_url = $v_attacks_ar[$text]["URL"];
         echo "<td class='datatd'>";
         if ($attack_url != "") {
-          echo "<a $ahref target='new'>";
+          echo "<a href='$attack_url' target='new'>";
         }
-        echo "$attack";
+        if ($attack != "") {
+          echo "$attack<br />";
+        }
         if ($attack_url != "") {
           echo "</a>";
         }
         if ($smac != "") {
-          echo "<br />$smac";
+          echo "$smac";
         }
         echo "</td>\n";
       } elseif ($sev == 16) {

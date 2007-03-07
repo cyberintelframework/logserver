@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
+# Version 1.04.03                  #
 # 29-01-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 updated destination port graphs & added timepstamp + organisation option in menu
 # 1.04.02 Added destination port graphs
 # 1.04.01 Initial release
 #############################################
@@ -45,9 +46,9 @@ function shlinks(id) {
 </script>
 
 <?
-
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
+$s_access_search = intval($s_access{1});
 
 if ($_GET) {
   $qs = $_SERVER['QUERY_STRING'];
@@ -62,8 +63,7 @@ if ($_GET) {
   $sql_getsensors .= "WHERE organisations.id = sensors.organisation $where ORDER BY sensors.keyname";
   $debuginfo[] = $sql_getsensors;
   $result_getsensors = pg_query($sql_getsensors);
-  
-  
+
   echo "<div class='tabselect' align='left' style='float: left;'>\n";
     echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='Severity' onclick='javascript: shlinks(\"severity\", mytabs);' />\n";
     echo "<input class='tab' id='button_attacks' type='button' name='button_attacks' value='Attack' onclick='javascript: shlinks(\"attacks\");' />\n";
@@ -90,6 +90,29 @@ if ($_GET) {
 	</select>";
         echo "</td>\n";
       echo "</tr>\n";
+      if ($s_access_search == 9) {
+    		if (!isset($clean['org'])) {
+      			$err = 1;
+    		}
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='200'>Organisation:</td>\n";
+        echo "<td class='datatd' width='300'>";
+  	
+    	$sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    	$debuginfo[] = $sql_orgs;
+    	$result_orgs = pg_query($pgconn, $sql_orgs);
+    	echo "<select name='int_org'>\n";
+      		echo printOption(0, "All", $q_org) . "\n";
+      		while ($row = pg_fetch_assoc($result_orgs)) {
+        		$org_id = $row['id'];
+        		$organisation = $row['organisation'];
+        		echo printOption($org_id, $organisation, $q_org) . "\n";
+      		}
+    	echo "</select>&nbsp;\n";
+  	
+        echo "</td>\n";
+      echo "</tr>\n";
+      }
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='200'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
@@ -183,6 +206,28 @@ if ($_GET) {
 	</select>";
         echo "</td>\n";
       echo "</tr>\n";
+      if ($s_access_search == 9) {
+    		if (!isset($clean['org'])) {
+      			$err = 1;
+    		}
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='200'>Organisation:</td>\n";
+        echo "<td class='datatd' width='300'>";
+  	
+    	$sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    	$debuginfo[] = $sql_orgs;
+    	$result_orgs = pg_query($pgconn, $sql_orgs);
+    	echo "<select name='int_org'>\n";
+      		echo printOption(0, "All", $q_org) . "\n";
+      		while ($row = pg_fetch_assoc($result_orgs)) {
+        		$org_id = $row['id'];
+        		$organisation = $row['organisation'];
+        		echo printOption($org_id, $organisation, $q_org) . "\n";
+      		}
+    	echo "</select>&nbsp;\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      }
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='200'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
@@ -284,6 +329,28 @@ if ($_GET) {
 	</select>";
         echo "</td>\n";
       echo "</tr>\n";
+      if ($s_access_search == 9) {
+    		if (!isset($clean['org'])) {
+      			$err = 1;
+    		}
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='200'>Organisation:</td>\n";
+        echo "<td class='datatd' width='300'>";
+  	
+    	$sql_orgs = "SELECT * FROM organisations WHERE NOT organisation = 'ADMIN'";
+    	$debuginfo[] = $sql_orgs;
+    	$result_orgs = pg_query($pgconn, $sql_orgs);
+    	echo "<select name='int_org'>\n";
+      		echo printOption(0, "All", $q_org) . "\n";
+      		while ($row = pg_fetch_assoc($result_orgs)) {
+        		$org_id = $row['id'];
+        		$organisation = $row['organisation'];
+        		echo printOption($org_id, $organisation, $q_org) . "\n";
+      		}
+    	echo "</select>&nbsp;\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      }
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='200'>From:</td>\n";
         echo "<td class='datatd' width='300'>";
@@ -319,7 +386,7 @@ if ($_GET) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td class='datatd'>Destination ports/ranges:<br />(example: 137-145,80,21 )</td>\n";
+        echo "<td class='datatd'>Destination ports/ranges:<br />example:<br />80,100-1000,!445,!137-145 or all</td>\n";
         echo "<td class='datatd'>\n";
           echo "<input type='text' name='strip_html_escape_ports' size='20' />\n";
         echo "</td>\n";

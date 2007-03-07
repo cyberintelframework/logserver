@@ -2,13 +2,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
+# Version 1.04.05                  #
 # 05-02-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added extra dport and timestamp functionality 
+# 1.04.04 Fixed bugs with organisation  
+# 1.04.03 Location of phplot.php is a config value now
 # 1.04.02 Fixed typo
 # 1.04.01 Initial release
 #############################################
@@ -46,6 +49,7 @@ function getepoch($stamp) {
 */
 
 $s_org = intval($_SESSION['s_org']);
+$s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
@@ -97,21 +101,25 @@ if (!isset($clean['org']) || empty($clean['org'])) {
 	}
 	else {
   		$org = $s_org;
-  		$q_org = " AND sensors.organisation = $org ";
+  		$q_org = " sensors.organisation = $org ";
 	}	
 } else {
    $org = $clean['org']; 
    if ($s_org == $org) {
-   	$q_org = " AND sensors.organisation = $org ";
+   	$q_org = " sensors.organisation = $org ";
    }
    elseif($s_admin == 1) {
-   	$q_org = " AND sensors.organisation = $org ";
+   	$q_org = " sensors.organisation = $org ";
    } 	
-  else { echo "you are not allowed"; }
+  else { 
+  	readfile("images/nodata.gif");
+  	exit; 
+  }
 }
-#echo "SORG: $s_org";
-#echo "ORG: $org";
-#echo "QORG: $q_org";
+#echo "SADMIN: $s_admin<br />";
+#echo "SORG: $s_org<br />";
+#echo "ORG: $org<br />";
+#echo "QORG: $q_org<br />";
 ########################
 ########################
 # Interval
@@ -150,6 +158,7 @@ add_to_sql("sensors", "table");
 add_to_sql("DISTINCT attacks.severity", "select");
 add_to_sql("attacks", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
+add_to_sql("$q_org", "where");
 
 ########################
 # Severity
@@ -341,36 +350,62 @@ $tempwhere = "";
 ########################
 if (isset($clean['ports'])) {
   $ports = $clean['ports'];
-  $ports = trim($ports, ",");
-  $pattern = '/^([0-9]+-?,?)+$/';
-  if (preg_match($pattern, $ports)) {
+  if ($ports == "all") {
+    add_to_sql("attacks.dport", "select");
+    add_to_sql("attacks.dport", "group");
+    prepare_sql();
+  } else {
+   $ports = trim($ports, ",");
+   $pattern = '/^(\!?[0-9]+-?,?)+$/';
+   if (preg_match($pattern, $ports)) {
     $ports_ar = explode(",", $ports);
-    
-    foreach ($ports_ar as $port) {
-      $count = substr_count($port, '-');
-      if ($count == 1) {
-        $portrange_ar = explode("-", $port);
-#	echo "PORTRANGE: $portrange_ar[0] - $portrange_ar[1]<br />";
-        $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
-      }
-      else { 
-        $portlist .= $port .","; 
-        
-      }
-  }
-    
-    #echo "PORT: $portlist<br />";
+     foreach ($ports_ar as $port) {
+       $count = substr_count($port, '-');
+       if ($count == 1) {
+         if ($port{0} == "!") {
+	   $port = substr($port, 1); 
+	   $portrange_ar = explode("-", $port);
+#	   echo "NOT PORTRANGE: $portrange_ar[0] - $portrange_ar[1]<br />";
+	   $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) AND ";
+	 }
+	 else { 
+	   $portrange_ar = explode("-", $port);
+ #  	   echo "PORTRANGE: $portrange_ar[0] - $portrange_ar[1]<br />";
+           $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
+       	 }
+       }
+       else { 
+         if ($port{0} == "!") {
+	   $port = substr($port, 1); 
+	   $notportlist .= "0,". $port .",";
+	 }
+         else {
+	   $portlist .= $port .","; 
+       	 }
+       }
+   }
+  }  
+#   echo "PORT: $portlist<br />";
+#   echo "NOT PORT: $notportlist<br />";
     if ($portlist) { 
     	$portlist = trim($portlist, ",");
     	$sqlports .= "attacks.dport IN ($portlist)"; 
     }
+    if ($notportlist) { 
+    	$notportlist = trim($notportlist, ",");
+    	$notsqlports .= "attacks.dport NOT IN ($notportlist)"; 
+    }
+    
     $sqlports = trim($sqlports);
     $sqlports = trim($sqlports, "OR");
-    add_to_sql("NOT attacks.dport = 0", "where");
+    $notsqlports = trim($notsqlports);
+    $notsqlports = trim($notsqlports, "AND");
     add_to_sql("($sqlports)", "where");
+    add_to_sql("($notsqlports)", "where");
     add_to_sql("attacks.dport", "select");
     add_to_sql("attacks.dport", "group");
     $title .= " with attack port ($ports)  ";
+    prepare_sql();
  }
 }
 $title .= "\n From $textstart to $textend";
@@ -378,9 +413,11 @@ $title .= "\n From $textstart to $textend";
 ##############
 # PHPlot stuff
 ##############
-require_once '/usr/share/phplot/phplot.php';  // here we include the PHPlot code 
+
+require_once "$c_phplot";  // here we include the PHPlot code 
 #$plot =& new PHPlot(990,600);    // here we define the variable
 $plot =& new PHPlot($width,$heigth);    // here we define the variable
+
 $plot->SetTitle($title);
 $plot->SetXTitle('Time');
 $plot->SetYTitle('Attacks');
@@ -396,10 +433,13 @@ add_to_sql("severity", "order");
 add_to_sql("COUNT(attacks.severity) as total", "select");
 prepare_sql();
 
+$point = array();
 while ($i != $tssteps) {
   $a = $i;
   $i++;
-  $point = array();
+  foreach ($point as $key => $value) {
+  	$point[$key]=0;
+  }
 #  $sql = "SELECT DISTINCT $selectattacks $selectsensorid attacks.severity, COUNT(attacks.severity) as total FROM attacks, sensors, details ";
 #  $sql .= "WHERE details.attackid = attacks.id AND timestamp >= $tsstart + ($interval * $a) AND timestamp <= $tsstart + ($interval * $i) ";
 #  $sql .= "AND sensors.id = attacks.sensorid $where ";
@@ -430,7 +470,7 @@ while ($i != $tssteps) {
     } elseif ($interval == 604800) {
       $datestring = "Week\n" .date("W", $date);
     }
-    $point[] = $datestring;
+    $point[0] = $datestring;
     while($row = pg_fetch_assoc($result)) {
       $count = $row['total'];
       $sev = $row['severity'];
@@ -461,7 +501,10 @@ while ($i != $tssteps) {
         $port = $row['dport'];
         $legend .= " $port";
       }
-      $v_severity_ar[$sev] = substr($v_severity_ar[$sev], 0, 3);
+      if ($v_severity_ar[$sev] == "Possible malicious attack") { $v_severity_ar[$sev] = "PosA"; }
+      if ($v_severity_ar[$sev] == "Malicious attack") { $v_severity_ar[$sev] = "MalA"; }
+      if ($v_severity_ar[$sev] == "Malware offered") { $v_severity_ar[$sev] = "MalO"; }
+      if ($v_severity_ar[$sev] == "Malware downloaded") { $v_severity_ar[$sev] = "MalD"; }
       if ($legend == "") {$legend .= " ".$v_severity_ar[$sev];}
       else {$legend .= " - ".$v_severity_ar[$sev];}
       if (!in_array($legend, $check_ar)) {

@@ -1,11 +1,12 @@
 <?php include("menu.php"); set_title("Searchtemplates");
 
-####################################
-# SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-12-2006                       #
-# Peter Arts                       #
-####################################
+#################################################
+# SURFnet IDS                      		#
+# Version 1.04.04                  		#
+# 15-12-2006                       		#
+# Peter Arts 					#
+# Modified by Jan van Lith & Kees Trippelvitz   #
+#################################################
 
 #############################################
 # Changelog:

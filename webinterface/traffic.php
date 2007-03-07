@@ -1,15 +1,16 @@
-<?php include("menu.php"); ?>
+<?php include("menu.php");?> 
 <?php
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
+# Version 1.04.05                  #
 # 29-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Changed location debug info 
 # 1.04.04 Added online/offline status selector
 # 1.04.03 Changed debug stuff
 # 1.04.02 Added vlan support 
@@ -29,7 +30,7 @@ $allowed_get = array(
 	"int_onoff"
 );
 $check = extractvars($_GET, $allowed_get);
-debug_input();
+
 
 if ($s_access_search == 9) {
   $q_org = 0;
@@ -54,6 +55,8 @@ if ($s_admin == 1) {
   echo "<h3>Traffic analysis for: $db_org_name</h3>\n";
   add_to_sql("organisation = $s_org", "where");
 }
+
+debug_input();
 
 echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
   echo "<select name='int_onoff' onChange='javascript: this.form.submit();'>\n";

@@ -1,7 +1,7 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
+# Version 1.04.07                  #
 # 15-01-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -9,6 +9,7 @@
 
 #############################################
 # Changelog:
+# 1.04.07 Uncommented server admin
 # 1.04.06 Fixed another redirection bug with the $url variable
 # 1.04.05 Fixed a redirection bug with the $url variable
 # 1.04.04 Added server info page
@@ -147,9 +148,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           if ($s_admin == 1) {
             echo "<li><a href='${address}orgadmin.php' onmouseover='return overlib(\"$popup_org\");' onmouseout='return nd();'>Organisation Admin</a></li>\n";
           }
-          if ($s_admin == 1) {
-            echo "<li><a href='${address}serveradmin.php' onmouseover='return overlib(\"$popup_server\");' onmouseout='return nd();'>Server Admin</a></li>\n";
-          }
+#          if ($s_admin == 1) {
+#            echo "<li><a href='${address}serveradmin.php' onmouseover='return overlib(\"$popup_server\");' onmouseout='return nd();'>Server Admin</a></li>\n";
+#          }
           if ($s_admin == 1) {
             echo "<li><a href='${address}serverstats.php' onmouseover='return overlib(\"$popup_stats\");' onmouseout='return nd();'>Server Info</a></li>\n";
           }
