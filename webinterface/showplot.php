@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 05-02-2007                       #
+# Version 1.04.06                  #
+# 07-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Fixed bug when not giving any port exclusions
 # 1.04.05 Added extra dport and timestamp functionality 
 # 1.04.04 Fixed bugs with organisation  
 # 1.04.03 Location of phplot.php is a config value now
@@ -96,24 +97,21 @@ if ($drawerr == 1) {
 #  Organisation 
 ########################
 if (!isset($clean['org']) || empty($clean['org'])) {
-   	if ($s_admin == 1) { 
-		$q_org = ""; 
-	}
-	else {
-  		$org = $s_org;
-  		$q_org = " sensors.organisation = $org ";
-	}	
+  if ($s_admin == 1) { 
+    $q_org = ""; 
+  } else {
+    $org = $s_org;
+    $q_org = " sensors.organisation = $org ";
+  }	
 } else {
-   $org = $clean['org']; 
-   if ($s_org == $org) {
-   	$q_org = " sensors.organisation = $org ";
-   }
-   elseif($s_admin == 1) {
-   	$q_org = " sensors.organisation = $org ";
-   } 	
-  else { 
-  	readfile("images/nodata.gif");
-  	exit; 
+  $org = $clean['org']; 
+  if ($s_org == $org) {
+    $q_org = " sensors.organisation = $org ";
+  } elseif($s_admin == 1) {
+    $q_org = " sensors.organisation = $org ";
+  } else { 
+    readfile("images/nodata.gif");
+    exit; 
   }
 }
 #echo "SADMIN: $s_admin<br />";
@@ -231,6 +229,23 @@ if ($tainted['attack']) {
       add_to_sql("details.text", "group");
       $title .= ") ";
       add_to_sql("details.text", "select");
+    }
+  }
+}
+$tempwhere = "";
+
+########################
+# OS Types
+########################
+if ($tainted['os']) {
+  if (@is_array($tainted['os'])) {
+    if (intval($tainted['os'][0]) != 99) {
+      add_to_sql("system", "table");
+      add_to_sql("attacks.source = system.ip_addr", "where");
+
+      $check = 0;
+      add_to_sql("os", "group");
+      add_to_sql("split_part(system.name, '/', 1) as os", "select");
     }
   }
 }
@@ -380,18 +395,17 @@ if (isset($clean['ports'])) {
     if ($portlist) { 
       $portlist = trim($portlist, ",");
       $sqlports .= "attacks.dport IN ($portlist)"; 
+      $sqlports = trim($sqlports);
+      $sqlports = trim($sqlports, "OR");
+      add_to_sql("($sqlports)", "where");
     }
     if ($notportlist) { 
       $notportlist = trim($notportlist, ",");
       $notsqlports .= "attacks.dport NOT IN ($notportlist)"; 
+      $notsqlports = trim($notsqlports);
+      $notsqlports = trim($notsqlports, "AND");
+      add_to_sql("($notsqlports)", "where");
     }
-    
-    $sqlports = trim($sqlports);
-    $sqlports = trim($sqlports, "OR");
-    $notsqlports = trim($notsqlports);
-    $notsqlports = trim($notsqlports, "AND");
-    add_to_sql("($sqlports)", "where");
-    add_to_sql("($notsqlports)", "where");
     add_to_sql("attacks.dport", "select");
     add_to_sql("attacks.dport", "group");
     $title .= " with attack port ($ports)  ";
@@ -509,7 +523,7 @@ while ($i != $tssteps) {
 
 #printer($data);
 
-#debug_sql();
+debug_sql();
 
 if (!empty($data)) {
 #  printer($maxcount);
