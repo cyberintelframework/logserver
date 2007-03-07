@@ -3,7 +3,7 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
+# Version 1.04.07                  #
 # 26-01-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 1.04.07 Added possible attacks check 
 # 1.04.06 wrong amount of attacks bug fixed
 # 1.04.05 add_to_sql()
 # 1.04.04 Changed some sql stuff
