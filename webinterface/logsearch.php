@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.03.01                  #
-# 11-10-2006                       #
+# Version 1.03.02                  #
+# 08-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.03.02 Quickfix for empty source/destination IP addresses
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.16 Changed the way graphs are generated
 # 1.02.15 strip_tags("ts_start"), 
@@ -91,10 +92,14 @@ if (@is_array($_GET["sensorid"])) {
 
 $source_ip = $_GET["source_ip"];
 $full_source_ip = "";
-foreach ($source_ip as $key=>$val) {
+if (!empty($source_ip)) {
+  foreach ($source_ip as $key=>$val) {
 	$val = intval(trim($val));
 	if ($key > 0) $full_source_ip .= ".";
 	$full_source_ip .= $val;
+  }
+} else {
+  $full_source_ip = "0.0.0.0";
 }
 if ($full_source_ip == "0.0.0.0") $full_source_ip = -1;
 elseif (ip2long($full_source_ip) === -1) $full_source_ip = -2;
@@ -108,10 +113,14 @@ if ($_GET["s_radio"] == "A") {
 }
 $destination_ip = $_GET["destination_ip"];
 $full_destination_ip = "";
-foreach ($destination_ip as $key=>$val) {
+if (!empty($destination_ip)) {
+  foreach ($destination_ip as $key=>$val) {
 	$val = intval(trim($val));
 	if ($key > 0) $full_destination_ip .= ".";
 	$full_destination_ip .= $val;
+  }
+} else {
+  $full_destination_ip = "0.0.0.0";
 }
 if ($full_destination_ip == "0.0.0.0") $full_destination_ip = -1;
 elseif (ip2long($full_destination_ip) === -1) $full_destination_ip = -2;
