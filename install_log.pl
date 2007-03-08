@@ -527,6 +527,7 @@ print "#####################################\n";
 print "\n";
 print "Interesting configuration files:\n";
 print "  ${g}/etc/crontab${n}\n";
+print "  ${g}$apachev config files${n}\n";
 
 print "Still needs configuration:\n";
 print "  ${g}$configdir/surfnetids-log.conf${n}\n";
