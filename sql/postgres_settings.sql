@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.07
--- 13-02-2007
+-- Version 1.04.08
+-- 08-03-2007
 --
 
 -- Version history
+-- 1.04.08 Removed idslog priviliges for scanners
 -- 1.04.07 Removed arp stuff from sensors table
 -- 1.04.06 Updating sql file for 1.04beta
 -- 1.04.05 Changed constraint for report_content
@@ -296,8 +297,8 @@ CREATE TABLE scanners (
 ALTER TABLE ONLY scanners
     ADD CONSTRAINT scanners_pkey PRIMARY KEY (id);
 
-GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE scanners TO idslog;
-GRANT SELECT,UPDATE ON TABLE scanners_id_seq TO idslog;
+GRANT SELECT ON TABLE scanners TO idslog;
+GRANT SELECT ON TABLE scanners_id_seq TO idslog;
 
 --
 -- SEARCHTEMPLATE
