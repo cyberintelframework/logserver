@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 26-01-2007                       #
+# Version 1.04.09                  #
+# 12-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.09 Added geoip and p0f stuff
 # 1.04.08 Added protocols ranking; add_to_sql();
 # 1.04.07 Replaced $where[] with add_where()
 # 1.04.06 Changed some sql stuff
@@ -29,6 +30,12 @@
 # 1.02.02 Added number formatting
 # 1.02.01 Small fixes
 ####################################
+
+### GEOIP STUFF
+if ($c_geoip_enable == 1) {
+  include '../include/' .$c_geoip_module;
+  $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
+}
 
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
@@ -696,7 +703,42 @@ echo "<table width='100%'>\n";
                 $total = $row['total'];
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='whois.php?ip_ip=$source'>$source</a></td>\n";
+
+                  echo "<td class='datatd'>";
+                    if ($c_enable_pof == 1) {
+                      $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
+                      $result_finger = pg_query($pgconn, $sql_finger);
+                      $numrows_finger = pg_num_rows($result_finger);
+
+                      $fingerprint = pg_result($result_finger, 0);
+                      $finger_ar = explode(" ", $fingerprint);
+                      $os = $finger_ar[0];
+                    } else {
+                      $numrows_finger = 0;
+                    }
+                    if ($numrows_finger != 0) {
+                      $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
+                      if (file_exists($osimg)) {
+                        echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                      } else {
+                        echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                      }
+                    } else {
+                      echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
+                    }
+                    if ($c_geoip_enable == 1) {
+                      $record = geoip_record_by_addr($gi, $source);
+                      $countrycode = strtolower($record->country_code);
+                      $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+                      if (file_exists($cimg)) {
+                        $country = $record->country_name;
+                        echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+                      } else {
+                        echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
+                      }
+                    }
+                    echo "<a href='whois.php?ip_ip=$source'>$source</a>";
+                  echo "</td>\n";
                   echo "<td class='datatd'>$total</td>\n";
                 echo "</tr>\n";
                 $i++;
@@ -719,8 +761,42 @@ echo "<table width='100%'>\n";
                   $total = $row['total'];
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd'>$i</td>\n";
-                        echo "<td class='datatd'><a href='whois.php?ip_ip=$source'>$source</a></td>\n";
-                        echo "<td class='datatd'>$total</td>\n";
+                      echo "<td class='datatd'>
+                        if ($c_enable_pof == 1) {
+                          $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
+                          $result_finger = pg_query($pgconn, $sql_finger);
+                          $numrows_finger = pg_num_rows($result_finger);
+
+                          $fingerprint = pg_result($result_finger, 0);
+                          $finger_ar = explode(" ", $fingerprint);
+                          $os = $finger_ar[0];
+                        } else {
+                          $numrows_finger = 0;
+                        }
+                        if ($numrows_finger != 0) {
+                          $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
+                          if (file_exists($osimg)) {
+                            echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                          } else {
+                            echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                          }
+                        } else {
+                          echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
+                        }
+                        if ($c_geoip_enable == 1) {
+                          $record = geoip_record_by_addr($gi, $source);
+                          $countrycode = strtolower($record->country_code);
+                          $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+                          if (file_exists($cimg)) {
+                            $country = $record->country_name;
+                            echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();'$
+                          } else {
+                            echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='wid$
+                          }
+                        }
+                        echo "<a href='whois.php?ip_ip=$source'>$source</a>";
+                      echo "</td>\n";
+                      echo "<td class='datatd'>$total</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }
