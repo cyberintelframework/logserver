@@ -1,9 +1,10 @@
 -- SURFnet IDS SQL changes for 1.03
--- Version: 1.03.02
--- 27-11-2006
+-- Version: 1.03.03
+-- 13-03-2007
 
 -- Changelog
 -- Removed the timeunit from table login
+-- 1.03.03 Added column subject to table report_content
 -- 1.03.02 Removed table report and added gpg to table login
 -- 1.03.01 Initial release
 
@@ -45,7 +46,8 @@ CREATE TABLE report_content (
     sensor_id integer,
     frequency integer,
     "interval" integer,
-    priority integer
+    priority integer,
+    subject character varying
 );
 
 ALTER TABLE ONLY report_content
