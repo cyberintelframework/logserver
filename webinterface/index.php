@@ -2,14 +2,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 12-03-2007                       #
+# Version 1.04.05                  #
+# 13-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added last seen column
+# 1.04.04 Added empty flag for unknown countries
 # 1.04.03 Added geoip and p0f stuff
 # 1.04.02 Added some graphs and stats 
 # 1.04.01 Added changelog and GD check
@@ -31,7 +33,7 @@ if (!in_array ("gd", $phpext)){
     echo "<font color='red'>\n";
       echo "Warning: GD was not loaded with FreeType support!<br />\n";
       echo "This means that chart generation will most likely fail!<br />\n";
-      echo "For more information check out the documentation <a href='http://ids.surfnet.nl/documentation/faq_log.php#5'>here</a>.\n";
+      echo "For more information check out the documentation <a href='http://ids.surfnet.nl/'>here</a>.\n";
     echo "</font>\n";
   echo "</p>\n";
 } else {
@@ -41,7 +43,7 @@ if (!in_array ("gd", $phpext)){
       echo "<font color='red'>\n";
         echo "Warning: GD was not loaded with FreeType support!<br />\n";
         echo "This means that chart generation will most likely fail!<br />\n";
-        echo "For more information check out the documentation <a href='http://ids.surfnet.nl/documentation/faq_log.php#5'>here</a>.\n";
+        echo "For more information check out the documentation <a href='http://ids.surfnet.nl/'>here</a>.\n";
       echo "</font>\n";
     echo "</p>\n";
   }
@@ -51,8 +53,8 @@ echo "<h3>SURFnet IDS $c_version</h3>\n";
 $day = date("d");
 $year = date("Y");
 $month = date("n");
-$start = getStartWeek($day, $month, $year);
-$end = getEndWeek($day, $month, $year);
+$start = date("U") - (7 * 24 * 60 * 60);
+$end = date("U");
 
 $startqs = date("d-m-Y+H", $start);
 $endqs = date("d-m-Y+H", $end);
@@ -62,13 +64,13 @@ $endqsmin = date("i", $end);
 echo "<table width='70%'>\n";
   echo "<tr>\n";
     echo "<td>\n";
-      echo "<b>This week Attacks</b>";
+      echo "<b>Attacks (Last 7 days)</b>";
       echo "<br />";
       echo "<a href='plotter.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&sensorid%5B%5D=&severity%5B%5D=99&int_interval=3600&int_type=1'><img src='showplot.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&sensorid%5B%5D=&severity%5B%5D=99&int_interval=3600&int_type=1&int_width=475&int_heigth=300'></a>";
     echo "</td>\n";
     echo "<td>\n";
       ###### Display attacks by ports for today
-      echo "<b>This week Attacks by Port</b>\n";
+      echo "<b>Attacks by Port (Last 7 days)</b>\n";
       echo "<br />";
       echo "<a href='plotter.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&strip_html_escape_ports=all&severity%5B%5D=0&severity%5B%5D=1&int_interval=86400&int_type=1'><img src='showplot.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&strip_html_escape_ports=all&severity%5B%5D=0&severity%5B%5D=1&int_interval=86400&int_type=1&int_width=475&int_heigth=300'></a>";
     echo "</td>\n";
@@ -76,23 +78,40 @@ echo "<table width='70%'>\n";
   echo "<tr>\n";
     echo "<td>\n";
     ###### Display todays attackers.
-      echo "<b>This week Attackers</b>\n";
+      echo "<b>Attackers (Last 7 days)</b>\n";
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
-          echo "<td class='dataheader' width='85%'>IP Address</td>\n";
-          echo "<td class='dataheader' width='100%'>Total Hits</td>\n";
+          echo "<td class='dataheader' width='50%'>IP Address</td>\n";
+          echo "<td class='dataheader' width='35%'>Last Seen</td>\n";
+          echo "<td class='dataheader' width='15%'>Total Hits</td>\n";
         echo "</tr>\n";
         #### Get the data for todays attackers and display it.
         $query = "attacks.sensorid = sensors.id ";
         $query .= "AND timestamp >= $start AND timestamp <= $end ";
         if ($s_admin != 1) {
-          $query .= "AND sensors.organisation = '$s_org' ";
+          $query .= " AND sensors.organisation = '$s_org' ";
         }
 
-        $sql_attack_countqry = "SELECT count(*),source FROM attacks,sensors WHERE $query GROUP BY source ORDER BY count DESC LIMIT 10";
+        $sql_attack_countqry = "SELECT count(*), source FROM attacks, sensors WHERE $query GROUP BY source ORDER BY count DESC LIMIT 10";
+        $debuginfo[] = $sql_attack_countqry;
         $result_countqry = pg_query($pgconn, $sql_attack_countqry);
         while ($row = pg_fetch_assoc($result_countqry)) {
           $source = $row['source'];
+          $sql_attack_ls = "SELECT timestamp FROM attacks, sensors WHERE source = '$source' AND attacks.sensorid = sensors.id ";
+          if ($s_admin != 1) {
+            $sql_attack_ls .= " AND sensors.organisation = '$s_org' ";
+          }
+          $sql_attack_ls .= " ORDER BY timestamp DESC LIMIT 1";
+          $debuginfo[] = $sql_attack_ls;
+          $result_ls = pg_query($pgconn, $sql_attack_ls);
+          $lsdb = pg_fetch_assoc($result_ls);
+          $ls = $lsdb['timestamp'];
+
+          $chk = date("d", $ls);
+          $cur = date("d");
+          $dif = $cur - $chk;
+          $ls = date("d-m-Y H:i:s", $ls);
+
           echo "<tr>\n";
             echo "<td class='datatd'>";
               if ($c_enable_pof == 1) {
@@ -123,18 +142,21 @@ echo "<table width='70%'>\n";
                 if (file_exists($cimg)) {
                   $country = $record->country_name;
                   echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+                } else {
+                  echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                 }
               }
               echo "<a href='whois.php?ip_ip=$source'>$source</a>";
             echo "</td>\n";
-            echo "<td class='datatd'>$row[count]</td>\n";
+            echo "<td class='datatd' style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
+            echo "<td class='datatd'><a href='logsearch.php?ip_searchip=$source&strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin'>$row[count]</a></td>\n";
           echo "</tr>\n";
         }
       echo "</table>\n";
     echo "</td>\n";
     echo "<td valign=top>\n";
       ###### Display todays ports.
-      echo "<b>This week Ports</b>\n";
+      echo "<b>Ports (Last 7 days)</b>\n";
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader' width='40%'>Destination Ports</td>\n";
@@ -162,6 +184,7 @@ echo "<table width='70%'>\n";
   echo "</tr>\n";
 echo "</table>\n";
 
+debug_sql();
 ?>
 <p>For more technical information you can surf to: <a href="http://ids.surfnet.nl/">http://ids.surfnet.nl/</a></p>
 
