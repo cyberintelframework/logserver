@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL settings
--- Version: 1.03.04
--- 27-11-2006
+-- Version: 1.03.05
+-- 13-03-2007
 
 -- Changelog
+-- 1.03.05 Added column subject to report_content
 -- 1.03.04 Changed the constraint for report_content
 -- 1.03.03 Removed table report and changed login
 -- 1.03.02 Removed the timeunit from table login
@@ -77,7 +78,8 @@ CREATE TABLE report_content (
     sensor_id integer,
     frequency integer,
     "interval" integer,
-    priority integer
+    priority integer,
+    subject character varying
 );
 
 CREATE TABLE report_template_threshold (
