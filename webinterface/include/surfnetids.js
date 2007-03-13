@@ -36,7 +36,7 @@ function updateThreshold() {
   target.innerHTML += '&nbsp;then send e-mail report with priority ';
   target.innerHTML += document.getElementById('priority')[document.getElementById('priority').selectedIndex].innerHTML + '';
 }
-
+/*
 function submitSearchTemplate() {
   var sform = document.getElementById('searchform');
   //searchtemplate_title
@@ -46,12 +46,12 @@ function submitSearchTemplate() {
     return false;
   }
   if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
-    document.getElementById('searchtemplate_title').value = title;
+    document.getElementById('strip_html_escape_sttitle').value = title;
     sform.action = 'searchtemplate.php';
     sform.submit();
   } else return false;
 }
-
+*/
 function submitSearchTemplateFromResults(url) {
   //searchtemplate_title
   var title = prompt('Please submit a title for this searchtemplate');
@@ -60,7 +60,7 @@ function submitSearchTemplateFromResults(url) {
     return false;
   }
   if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
-    url = '/searchtemplate.php?' + url + '&searchtemplate_title=' + title;
+    url = '/searchtemplate.php?' + url + '&strip_html_escape_sttitle=' + title;
     url = URLDecode(url);
     window.location.href = url;
     return true;
