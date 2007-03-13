@@ -51,6 +51,31 @@ sub checkcron() {
   return $chk;
 }
 
+# 1.04 rmsvn
+# Function to remove the remaining .svn directories
+sub rmsvn() {
+  my ($chk, $dir, $newdir, $file);
+  $dir = $_[0];
+  chomp($dir);
+  opendir(DH, $dir);
+  foreach (readdir(DH)) {
+    $file = $_;
+    chomp($file);
+    if ($file !~ /^(\.|\.\.)$/) {
+      if ($file ne "svnroot") {
+        if (-d "$dir$file") {
+          if ($file =~ /^\.svn$/) {
+            `rm -r $dir$file/`;
+          } else {
+            $newdir = "$dir$file/";
+            &rmsvn($newdir);
+          }
+        }
+      }
+    }
+  }
+  closedir(DH);
+}
 
 # 3.04 validip
 # Function to check if a given IP address is a valid IP address.
