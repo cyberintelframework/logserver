@@ -1,14 +1,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 01-02-2007                       #
+# Version 1.04.06                  #
+# 13-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Added v_indexcolors array
+# 1.04.05 Added error string for orgedit.php
 # 1.04.04 Added v_ prefix to the variables
 # 1.04.03 Added a few more error messages
 # 1.04.02 Added org_ident_type_ar
@@ -256,6 +258,7 @@ $v_errors = array(
 	orgedit.php => array(
 				1 => "Successfully saved the organisation details!",
 				2 => "Successfully deleted the organisation identifier!",
+				90 => "Invalid ranges string!",
 				91 => "Admin rights are required to access this page!",
 				92 => "Organisation ID was not set!",
 				93 => "Identifier ID was not set!",
@@ -342,4 +345,14 @@ $v_ipregexp = '^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
 $v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
 $v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
 $v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$';
+
+$v_indexcolors = array(
+			0 => "Red",
+			1 => "DarkOrange",
+			2 => "Gold",
+			3 => "Yellow",
+			4 => "LawnGreen",
+			5 => "LimeGreen",
+			6 => "SeaGreen"
+);
 ?>
