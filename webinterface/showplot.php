@@ -9,6 +9,7 @@
 
 #############################################
 # Changelog:
+# 1.04.08 Added data colors array, background color
 # 1.04.07 Added virus graphs
 # 1.04.06 Fixed bug when not giving any port exclusions
 # 1.04.05 Added extra dport and timestamp functionality 
@@ -601,6 +602,8 @@ if (!empty($data)) {
 #  printer($pertick);
 #  printer($ytick);
 
+  $plot->SetDataColors($v_phplot_data_colors);
+  $plot->SetBackgroundColor("grey");
   $plot->SetYTickIncrement($ytick);
   $plot->SetDataValues($data);
   $plot->SetLegendPixels(0, 0);

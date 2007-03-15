@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 14-03-2007                       #
+# Version 1.04.08                  #
+# 15-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Added v_phplot_data_colors array
 # 1.04.07 Added v_index_periods array
 # 1.04.06 Added v_indexcolors array
 # 1.04.05 Added error string for orgedit.php
@@ -360,5 +361,11 @@ $v_indexcolors = array(
 $v_index_periods = array(
 			0 => "Today",
 			1 => "Last 7 days"
+);
+
+$v_phplot_data_colors = array(
+	"beige", "black", "blue", "brown", "cyan", "DarkGreen", "DimGrey", "gold", "green", "lavender", "magenta", "maroon", "navy", 
+	"orange", "orchid", "PeachPuff", "peru", "pink", "plum", "purple", "red", "salmon", "SkyBlue", "SlateBlue", "tan", "violet", 
+	"wheat", "yellow", "YellowGreen"
 );
 ?>
