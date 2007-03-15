@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 15-01-2007                       #
+# Version 1.04.08                  #
+# 12-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Added home button
 # 1.04.07 Uncommented server admin
 # 1.04.06 Fixed another redirection bug with the $url variable
 # 1.04.05 Fixed a redirection bug with the $url variable
@@ -98,6 +99,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       echo "</table>\n";
     echo "</div>\n";
     echo "<div class='filler'></div>\n";
+    $popup_home = "Dashboard overview!";
     $popup_sensor = "Shows the status information of all your sensors!";
     $popup_rank = "Shows the current ranking of your sensors and organisation!";
     $popup_search = "Search engine for searching through the logging data!";
@@ -109,6 +111,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     $popup_plotter = "Plot attacks!";
     echo "<div class='nav-menu'>\n";
       echo "<ul>\n";
+        echo "<li><a href='${address}index.php' onmouseover='return overlib(\"$popup_home\");' onmouseout='return nd();'>Home</a></li>\n";
         echo "<li><a href='${address}sensorstatus.php' onmouseover='return overlib(\"$popup_sensor\");' onmouseout='return nd();'>Sensor Status</a></li>\n";
         echo "<li><a href='${address}rank.php' onmouseover='return overlib(\"$popup_rank\");' onmouseout='return nd();'>Ranking</a></li>\n";
         echo "<li><a href='${address}search.php' onmouseover='return overlib(\"$popup_search\");' onmouseout='return nd();'>Search</a></li>\n";
