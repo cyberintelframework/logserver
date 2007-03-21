@@ -1,14 +1,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 01-02-2007                       #
+# Version 1.04.11                  #
+# 20-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Modified censorip()
+# 1.04.10 Added censorip()
 # 1.04.09 Removed unused sql functions and added INDEX
 # 1.04.08 Added add_to_sql, reset_sql
 # 1.04.07 Bugfix in getEndWeek()
@@ -65,6 +67,7 @@
 # 3.15		microtime_float
 # 3.16		matchCIDR
 # 3.17		getportdescr
+# 3.18		censorip
 #
 # 4 Debug Functions
 # 4.01		printer
@@ -664,6 +667,39 @@ function getPortDescr($aPort) {
       case  995: return "pop3s"; break;
       case 5000: return "UPnP"; break;
       default  : return "Port could not be determined"; break;
+  }
+}
+
+# 3.18 censorip
+# Function to determine if a destination IP address has to be censored or not
+#function censorip($ip, $ranges_ar) {
+function censorip($ip) {
+  global $c_censor_ip;
+  global $s_admin;
+  global $c_censor_word;
+  global $orgranges_ar;
+  if ($c_censor_ip == 2) {
+    # Censor all destination IP's
+    return $c_censor_word;
+  } elseif ($c_censor_ip == 1) {
+    if ($s_admin != 1) {
+      if (isset($orgranges_ar)) {
+        # Censor all destination IP's not of organisation ranges
+        $check = matchCIDR($ip, $orgranges_ar);
+        if ($check == 1) {
+          return $ip;
+        } else {
+          return $c_censor_word;
+        }
+      } else {
+        return $ip;
+      }
+    } else {
+      # Except if user is admin.
+      return $ip;
+    }
+  } else {
+    return $ip;
   }
 }
 
