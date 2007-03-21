@@ -2,13 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 06-02-2007                       #
+# Version 1.04.09                  #
+# 16-03-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Added hash check
+# 1.04.08 Added pattern check for organisation IP ranges
 # 1.04.07 Fixed bug with organisation existancy check. Case insensitive search.
 # 1.04.06 Removed orgname check when type = ident
 # 1.04.05 Added more checks on the ranges
@@ -40,11 +42,13 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 $allowed_get = array(
                 "savetype",
-		"int_orgid"
+		"int_orgid",
+		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -54,10 +58,16 @@ $allowed_post = array(
 		"strip_html_escape_ranges",
 		"int_identtype",
 		"strip_html_escape_orgident",
-		"strip_html_escape_orgname"
+		"strip_html_escape_orgname",
+		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
+
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 89;
+}
 
 # Get the type of update
 $type = $tainted['savetype'];
@@ -89,6 +99,30 @@ if ($type == "ident") {
     $m = 96;
   }
 
+  $ranges = str_replace("\r", ";", $ranges);
+  $ranges = str_replace("\n", ";", $ranges);
+  $ranges = preg_replace("/;+/", ";", $ranges);
+  $ranges = preg_replace("/ +;/", ";", $ranges);
+  $ranges = preg_replace("/; +/", ";", $ranges);
+  $ranges = preg_replace("/^ +/", "", $ranges);
+  $ranges = preg_replace("/ +$/", "", $ranges);
+  $ranges = preg_replace("/^;+/", "", $ranges);
+  $ranges = preg_replace("/;+$/", "", $ranges);
+
+  if ($ranges != "") {
+    $ranges = rtrim($ranges, ";");
+    $ranges .= ";";
+
+    $pattern = '/^(([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+    $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+    $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
+    $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]));{1})*$/';
+
+    if (!preg_match($pattern, $ranges)) {
+      $err = 1;
+      $m = 90;
+    }
+  }
 } elseif ($type == "org") {
   if (isset($clean['orgname'])) {
     $orgname = $clean['orgname'];
@@ -120,15 +154,6 @@ if ($type == "ident") {
 
 if ($err != 1) {
   if ($type == "ident") {
-    $ranges = str_replace("\r", ";", $ranges);
-    $ranges = str_replace("\n", ";", $ranges);
-    $ranges = preg_replace("/;+/", ";", $ranges);
-    $ranges = preg_replace("/ +;/", ";", $ranges);
-    $ranges = preg_replace("/; +/", ";", $ranges);
-    $ranges = preg_replace("/^ +/", "", $ranges);
-    $ranges = preg_replace("/ +$/", "", $ranges);
-    $ranges = preg_replace("/^;+/", "", $ranges);
-    $ranges = preg_replace("/;+$/", "", $ranges);
 
     $sql = "UPDATE organisations SET organisation = '" .$orgname. "', ranges = '" .$ranges. "' WHERE id = $orgid";
     $execute = pg_query($pgconn, $sql);

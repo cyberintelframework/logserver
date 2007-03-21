@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 11-12-2006                       #
+# Version 1.04.03                  #
+# 19-03-2007                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.03 Added hash check stuff
 # 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Split up report.php into seperate files
@@ -21,6 +22,7 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 $allowed_get = array(
@@ -73,7 +75,8 @@ $allowed_post = array(
 		"int_frequency",
 		"bool_active",
 		"int_valueuser",
-		"int_deviation"
+		"int_deviation",
+		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
 debug_input();
@@ -115,36 +118,41 @@ if ($report_content_id > 0) {
           $m = geterror(92);
           echo $m;
         } else {
-          // Save data
-          $sql_update = "UPDATE report_content SET ";
-          $sql_update .= "title = '$title', sensor_id = '$sensor_id', active = '$active', priority = '$priority', ";
-          $sql_update .= "frequency = '$timespan', interval = 0, subject = '$subject' WHERE id = '$report_content_id'";
-          $debuginfo[] = $sql_update;
+          if ($clean['hash'] != $s_hash) {
+            // Save data
+            $sql_update = "UPDATE report_content SET ";
+            $sql_update .= "title = '$title', sensor_id = '$sensor_id', active = '$active', priority = '$priority', ";
+            $sql_update .= "frequency = '$timespan', interval = 0, subject = '$subject' WHERE id = '$report_content_id'";
+            $debuginfo[] = $sql_update;
 
-          $result = pg_query($sql_update);
-          $msg = pg_errormessage();
-          if (empty($msg)) {
-            $sql_threshold = "UPDATE report_template_threshold SET ";
-            $sql_threshold .= "target = '$target', operator = '$operator', value = '$value', deviation = '$deviation' ";
-            $sql_threshold .= "WHERE report_content_id = '$report_content_id'";
-            $debuginfo[] = $sql_threshold;
-
-            $result = pg_query($sql_threshold);
+            $result = pg_query($sql_update);
             $msg = pg_errormessage();
             if (empty($msg)) {
-              echo "<p style='color:green'><b>Data updated succesfully</b>.</p>\n";
-              // Reload title/status var
-              $sql_report_content = "SELECT * FROM report_content WHERE user_id = '$user_id' AND id = '$report_content_id'";
-              $debuginfo[] = $sql_report_content;
+              $sql_threshold = "UPDATE report_template_threshold SET ";
+              $sql_threshold .= "target = '$target', operator = '$operator', value = '$value', deviation = '$deviation' ";
+              $sql_threshold .= "WHERE report_content_id = '$report_content_id'";
+              $debuginfo[] = $sql_threshold;
 
-              $result_report_content = pg_query($sql_report_content);
-              $report_content = pg_fetch_assoc($result_report_content);
+              $result = pg_query($sql_threshold);
+              $msg = pg_errormessage();
+              if (empty($msg)) {
+                echo "<p style='color:green'><b>Data updated succesfully</b>.</p>\n";
+                // Reload title/status var
+                $sql_report_content = "SELECT * FROM report_content WHERE user_id = '$user_id' AND id = '$report_content_id'";
+                $debuginfo[] = $sql_report_content;
+
+                $result_report_content = pg_query($sql_report_content);
+                $report_content = pg_fetch_assoc($result_report_content);
+              } else {
+                $m = geterror(94);
+                echo $m;
+              }
             } else {
-              $m = geterror(94);
+              $m = geterror(93);
               echo $m;
             }
           } else {
-            $m = geterror(93);
+            $m = geterror(95);
             echo $m;
           }
         }

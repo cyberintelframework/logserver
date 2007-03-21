@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 19-01-2007                       #
+# Version 1.04.06                  #
+# 07-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Added censorip stuff
 # 1.04.05 Fixed bug where 2 error messages where shown
 # 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
@@ -155,7 +156,7 @@ echo "<table class='datatable' width='100%'>\n";
     $remote = $row['remoteip'];
     $local = $row['localip'];
     $tap = $row['tap'];
-    $tapip = $row['tapip'];
+    $tapip = censorip($row['tapip']);
     $update = $row['lastupdate'];
     $start = $row['laststart'];
     $laststop = $row['laststop'];

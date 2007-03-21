@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 12-02-2007                       #
+# Version 1.04.05                  #
+# 19-03-2007                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added hash check
 # 1.04.04 Fixed a bug with weekday count
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
@@ -21,6 +22,7 @@
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
+$s_hash = md5($_SESSION['s_hash']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
@@ -78,7 +80,8 @@ $allowed_post = array(
 		"int_frequency",
 		"int_intervalweek",
 		"int_intervalday",
-		"int_template"
+		"int_template",
+		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
 debug_input();
@@ -130,7 +133,12 @@ if (isset($clean["nextstep"])) {
   }
   // Step 2: no checks needed
   
-  if (($step == 3) && ($step == $request_step)) {
+  $err = 0;
+  if ($clean['hash'] != $s_hash) {
+    $err = 1;
+  }
+
+  if (($step == 3) && ($step == $request_step) && $err == 0) {
     # All clear, save data
     // Table report_content
     $sql_insert = "INSERT INTO report_content ";
@@ -181,6 +189,7 @@ if (($step == 2) && ($template == 3)) echo " onclick=\"updateThreshold();\"";
 echo ">\n";
   echo "<input type='hidden' name='int_userid' value='$user_id'>";
   echo "<input type='hidden' name='int_nextstep' id='nextstep' value='" . ($step + 1) . "'>\n";
+  echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   if ($step == 1) {
     echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
       echo "<tr class='datatr'>";

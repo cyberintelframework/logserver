@@ -3,14 +3,14 @@
 ####################################
 # SURFnet IDS                      #
 # Version 1.04.05                  #
-# 13-03-2007                       #
+# 15-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
-# 1.04.05 Added last seen column
+# 1.04.05 Added dropdown box
 # 1.04.04 Added empty flag for unknown countries
 # 1.04.03 Added geoip and p0f stuff
 # 1.04.02 Added some graphs and stats 
@@ -19,6 +19,18 @@
 
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
+
+$allowed_post = array(
+                "int_selperiod"
+);
+$check = extractvars($_POST, $allowed_post);
+debug_input();
+
+if (isset($clean['selperiod'])) {
+  $sel = $clean['selperiod'];
+} else {
+  $sel = $c_sel_period;
+}
 
 ### GEOIP STUFF
 if ($c_geoip_enable == 1) {
@@ -49,40 +61,85 @@ if (!in_array ("gd", $phpext)){
   }
 }
 
-echo "<h3>SURFnet IDS $c_version</h3>\n";
-$day = date("d");
-$year = date("Y");
-$month = date("n");
-$start = date("U") - (7 * 24 * 60 * 60);
-$end = date("U");
+echo "<table width='100%'>\n";
+  echo "<tr>\n";
+    echo "<td><h3>SURFnet IDS $c_version</h3></td>\n";
+    echo "<td>\n";
+      echo "<form name='viewform' action='index.php' method='post'>\n";
+        echo "<table width='100%' id='sensortable'>\n";
+          echo "<tr>\n";
+            echo "<td align='right'>\n";
+              echo "<select name='int_selperiod' onChange='javascript: this.form.submit();'>\n";
+                foreach ($v_index_periods as $key => $value) {
+                  echo printOption($key, $value, $sel) . "\n";
+                }
+              echo "</select>\n";
+            echo "</td>\n";
+          echo "</tr>\n";
+        echo "</table>\n";
+      echo "</form>\n";
+    echo "</td>\n";
+  echo "</tr>\n";
+echo "</table>\n";
 
-$startqs = date("d-m-Y+H", $start);
-$endqs = date("d-m-Y+H", $end);
-$startqsmin = date("i", $start);
-$endqsmin = date("i", $end);
+if ($sel == 0) {
+  $ts_qs = "?strip_html_escape_tsselect=T";
+  $day = date("d");
+  $month = date("m");
+  $year = date("Y");
+  $start = getStartDay($day, $month, $year);
+  $end = getEndDay($day, $month, $year);
+  $interval_a = 3600;
+  $interval_p = 3600;
+} elseif ($sel == 1) {
+  $start = date("U") - (7 * 24 * 60 * 60);
+  $end = date("U");
+  $startqs = date("d-m-Y H:i:s", $start);
+  $endqs = date("d-m-Y H:i:s", $end);
+  $ts_qs = "?strip_html_escape_tsstart=$startqs&strip_html_escape_tsend=$endqs";
+  $interval_a = 3600;
+  $interval_p = 86400;
+}
 
 echo "<table width='70%'>\n";
   echo "<tr>\n";
     echo "<td>\n";
-      echo "<b>Attacks (Last 7 days)</b>";
+      echo "<b>Attacks ($v_index_periods[$sel])</b>";
       echo "<br />";
-      echo "<a href='plotter.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&sensorid%5B%5D=&severity%5B%5D=99&int_interval=3600&int_type=1'><img src='showplot.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&sensorid%5B%5D=&severity%5B%5D=99&int_interval=3600&int_type=1&int_width=475&int_heigth=300'></a>";
+      echo "<a href='plotter.php$ts_qs&sensorid%5B%5D=&severity%5B%5D=99&int_interval=$interval_a&int_type=1'>";
+        echo "<img src='showplot.php$ts_qs&sensorid%5B%5D=&severity%5B%5D=99&int_interval=$interval_a&int_type=1&int_width=475&int_heigth=300'>";
+      echo "</a>";
     echo "</td>\n";
     echo "<td>\n";
       ###### Display attacks by ports for today
-      echo "<b>Attacks by Port (Last 7 days)</b>\n";
+      echo "<b>Attacks by Port ($v_index_periods[$sel])</b>\n";
       echo "<br />";
-      echo "<a href='plotter.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&strip_html_escape_ports=all&severity%5B%5D=0&severity%5B%5D=1&int_interval=86400&int_type=1'><img src='showplot.php?strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin&strip_html_escape_ports=all&severity%5B%5D=0&severity%5B%5D=1&int_interval=86400&int_type=1&int_width=475&int_heigth=300'></a>";
+      echo "<a href='plotter.php$ts_qs&strip_html_escape_ports=all&severity%5B%5D=0&severity%5B%5D=1&int_interval=$interval_p&int_type=1'>";
+        echo "<img src='showplot.php$ts_qs&strip_html_escape_ports=all&severity%5B%5D=0&severity%5B%5D=1&int_interval=$interval_p&int_type=1&int_width=475&int_heigth=300'>";
+      echo "</a>";
     echo "</td>\n";
   echo "</tr>\n";
   echo "<tr>\n";
     echo "<td>\n";
     ###### Display todays attackers.
-      echo "<b>Attackers (Last 7 days)</b>\n";
+      echo "<table style='width: 100%;'>\n";
+        echo "<tr style='height: 5px;'>\n";
+          echo "<td><b>Attackers ($v_index_periods[$sel])</b></td>\n";
+          echo "<td class='datatd' style='background-color: $v_indexcolors[0]; text-align: center;' width='70'>Today</td>\n";
+          $count = count($v_indexcolors) - 1;
+          foreach ($v_indexcolors as $key => $value) {
+            if ($key != 0 && $key != $count) {
+              echo "<td class='datatd' style='background-color: $value;'>&nbsp;</td>\n";
+            }
+          }
+          echo "<td class='datatd' style='background-color: $v_indexcolors[$count]; text-align: center;' width='70'>7 days ago</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader' width='50%'>IP Address</td>\n";
-          echo "<td class='dataheader' width='35%'>Last Seen</td>\n";
+          echo "<td class='dataheader' width='35%'>Last Seen</td>";
           echo "<td class='dataheader' width='15%'>Total Hits</td>\n";
         echo "</tr>\n";
         #### Get the data for todays attackers and display it.
@@ -149,14 +206,15 @@ echo "<table width='70%'>\n";
               echo "<a href='whois.php?ip_ip=$source'>$source</a>";
             echo "</td>\n";
             echo "<td class='datatd' style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
-            echo "<td class='datatd'><a href='logsearch.php?ip_searchip=$source&strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin'>$row[count]</a></td>\n";
+#            echo "<td class='datatd'>CHK: $chk, CUR: $cur, DIF: $dif</td>\n";
+            echo "<td class='datatd'>$row[count]</td>\n";
           echo "</tr>\n";
         }
       echo "</table>\n";
     echo "</td>\n";
     echo "<td valign=top>\n";
       ###### Display todays ports.
-      echo "<b>Ports (Last 7 days)</b>\n";
+      echo "<b>Ports ($v_index_periods[$sel])</b>\n";
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader' width='40%'>Destination Ports</td>\n";

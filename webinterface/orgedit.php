@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-12-2006                       #
+# Version 1.04.05                  #
+# 16-03-2007                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.05 Added hash check stuff
 # 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
 # 1.04.02 Added identifier type
@@ -25,6 +26,7 @@
 
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
+$s_hash = md5($_SESSION['s_hash']);
 # $s_access is obsolete again because $s_admin needs to be 1 to gain access
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
@@ -84,7 +86,8 @@ if ($err != 1) {
     $result_orgids = pg_query($pgconn, $sql_orgids);
     $debuginfo[] = $sql_orgids;
     
-    echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid'>Generate Random Identifier String</a><br />\n";
+    echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>Generate Random Identifier String</a>&nbsp;&nbsp;";
+    echo "[<a href='http://ids.surfnet.nl/wiki/doku.php?id=docs:1.04:faq#folded_28' 'target='_new'>?</a>]<br />\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='dataheader' width='100'>ID</td>\n";
@@ -102,7 +105,7 @@ if ($err != 1) {
           echo "<td class='datatd'>$id</td>\n";
           echo "<td class='datatd'>$identifier</td>\n";
           echo "<td class='datatd'>$v_org_ident_type_ar[$type]</td>\n";
-          echo "<td class='datatd'><a href='orgdel.php?int_orgid=$orgid&int_ident=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
+          echo "<td class='datatd'><a href='orgdel.php?int_orgid=$orgid&int_ident=$id&md5_hash=$s_hash' onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a></td>\n";
         echo "</tr>\n";
       }
 
@@ -125,6 +128,7 @@ if ($err != 1) {
           echo "<input type='submit' name='submit' value='Save' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
+    echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   echo "</form>\n";
 }
 pg_close($pgconn);

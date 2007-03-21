@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 01-02-2007                       #
+# Version 1.04.05                  #
+# 16-03-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.05 Added hash check stuff
 # 1.04.04 Added sort option
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug info
@@ -29,6 +30,7 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 $allowed_get = array(
@@ -125,6 +127,7 @@ if ($err == 0) {
       echo "<td class='datatd'><input type='submit' class='button' style='width: 100%;' value='Insert' /></td>\n";
     echo "</tr>\n";
   echo "</table>\n";
+  echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   echo "</form>\n";
 }
 debug_sql();

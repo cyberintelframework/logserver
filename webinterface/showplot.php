@@ -2,13 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 07-03-2007                       #
+# Version 1.04.07                  #
+# 15-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Added data colors array, background color
+# 1.04.07 Added virus graphs
 # 1.04.06 Fixed bug when not giving any port exclusions
 # 1.04.05 Added extra dport and timestamp functionality 
 # 1.04.04 Fixed bugs with organisation  
@@ -24,43 +26,19 @@ include '../include/variables.inc.php';
 
 session_start();
 
-/*
-function getepoch($stamp) {
-  list($date, $time) = explode(" ", $stamp);
-  list($day, $mon, $year) = explode("-", $date);
-  list($hour, $min) = explode(":", $time);
-  // Date MUST BE valid
-  $day = intval($day);
-  $mon = intval($mon);
-  $year = intval($year);
-  if (($day > 0) && ($mon > 0) && ($year > 0)) {
-    if (checkdate($mon, $day, $year)) {
-      // Valid date, check time
-      $hour = intval($hour);
-      $min = intval($min);
-      if (!(($minute >= 0) && ($min < 60) && ($hour >= 0) && ($hour < 24))) {
-        // Invalid time, generate midnight (0:00)
-        $hour = $min = 0;
-      }
-      $epoch = mktime($hour, $min, 0, $mon, $day, $year);
-      return $epoch;
-    }
-  }
-}
-*/
-
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
 if ($s_access_search == 9 && isset($clean['org'])) {
-     $q_org = $clean['org'];
+  $q_org = $clean['org'];
 } else {
-    $q_org = intval($s_org);
+  $q_org = intval($s_org);
 }
 
 $drawerr = 0;
+$limit = "";
 $allowed_get = array(
                 "int_interval",
                 "strip_html_escape_tsselect",
@@ -70,10 +48,12 @@ $allowed_get = array(
 		"sensorid",
 		"severity",
 		"attack",
+		"os",
 		"strip_html_escape_ports",
 		"int_width",
 		"int_heigth",
-		"int_org"
+		"int_org",
+		"int_scanner"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -239,13 +219,69 @@ $tempwhere = "";
 ########################
 if ($tainted['os']) {
   if (@is_array($tainted['os'])) {
-    if (intval($tainted['os'][0]) != 99) {
+    if ($tainted['os'][0] == "all") {
       add_to_sql("system", "table");
       add_to_sql("attacks.source = system.ip_addr", "where");
-
-      $check = 0;
       add_to_sql("os", "group");
-      add_to_sql("split_part(system.name, '/', 1) as os", "select");
+      add_to_sql("split_part(system.name, ' ', 1) as os", "select");
+    } else {
+      add_to_sql("system", "table");
+      add_to_sql("attacks.source = system.ip_addr", "where");
+      add_to_sql("os", "group");
+      add_to_sql("split_part(system.name, ' ', 1) as os", "select");
+      $title .= " (";
+      $tempwhere .= "split_part(system.name, ' ', 1) IN (";
+      $check = 0;
+      foreach ($tainted['os'] as $os) {
+        $check++;
+        $os = pg_escape_string(strip_tags(htmlentities($os)));
+
+        if ($check != count($tainted['os'])) {
+          $tempwhere .= "'" .$os. "', ";
+          $title .= $os .", ";
+        } else {
+          $tempwhere .= "'" .$os. "'";
+          $title .= $os;
+        }
+      }
+      $tempwhere .= ") ";
+      $title .= ") ";
+      add_to_sql($tempwhere, "where");
+    }
+  }
+}
+$tempwhere = "";
+
+########################
+# Virus Types
+########################
+if ($tainted['virus']) {
+  if (@is_array($tainted['virus'])) {
+    add_to_sql("binaries.bin", "select");
+    add_to_sql("binaries", "table");
+    add_to_sql("uniq_binaries", "table");
+    add_to_sql("details", "table");
+    add_to_sql("attacks.id = details.attackid", "where");
+    add_to_sql("details.type = 8", "where");
+    add_to_sql("details.text = uniq_binaries.name", "where");
+    add_to_sql("uniq_binaries.id = binaries.bin", "where");
+    add_to_sql("binaries.bin", "group");
+    if ($clean['scanner']) {
+      $scanner = $clean['scanner'];
+      add_to_sql("binaries.scanner = $scanner", "where");
+      $sql_getscanner = "SELECT name FROM scanners WHERE id = $scanner";
+      $debuginfo[] = $sql_getscanner;
+      $result_getscanner = pg_query($sql_getscanner);
+      $row_scanner = pg_fetch_assoc($result_getscanner);
+      $scannername = " (" .$row_scanner['name'] . ")";
+    }
+    if ($tainted['virus'][0] != "all") {
+      $limit = 10;
+      $title .= " (Top $limit virusses$scannername)";
+      $sqllimit = " LIMIT $limit";
+    } else {
+      $sqllimit = "";
+      $title .= "$scannername";
     }
   }
 }
@@ -307,10 +343,6 @@ $textend = $tsend;
 $tsstart = getepoch($tsstart);
 $tsend = getepoch($tsend);
 $tsperiod = $tsend - $tsstart;
-#echo "INTERVAL: $interval<br />\n";
-#echo "TSSTART: $tsstart<br />";
-#echo "TSEND: $tsend<br />";
-#echo "TSPERIOD: $tsperiod<br />";
 $tssteps = intval($tsperiod / $interval);
 
 ########################
@@ -371,25 +403,25 @@ if (isset($clean['ports'])) {
     $pattern = '/^(\!?[0-9]+-?,?)+$/';
     if (preg_match($pattern, $ports)) {
       $ports_ar = explode(",", $ports);
-       foreach ($ports_ar as $port) {
-         $count = substr_count($port, '-');
-         if ($count == 1) {
-           if ($port{0} == "!") {
-	     $port = substr($port, 1); 
-	     $portrange_ar = explode("-", $port);
-             $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) AND ";
-	   } else { 
-	     $portrange_ar = explode("-", $port);
-             $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
-       	   }
-         } else { 
-           if ($port{0} == "!") {
-	     $port = substr($port, 1); 
-	     $notportlist .= "0,". $port .",";
-	   } else {
-	     $portlist .= $port .","; 
-       	   }
-         }
+      foreach ($ports_ar as $port) {
+        $count = substr_count($port, '-');
+        if ($count == 1) {
+          if ($port{0} == "!") {
+            $port = substr($port, 1); 
+            $portrange_ar = explode("-", $port);
+            $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) AND ";
+          } else { 
+            $portrange_ar = explode("-", $port);
+            $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
+          }
+        } else { 
+          if ($port{0} == "!") {
+            $port = substr($port, 1); 
+            $notportlist .= "0,". $port .",";
+          } else {
+            $portlist .= $port .","; 
+          }
+        }
       }
     }  
     if ($portlist) { 
@@ -409,7 +441,6 @@ if (isset($clean['ports'])) {
     add_to_sql("attacks.dport", "select");
     add_to_sql("attacks.dport", "group");
     $title .= " with attack port ($ports)  ";
-    prepare_sql();
   }
 }
 $title .= "\n From $textstart to $textend";
@@ -456,11 +487,13 @@ while ($i != $tssteps) {
   } else {
     $sql .= " WHERE ";
   }
-  $sql .= " timestamp >= $tsstart + ($interval * $a) ";
-  $sql .= " AND timestamp <= $tsstart + ($interval * $i) ";
+  $sql .= " attacks.timestamp >= $tsstart + ($interval * $a) ";
+  $sql .= " AND attacks.timestamp <= $tsstart + ($interval * $i) ";
   $sql .= " GROUP BY $sql_group ";
   $sql .= " ORDER BY $sql_order ";
-#  printer($sql);
+  if (isset($tainted['virus'])) {
+    $sql .= $sqllimit;
+  }
   $debuginfo[] = $sql;
 
   $result = pg_query($pgconn, $sql);
@@ -505,17 +538,43 @@ while ($i != $tssteps) {
         $port = $row['dport'];
         $legend .= " $port";
       }
-      if ($v_severity_ar[$sev] == "Possible malicious attack") { $v_severity_ar[$sev] = "PosA"; }
-      if ($v_severity_ar[$sev] == "Malicious attack") { $v_severity_ar[$sev] = "MalA"; }
-      if ($v_severity_ar[$sev] == "Malware offered") { $v_severity_ar[$sev] = "MalO"; }
-      if ($v_severity_ar[$sev] == "Malware downloaded") { $v_severity_ar[$sev] = "MalD"; }
-      if ($legend == "") {$legend .= " ".$v_severity_ar[$sev];}
-      else {$legend .= " - ".$v_severity_ar[$sev];}
-      if (!in_array($legend, $check_ar)) {
-        $check_ar[] = $legend;
-        $plot->SetLegend($legend);
+      if (isset($row['os'])) {
+        $os = $row['os'];
+        $legend .= " $os";
       }
-      $point[$legend] = $count;
+      if (isset($row['bin'])) {
+        $bin = $row['bin'];
+
+        $sql_bin = "SELECT name FROM stats_virus, binaries ";
+        $sql_bin .= "WHERE binaries.info = stats_virus.id AND binaries.bin = $bin AND binaries.scanner = $scanner ";
+        $sql_bin .= "ORDER BY binaries.timestamp ASC LIMIT 1";
+        $result_bin = pg_query($pgconn, $sql_bin);
+        $row_bin = pg_fetch_assoc($result_bin);
+        $name = $row_bin['name'];
+
+        $legend .= " $name";
+      } else {
+        if ($v_severity_ar[$sev] == "Possible malicious attack") { $v_severity_ar[$sev] = "PosA"; }
+        if ($v_severity_ar[$sev] == "Malicious attack") { $v_severity_ar[$sev] = "MalA"; }
+        if ($v_severity_ar[$sev] == "Malware offered") { $v_severity_ar[$sev] = "MalO"; }
+        if ($v_severity_ar[$sev] == "Malware downloaded") { $v_severity_ar[$sev] = "MalD"; }
+        if ($legend == "") {$legend .= " ".$v_severity_ar[$sev];}
+        else {$legend .= " - ".$v_severity_ar[$sev];}
+      }
+      if (!in_array($legend, $check_ar)) {
+        if ($limit != "") {
+          if (count($check_ar) != $limit) {
+            $check_ar[] = $legend;
+            $plot->SetLegend($legend);
+          }
+        } else {
+          $check_ar[] = $legend;
+          $plot->SetLegend($legend);
+        }
+      }
+      if (in_array($legend, $check_ar)) {
+        $point[$legend] = $count;
+      }
     }
     $data[] = $point;
   }
@@ -523,7 +582,7 @@ while ($i != $tssteps) {
 
 #printer($data);
 
-debug_sql();
+#debug_sql();
 
 if (!empty($data)) {
 #  printer($maxcount);
@@ -543,6 +602,8 @@ if (!empty($data)) {
 #  printer($pertick);
 #  printer($ytick);
 
+  $plot->SetDataColors($v_phplot_data_colors);
+  $plot->SetBackgroundColor("grey");
   $plot->SetYTickIncrement($ytick);
   $plot->SetDataValues($data);
   $plot->SetLegendPixels(0, 0);

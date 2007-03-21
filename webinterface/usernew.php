@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-02-2007                       #
+# Version 1.04.05                  #
+# 16-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added hash check
 # 1.04.04 Fixed a radio button name
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug info
@@ -24,6 +25,7 @@
 
 $s_org = intval($_SESSION['s_org']);
 $s_user = intval($_SESSION['s_userid']);
+$s_hash = md5($_SESSION['s_hash']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
@@ -140,6 +142,7 @@ if ($err == 0) {
         echo "</td>\n";
       echo "</tr>\n";
     echo "</table>\n";
+    echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   echo "</form>\n";
 }
 debug_sql();

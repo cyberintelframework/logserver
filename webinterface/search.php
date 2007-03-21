@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 06-02-2007                       #
+# Version 1.04.08                  #
+# 20-03-2007                       #
 # Peter Arts                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Removed libchart stuff & fixed sensors query
 # 1.04.07 Fixed a bug with the destination radiobutton
 # 1.04.06 Changed strip_html_escape_bin to strip_html_escape_binname
 # 1.04.05 Changed data input handling
@@ -64,7 +65,7 @@ function check_byte(b_val,next_field) {
     $s_org = intval($_SESSION['s_org']);
     $s_admin = intval($_SESSION['s_admin']);
 	if ($s_admin == 1) $where = " ";
-	else $where = " AND organisation = '$s_org'";
+	else $where = " AND sensors.organisation = '$s_org'";
 
     $sql = "SELECT COUNT(*) FROM sensors WHERE 1=1 $where";
     $debuginfo[] = $sql;
@@ -178,8 +179,6 @@ function check_byte(b_val,next_field) {
    <select name="reptype" style="background-color:white;" onchange="change_form(this.selectedIndex);">
     <option value="multi">Multi page</option>
     <option value="single">Single page</option>
-    <option value="chart_sensor">Chart for sensor</option>
-    <option value="chart_attack">Chart for attack</option>
     <option value="idmef">IDMEF</option>
     <option value="pdf">PDF</option>
    </select>

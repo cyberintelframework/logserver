@@ -27,6 +27,7 @@
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
+$s_hash = md5($_SESSION['s_hash']);
 $s_access_user = intval($s_access{2});
 $err = 0;
 
@@ -200,6 +201,7 @@ if ($err == 0) {
         echo "</td>\n";
       echo "</tr>\n";
     echo "</table>\n";
+    echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
     echo "</form>\n";
 }
 

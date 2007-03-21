@@ -761,7 +761,7 @@ echo "<table width='100%'>\n";
                   $total = $row['total'];
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'>
+                      echo "<td class='datatd'>";
                         if ($c_enable_pof == 1) {
                           $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
                           $result_finger = pg_query($pgconn, $sql_finger);
@@ -789,9 +789,9 @@ echo "<table width='100%'>\n";
                           $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
                           if (file_exists($cimg)) {
                             $country = $record->country_name;
-                            echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();'$
+                            echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
                           } else {
-                            echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='wid$
+                            echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                           }
                         }
                         echo "<a href='whois.php?ip_ip=$source'>$source</a>";

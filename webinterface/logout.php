@@ -38,6 +38,7 @@ $_SESSION['s_access'] = NULL;
 $_SESSION['s_admin'] = NULL;
 $_SESSION['s_user'] = NULL;
 $_SESSION['s_userid'] = NULL;
+$_SESSION['s_hash'] = NULL;
 $_SESSION['search_num_rows'] = NULL;
 $_SESSION['s_total_search_records'] = NULL;
 

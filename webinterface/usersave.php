@@ -38,6 +38,7 @@ $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
 $s_auser = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 $allowed_post = array(
@@ -50,10 +51,16 @@ $allowed_post = array(
 		"md5_confirm",
 		"int_org",
 		"strip_html_escape_email",
-		"int_gpg"
+		"int_gpg",
+		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
+
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 91;
+}
 
 # Checking MD5sums
 if (isset($clean['pass'])) {

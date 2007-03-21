@@ -46,7 +46,7 @@ $check = extractvars($_GET, $allowed_get);
 $f_user = $clean['user'];
 $f_pass = $clean['pass'];
 
-$sql_user = "SELECT * FROM login WHERE username = '" .$f_user. "'";
+$sql_user = "SELECT id, access, password, serverhash, organisation FROM login WHERE username = '" .$f_user. "'";
 $result_user = pg_query($pgconn, $sql_user);
 $numrows_user = pg_num_rows($result_user);
 
@@ -55,6 +55,7 @@ if ($numrows_user == 1) {
   $id = $row['id'];
   $access = $row['access'];
   $pass = $row['password'];
+  $hash = $row['serverhash'];
 
   if ($c_login_method == 1) {
     $checkstring = $pass;
@@ -86,6 +87,7 @@ if ($numrows_user == 1) {
     $_SESSION['s_org'] = intval($db_org);
     $_SESSION['s_user'] = $f_user;
     $_SESSION['s_userid'] = intval($id);
+    $_SESSION['s_hash'] = $hash;
 
     // Adding the session - IP pair to the sessions table
     $timestamp = time();

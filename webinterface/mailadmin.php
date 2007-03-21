@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 19-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.04 Added hash stuff
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
@@ -18,6 +19,7 @@
 
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
+$s_hash = md5($_SESSION['s_hash']);
 
 $allowed_get = array(
                 "int_userid",
@@ -120,10 +122,10 @@ if ($s_access_user > 0) {
   echo "<br /><br />\n";
 
   echo "<b>Reports</b><br /><br />";
-  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_add.php?int_userid=$user_id';>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<input type='button' value='Disable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=d';>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<input type='button' value='Enable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=e';>&nbsp;&nbsp;|&nbsp;&nbsp;";
-  echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=r';><br /><br />";
+  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_add.php?int_userid=$user_id&md5_hash=$s_hash';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Disable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=d&md5_hash=$s_hash';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Enable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=e&md5_hash=$s_hash';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=r&md5_hash=$s_hash';><br /><br />";
   echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
     echo "<tr class='dataheader'>\n";
       echo "<td class='datatd' width='400'>Title</td>\n";
