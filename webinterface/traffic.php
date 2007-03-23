@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 29-01-2007                       #
+# Version 1.04.06                  #
+# 23-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Added allsensors pictures again
 # 1.04.05 Changed location debug info 
 # 1.04.04 Added online/offline status selector
 # 1.04.03 Changed debug stuff
@@ -30,7 +31,6 @@ $allowed_get = array(
 	"int_onoff"
 );
 $check = extractvars($_GET, $allowed_get);
-
 
 if ($s_access_search == 9) {
   $q_org = 0;
@@ -78,17 +78,26 @@ add_to_sql("vlanid", "select");
 add_to_sql("sensors", "table");
 add_to_sql("keyname", "order");
 
-
-
 if ($onoff != 2) {
   add_to_sql("status = $onoff", "where");
 }
-
 prepare_sql();
-$sql_getactive = "SELECT $sql_select FROM $sql_from $sql_where ORDER BY $sql_order";
 
+$sql_getactive = "SELECT $sql_select FROM $sql_from $sql_where ORDER BY $sql_order";
 $debuginfo[] = $sql_getactive;
 $result_getactive = pg_query($pgconn, $sql_getactive);
+
+$sql_allsensors = "SELECT id FROM rrd WHERE type = 'day' AND label = 'allsensors'";
+$result_allsensors = pg_query($pgconn, $sql_allsensors);
+$row_allsensors = pg_fetch_assoc($result_allsensors);
+$allid = $row_allsensors['id'];
+
+echo "<table>\n";
+  echo "<tr>\n";
+    echo "<td><a href='trafficview.php?int_imgid=$allid'><img src='showtraffic.php?int_imgid=$allid' alt='All sensors' border='1' /></a></td>\n";
+  echo "</tr>\n";
+echo "</table>\n";
+
 while ($rowactive = pg_fetch_assoc($result_getactive)) {
   $db_orgid = $rowactive['organisation'];
   $db_orgkeyname = $rowactive['keyname'];
