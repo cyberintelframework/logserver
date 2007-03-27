@@ -76,7 +76,7 @@ if ($err != 1) {
         echo "<td class='datatd'><input type='text' name='strip_html_escape_orgname' value='$orgname' style='width: 99%;' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td class='datatd' valign='top'>Ranges</td>\n";
+        echo "<td class='datatd' valign='top'>Ranges&nbsp;&nbsp;" .printhelp("org_admin_ranges"). "</td>\n";
         echo "<td class='datatd'><textarea name='strip_html_escape_ranges' cols='40' rows='10'>$ranges</textarea></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
@@ -87,7 +87,7 @@ if ($err != 1) {
     $debuginfo[] = $sql_orgids;
     
     echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>Generate Random Identifier String</a>&nbsp;&nbsp;";
-    echo "[<a href='http://ids.surfnet.nl/wiki/doku.php?id=docs:1.04:faq#folded_28' 'target='_new'>?</a>]<br />\n";
+    echo printhelp("org_admin_ris") ."<br />\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='dataheader' width='100'>ID</td>\n";

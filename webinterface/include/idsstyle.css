@@ -288,6 +288,10 @@ img {
 /*---------------------*/
 /* Miscellaneous       */
 /*---------------------*/
+.warning {
+  color:		red;
+  font-weight:		bold;
+}
 .button {
   background: url(../images/nav-menu.jpg);
 }

@@ -374,4 +374,24 @@ $v_phplot_data_colors = array(
 	"orange", "orchid", "PeachPuff", "peru", "pink", "plum", "purple", "red", "salmon", "SkyBlue", "SlateBlue", "tan", "violet", 
 	"wheat", "yellow", "YellowGreen"
 );
+
+$v_help = array(
+	logindex.php => array(
+		0 => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_12",
+		1 => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_3",
+		16 => "",
+		32 => ""
+	),
+	orgedit.php => array(
+		"ranges" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_10",
+		"ris" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_13",
+	),
+	sensorstatus.php => array(
+		"tapmac" => "",
+		"tap" => "",
+		"tapip" => "",
+		"status" => "",
+		"action" => ""
+	)
+);
 ?>

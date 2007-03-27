@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 12-03-2007                       #
+# Version 1.04.10                  #
+# 21-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.10 Fixed typo
 # 1.04.09 Added geoip and p0f stuff
 # 1.04.08 Added protocols ranking; add_to_sql();
 # 1.04.07 Replaced $where[] with add_where()
@@ -114,7 +115,6 @@ if ($b == "all") {
   $tsquery = " timestamp >= $start AND timestamp <= $end";
 }
 
-echo "Checking organisation ranges for attacks sourced by these ranges.<br /><br />\n";
 ### BROWSE MENU
 $today = date("U");
 echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";

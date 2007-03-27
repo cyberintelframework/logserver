@@ -132,7 +132,7 @@ $debuginfo[] = $sql_sensors;
 $result_sensors = pg_query($pgconn, $sql_sensors);
 
 echo "<table class='datatable' width='100%'>\n";
-  echo "<tr class='datatr'>\n";
+  echo "<tr class='datatr' align='center'>\n";
     echo "<td class='dataheader'><a href='sensorstatus.php?sort=sensor'>Sensor</a></td>\n";
     echo "<td class='dataheader'>Remote Address</td>\n";
     echo "<td class='dataheader'>Local Address</td>\n";
@@ -148,6 +148,24 @@ echo "<table class='datatable' width='100%'>\n";
       echo "<td class='dataheader'>Action</td>\n";
     }
   echo "</tr>\n";
+  if ($c_showhelp == 1) {
+    echo "<tr align='center'>\n";
+      echo "<td class='dataheader'>" .printhelp("sensor"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("remote"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("local"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("tap"). "</a></td>\n";
+      echo "<td class='dataheader'>" .printhelp("tapmac"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("tapip"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("timestamps"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("status"). "</td>\n";
+      if ($s_access_sensor == 9) {
+        echo "<td class='dataheader'></td>\n";
+      }
+      if ($s_access_sensor > 0) {
+        echo "<td class='dataheader'>" .printhelp("action"). "</td>\n";
+      }
+    echo "</tr>\n";
+  }
 
   while ($row = pg_fetch_assoc($result_sensors)) {
     $now = time();
@@ -275,6 +293,8 @@ echo "<table class='datatable' width='100%'>\n";
     
         if ($status == 0) {
           echo "<td class='datatd' bgcolor='red'>&nbsp;</td>\n";
+        } elseif (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
+          echo "<td class='datatd' bgcolor='blue'>$nbsp;</td>\n";
         } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
           echo "<td class='datatd' bgcolor='green'>&nbsp;</td>\n";
         } elseif ($diffupdate > 3600 && $status == 1) {

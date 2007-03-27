@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 16-02-2007                       #
+# Version 1.04.04                  #
+# 27-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.04 Removed out of date sensor message
 # 1.04.03 Restructured the code
 # 1.04.02 Fixed a bug with daily reports at a certain time and sensor specific reports
 # 1.04.01 Rereleased as 1.04.01
@@ -485,13 +486,13 @@ while (@row = $email_query->fetchrow_array) {
             $sendit = 1;
             printmail("$keyname tap/tapip error!");
           }
-          if ("$lastupdate" ne "") {
-            $ts_diff = $ts_now - $lastupdate;
-            if ($ts_diff > 3900) {
-              $sendit = 1;
-              printmail("$keyname missed an update!");
-            }
-          }
+#          if ("$lastupdate" ne "") {
+#            $ts_diff = $ts_now - $lastupdate;
+#            if ($ts_diff > 3900) {
+#              $sendit = 1;
+#              printmail("$keyname missed an update!");
+#            }
+#          }
         }
       }
     }

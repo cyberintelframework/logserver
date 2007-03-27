@@ -116,7 +116,11 @@ if ($err == 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>$id</td>\n";
         echo "<td class='datatd'>$org</td>\n";
-        echo "<td class='datatd'>$count</td>\n";
+        if ($org != "ADMIN" && $count == 0) {
+          echo "<td class='datatd'><span class='warning'>$count</span></td>\n";
+        } else {
+          echo "<td class='datatd'>$count</td>\n";
+        }
         echo "<td class='datatd'><a href='orgedit.php?int_orgid=$id' alt='Edit the organisation' class='linkbutton'><font size=1>[Edit]</font></a></td>\n";
       echo "</tr>\n";
     }

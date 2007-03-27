@@ -68,6 +68,7 @@
 # 3.16		matchCIDR
 # 3.17		getportdescr
 # 3.18		censorip
+# 3.19		printhelp
 #
 # 4 Debug Functions
 # 4.01		printer
@@ -700,6 +701,22 @@ function censorip($ip) {
     }
   } else {
     return $ip;
+  }
+}
+
+# 3.19 printhelp
+# Function to print a help link to the documentation
+function printhelp($id) {
+  global $v_help;
+  global $c_showhelp;
+  $e_file = $_SERVER['SCRIPT_NAME'];
+  $e_file = basename($e_file);
+  $e_file = str_replace(".", "", $e_file);
+  $m = $v_help[$e_file][$id];
+  if ($c_showhelp == 1) {
+    return "&nbsp;[<a href='$m' target='_new'>?</a>]";
+  } else {
+    return "";
   }
 }
 
