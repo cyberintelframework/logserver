@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 16-03-2007                       #
+# Version 1.04.10                  #
+# 27-03-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Fixed network ranges regexp
 # 1.04.09 Added hash check
 # 1.04.08 Added pattern check for organisation IP ranges
 # 1.04.07 Fixed bug with organisation existancy check. Case insensitive search.
@@ -116,8 +117,7 @@ if ($type == "ident") {
     $pattern = '/^(([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
     $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
     $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
-    $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]));{1})*$/';
-
+    $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))(\/([1-9]|[1-2][0-9]|3[0-2]))?;{1})*$/';
     if (!preg_match($pattern, $ranges)) {
       $err = 1;
       $m = 90;

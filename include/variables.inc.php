@@ -387,11 +387,14 @@ $v_help = array(
 		"ris" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_13",
 	),
 	sensorstatus.php => array(
-		"tapmac" => "",
-		"tap" => "",
-		"tapip" => "",
-		"status" => "",
-		"action" => ""
+		"sensor" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_13",
+		"remote" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_16",
+		"local" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_15",
+		"tapmac" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_20",
+		"tap" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_18",
+		"tapip" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_19",
+		"status" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_17",
+		"action" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_14"
 	)
 );
 ?>
