@@ -394,7 +394,8 @@ $v_help = array(
 		"tap" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_18",
 		"tapip" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_19",
 		"status" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_17",
-		"action" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_14"
+		"action" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_14",
+		"timestamps" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_21"
 	)
 );
 ?>
