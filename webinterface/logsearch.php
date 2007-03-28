@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.19                  #
-# 27-03-2007                       #
+# Version 1.04.20                  #
+# 28-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.20 Removed chartof variable
 # 1.04.19 Fixed typo
 # 1.04.18 Removed libchart stuff, modified search results to include cross organisation attacks
 # 1.04.17 Fixed bug with destination port
@@ -106,7 +107,6 @@ $allowed_get = array(
 		"int_from",
 		"int_to",
 		"int_charttype",
-		"chartof",
 		"order",
 		"orderm",
 		"int_page",

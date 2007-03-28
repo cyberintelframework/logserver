@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 20-03-2007                       #
+# Version 1.04.09                  #
+# 28-03-2007                       #
 # Peter Arts                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Removed chartof stuff
 # 1.04.08 Removed libchart stuff & fixed sensors query
 # 1.04.07 Fixed a bug with the destination radiobutton
 # 1.04.06 Changed strip_html_escape_bin to strip_html_escape_binname
@@ -186,16 +187,6 @@ function check_byte(b_val,next_field) {
  </tr>
  <tr>
   <td colspan=2><h4>What</h4></td>
- </tr>
- <tr id="what_c1" name="what_c1" style="display:none;">
-  <td class="datatd">Chart of:</td>
-  <td class="datatd">
-   <select name="chartof" style="background-color:white;">
-    <option value="attack">Attack</option>
-    <option value="severity">Severity</option>
-    <option value="virus">Virus top 15</option>
-   </select>
-  </td>
  </tr>
  <tr id="what_1" name="what_1">
   <td class="datatd">Severity: </td>
