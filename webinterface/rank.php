@@ -863,7 +863,11 @@ echo "<table width='100%'>\n";
 
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$filename</a></td>\n";
+                  if ($s_admin == 1 || $s_access_search == 9) {
+                    echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$filename</a></td>\n";
+                  } else {
+                    echo "<td class='datatd'>$filename</td>\n";
+                  }
                   echo "<td class='datatd'>$total</td>\n";
                 echo "</tr>\n";
               }
