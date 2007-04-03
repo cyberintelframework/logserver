@@ -2,14 +2,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 15-03-2007                       #
+# Version 1.04.06                  #
+# 03-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Fixed some layout issues
 # 1.04.05 Added dropdown box
 # 1.04.04 Added empty flag for unknown countries
 # 1.04.03 Added geoip and p0f stuff
@@ -120,7 +121,7 @@ echo "<table width='70%'>\n";
     echo "</td>\n";
   echo "</tr>\n";
   echo "<tr>\n";
-    echo "<td>\n";
+    echo "<td valign='top'>\n";
     ###### Display todays attackers.
       echo "<table style='width: 100%;'>\n";
         echo "<tr style='height: 5px;'>\n";
@@ -211,7 +212,7 @@ echo "<table width='70%'>\n";
         }
       echo "</table>\n";
     echo "</td>\n";
-    echo "<td valign=top>\n";
+    echo "<td valign='top'>\n";
       ###### Display todays ports.
       echo "<table style='width: 100%;'>\n";
         echo "<tr style='height: 5px;'>\n";
