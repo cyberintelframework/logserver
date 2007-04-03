@@ -1,6 +1,11 @@
 --
 -- SURFnet IDS Nepenthes functions
--- Version 1.04.01
+-- Version 1.04.02
+--
+
+--
+-- 1.04.02 Modifed surfnet_detail_add functions
+-- 1.04.01 Initial release
 --
 
 CREATE PROCEDURAL LANGUAGE plpgsql;
@@ -95,6 +100,13 @@ CREATE FUNCTION surfnet_detail_add(integer, inet, integer, character varying) RE
 BEGIN
         SELECT INTO m_sensorid surfnet_sensorid_get(p_localhost);
 
+        IF p_type = 1 THEN
+          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = 'p_data';
+          IF m_check > 0 THEN
+            INSERT INTO stats_dialogue (name) VALUES (p_data);
+          END IF;
+        END IF;
+
         INSERT INTO details
                 (attackid,sensorid,type,text)
         VALUES
@@ -112,6 +124,13 @@ CREATE FUNCTION surfnet_detail_add_by_id(integer, integer, integer, character va
         p_type ALIAS FOR $3;
         p_data ALIAS FOR $4;
 BEGIN
+        IF p_type = 1 THEN
+          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = 'p_data';
+          IF m_check > 0 THEN
+            INSERT INTO stats_dialogue (name) VALUES (p_data);
+          END IF;
+        END IF;
+
         INSERT INTO details
                 (attackid,sensorid,type,text)
         VALUES
@@ -136,6 +155,12 @@ BEGIN
         SELECT INTO m_attackid surfnet_attack_add_by_id(32,p_remotehost, 0,
                 p_localhost, 0,
                 NULL,m_sensorid);
+
+        SELECT COUNT(name) INTO m_check FROM uniq_binaries WHERE name = 'p_hash';
+
+        IF m_check > 0 THEN
+          INSERT INTO uniq_binaries (name) VALUES (p_hash); 
+        END IF;
 
         PERFORM surfnet_detail_add_by_id(m_attackid,
                                 m_sensorid,4,p_url);
