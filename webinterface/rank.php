@@ -568,7 +568,7 @@ echo "<table width='100%'>\n";
   add_to_sql("$tsquery", "where");
   add_to_sql("NOT attacks.dport = 0", "where");
   add_to_sql("attacks.dport", "group");
-  add_to_sql("total DESC LIMIT 10 OFFSET 0", "order");
+  add_to_sql("total DESC LIMIT $c_topports OFFSET 0", "order");
   prepare_sql();
   $sql_topports = "SELECT $sql_select ";
   $sql_topports .= " FROM $sql_from ";
@@ -599,7 +599,7 @@ echo "<table width='100%'>\n";
       echo "<table width='100%'>\n";
         echo "<tr>\n";
           echo "<td width='45%'>\n";
-            echo "<b>Top 10 ports of all sensors</b>\n"; // change this into variable to be read from conf
+            echo "<b>Top $c_topports ports of all sensors</b>\n"; // change this into variable to be read from conf
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
@@ -613,9 +613,12 @@ echo "<table width='100%'>\n";
                 $total = $row['total'];
                 echo "<tr class='datatr'>\n";
                   echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
+                  if ($s_admin == 1 || $s_access_search == 9) {
+                    echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
+                  } else {
+                    echo "<td class='datatd'>$port</td>\n";
+                  }
                   echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
-                  
                   echo "<td class='datatd'>$total</td>\n";
                 echo "</tr>\n";
                 $i++;
@@ -625,7 +628,7 @@ echo "<table width='100%'>\n";
           echo "<td width='10%'></td>\n";
           echo "<td width='45%' valign='top'>\n";
             if ($s_admin != 1 || ($s_admin == 1 && isset($clean['org']) && $clean['org'] != 0) ) {
-              echo "<b>Top 10 ports of your sensors</b>\n"; // change this into variable to be read from conf
+              echo "<b>Top $c_topports ports of your sensors</b>\n"; // change this into variable to be read from conf
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td width='5%' class='datatd'>#</td>\n";
@@ -639,9 +642,9 @@ echo "<table width='100%'>\n";
                   $total = $row['total'];
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd'>$i</td>\n";
-                        echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
-                        echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
-                        echo "<td class='datatd'>$total</td>\n";
+                    echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
+                    echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
+                    echo "<td class='datatd'>$total</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }
