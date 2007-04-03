@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.03
--- 13-03-2007
+-- Version: 1.04.04
+-- 03-04-2007
 
 -- Changelog
+-- 1.04.04 Fixed transition from netconf to netconfdetail
 -- 1.04.03 Added column subject to table report_content
 -- 1.04.02 Added f-prot updater
 -- 1.04.01 Initial release
@@ -113,6 +114,8 @@ ALTER TABLE org_id ADD COLUMN type integer;
 --
 -- SENSORS
 --
+UPDATE sensors SET netconfdetail = sensors.netconf WHERE NOT netconf IN ('vlans', 'vland', 'dhcp', 'static');
+UPDATE sensors SET netconf = 'static' WHERE NOT netconf IN ('vlans', 'vland', 'dhcp', 'static');
 ALTER TABLE sensors ADD COLUMN netconfdetail text;
 ALTER TABLE sensors ADD COLUMN vlanid integer DEFAULT 0;
 
