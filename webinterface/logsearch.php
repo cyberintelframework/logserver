@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.21                  #
-# 29-03-2007                       #
+# Version 1.04.22                  #
+# 03-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.22 Fixed a bug with organisation ranges arrays
 # 1.04.21 Fixed severity check
 # 1.04.20 Removed chartof variable
 # 1.04.19 Fixed typo
@@ -503,6 +504,7 @@ if (isset($q_org)) {
     $result_getranges = pg_query($pgconn, $sql_getranges);
     $temp = pg_fetch_assoc($result_getranges);
     $orgranges = $temp['ranges'];
+    $orgranges = rtrim($orgranges, ";");
     $orgranges_ar = explode(";", $orgranges);
     $tmp_sql = "(sensors.organisation = $q_org";
     foreach ($orgranges_ar as $key => $value) {
