@@ -1,14 +1,18 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 15-03-2007                       #
+# Version 1.04.12                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.12 Changed help messages
+# 1.04.11 Added Argos attack
+# 1.04.10 Added error messages for mailadmin
+# 1.04.09 Added error messages
 # 1.04.08 Added v_phplot_data_colors array
 # 1.04.07 Added v_index_periods array
 # 1.04.06 Added v_indexcolors array
@@ -133,6 +137,7 @@ $v_attacks_ar = array(
 $v_severity_ar = array(
 		'0'	=> 'Possible malicious attack',
 		'1'	=> 'Malicious attack',
+		'2'	=> 'Argos attack',
 		'16'	=> 'Malware offered',
 		'32'	=> 'Malware downloaded'
 );
@@ -248,10 +253,13 @@ $v_errors = array(
 				2 => "Disabled all reports!",
 				3 => "Enabled all reports!",
 				4 => "Reset all timestamps!",
-				90 => "You don't have sufficient rights to perform the requested action!"
+				90 => "You don't have sufficient rights to perform the requested action!",
+				91 => "Invalid hash!",
+				92 => "Invalid action method!"
 			),
 	orgadmin.php => array(
 				1 => "Successfully added the organisation!",
+				89 => "Invalid hash!",
 				91 => "Admin rights are required to access this page!",
 				95 => "Invalid update type!",
 				96 => "Invalid or missing organisation name!",
@@ -260,6 +268,7 @@ $v_errors = array(
 	orgedit.php => array(
 				1 => "Successfully saved the organisation details!",
 				2 => "Successfully deleted the organisation identifier!",
+				89 => "Invalid hash!",
 				90 => "Invalid ranges string!",
 				91 => "Admin rights are required to access this page!",
 				92 => "Organisation ID was not set!",
@@ -367,5 +376,31 @@ $v_phplot_data_colors = array(
 	"beige", "black", "blue", "brown", "cyan", "DarkGreen", "DimGrey", "gold", "green", "lavender", "magenta", "maroon", "navy", 
 	"orange", "orchid", "PeachPuff", "peru", "pink", "plum", "purple", "red", "salmon", "SkyBlue", "SlateBlue", "tan", "violet", 
 	"wheat", "yellow", "YellowGreen"
+);
+
+$v_help = array(
+	logindex.php => array(
+		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
+		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.<br /> An exploit was used to try and gain entry to the system.",
+		2 => "Argos has detected a buffer overflow in a connection to the honeypot.",
+		16 => "A piece of malware is offered to the honeypot. The honeypot will try to download it.",
+		32 => "The malware was succesfully downloaded to the honeypot."
+	),
+	orgedit.php => array(
+		"ranges" => "The IP network ranges of the organisations networks. These ranges are used to check for attacks sourced from these ranges.",
+		"ris" => "This is a unique string to identify the organisation.<br /> This can be placed on the sensor to make sure it will be placed in the correct organisation.",
+	),
+	sensorstatus.php => array(
+		"sensor" => "The name of the sensor (VLAN number included if applicable).",
+		"remote" => "The sensor IP address that&#39;s connecting to the tunnel server.",
+		"local" => "The actual IP address of the sensor. This will differ from the remote IP address in case of NAT.",
+		"tapmac" => "The MAC address of the virtual device on the server.",
+		"tap" => "The virtual device on the tunnel server. This is in fact the tunnel endpoint on the server.",
+		"tapip" => "The IP address of the virtual device on the server.",
+		"status" => "The current status of the sensor.",
+		"action" => "Possible actions that can be given to the sensor.",
+		"timestamps" => "Uptime and several other timestamps.",
+		"static" => "This is the IP address on the virtual interface on the server.<br />This IP needs to be an IP from the same network range as the sensor.<br /> It cannot be the same IP address as the local or remote address!"
+	)
 );
 ?>

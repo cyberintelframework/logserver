@@ -1,14 +1,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 07-02-2007                       #
+# Version 1.04.12                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.12 Modified printhelp
+# 1.04.11 Modified censorip()
 # 1.04.10 Added censorip()
 # 1.04.09 Removed unused sql functions and added INDEX
 # 1.04.08 Added add_to_sql, reset_sql
@@ -67,6 +69,7 @@
 # 3.16		matchCIDR
 # 3.17		getportdescr
 # 3.18		censorip
+# 3.19		printhelp
 #
 # 4 Debug Functions
 # 4.01		printer
@@ -676,17 +679,22 @@ function censorip($ip) {
   global $c_censor_ip;
   global $s_admin;
   global $c_censor_word;
+  global $orgranges_ar;
   if ($c_censor_ip == 2) {
     # Censor all destination IP's
     return $c_censor_word;
   } elseif ($c_censor_ip == 1) {
     if ($s_admin != 1) {
-      # Censor all destination IP's not of organisation ranges
-      $check = matchCIDR($ip, $ranges_ar);
-      if ($check == 1) {
-        return $ip;
+      if (isset($orgranges_ar)) {
+        # Censor all destination IP's not of organisation ranges
+        $check = matchCIDR($ip, $orgranges_ar);
+        if ($check == 1) {
+          return $ip;
+        } else {
+          return $c_censor_word;
+        }
       } else {
-        return $c_censor_word;
+        return $ip;
       }
     } else {
       # Except if user is admin.
@@ -694,6 +702,22 @@ function censorip($ip) {
     }
   } else {
     return $ip;
+  }
+}
+
+# 3.19 printhelp
+# Function to print a help link to the documentation
+function printhelp($id) {
+  global $v_help;
+  global $c_showhelp;
+  $e_file = $_SERVER['SCRIPT_NAME'];
+  $e_file = basename($e_file);
+  $e_file = str_replace(".", "", $e_file);
+  $m = $v_help[$e_file][$id];
+  if ($c_showhelp == 1) {
+    return "&nbsp;[<a href='#' onmouseover='return overlib(\"$m\");' onmouseout='return nd();'>?</a>]";
+  } else {
+    return "";
   }
 }
 
