@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 19-03-2007                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Added hash stuff
 # 1.04.03 Changed data input handling
 # 1.04.01 Released as 1.04.01
 # 1.03.01 Initial release
@@ -34,11 +35,13 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 $allowed_get = array(
                 "int_userid",
-                "a"
+                "a",
+		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -75,7 +78,12 @@ $action = $tainted['a'];
 $pattern = '/^(d|e|r)$/';
 if (!preg_match($pattern, $action)) {
   $err = 1;
-  $m = 44;
+  $m = 92;
+}
+
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 91;
 }
 
 if ($err == 0) {

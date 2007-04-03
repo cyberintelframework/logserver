@@ -122,11 +122,24 @@ echo "<table width='70%'>\n";
   echo "<tr>\n";
     echo "<td>\n";
     ###### Display todays attackers.
-      echo "<b>Attackers ($v_index_periods[$sel])</b>\n";
+      echo "<table style='width: 100%;'>\n";
+        echo "<tr style='height: 5px;'>\n";
+          echo "<td><b>Attackers ($v_index_periods[$sel])</b></td>\n";
+          echo "<td style='background-color: $v_indexcolors[0]; text-align: center;' width='70'>Today</td>\n";
+          $count = count($v_indexcolors) - 1;
+          foreach ($v_indexcolors as $key => $value) {
+            if ($key != 0 && $key != $count) {
+              echo "<td style='background-color: $value; width: 10px;'>&nbsp;</td>\n";
+            }
+          }
+          echo "<td style='background-color: $v_indexcolors[$count]; text-align: center;' width='70'>7 days ago</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader' width='50%'>IP Address</td>\n";
-          echo "<td class='dataheader' width='35%'>Last Seen</td>\n";
+          echo "<td class='dataheader' width='35%'>Last Seen</td>";
           echo "<td class='dataheader' width='15%'>Total Hits</td>\n";
         echo "</tr>\n";
         #### Get the data for todays attackers and display it.
@@ -193,7 +206,6 @@ echo "<table width='70%'>\n";
               echo "<a href='whois.php?ip_ip=$source'>$source</a>";
             echo "</td>\n";
             echo "<td class='datatd' style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
-#            echo "<td class='datatd'>CHK: $chk, CUR: $cur, DIF: $dif</td>\n";
             echo "<td class='datatd'>$row[count]</td>\n";
           echo "</tr>\n";
         }
@@ -201,7 +213,13 @@ echo "<table width='70%'>\n";
     echo "</td>\n";
     echo "<td valign=top>\n";
       ###### Display todays ports.
-      echo "<b>Ports ($v_index_periods[$sel])</b>\n";
+      echo "<table style='width: 100%;'>\n";
+        echo "<tr style='height: 5px;'>\n";
+          echo "<td><b>Ports ($v_index_periods[$sel])</b></td>\n";
+          echo "<td style='height: 6px';>&nbsp;</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
           echo "<td class='dataheader' width='40%'>Destination Ports</td>\n";

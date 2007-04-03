@@ -3,13 +3,17 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 19-01-2007                       #
+# Version 1.04.09                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Changed printhelp stuff
+# 1.04.08 Added help message for static IP addresses
+# 1.04.07 Added config status, removed organisation query and added help links
+# 1.04.06 Added censorip stuff
 # 1.04.05 Fixed bug where 2 error messages where shown
 # 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
@@ -22,7 +26,6 @@
 # 1.02.06 Initial release
 #############################################
 
-$orderby = "ORDER BY keyname ASC";
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -37,15 +40,6 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
-# Link tables tap and mac with the associated sensor
-if ($s_access_sensor < 9) {
-  $where = "WHERE organisation = " . $s_org;
-  $and = "AND";
-} else {
-  $where = "";
-  $and = "WHERE";
-}
-
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $pattern = '/^(tap|lastupdate|laststart|sensor)$/';
@@ -53,14 +47,16 @@ if (isset($tainted['sort'])) {
     $sort = "sensor";
   }
   if ($sort == "tap") {
-    $orderby = "ORDER BY tap ASC";
+    add_to_sql("tap ASC", "order");
   } elseif ($sort == "lastupdate") {
-    $orderby = "ORDER BY lastupdate ASC";
+    add_to_sql("lastupdate ASC", "order");
   } elseif ($sort == "laststart") {
-    $orderby = "ORDER BY laststart ASC";
+    add_to_sql("laststart ASC", "order");
   } elseif ($sort == "sensor") {
-    $orderby = "ORDER BY keyname ASC";
+    add_to_sql("keyname ASC", "order");
   }
+} else {
+  add_to_sql("keyname ASC", "order");
 }
 
 if (isset($clean['selview'])) {
@@ -113,25 +109,40 @@ echo "<table width='100%'>\n";
   echo "</tr>\n";
 echo "</table>\n";
 
-
-if ($selview == "0") {
-  $sql_sensors = "SELECT * FROM sensors $where $orderby";
-} elseif ($selview == "1") {
-  $sql_sensors = "SELECT * FROM sensors $where $and status = 0 $orderby";
+$or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL)";
+add_to_sql("*", "select");
+if ($selview == "1") {
+  add_to_sql("(status = 0 OR $or)", "where");
 } elseif ($selview == "2") {
-  $sql_sensors = "SELECT * FROM sensors $where $and status = 1 $orderby";
+  add_to_sql("(status = 1 OR $or)", "where");
 } elseif ($selview == "3") {
   $now = time();
   $upd = $now - 3600;
-  $sql_sensors = "SELECT * FROM sensors $where $and lastupdate < $upd AND NOT status = 0 $orderby";
-} else {
-  $sql_sensors = "SELECT * FROM sensors $where $orderby";
+  add_to_sql("((NOT status = 0", "where");
+  add_to_sql("lastupdate < $upd) OR $or)", "where");
 }
+
+if ($s_access_sensor < 9) {
+  add_to_sql("organisation = '$s_org'", "where");
+} elseif ($s_access_sensor == 9) {
+  add_to_sql("organisations", "table");
+  add_to_sql("organisations.organisation", "select");
+  add_to_sql("sensors.organisation = organisations.id", "where");
+}
+
+add_to_sql("sensors", "table");
+prepare_sql();
+
+$sql_sensors = "SELECT $sql_select ";
+$sql_sensors .= " FROM $sql_from ";
+$sql_sensors .= " $sql_where ";
+$sql_sensors .= " ORDER BY $sql_order ";
+
 $debuginfo[] = $sql_sensors;
 $result_sensors = pg_query($pgconn, $sql_sensors);
 
 echo "<table class='datatable' width='100%'>\n";
-  echo "<tr class='datatr'>\n";
+  echo "<tr class='datatr' align='center'>\n";
     echo "<td class='dataheader'><a href='sensorstatus.php?sort=sensor'>Sensor</a></td>\n";
     echo "<td class='dataheader'>Remote Address</td>\n";
     echo "<td class='dataheader'>Local Address</td>\n";
@@ -147,6 +158,24 @@ echo "<table class='datatable' width='100%'>\n";
       echo "<td class='dataheader'>Action</td>\n";
     }
   echo "</tr>\n";
+  if ($c_showhelp == 1) {
+    echo "<tr align='center'>\n";
+      echo "<td class='dataheader'>" .printhelp("sensor"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("remote"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("local"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("tap"). "</a></td>\n";
+      echo "<td class='dataheader'>" .printhelp("tapmac"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("tapip"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("timestamps"). "</td>\n";
+      echo "<td class='dataheader'>" .printhelp("status"). "</td>\n";
+      if ($s_access_sensor == 9) {
+        echo "<td class='dataheader'></td>\n";
+      }
+      if ($s_access_sensor > 0) {
+        echo "<td class='dataheader'>" .printhelp("action"). "</td>\n";
+      }
+    echo "</tr>\n";
+  }
 
   while ($row = pg_fetch_assoc($result_sensors)) {
     $now = time();
@@ -155,7 +184,7 @@ echo "<table class='datatable' width='100%'>\n";
     $remote = $row['remoteip'];
     $local = $row['localip'];
     $tap = $row['tap'];
-    $tapip = $row['tapip'];
+    $tapip = censorip($row['tapip']);
     $update = $row['lastupdate'];
     $start = $row['laststart'];
     $laststop = $row['laststop'];
@@ -187,10 +216,6 @@ echo "<table class='datatable' width='100%'>\n";
     }
     if ($s_access_sensor == 9) {
       $org = $row['organisation'];
-      $sql_getorg = "SELECT organisation FROM organisations WHERE id = " .$org;
-      $debuginfo[] = $sql_getorg;
-      $result_getorg = pg_query($pgconn, $sql_getorg);
-      $org = pg_result($result_getorg, 0);
     }
 
     echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview'>\n";
@@ -222,7 +247,9 @@ echo "<table class='datatable' width='100%'>\n";
             echo "$tapip\n";
           }
         } elseif ($netconf == "vlans") {
-          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN static<br />\n";
+          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN static ";
+          echo printhelp("static");
+          echo "<br />\n";
             if ($s_access_sensor == 0) {
               echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
 	    } else {
@@ -230,7 +257,9 @@ echo "<table class='datatable' width='100%'>\n";
             }
           echo "</td>\n";
         } else {
-          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>static<br />\n";
+          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>static ";
+          echo printhelp("static");
+          echo "<br />\n";
             if ($s_access_sensor == 0) {
               echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
             } else {
@@ -272,7 +301,9 @@ echo "<table class='datatable' width='100%'>\n";
           echo "</table>\n";
         echo "</td>\n";
     
-        if ($status == 0) {
+        if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
+          echo "<td class='datatd' bgcolor='blue'>$nbsp;</td>\n";
+        } elseif ($status == 0) {
           echo "<td class='datatd' bgcolor='red'>&nbsp;</td>\n";
         } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
           echo "<td class='datatd' bgcolor='green'>&nbsp;</td>\n";
@@ -333,6 +364,10 @@ echo "<table>\n";
   echo "<tr>\n";
     echo "<td width='2' bgcolor='green'>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
     echo "<td>Sensor active</td>\n";
+  echo "</tr>\n";
+  echo "<tr>\n";
+    echo "<td width='2' bgcolor='blue'>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
+    echo "<td>Sensor needs configuration</td>\n";
   echo "</tr>\n";
   echo "<tr>\n";
     echo "<td width='2' bgcolor='black'>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";

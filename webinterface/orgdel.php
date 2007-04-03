@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 16-03-2007                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.04 Added hash check
 # 1.04.03 Changed data input handling
 # 1.04.02 Modified error messages
 # 1.04.01 Added pg_close when not logged in
@@ -34,14 +35,21 @@ if (!isset($_SESSION['s_admin'])) {
 
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 $allowed_get = array(
                 "int_orgid",
-		"int_ident"
+		"int_ident",
+		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
+
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 89;
+}
 
 if ($s_admin != 1) {
   $err = 1;

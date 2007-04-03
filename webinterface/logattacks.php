@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 05-02-2007                       #
+# Version 1.04.08                  #
+# 20-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Fixed missing link between sensors and attacks table
 # 1.04.07 Fixed sql bug
 # 1.04.06 add_to_sql()
 # 1.04.05 Replaced $where[] with add_where()
@@ -63,6 +64,7 @@ if ($s_access_search == 9) {
       $q_org = $clean['org'];
       add_to_sql("sensors", "table");
       add_to_sql("sensors.organisation = $q_org", "where");
+      add_to_sql("attacks.sensorid = sensors.id", "where");
       $querystring = $querystring . "&amp;int_org=$q_org";
     } else {
       $q_org = 0;
@@ -71,6 +73,7 @@ if ($s_access_search == 9) {
 } else {
   add_to_sql("sensors", "table");
   add_to_sql("sensors.organisation = $q_org", "where");
+  add_to_sql("attacks.sensorid = sensors.id", "where");
 }
 
 ### Checking for period.

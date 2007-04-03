@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 16-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Added hash check
 # 1.04.03 Changed data input handling
 # 1.04.02 Added debug info
 # 1.04.01 Rereleased as 1.04.01
@@ -39,6 +40,7 @@ if (!isset($_SESSION['s_admin'])) {
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 
 $allowed_post = array(
                 "strip_html_escape_username",
@@ -50,10 +52,16 @@ $allowed_post = array(
                 "md5_confirm",
                 "int_org",
                 "strip_html_escape_email",
-                "int_gpg"
+                "int_gpg",
+		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
+
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 91;
+}
 
 # Checking MD5sums
 if (isset($clean['pass'])) {
@@ -84,10 +92,6 @@ $org = $clean['org'];
 $email = $clean['email'];
 $gpg = $clean['gpg'];
 
-
-if (empty($confirm)) { 
-echo "test";
-}
 ### Password check
 if (empty($pass) || empty($confirm)) { 
   $m = 93;
