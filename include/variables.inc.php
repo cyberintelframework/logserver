@@ -1,14 +1,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 19-03-2007                       #
+# Version 1.04.12                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.12 Changed help messages
+# 1.04.11 Added Argos attack
 # 1.04.10 Added error messages for mailadmin
 # 1.04.09 Added error messages
 # 1.04.08 Added v_phplot_data_colors array
@@ -135,6 +137,7 @@ $v_attacks_ar = array(
 $v_severity_ar = array(
 		'0'	=> 'Possible malicious attack',
 		'1'	=> 'Malicious attack',
+		'2'	=> 'Argos attack',
 		'16'	=> 'Malware offered',
 		'32'	=> 'Malware downloaded'
 );
@@ -377,25 +380,27 @@ $v_phplot_data_colors = array(
 
 $v_help = array(
 	logindex.php => array(
-		0 => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_12",
-		1 => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_3",
-		16 => "",
-		32 => ""
+		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
+		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.<br /> An exploit was used to try and gain entry to the system.",
+		2 => "Argos has detected a buffer overflow in a connection to the honeypot.",
+		16 => "A piece of malware is offered to the honeypot. The honeypot will try to download it.",
+		32 => "The malware was succesfully downloaded to the honeypot."
 	),
 	orgedit.php => array(
-		"ranges" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_10",
-		"ris" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_13",
+		"ranges" => "The IP network ranges of the organisations networks. These ranges are used to check for attacks sourced from these ranges.",
+		"ris" => "This is a unique string to identify the organisation.<br /> This can be placed on the sensor to make sure it will be placed in the correct organisation.",
 	),
 	sensorstatus.php => array(
-		"sensor" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_13",
-		"remote" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_16",
-		"local" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_15",
-		"tapmac" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_20",
-		"tap" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_18",
-		"tapip" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_19",
-		"status" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_17",
-		"action" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_14",
-		"timestamps" => "http://ids.surfnet.nl/wiki/doku.php?id=glossary#folded_21"
+		"sensor" => "The name of the sensor (VLAN number included if applicable).",
+		"remote" => "The sensor IP address that&#39;s connecting to the tunnel server.",
+		"local" => "The actual IP address of the sensor. This will differ from the remote IP address in case of NAT.",
+		"tapmac" => "The MAC address of the virtual device on the server.",
+		"tap" => "The virtual device on the tunnel server. This is in fact the tunnel endpoint on the server.",
+		"tapip" => "The IP address of the virtual device on the server.",
+		"status" => "The current status of the sensor.",
+		"action" => "Possible actions that can be given to the sensor.",
+		"timestamps" => "Uptime and several other timestamps.",
+		"static" => "This is the IP address on the virtual interface on the server.<br />This IP needs to be an IP from the same network range as the sensor.<br /> It cannot be the same IP address as the local or remote address!"
 	)
 );
 ?>

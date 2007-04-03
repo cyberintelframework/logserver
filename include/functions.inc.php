@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.11                  #
-# 20-03-2007                       #
+# Version 1.04.12                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.12 Modified printhelp
 # 1.04.11 Modified censorip()
 # 1.04.10 Added censorip()
 # 1.04.09 Removed unused sql functions and added INDEX
@@ -714,7 +715,7 @@ function printhelp($id) {
   $e_file = str_replace(".", "", $e_file);
   $m = $v_help[$e_file][$id];
   if ($c_showhelp == 1) {
-    return "&nbsp;[<a href='$m' target='_new'>?</a>]";
+    return "&nbsp;[<a href='#' onmouseover='return overlib(\"$m\");' onmouseout='return nd();'>?</a>]";
   } else {
     return "";
   }
