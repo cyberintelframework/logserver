@@ -3,13 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 27-03-2007                       #
+# Version 1.04.09                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Changed printhelp stuff
+# 1.04.08 Added help message for static IP addresses
 # 1.04.07 Added config status, removed organisation query and added help links
 # 1.04.06 Added censorip stuff
 # 1.04.05 Fixed bug where 2 error messages where shown
@@ -245,7 +247,9 @@ echo "<table class='datatable' width='100%'>\n";
             echo "$tapip\n";
           }
         } elseif ($netconf == "vlans") {
-          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN static<br />\n";
+          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>VLAN static ";
+          echo printhelp("static");
+          echo "<br />\n";
             if ($s_access_sensor == 0) {
               echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
 	    } else {
@@ -253,7 +257,9 @@ echo "<table class='datatable' width='100%'>\n";
             }
           echo "</td>\n";
         } else {
-          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>static<br />\n";
+          echo "<td class='datatd' valign='top' style='padding-top: 0px;' align='center'>static ";
+          echo printhelp("static");
+          echo "<br />\n";
             if ($s_access_sensor == 0) {
               echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
             } else {

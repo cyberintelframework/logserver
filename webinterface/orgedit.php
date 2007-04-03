@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 16-03-2007                       #
+# Version 1.04.06                  #
+# 30-03-2007                       #
 # Kees Trippelvitz                 #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.06 Changed printhelp stuff
 # 1.04.05 Added hash check stuff
 # 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
@@ -76,7 +77,7 @@ if ($err != 1) {
         echo "<td class='datatd'><input type='text' name='strip_html_escape_orgname' value='$orgname' style='width: 99%;' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td class='datatd' valign='top'>Ranges&nbsp;&nbsp;" .printhelp("org_admin_ranges"). "</td>\n";
+        echo "<td class='datatd' valign='top'>Ranges&nbsp;&nbsp;" .printhelp("ranges"). "</td>\n";
         echo "<td class='datatd'><textarea name='strip_html_escape_ranges' cols='40' rows='10'>$ranges</textarea></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
@@ -87,7 +88,7 @@ if ($err != 1) {
     $debuginfo[] = $sql_orgids;
     
     echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>Generate Random Identifier String</a>&nbsp;&nbsp;";
-    echo printhelp("org_admin_ris") ."<br />\n";
+    echo printhelp("ris") ."<br />\n";
     echo "<table class='datatable'>\n";
       echo "<tr class='datatr'>\n";
         echo "<td class='dataheader' width='100'>ID</td>\n";

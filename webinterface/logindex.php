@@ -3,14 +3,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 21-03-2007                       #
+# Version 1.04.10                  #
+# 30-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Changed printhelp stuff
+# 1.04.09 Fixed severity stuff
 # 1.04.08 Fixed typo
 # 1.04.07 add_to_sql()
 # 1.04.06 Replaced $where[] with add_where()
@@ -208,6 +210,8 @@ echo "<table class='datatable'>\n";
         echo "<td class='datatd' align='right'><a href='logsearch.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
       } elseif ($severity == 1 || $severity == 32) {
         echo "<td class='datatd' align='right'><a href='logattacks.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+      } else {
+        echo "<td class='datatd' align='right'><a href='logsearch.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
       }
     echo "</tr>\n";
   }
