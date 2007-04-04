@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 04-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Fixed binname variable name
 # 1.04.03 Changed data input handling
 # 1.04.02 Changes due to new table layout binaries, uniq_binaries, scanners, etc
 # 1.04.01 Code layout
@@ -73,7 +74,7 @@ if ($err != 1) {
     echo "<tr>\n";
       echo "<td class='datatd'>$attackid</td>\n";
       if ($count != 0) {
-        echo "<td class='datatd'><a href='binaryhist.php?binname=$logging'>$logging<a/></td>\n";
+        echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$logging'>$logging<a/></td>\n";
       } else {
         echo "<td class='datatd'>$logging</td>\n";
       }
