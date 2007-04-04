@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.08
--- 08-03-2007
+-- Version 1.04.09
+-- 04-04-2007
 --
 
 -- Version history
+-- 1.04.09 Updated p0f-db tables
 -- 1.04.08 Removed idslog priviliges for scanners
 -- 1.04.07 Removed arp stuff from sensors table
 -- 1.04.06 Updating sql file for 1.04beta
@@ -474,20 +475,55 @@ ALTER TABLE ONLY stats_history_virus
 GRANT ALL ON TABLE stats_history_virus TO idslog;
 
 --
+-- SCHEME
+--
+CREATE TABLE scheme (
+    version     integer PRIMARY KEY,
+    created     timestamp with time zone NOT NULL
+);
+
+INSERT INTO scheme (version, created) VALUES (1002, CURRENT_TIMESTAMP);
+
+--
 -- SYSTEM
 --
-CREATE TABLE "system" (
-    ip_addr inet NOT NULL,
-    name character(128) NOT NULL,
-    first_tstamp timestamp with time zone,
-    last_tstamp timestamp with time zone NOT NULL
+CREATE TABLE system (
+        sid             bigserial PRIMARY KEY,
+        ip_addr         inet NOT NULL,
+        name            character varying(128) NOT NULL,
+        first_tstamp    timestamp with time zone,
+        last_tstamp     timestamp with time zone NOT NULL,
+        UNIQUE(ip_addr, name)
 );
+
+CREATE INDEX ip_addr_name_index ON system (ip_addr, name);
+CREATE INDEX first_tstamp_index ON system (first_tstamp);
+CREATE INDEX last_tstamp_index ON system (last_tstamp);
 
 ALTER TABLE ONLY "system"
     ADD CONSTRAINT system_pkey PRIMARY KEY (ip_addr, name);
 
 GRANT SELECT ON TABLE "system" TO idslog;
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE "system" TO pofuser;
+GRANT SELECT,UPDATE ON TABLE system_sid_seq TO pofuser;
+
+--
+-- SYSTEM_DETAILS
+--
+CREATE TABLE system_details (
+        sid integer NOT NULL,
+        ip_addr inet NOT NULL,
+        nat character varying(64) NOT NULL DEFAULT 'no/unknown',
+        ecn character varying(64) NOT NULL DEFAULT 'no/unknown',
+        firewall character varying(64) NOT NULL DEFAULT 'no/unknown',
+        lookup_link character varying(128) NOT NULL DEFAULT 'unknown',
+        distance smallint NOT NULL DEFAULT 0
+);
+
+CREATE INDEX sid_index ON system_details (sid);
+CREATE INDEX system_details_ip_addr_index ON system_details (ip_addr);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE "system_details" TO pofuser;
 
 --
 -- UNIQ_BINARIES
