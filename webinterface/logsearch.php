@@ -1,7 +1,7 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.23                  #
+# Version 1.04.24                  #
 # 04-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -9,6 +9,7 @@
 
 #########################################################################
 # Changelog:
+# 1.04.24 Removed the fix
 # 1.04.23 Fix for newer PostgreSQL versions
 # 1.04.22 Fixed a bug with organisation ranges arrays
 # 1.04.21 Fixed severity check
@@ -717,6 +718,10 @@ if ($rapport == "pdf") {
 
 add_to_sql("attacks", "table");
 add_to_sql("attacks.*", "select");
+add_to_sql("sensors.keyname", "select");
+add_to_sql("sensors.vlanid", "select");
+add_to_sql("sensors", "table");
+add_to_sql("attacks.sensorid = sensors.id", "where");
 
 prepare_sql();
 
@@ -834,11 +839,6 @@ echo "<div id=\"pdf_btn\"><a href=\"$pdf_url\" title=\"Download these results as
 echo "<div id=\"personal_searchtemplate\"><a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br>Search-<br>template</div>\n";
 
 flush();
-
-add_to_sql("sensors.keyname", "select");
-add_to_sql("sensors.vlanid", "select");
-add_to_sql("sensors", "table");
-add_to_sql("attacks.sensorid = sensors.id", "where");
 
 prepare_sql();
 
