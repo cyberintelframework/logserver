@@ -3,10 +3,16 @@
 ####################################
 # Installation script              #
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 01-02-2007                       #
+# Version 1.04.02                  #
+# 04-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
+
+###############################################
+# Changelog:
+# 1.04.02 Added nepenthes sql functions option
+# 1.04.01 Initial release
+###############################################
 
 ##########################
 # Variables
@@ -405,6 +411,30 @@ if ($confirm =~ /^(n|N)$/) {
     }
   } else {
     printmsg("Skipping database installation/upgrade:", "info");
+  }
+}
+
+$confirm = "a";
+while ($confirm !~ /^(n|N|y|Y)$/) {
+  $confirm = &prompt("Do you want to install the nepenthes SQL functions? [Y/n]: ");
+}
+
+if ($confirm =~ /^(y|Y)$/) {
+  $e = 1;
+  while ($e != 0) {
+    `sudo -u postgres psql -q -f $targetdir/sql/nepenthes.sql -U $dbuser -W $dbname 2>>$logfile`;
+    printmsg("Installing the nepenthes SQL functions:", $?);
+    if ($? != 0) { $err++; }
+    $e = $?;
+    if ($? != 0) {
+      $confirm = "a";
+      while ($confirm !~ /^(n|N|y|Y)$/) {
+        $confirm = &prompt("Installation nepenthes SQL functions failed. Try again? [Y/n]: ");
+      }
+      if ($confirm =~ /^(n|N)$/) {
+        $e = 0;
+      }
+    }
   }
 }
 
