@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.22                  #
-# 03-04-2007                       #
+# Version 1.04.23                  #
+# 04-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.23 Fix for newer PostgreSQL versions
 # 1.04.22 Fixed a bug with organisation ranges arrays
 # 1.04.21 Fixed severity check
 # 1.04.20 Removed chartof variable
@@ -715,11 +716,7 @@ if ($rapport == "pdf") {
 }
 
 add_to_sql("attacks", "table");
-add_to_sql("sensors", "table");
-add_to_sql("attacks.sensorid = sensors.id", "where");
 add_to_sql("attacks.*", "select");
-add_to_sql("sensors.keyname", "select");
-add_to_sql("sensors.vlanid", "select");
 
 prepare_sql();
 
@@ -727,19 +724,19 @@ prepare_sql();
 ### Prepare sql-ORDER BY
 #########################
 $order_by_tbl = array(	"id"		=> "attacks.id", 
-						"timestamp"	=> "attacks.timestamp", 
-						"severity"	=> "attacks.severity", 
-						"source"	=> "attacks.source",
-						"dest"		=> "attacks.dest",
-						"keyname"	=> "sensors.id");
+			"timestamp"	=> "attacks.timestamp", 
+			"severity"	=> "attacks.severity", 
+			"source"	=> "attacks.source",
+			"dest"		=> "attacks.dest",
+			"keyname"	=> "sensors.id");
 if (isset($tainted['order'])) {
-	$sql_order_by = $order_by_tbl[$tainted['order']];
+  $sql_order_by = $order_by_tbl[$tainted['order']];
 }
 if (empty($sql_order_by) || !isset($sql_order_by)) $sql_order_by = $order_by_tbl["id"];
 // Order method (ascending or descending, default ASC)
 if (isset($tainted['orderm'])) {
-	if ($tainted['orderm'] == "DESC") $asc_desc = "DESC";
-	else $asc_desc = "ASC";
+  if ($tainted['orderm'] == "DESC") $asc_desc = "DESC";
+  else $asc_desc = "ASC";
 } else $asc_desc = "ASC";
 if ($asc_desc == "ASC") $order_m_url[$tainted['order']] = "&orderm=DESC";
 add_to_sql($sql_order_by, "order");
@@ -747,34 +744,34 @@ add_to_sql($sql_order_by, "order");
 #########################
 
 if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]) == 0) || ($clean['page'] == 0)) {
-	### Prepare count SQL query
-	$sql_select = "COUNT(attacks.id) AS total";
-	$sql_count = "SELECT $sql_select ";
-	$sql_count .= " FROM $sql_from ";
-	$sql_count .= " $sql_where ";
-        $debuginfo[] = $sql_count;
+  ### Prepare count SQL query
+  $sql_select = "COUNT(attacks.id) AS total";
+  $sql_count = "SELECT $sql_select ";
+  $sql_count .= " FROM $sql_from ";
+  $sql_count .= " $sql_where ";
+  $debuginfo[] = $sql_count;
 
-	// SQL-count query
-	$query_count = pg_query($sql_count);
-	// Don't use pg_num_rows, slow's down factor 2-4!
-	$num_rows = pg_result($query_count, 0);
-    ### Check for config option.
-    if ($c_search_cache == 1) {
-    	$_SESSION["search_num_rows"] = $num_rows;
-    }
+  // SQL-count query
+  $query_count = pg_query($sql_count);
+  // Don't use pg_num_rows, slow's down factor 2-4!
+  $num_rows = pg_result($query_count, 0);
+  ### Check for config option.
+  if ($c_search_cache == 1) {
+    $_SESSION["search_num_rows"] = $num_rows;
+  }
 }
 $num_rows = intval($_SESSION["search_num_rows"]);
 
 if ($num_rows == 0) {
-        debug_sql();
-	echo "<p>No matching results found!</p>\n";
-	?>
-	<script language="javascript" type="text/javascript">
-	document.getElementById('search_wait').style.display='none';
-	</script>
-	<?
-	footer();
-	exit;
+  debug_sql();
+  echo "<p>No matching results found!</p>\n";
+  ?>
+  <script language="javascript" type="text/javascript">
+  document.getElementById('search_wait').style.display='none';
+  </script>
+  <?
+  footer();
+  exit;
 }
 ### Prepare sql-LIMIT
 if ($rapport == "single") $per_page = $num_rows;
@@ -782,16 +779,16 @@ else $per_page = 20;
 
 $last_page = ceil($num_rows / $per_page);
 if (isset($clean['page'])) {
-	$page_nr = $clean['page'];
-	if ($page_nr <= $last_page) {
-		$offset = ($page_nr - 1) * $per_page;
-	} else {
-		$page_nr = 1;
-		$offset = 0;
-	}
+  $page_nr = $clean['page'];
+  if ($page_nr <= $last_page) {
+    $offset = ($page_nr - 1) * $per_page;
+  } else {
+    $page_nr = 1;
+    $offset = 0;
+  }
 } else {
-	$page_nr = 1;
-	$offset = 0;
+  $page_nr = 1;
+  $offset = 0;
 }
 $sql_limit = "LIMIT $per_page OFFSET $offset";
 $first_result = number_format($offset, 0, ".", ",");
@@ -805,10 +802,10 @@ $nav = "Result page: ";
 $url = $_SERVER['REQUEST_URI'];
 $url = str_replace("&int_page=" . $clean["page"], "", $url);
 for ($i = ($page_nr - 3); $i <= ($page_nr + 3); $i++) {
-	if (($i > 0) && ($i <= $last_page)) {
-		if ($i == $page_nr) $nav .= "<b>&laquo;$i&raquo;</b>&nbsp;";
-		else $nav .= "<a href=\"$url&int_page=$i\">$i</a>&nbsp;";
-	}
+  if (($i > 0) && ($i <= $last_page)) {
+    if ($i == $page_nr) $nav .= "<b>&laquo;$i&raquo;</b>&nbsp;";
+    else $nav .= "<a href=\"$url&int_page=$i\">$i</a>&nbsp;";
+  }
 }
 $nav .= "<br />\n";
 if ($page_nr == 1) $nav .= "&lt;&lt;&nbsp;First&nbsp;&nbsp;";
@@ -838,6 +835,11 @@ echo "<div id=\"personal_searchtemplate\"><a href=\"#\" onclick=\"submitSearchTe
 
 flush();
 
+add_to_sql("sensors.keyname", "select");
+add_to_sql("sensors.vlanid", "select");
+add_to_sql("sensors", "table");
+add_to_sql("attacks.sensorid = sensors.id", "where");
+
 prepare_sql();
 
 ### Prepare final SQL query
@@ -856,8 +858,8 @@ else $page_lbl = "page";
 echo "<p>Results <b>$first_result</b> - <b>$last_result</b> of <b>" . number_format($num_rows, 0, ".", ",") . "</b> in <b>" . number_format($last_page, 0, ".", ",") . "</b> $page_lbl.</p>\n";
 
 if ($rapport == "multi") {
-	echo "<div id=\"lognav\" align=\"center\">$nav</div>\n";
-	echo "<br />\n";
+  echo "<div id=\"lognav\" align=\"center\">$nav</div>\n";
+  echo "<br />\n";
 }
 
 $url = $_SERVER['REQUEST_URI'];
