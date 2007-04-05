@@ -1,9 +1,10 @@
 --
 -- SURFnet IDS Nepenthes functions
--- Version 1.04.02
+-- Version 1.04.03
 --
 
 --
+-- 1.04.03 m_check declarations added
 -- 1.04.02 Modifed surfnet_detail_add functions
 -- 1.04.01 Initial release
 --
@@ -97,6 +98,7 @@ CREATE FUNCTION surfnet_detail_add(integer, inet, integer, character varying) RE
         p_data ALIAS FOR $4;
 
         m_sensorid INTEGER;
+	m_check INTEGER;
 BEGIN
         SELECT INTO m_sensorid surfnet_sensorid_get(p_localhost);
 
@@ -123,6 +125,8 @@ CREATE FUNCTION surfnet_detail_add_by_id(integer, integer, integer, character va
         m_sensorid ALIAS FOR $2;
         p_type ALIAS FOR $3;
         p_data ALIAS FOR $4;
+
+	m_check INTEGER;
 BEGIN
         IF p_type = 1 THEN
           SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = 'p_data';
@@ -150,6 +154,7 @@ CREATE FUNCTION surfnet_detail_add_download(inet, inet, character varying, chara
 
         m_sensorid INTEGER;
         m_attackid INTEGER;
+	m_check INTEGER;
 BEGIN
         SELECT INTO m_sensorid surfnet_sensorid_get(p_localhost);
         SELECT INTO m_attackid surfnet_attack_add_by_id(32,p_remotehost, 0,
