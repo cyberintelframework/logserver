@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 30-03-2007                       #
+# Version 1.04.10                  #
+# 10-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Fixed sort bug
 # 1.04.09 Changed printhelp stuff
 # 1.04.08 Added help message for static IP addresses
 # 1.04.07 Added config status, removed organisation query and added help links
@@ -143,10 +144,10 @@ $result_sensors = pg_query($pgconn, $sql_sensors);
 
 echo "<table class='datatable' width='100%'>\n";
   echo "<tr class='datatr' align='center'>\n";
-    echo "<td class='dataheader'><a href='sensorstatus.php?sort=sensor'>Sensor</a></td>\n";
+    echo "<td class='dataheader'><a href='sensorstatus.php?sort=sensor&int_selview=$selview'>Sensor</a></td>\n";
     echo "<td class='dataheader'>Remote Address</td>\n";
     echo "<td class='dataheader'>Local Address</td>\n";
-    echo "<td class='dataheader'><a href='sensorstatus.php?sort=tap'>Tap Device</a></td>\n";
+    echo "<td class='dataheader'><a href='sensorstatus.php?sort=tap&int_selview=$selview'>Tap Device</a></td>\n";
     echo "<td class='dataheader'>Tap Device MAC</td>\n";
     echo "<td class='dataheader'>Tap IP Address</td>\n";
     echo "<td class='dataheader'>Timestamps</td>\n";
