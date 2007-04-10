@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-12-2006                       #
+# Version 1.04.05                  #
+# 10-04-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Saving action for all sensors with the same keyname
 # 1.04.04 Changed data input handling
 # 1.04.03 Added input checks for $action, $vlanid and $keyname
 # 1.04.02 Added VLAN support 
@@ -112,7 +113,7 @@ if (isset($clean[tapip])) {
   }
 }
 if ($err != 1) {
-  $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE id = '$sid'";
+  $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE keyname = '$keyname'";
   $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
   if ($m == "") {
     $m = 1;
