@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 10-04-2007                       #
+# Version 1.04.11                  #
+# 16-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Added new status code
 # 1.04.10 Fixed sort bug
 # 1.04.09 Changed printhelp stuff
 # 1.04.08 Added help message for static IP addresses
