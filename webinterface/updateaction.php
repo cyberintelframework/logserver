@@ -69,19 +69,27 @@ $check = extractvars($_POST, $allowed_post);
 
 $err = 0;
 $sid = $clean['sid'];
-$vlanid = $clean['vlanid'];
+
+if (isset($clean['vlanid'])) {
+  $vlanid = $clean['vlanid'];
+} else {
+  $m = 99;
+  $err = 1;
+}
+
 $action = $tainted['action'];
-$action_pattern = '/^(NONE|REBOOT|SSHOFF|SSHON|RESTART|DISABLE|ENABLE|START|STOP)$/';
+$action_pattern = '/^(NONE|REBOOT|SSHOFF|SSHON|RESTART|DISABLE|ENABLE|START|STOP|IGNORE|UNIGNORE)$/';
 if (preg_match($action_pattern, $action) != 1) {
   $m = 92;
   $err = 1;
 }
 
 if (isset($clean['sid'])) {
-  $sql_sid = "SELECT keyname FROM sensors WHERE id = '$sid'";
+  $sql_sid = "SELECT keyname, status FROM sensors WHERE id = '$sid'";
   $result_sid = pg_query($pgconn, $sql_sid);
   $row_sid = pg_fetch_assoc($result_sid);
   $keyname = $row_sid['keyname'];
+  $status = $row_sid['status'];
   if ($keyname == "") {
     $m = 95;
     $err = 1;
@@ -113,10 +121,25 @@ if (isset($clean[tapip])) {
   }
 }
 if ($err != 1) {
-  $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE keyname = '$keyname'";
-  $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
-  if ($m == "") {
-    $m = 1;
+  $action_pattern = '/^(IGNORE|UNIGNORE)$/';
+  if (!preg_match($action_pattern, $action)) {
+    $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE keyname = '$keyname'";
+    $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
+    if ($m == "") {
+      $m = 1;
+    }
+  } else {
+    if ($action == "IGNORE") {
+      $sql_updatestatus = "UPDATE sensors SET status = 3 WHERE keyname = '$keyname' AND vlanid = $vlanid";
+      $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
+      $m = 1;
+    } else {
+      if ($status == 3) {
+        $sql_updatestatus = "UPDATE sensors SET status = 0 WHERE keyname = '$keyname' AND vlanid = $vlanid";
+        $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
+        $m = 1;
+      }
+    }
   }
 }
 

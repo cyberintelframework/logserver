@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.12                  #
-# 30-03-2007                       #
+# Version 1.04.13                  #
+# 16-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.13 Added error message for missing vlan id
 # 1.04.12 Changed help messages
 # 1.04.11 Added Argos attack
 # 1.04.10 Added error messages for mailadmin
@@ -307,7 +308,8 @@ $v_errors = array(
 				91 => "You don't have sufficient rights to perform the requested action!",
 				92 => "Invalid or missing action!",
 				93 => "Invalid or missing sensor ID!",
-				94 => "Invalid or missing tap IP address!"
+				94 => "Invalid or missing tap IP address!",
+				95 => "Invalid or missing VLAN ID!"
 			),
 	serveradmin.php => array(
 				1 => "Successfully added a new server!",
