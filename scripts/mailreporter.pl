@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 27-03-2007                       #
+# Version 1.04.05                  #
+# 16-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.05 Added vlanid to sensor name
 # 1.04.04 Removed out of date sensor message
 # 1.04.03 Restructured the code
 # 1.04.02 Fixed a bug with daily reports at a certain time and sensor specific reports
@@ -260,7 +261,7 @@ while (@row = $email_query->fetchrow_array) {
         # Get details about the attacks and print them to mail.   
         # Printed in format: ip address attacker, time of attack, type of attack.   
         $message = "";
-        $sql = "SELECT DISTINCT attacks.source, attacks.timestamp, details.text, sensors.keyname ";
+        $sql = "SELECT DISTINCT attacks.source, attacks.timestamp, details.text, sensors.keyname, sensors.vlanid ";
         $sql .= " FROM attacks, sensors, details WHERE details.attackid = attacks.id ";
         $sql .= " AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
         $sql .= " AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id ";
@@ -282,7 +283,11 @@ while (@row = $email_query->fetchrow_array) {
           $time = getdatetime($timestamp);
           $attacktype = $row[2]; 
           $attacktype =~ s/Dialogue//; 
-          $keyname = $row[3] . " ";
+          $keyname = $row[3];
+          $vlanid = $row[4];
+          if ($vlanid != 0) {
+            $keyname = "$keyname-$vlanid";
+          }
           printmail("$keyname\t$ip\t\t$time\t$attacktype");
         }
       }
@@ -466,7 +471,7 @@ while (@row = $email_query->fetchrow_array) {
         $andorg = "AND sensors.organisation = '$org'";
       }
 
-      $sql = "SELECT status, lastupdate, tap, tapip, keyname FROM sensors ";
+      $sql = "SELECT status, lastupdate, tap, tapip, keyname, vlanid FROM sensors ";
       $sql .= " WHERE sensors.id = sensors.id $andorg $sensor_where ";
       $sql .= " ORDER BY keyname";
       $sensors_query = $dbh->prepare($sql);
@@ -477,6 +482,11 @@ while (@row = $email_query->fetchrow_array) {
         $tap = $sensors[2];
         $tapip = $sensors[3];
         $keyname = $sensors[4];
+        $vlanid = $sensors[5];
+
+        if ($vlanid != 0) {
+          $keyname = "$keyname-$vlanid";
+        }
 
         if ($status == 0) {
           $sendit = 1;
