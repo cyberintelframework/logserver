@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.06
+-- Version: 1.04.07
 -- 16-04-2007
 
 -- Changelog
+-- 1.04.07 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
 -- 1.04.06 Added default value for sensors.status
 -- 1.04.05 Fixed binaries conversion, updated antivirus stuff
 -- 1.04.04 Fixed transition from netconf to netconfdetail
@@ -95,6 +96,8 @@ ALTER TABLE ONLY uniq_binaries
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE uniq_binaries TO idslog;
 GRANT SELECT,UPDATE ON TABLE uniq_binaries_id_seq TO idslog;
+GRANT INSERT,SELECT ON TABLE uniq_binaries TO nepenthes;
+GRANT SELECT,UPDATE ON TABLE uniq_binaries_id_seq TO nepenthes;
 
 --
 -- BINARIES
@@ -137,3 +140,10 @@ ALTER TABLE login ADD COLUMN gpg integer DEFAULT 0;
 --
 ALTER TABLE report_content ADD COLUMN user_id integer;
 ALTER TABLE report_content ADD COLUMN subject character varying;
+
+--
+-- STATS_DIALOGUE
+--
+GRANT INSERT,SELECT ON TABLE stats_dialogue TO nepenthes;
+GRANT SELECT,UPDATE ON TABLE stats_dialogue_id_seq TO nepenthes;
+

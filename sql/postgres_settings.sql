@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.11
+-- Version 1.04.12
 -- 16-04-2007
 --
 
 -- Version history
+-- 1.04.12 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
 -- 1.04.11 Added default value for status
 -- 1.04.10 Removed nepenthes functions, located in separate sql file now
 -- 1.04.09 Updated p0f-db tables
@@ -401,6 +402,8 @@ ALTER TABLE ONLY stats_dialogue
 
 GRANT ALL ON TABLE stats_dialogue TO idslog;
 GRANT SELECT,UPDATE ON TABLE stats_dialogue_id_seq TO idslog;
+GRANT INSERT,SELECT ON TABLE stats_dialogue TO nepenthes;
+GRANT SELECT,UPDATE ON TABLE stats_dialogue_id_seq TO nepenthes;
 
 --
 -- STATS_HISTORY
@@ -542,3 +545,5 @@ ALTER TABLE ONLY uniq_binaries
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE uniq_binaries TO idslog;
 GRANT SELECT,UPDATE ON TABLE uniq_binaries_id_seq TO idslog;
+GRANT INSERT,SELECT ON TABLE uniq_binaries TO nepenthes;
+GRANT SELECT,UPDATE ON TABLE uniq_binaries_id_seq TO nepenthes;
