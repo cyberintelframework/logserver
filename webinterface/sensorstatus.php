@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 10-04-2007                       #
+# Version 1.04.11                  #
+# 16-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Added new status code
 # 1.04.10 Fixed sort bug
 # 1.04.09 Changed printhelp stuff
 # 1.04.08 Added help message for static IP addresses
@@ -301,9 +302,11 @@ echo "<table class='datatable' width='100%'>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</td>\n";
-    
-        if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
-          echo "<td class='datatd' bgcolor='blue'>$nbsp;</td>\n";
+
+        if ($status == 3) {
+          echo "<td class='datatd'>&nbsp;</td>\n";
+        } elseif (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
+          echo "<td class='datatd' bgcolor='blue'>&nbsp;</td>\n";
         } elseif ($status == 0) {
           echo "<td class='datatd' bgcolor='red'>&nbsp;</td>\n";
         } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
@@ -373,6 +376,10 @@ echo "<table>\n";
   echo "<tr>\n";
     echo "<td width='2' bgcolor='black'>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
     echo "<td>Sensor disabled by admin</td>\n";
+  echo "</tr>\n";
+  echo "<tr>\n";
+    echo "<td width='2' style='border: 1px solid black;'>&nbsp;&nbsp;&nbsp;&nbsp;</td>\n";
+    echo "<td>Sensor ignored by network config</td>\n";
   echo "</tr>\n";
 echo "</table>\n";
 
