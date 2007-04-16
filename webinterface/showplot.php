@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 15-03-2007                       #
+# Version 1.04.09                  #
+# 16-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Shows empty graph when no data
 # 1.04.08 Added data colors array, background color
 # 1.04.07 Added virus graphs
 # 1.04.06 Fixed bug when not giving any port exclusions
@@ -584,7 +585,15 @@ while ($i != $tssteps) {
 
 #debug_sql();
 
-if (!empty($data)) {
+#if (!empty($data)) {
+if (empty($data)) {
+  $point = array();
+  $point[] = " ";
+  $point[] = " ";
+  $data = array();
+  $data[] = $point;
+  $ytick = 1;
+} else {
 #  printer($maxcount);
   $pertick = intval($maxcount / 20);
   if ($pertick > 50) {
@@ -598,7 +607,7 @@ if (!empty($data)) {
   } else {
     $ytick = 1;
   }
-
+}
 #  printer($pertick);
 #  printer($ytick);
 
@@ -609,7 +618,7 @@ if (!empty($data)) {
   $plot->SetLegendPixels(0, 0);
   $plot->SetDefaultDashedStyle('4-3');
   $plot->DrawGraph();
-} else {
-  readfile("images/nodata.gif");
-}
+#} else {
+#  readfile("images/nodata.gif");
+#}
 ?>
