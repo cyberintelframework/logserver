@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 10-04-2006                       #
+# Version 1.04.06                  #
+# 16-04-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Added ignore/unignore stuff
 # 1.04.05 Saving action for all sensors with the same keyname
 # 1.04.04 Changed data input handling
 # 1.04.03 Added input checks for $action, $vlanid and $keyname
@@ -130,9 +131,11 @@ if ($err != 1) {
     }
   } else {
     if ($action == "IGNORE") {
-      $sql_updatestatus = "UPDATE sensors SET status = 3 WHERE keyname = '$keyname' AND vlanid = $vlanid";
-      $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
-      $m = 1;
+      if ($status != 1) {
+        $sql_updatestatus = "UPDATE sensors SET status = 3 WHERE keyname = '$keyname' AND vlanid = $vlanid";
+        $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
+        $m = 1;
+      }
     } else {
       if ($status == 3) {
         $sql_updatestatus = "UPDATE sensors SET status = 0 WHERE keyname = '$keyname' AND vlanid = $vlanid";
