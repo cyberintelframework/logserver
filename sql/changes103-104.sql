@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.05
--- 04-04-2007
+-- Version: 1.04.06
+-- 16-04-2007
 
 -- Changelog
+-- 1.04.06 Added default value for sensors.status
 -- 1.04.05 Fixed binaries conversion, updated antivirus stuff
 -- 1.04.04 Fixed transition from netconf to netconfdetail
 -- 1.04.03 Added column subject to table report_content
@@ -119,6 +120,7 @@ UPDATE sensors SET netconfdetail = sensors.netconf WHERE NOT netconf IN ('vlans'
 UPDATE sensors SET netconf = 'static' WHERE NOT netconf IN ('vlans', 'vland', 'dhcp', 'static');
 ALTER TABLE sensors ADD COLUMN netconfdetail text;
 ALTER TABLE sensors ADD COLUMN vlanid integer DEFAULT 0;
+ALTER TABLE sensors ALTER COLUMN status SET DEFAULT 0;
 
 --
 -- SESSIONS

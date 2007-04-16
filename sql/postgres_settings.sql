@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.10
--- 05-04-2007
+-- Version 1.04.11
+-- 16-04-2007
 --
 
 -- Version history
+-- 1.04.11 Added default value for status
 -- 1.04.10 Removed nepenthes functions, located in separate sql file now
 -- 1.04.09 Updated p0f-db tables
 -- 1.04.08 Removed idslog priviliges for scanners
@@ -30,7 +31,7 @@ CREATE TABLE sensors (
     laststart integer,
     "action" character varying,
     ssh integer DEFAULT 1,
-    status integer,
+    status integer DEFAULT 0,
     uptime integer,
     laststop integer,
     tap character varying,
