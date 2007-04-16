@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.11                  #
+# Version 1.04.12                  #
 # 16-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.12 Added ignore/unignore actions
 # 1.04.11 Added new status code
 # 1.04.10 Fixed sort bug
 # 1.04.09 Changed printhelp stuff
@@ -111,7 +112,7 @@ echo "<table width='100%'>\n";
   echo "</tr>\n";
 echo "</table>\n";
 
-$or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL)";
+$or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL AND NOT status = 3)";
 add_to_sql("*", "select");
 if ($selview == "1") {
   add_to_sql("(status = 0 OR $or)", "where");
@@ -339,6 +340,8 @@ echo "<table class='datatable' width='100%'>\n";
               echo "" . printOption("START", "Start", $action) . "\n";
               echo "" . printOption("DISABLE", "Disable", $action) . "\n";
               echo "" . printOption("ENABLE", "Enable", $action) . "\n";
+              echo "" . printOption("IGNORE", "Ignore", $action) . "\n";
+              echo "" . printOption("UNIGNORE", "Unignore", $action) . "\n";
             echo "</select>\n";
             echo "<td colspan='12' class='datatd' align='right'>\n";
               echo "<input type='submit' name='submit' value='Update' class='button' />";
