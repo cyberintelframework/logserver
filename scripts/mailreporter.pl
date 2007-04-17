@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 16-04-2007                       #
+# Version 1.04.06                  #
+# 17-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.06 Fixed logsearch.php url
 # 1.04.05 Added vlanid to sensor name
 # 1.04.04 Removed out of date sensor message
 # 1.04.03 Restructured the code
@@ -457,7 +458,7 @@ while (@row = $email_query->fetchrow_array) {
         printmail("$printcheck");
         printmail("");
         printmail("Use next link to view related attacks:");
-        printmail($c_webinterface_prefix . "/logsearch.php?from=$ts_start&to=$ts_end&f_reptype=multi&f_sev=$target&f_submit=Search");
+        printmail($c_webinterface_prefix . "/logsearch.php?int_from=$ts_start&int_to=$ts_end&reptype=multi&int_sev=$target");
         printmail("");
       }
     } elsif ($template == 4) {
