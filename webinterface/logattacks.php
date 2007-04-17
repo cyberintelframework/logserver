@@ -157,19 +157,19 @@ if ($err != 1) {
   ######### Table for Downloaded Malware (SEV: 32) #############
   
   elseif ($sev == 32) {
-#    add_to_sql("DISTINCT uniq_binaries.id", "select");
     add_to_sql("details.text", "select");
     add_to_sql("COUNT(details.id) as total", "select");
-#    add_to_sql("sensors", "table");
     add_to_sql("details", "table");
 #    add_to_sql("uniq_binaries", "table");
+#    add_to_sql("binaries", "table");
+#    add_to_sql("(SELECT id FROM scanners ORDER BY id LIMIT 1) as scan", "table");
     add_to_sql("attacks", "table");
     add_to_sql("attacks.severity = 32", "where");
-#    add_to_sql("attacks.sensorid = sensors.id", "where");
     add_to_sql("attacks.id = details.attackid", "where");
     add_to_sql("details.type = 8", "where");
 #    add_to_sql("details.text = uniq_binaries.name", "where");
-#    add_to_sql("uniq_binaries.id", "group");
+#    add_to_sql("uniq_binaries.id = binaries.bin", "where");
+#    add_to_sql("binaries.scanner = scan.id", "where");
     add_to_sql("details.text", "group");
     add_to_sql("total DESC", "order");
     prepare_sql();

@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 21-03-2007                       #
+# Version 1.04.11                  #
+# 17-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.11 Added percentages to the stats
 # 1.04.10 Fixed typo
 # 1.04.09 Added geoip and p0f stuff
 # 1.04.08 Added protocols ranking; add_to_sql();
@@ -391,25 +392,33 @@ echo "<table width='100%'>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
-                echo "<td width='85%' class='datatd'>Exploit</td>\n";
-                echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "<td width='75%' class='datatd'>Exploit</td>\n";
+                echo "<td width='20%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
               $i=1;
+              $grandtotal = 0;
               while ($row = pg_fetch_assoc($result_topexp)) {
                 $exploit = $row['text'];
-                $attack = $v_attacks_ar[$exploit]["Attack"];
-                $attack_url = $v_attacks_ar[$exploit]["URL"];
                 $total = $row['total'];
-                echo "<tr class='datatr'>\n";
-                  echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
-                  if ($attack_url != "") {
-                    echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
-                  } else {
-                    echo "<td class='datatd'>$attack</td>\n";
-                  }
-                  echo "<td class='datatd' align='right'>" . nf($total) . "&nbsp;</td>\n";
-                echo "</tr>\n";
-                $i++;
+                $exploit_ar[$exploit] = $total;
+                $grandtotal = $grandtotal + $total;
+              }
+              if ($exploit_ar != "") {
+                foreach ($exploit_ar as $key => $val) {
+                  $attack = $v_attacks_ar[$key]["Attack"];
+                  $attack_url = $v_attacks_ar[$key]["URL"];
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
+                    if ($attack_url != "") {
+                      echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
+                    } else {
+                      echo "<td class='datatd'>$attack</td>\n";
+                    }
+                    $perc = round($val / $grandtotal * 100);
+                    echo "<td class='datatd' align='right'>" . nf($val) . "&nbsp;(${perc}%)</td>\n";
+                  echo "</tr>\n";
+                  $i++;
+                }
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -420,25 +429,34 @@ echo "<table width='100%'>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td width='5%' class='datatd'>#</td>\n";
-                  echo "<td width='85%' class='datatd'>Exploit</td>\n";
-                  echo "<td width='10%' class='datatd'>Total</td>\n";
+                  echo "<td width='75%' class='datatd'>Exploit</td>\n";
+                  echo "<td width='20%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
                 $i = 1;
+                $grandtotal = 0;
+                $exploit_ar = "";
                 while ($row = pg_fetch_assoc($result_topexp_org)) {
                   $exploit = $row['text'];
-                  $attack = $v_attacks_ar[$exploit]["Attack"];
-                  $attack_url = $v_attacks_ar[$exploit]["URL"];
                   $total = $row['total'];
-                  echo "<tr class='datatr'>\n";
-                    echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
-                    if ($attack_url != "") {
-                      echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
-                    } else {
-                      echo "<td class='datatd'>$attack</td>\n";
-                    }
-                    echo "<td class='datatd' align='right'>" . nf($total) . "&nbsp;</td>\n";
-                  echo "</tr>\n";
-                  $i++;
+                  $exploit_ar[$exploit] = $total;
+                  $grandtotal = $grandtotal + $total;
+                }
+                if ($exploit_ar != "") {
+                  foreach ($exploit_ar as $key => $val) {
+                    $attack = $v_attacks_ar[$key]["Attack"];
+                    $attack_url = $v_attacks_ar[$key]["URL"];
+                    echo "<tr class='datatr'>\n";
+                      echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
+                      if ($attack_url != "") {
+                        echo "<td class='datatd'><a href='$attack_url' target='new'>$attack</a></td>\n";
+                      } else {
+                        echo "<td class='datatd'>$attack</td>\n";
+                      }
+                      $perc = round($val / $grandtotal * 100);
+                      echo "<td class='datatd' align='right'>" . nf($val) . "&nbsp;(${perc}%)</td>\n";
+                    echo "</tr>\n";
+                    $i++;
+                  }
                 }
               echo "</table>\n";
             }
@@ -604,24 +622,32 @@ echo "<table width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
                 echo "<td width='15%' class='datatd'>Port</td>\n";
-                echo "<td width='70%' class='datatd'>Port Description</td>\n";
-                echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "<td width='60%' class='datatd'>Port Description</td>\n";
+                echo "<td width='20%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
               $i=1;
+              $grandtotal = 0;
               while ($row = pg_fetch_assoc($result_topports)) {
                 $port = $row['dport'];
                 $total = $row['total'];
-                echo "<tr class='datatr'>\n";
-                  echo "<td class='datatd'>$i</td>\n";
-                  if ($s_admin == 1 || $s_access_search == 9) {
-                    echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
-                  } else {
-                    echo "<td class='datatd'>$port</td>\n";
-                  }
-                  echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
-                  echo "<td class='datatd'>$total</td>\n";
-                echo "</tr>\n";
-                $i++;
+                $grandtotal = $grandtotal + $total;
+                $port_ar[$port] = $total;
+              }
+              if ($port_ar != "") {
+                foreach ($port_ar as $key => $val) {
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
+                    if ($s_admin == 1 || $s_access_search == 9) {
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$key&orderm=DESC$dateqs'>$key</a></td>\n";
+                    } else {
+                      echo "<td class='datatd'>$key</td>\n";
+                    }
+                    echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$key'>".getPortDescr($key)."</a></td>\n";
+                    $perc = round($val / $grandtotal * 100);
+                    echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                  echo "</tr>\n";
+                  $i++;
+                }
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -633,20 +659,29 @@ echo "<table width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td width='5%' class='datatd'>#</td>\n";
                   echo "<td width='15%' class='datatd'>Port</td>\n";
-                  echo "<td width='70%' class='datatd'>Port Description</td>\n";
-                  echo "<td width='10%' class='datatd'>Total</td>\n";
+                  echo "<td width='60%' class='datatd'>Port Description</td>\n";
+                  echo "<td width='20%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
                 $i = 1;
+                $grandtotal = 0;
+                $port_ar = "";
                 while ($row = pg_fetch_assoc($result_topports_org)) {
                   $port = $row['dport'];
                   $total = $row['total'];
-                  echo "<tr class='datatr'>\n";
-                    echo "<td class='datatd'>$i</td>\n";
-                    echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$port&orderm=DESC$dateqs'>$port</a></td>\n";
-                    echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$port'>".getPortDescr($port)."</a></td>\n";
-                    echo "<td class='datatd'>$total</td>\n";
-                  echo "</tr>\n";
-                  $i++;
+                  $grandtotal = $grandtotal + $total;
+                  $port_ar[$port] = $total;
+                }
+                if ($port_ar != "") {
+                  foreach ($port_ar as $key => $val) {
+                    echo "<tr class='datatr'>\n";
+                      echo "<td class='datatd'>$i</td>\n";
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$key&orderm=DESC$dateqs'>$key</a></td>\n";
+                      echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$key'>".getPortDescr($key)."</a></td>\n";
+                      $perc = round($val / $grandtotal * 100);
+                      echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                    echo "</tr>\n";
+                    $i++;
+                  }
                 }
               echo "</table>\n";
             }
@@ -697,54 +732,62 @@ echo "<table width='100%'>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
-                echo "<td width='85%' class='datatd'>Address</td>\n";
-                echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "<td width='75%' class='datatd'>Address</td>\n";
+                echo "<td width='20%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
-              $i=1;
+              $i = 1;
+              $grandtotal = 0;
               while ($row = pg_fetch_assoc($result_topsource)) {
                 $source = $row['source'];
                 $total = $row['total'];
-                echo "<tr class='datatr'>\n";
-                  echo "<td class='datatd'>$i</td>\n";
+                $grandtotal = $grandtotal + $total;
+                $source_ar[$source] = $total;
+              }
+              if ($source_ar != "") {
+                foreach ($source_ar as $key => $val) {
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
 
-                  echo "<td class='datatd'>";
-                    if ($c_enable_pof == 1) {
-                      $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
-                      $result_finger = pg_query($pgconn, $sql_finger);
-                      $numrows_finger = pg_num_rows($result_finger);
+                    echo "<td class='datatd'>";
+                      if ($c_enable_pof == 1) {
+                        $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$key. "' ORDER BY last_tstamp DESC";
+                        $result_finger = pg_query($pgconn, $sql_finger);
+                        $numrows_finger = pg_num_rows($result_finger);
 
-                      $fingerprint = pg_result($result_finger, 0);
-                      $finger_ar = explode(" ", $fingerprint);
-                      $os = $finger_ar[0];
-                    } else {
-                      $numrows_finger = 0;
-                    }
-                    if ($numrows_finger != 0) {
-                      $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
-                      if (file_exists($osimg)) {
-                        echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                        $fingerprint = pg_result($result_finger, 0);
+                        $finger_ar = explode(" ", $fingerprint);
+                        $os = $finger_ar[0];
                       } else {
-                        echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                        $numrows_finger = 0;
                       }
-                    } else {
-                      echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
-                    }
-                    if ($c_geoip_enable == 1) {
-                      $record = geoip_record_by_addr($gi, $source);
-                      $countrycode = strtolower($record->country_code);
-                      $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
-                      if (file_exists($cimg)) {
-                        $country = $record->country_name;
-                        echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+                      if ($numrows_finger != 0) {
+                        $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
+                        if (file_exists($osimg)) {
+                          echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                        } else {
+                          echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                        }
                       } else {
-                        echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
+                        echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
                       }
-                    }
-                    echo "<a href='whois.php?ip_ip=$source'>$source</a>";
-                  echo "</td>\n";
-                  echo "<td class='datatd'>$total</td>\n";
-                echo "</tr>\n";
-                $i++;
+                      if ($c_geoip_enable == 1) {
+                        $record = geoip_record_by_addr($gi, $key);
+                        $countrycode = strtolower($record->country_code);
+                        $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+                        if (file_exists($cimg)) {
+                          $country = $record->country_name;
+                          echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+                        } else {
+                          echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
+                        }
+                      }
+                      echo "<a href='whois.php?ip_ip=$key'>$key</a>";
+                    echo "</td>\n";
+                    $perc = round($val / $grandtotal * 100);
+                    echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                  echo "</tr>\n";
+                  $i++;
+                }
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -755,53 +798,62 @@ echo "<table width='100%'>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                   echo "<td width='5%' class='datatd'>#</td>\n";
-                  echo "<td width='85%' class='datatd'>Address</td>\n";
-                  echo "<td width='10%' class='datatd'>Total</td>\n";
+                  echo "<td width='75%' class='datatd'>Address</td>\n";
+                  echo "<td width='20%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
                 $i = 1;
+                $grandtotal = 0;
+                $source_ar = "";
                 while ($row = pg_fetch_assoc($result_topsource_org)) {
                   $source = $row['source'];
                   $total = $row['total'];
-                  echo "<tr class='datatr'>\n";
-                    echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'>";
-                        if ($c_enable_pof == 1) {
-                          $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
-                          $result_finger = pg_query($pgconn, $sql_finger);
-                          $numrows_finger = pg_num_rows($result_finger);
+                  $grandtotal = $grandtotal + $total;
+                  $source_ar[$source] = $total;
+                }
+                if ($source_ar != "") {
+                  foreach ($source_ar as $key => $val) {
+                    echo "<tr class='datatr'>\n";
+                      echo "<td class='datatd'>$i</td>\n";
+                        echo "<td class='datatd'>";
+                          if ($c_enable_pof == 1) {
+                            $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$key. "' ORDER BY last_tstamp DESC";
+                            $result_finger = pg_query($pgconn, $sql_finger);
+                            $numrows_finger = pg_num_rows($result_finger);
 
-                          $fingerprint = pg_result($result_finger, 0);
-                          $finger_ar = explode(" ", $fingerprint);
-                          $os = $finger_ar[0];
-                        } else {
-                          $numrows_finger = 0;
-                        }
-                        if ($numrows_finger != 0) {
-                          $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
-                          if (file_exists($osimg)) {
-                            echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                            $fingerprint = pg_result($result_finger, 0);
+                            $finger_ar = explode(" ", $fingerprint);
+                            $os = $finger_ar[0];
                           } else {
-                            echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                            $numrows_finger = 0;
                           }
-                        } else {
-                          echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
-                        }
-                        if ($c_geoip_enable == 1) {
-                          $record = geoip_record_by_addr($gi, $source);
-                          $countrycode = strtolower($record->country_code);
-                          $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
-                          if (file_exists($cimg)) {
-                            $country = $record->country_name;
-                            echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+                          if ($numrows_finger != 0) {
+                            $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
+                            if (file_exists($osimg)) {
+                              echo "<img src='images/$os.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                            } else {
+                              echo "<img src='images/Blank.gif' onmouseover='return overlib(\"$fingerprint\");' onmouseout='return nd();' />&nbsp;";
+                            }
                           } else {
-                            echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
+                            echo "<img src='images/Blank.gif' alt='No info' title='No info' />&nbsp;";
                           }
-                        }
-                        echo "<a href='whois.php?ip_ip=$source'>$source</a>";
-                      echo "</td>\n";
-                      echo "<td class='datatd'>$total</td>\n";
-                  echo "</tr>\n";
-                  $i++;
+                          if ($c_geoip_enable == 1) {
+                            $record = geoip_record_by_addr($gi, $key);
+                            $countrycode = strtolower($record->country_code);
+                            $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+                            if (file_exists($cimg)) {
+                              $country = $record->country_name;
+                              echo "<img src='images/worldflags/flag_" .$countrycode. ".gif' onmouseover='return overlib(\"$country\");' onmouseout='return nd();' />&nbsp;";
+                            } else {
+                              echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
+                            }
+                          }
+                          echo "<a href='whois.php?ip_ip=$key'>$key</a>";
+                        echo "</td>\n";
+                        $perc = round($val / $grandtotal * 100);
+                        echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                    echo "</tr>\n";
+                    $i++;
+                  }
                 }
               echo "</table>\n";
             }
@@ -847,10 +899,11 @@ echo "<table width='100%'>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
-                echo "<td width='85%' class='datatd'>Filename</td>\n";
-                echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "<td width='75%' class='datatd'>Filename</td>\n";
+                echo "<td width='20%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
               $i = 0;
+              $grandtotal = 0;
               while ($row = pg_fetch_assoc($result_topfiles)) {
                 if ($i == $c_topfilenames) {
                   break;
@@ -859,17 +912,23 @@ echo "<table width='100%'>\n";
                 $total = $row['total'];
                 $array = @parse_url($url);
                 $filename = trim($array['path'],'/');
-                $i++;
-
-                echo "<tr class='datatr'>\n";
-                  echo "<td class='datatd'>$i</td>\n";
-                  if ($s_admin == 1 || $s_access_search == 9) {
-                    echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$filename</a></td>\n";
-                  } else {
-                    echo "<td class='datatd'>$filename</td>\n";
-                  }
-                  echo "<td class='datatd'>$total</td>\n";
-                echo "</tr>\n";
+                $grandtotal = $grandtotal + $total;
+                $file_ar[$filename] = $total;
+              }
+              if ($file_ar != "") {
+                foreach ($file_ar as $key => $val) {
+                  $i++;
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
+                    if ($s_admin == 1 || $s_access_search == 9) {
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$key&orderm=DESC$dateqs'>$key</a></td>\n";
+                    } else {
+                      echo "<td class='datatd'>$key</td>\n";
+                    }
+                    $perc = round($val / $grandtotal * 100);
+                    echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                  echo "</tr>\n";
+                }
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -880,28 +939,36 @@ echo "<table width='100%'>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                    echo "<td width='5%' class='datatd'>#</td>\n";
-                   echo "<td width='85%' class='datatd'>Filename</td>\n";
-                   echo "<td width='10%' class='datatd'>Total</td>\n";
+                   echo "<td width='75%' class='datatd'>Filename</td>\n";
+                   echo "<td width='20%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
 
-                  $filenameArray = array();
-                  $i = 0;
-                  while ($row = pg_fetch_assoc($result_topfiles_org)) {
-                    if ($i == $c_topfilenames) {
-                      break;
-                    }
-                    $url = $row['file'];
-                    $total = $row['total'];
-                    $array = @parse_url($url);
-                    $filename = trim($array['path'],'/');
+                $filenameArray = array();
+                $i = 0;
+                $grandtotal = 0;
+                $file_ar = "";
+                while ($row = pg_fetch_assoc($result_topfiles_org)) {
+                  if ($i == $c_topfilenames) {
+                    break;
+                  }
+                  $url = $row['file'];
+                  $total = $row['total'];
+                  $array = @parse_url($url);
+                  $filename = trim($array['path'],'/');
+                  $grandtotal = $grandtotal + $total;
+                  $file_ar[$filename] = $total;
+                }
+                if ($file_ar != "") {
+                  foreach ($file_ar as $key => $val) {
                     $i ++;
-
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$filename&orderm=DESC$dateqs'>$filename</a></td>\n";
-                      echo "<td class='datatd'>$total</td>\n";
+                      echo "<td class='datatd'><a href='logsearch.php?dradio=A&strip_html_escape_filename=$key&orderm=DESC$dateqs'>$key</a></td>\n";
+                      $perc = round($val / $grandtotal * 100);
+                      echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
                     echo "</tr>\n";
                   }
+                }
               echo "</table>\n";
             }
           echo "</td>\n";
@@ -946,10 +1013,11 @@ echo "<table width='100%'>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
-                echo "<td width='85%' class='datatd'>Protocol</td>\n";
-                echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "<td width='75%' class='datatd'>Protocol</td>\n";
+                echo "<td width='20%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
               $i = 0;
+              $grandtotal = 0;
               while ($row = pg_fetch_assoc($result_topproto)) {
                 if ($i == $c_topprotocols) {
                   break;
@@ -957,13 +1025,19 @@ echo "<table width='100%'>\n";
                 $tempproto = $row['proto'];
                 $total = $row['total'];
                 $proto = str_replace(":", "", $tempproto);
-                $i++;
-
-                echo "<tr class='datatr'>\n";
-                  echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'>$proto</td>\n";
-                  echo "<td class='datatd'>$total</td>\n";
-                echo "</tr>\n";
+                $grandtotal = $grandtotal + $total;
+                $proto_ar[$proto] = $total;
+              }
+              if ($proto_ar != "") {
+                foreach ($proto_ar as $key => $val) {
+                  $i++;
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
+                    echo "<td class='datatd'>$key</td>\n";
+                    $perc = round($val / $grandtotal * 100);
+                    echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                  echo "</tr>\n";
+                }
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -974,26 +1048,34 @@ echo "<table width='100%'>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                    echo "<td width='5%' class='datatd'>#</td>\n";
-                   echo "<td width='85%' class='datatd'>Protocol</td>\n";
-                   echo "<td width='10%' class='datatd'>Total</td>\n";
+                   echo "<td width='75%' class='datatd'>Protocol</td>\n";
+                   echo "<td width='20%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
 
-                  $i = 0;
-                  while ($row = pg_fetch_assoc($result_topproto_org)) {
-                    if ($i == $c_topprotocols) {
-                      break;
-                    }
-                    $tempproto = $row['proto'];
-                    $total = $row['total'];
-                    $proto = str_replace(":", "", $tempproto);
+                $i = 0;
+                $grandtotal = 0;
+                $proto_ar = "";
+                while ($row = pg_fetch_assoc($result_topproto_org)) {
+                  if ($i == $c_topprotocols) {
+                    break;
+                  }
+                  $tempproto = $row['proto'];
+                  $total = $row['total'];
+                  $proto = str_replace(":", "", $tempproto);
+                  $grandtotal = $grandtotal + $total;
+                  $proto_ar[$proto] = $total;
+                }
+                if ($proto_ar != "") {
+                  foreach ($proto_ar as $key => $val) {
                     $i ++;
-
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'>$proto</td>\n";
-                      echo "<td class='datatd'>$total</td>\n";
+                      echo "<td class='datatd'>$key</td>\n";
+                      $perc = round($val / $grandtotal * 100);
+                      echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
                     echo "</tr>\n";
                   }
+                }
               echo "</table>\n";
             }
           echo "</td>\n";
@@ -1038,23 +1120,30 @@ echo "<table width='100%'>\n";
             echo "<table class='datatable' width='100%'>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<td width='5%' class='datatd'>#</td>\n";
-                echo "<td width='85%' class='datatd'>OS</td>\n";
-                echo "<td width='10%' class='datatd'>Total</td>\n";
+                echo "<td width='75%' class='datatd'>OS</td>\n";
+                echo "<td width='20%' class='datatd'>Total</td>\n";
               echo "</tr>\n";
               $i = 0;
+              $grandtotal = 0;
               while ($row = pg_fetch_assoc($result_topos)) {
                 if ($i == $c_topos) {
                   break;
                 }
                 $os = $row['os'];
                 $total = $row['total'];
-                $i++;
-
-                echo "<tr class='datatr'>\n";
-                  echo "<td class='datatd'>$i</td>\n";
-                  echo "<td class='datatd'>$os</td>\n";
-                  echo "<td class='datatd'>$total</td>\n";
-                echo "</tr>\n";
+                $grandtotal = $grandtotal + $total;
+                $os_ar[$os] = $total;
+              }
+              if ($os_ar != "") {
+                foreach ($os_ar as $key => $val) {
+                  $i++;
+                  echo "<tr class='datatr'>\n";
+                    echo "<td class='datatd'>$i</td>\n";
+                    echo "<td class='datatd'>$key</td>\n";
+                    $perc = round($val / $grandtotal * 100);
+                    echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
+                  echo "</tr>\n";
+                }
               }
             echo "</table>\n";
           echo "</td>\n";
@@ -1065,25 +1154,33 @@ echo "<table width='100%'>\n";
               echo "<table class='datatable' width='100%'>\n";
                 echo "<tr class='dataheader'>\n";
                    echo "<td width='5%' class='datatd'>#</td>\n";
-                   echo "<td width='85%' class='datatd'>OS</td>\n";
-                   echo "<td width='10%' class='datatd'>Total</td>\n";
+                   echo "<td width='75%' class='datatd'>OS</td>\n";
+                   echo "<td width='20%' class='datatd'>Total</td>\n";
                 echo "</tr>\n";
 
-                  $i = 0;
-                  while ($row = pg_fetch_assoc($result_topos_org)) {
-                    if ($i == $c_topos) {
-                      break;
-                    }
-                    $os = $row['os'];
-                    $total = $row['total'];
+                $i = 0;
+                $grandtotal = 0;
+                $os_ar = "";
+                while ($row = pg_fetch_assoc($result_topos_org)) {
+                  if ($i == $c_topos) {
+                    break;
+                  }
+                  $os = $row['os'];
+                  $total = $row['total'];
+                  $grandtotal = $grandtotal + $total;
+                  $os_ar[$os] = $total;
+                }
+                if ($os_ar != "") {
+                  foreach ($os_ar as $key => $val) {
                     $i ++;
-
                     echo "<tr class='datatr'>\n";
                       echo "<td class='datatd'>$i</td>\n";
-                      echo "<td class='datatd'>$os</td>\n";
-                      echo "<td class='datatd'>$total</td>\n";
+                      echo "<td class='datatd'>$key</td>\n";
+                      $perc = round($val / $grandtotal * 100);
+                      echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
                     echo "</tr>\n";
                   }
+                }
               echo "</table>\n";
             }
           echo "</td>\n";
