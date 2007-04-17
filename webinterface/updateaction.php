@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 16-04-2006                       #
+# Version 1.04.07                  #
+# 17-04-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed redirection typo, ip check on same sensor
 # 1.04.06 Added ignore/unignore stuff
 # 1.04.05 Saving action for all sensors with the same keyname
 # 1.04.04 Changed data input handling
@@ -95,31 +96,35 @@ if (isset($clean['sid'])) {
     $m = 95;
     $err = 1;
   }
-}
-if (isset($clean[tapip])) {
-  $tapip = $clean[tapip];
-  $sql_checkip = "SELECT tapip FROM sensors WHERE tapip = '$tapip' AND NOT id = '$sid'";
-  $result_checkip = pg_query($pgconn, $sql_checkip);
-  $checkip = pg_num_rows($result_checkip);
-  if ($checkip > 0) {
-    $m = 101;
-    $err = 1;
+
+  if (isset($clean[tapip])) {
+    $tapip = $clean[tapip];
+    $sql_checkip = "SELECT tapip FROM sensors WHERE tapip = '$tapip' AND NOT keyname = '$keyname'";
+    $result_checkip = pg_query($pgconn, $sql_checkip);
+    $checkip = pg_num_rows($result_checkip);
+    if ($checkip > 0) {
+      $m = 101;
+      $err = 1;
+    } else {
+      $sql_updatestatus = "UPDATE sensors SET tapip = '$tapip' WHERE id = '$sid' AND vlanid = '$vlanid'";
+      $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
+      $m = 1;
+    }
   } else {
-    $sql_updatestatus = "UPDATE sensors SET tapip = '$tapip' WHERE id = '$sid' AND vlanid = '$vlanid'";
-    $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
-    $m = 1;
+    $sql_m = "SELECT netconf FROM sensors WHERE id = '$sid'";
+    $result_m = pg_query($pgconn, $sql_m);
+    $row_m = pg_fetch_assoc($result_m);
+    $netconf = $row_m['netconf'];
+
+    if ($netconf == "vlans" || $netconf == "static") {
+      $sql_updatestatus = "UPDATE sensors SET tapip = NULL WHERE id = '$sid' AND vlanid = '$vlanid'";
+      $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
+      $m = 94;
+    }
   }
 } else {
-  $sql_m = "SELECT netconf FROM sensors WHERE id = '$sid'";
-  $result_m = pg_query($pgconn, $sql_m);
-  $row_m = pg_fetch_assoc($result_m);
-  $netconf = $row_m['netconf'];
-
-  if ($netconf == "vlans" || $netconf == "static") {
-    $sql_updatestatus = "UPDATE sensors SET tapip = NULL WHERE id = '$sid' AND vlanid = '$vlanid'";
-    $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
-    $m = 94;
-  }
+  $m = 95;
+  $err = 1;
 }
 if ($err != 1) {
   $action_pattern = '/^(IGNORE|UNIGNORE)$/';
@@ -148,7 +153,7 @@ if ($err != 1) {
 
 pg_close($pgconn);
 if ($m != 1) {
-  header("location: sensorstatus.php?int_selview=$selview&int_m=$m&key=$keyname");
+  header("location: sensorstatus.php?int_selview=$selview&int_m=$m&strip_html_key=$keyname");
 } else {
   header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
 }
