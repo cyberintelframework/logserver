@@ -4,13 +4,13 @@
 # Function library for logging server #
 # SURFnet IDS                         #
 # Version 1.04.03                     #
-# 16-02-2007                          #
+# 17-04-2007                          #
 # Jan van Lith & Kees Trippelvitz     #
 #######################################
 
 #####################
 # Changelog:
-# 1.04.03 Changed function numbering
+# 1.04.03 Removed logging in connectdb
 # 1.04.02 Removed DB functions
 # 1.04.01 Initial release
 #####################
@@ -25,12 +25,11 @@
 # 2.03		getdatetime
 # 2.04		getdate
 # 2.05		gettime
-# 3		ALL misc functions
-# 3.01		printlog
-# 3.02		printmail
-# 3.03		printenv
-# 3.04		printdebug
-# 3.05		connectdb
+# 4		ALL misc functions
+# 4.01		printlog
+# 4.02		printmail
+# 4.05		printenv
+# 4.06		connectdb
 ###############################################
 
 # 2.01 getts
@@ -129,7 +128,7 @@ sub gettime {
   return $datestring;
 } 
 
-# 3.01 printlog
+# 4.01 printlog
 # Function to print something to a logfile
 # Returns 0 on success
 # Returns 1 on failure
@@ -157,7 +156,7 @@ sub printlog() {
   }
 }
 
-# 3.02 printmail
+# 4.02 printmail
 # Function to print a line in a mail report
 sub printmail() {
   my ($msg, $res, $len, $tabcount, $tabstring);
@@ -177,7 +176,7 @@ sub printmail() {
   close(MAIL);
 }
 
-# 3.03 printdebug
+# 4.03 printdebug
 # Function to print debug messages to a file
 sub printdebug() {
   my ($msg);
@@ -188,7 +187,7 @@ sub printdebug() {
   close(DEBUG);
 }
 
-# 3.04 printenv
+# 4.05 printenv
 # Function to print all environment variables. Used for debugging purposes.
 sub printenv() {
   my ($envlog, $key);
@@ -203,14 +202,13 @@ sub printenv() {
   close(ENVLOG);
 }
 
-# 3.05 connectdb
+# 4.06 connectdb
 # Function to connect to the database
 # Returns "true" on success
 # Returns "false" on failure
 sub connectdb() {
   my ($ts, $pgerr);
   $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass);
-  &printlog("Connecting to $c_pgsql_dbname with DSN: $c_dsn");
   if ($dbh ne "") {
     &printlog("Connect result: Ok");
     return "true";
