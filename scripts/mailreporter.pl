@@ -2,7 +2,7 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.07                  #
+# Version 1.04.08                  #
 # 17-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -10,6 +10,7 @@
 
 #########################################################################################
 # Changelog:
+# 1.04.08 Fixed group by issue with all attacks reports
 # 1.04.07 Fixed $logstamp variable
 # 1.04.06 Fixed logsearch.php url
 # 1.04.05 Added vlanid to sensor name
@@ -99,6 +100,9 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 ####################
 # Main script
 ####################
+
+$localtime = time();
+$localtime = getdatetime($localtime);
 
 # Opening log file
 open(LOG, ">> $logfile");
@@ -265,7 +269,7 @@ while (@row = $email_query->fetchrow_array) {
         $sql .= " FROM attacks, sensors, details WHERE details.attackid = attacks.id ";
         $sql .= " AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
         $sql .= " AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id ";
-        $sql .= " AND sensors.organisation = '$org' $sensor_where GROUP BY source, timestamp, text, keyname ";
+        $sql .= " AND sensors.organisation = '$org' $sensor_where GROUP BY source, timestamp, text, keyname, vlanid ";
         $sql .= " ORDER BY timestamp ASC";
         $ipview_query = $dbh->prepare($sql);
         $execute_result = $ipview_query->execute();
@@ -598,9 +602,7 @@ sub sendmail {
   $execute_result = $dbh->do($sql);
   
   # Print info to a log file
-  $localtime = time();
-  $localtime = getdatetime($localtime);
-  print LOG "[$localtime] Mailed stats for $sub_date to: $email with organisation $org\n";
+  printlog("Mailed stats for $sub_date to: $email with organisation $org");
   
   # Delete the mail and signed mail
   if (-e "$maildata") {

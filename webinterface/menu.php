@@ -57,10 +57,10 @@ if ($file != "login.php") {
   $s_org = intval($_SESSION['s_org']);
   if ($s_admin == 1) {
     $sql_active = "SELECT COUNT(*) as total FROM sensors WHERE status = 1";
-    $sql_sensors = "SELECT COUNT(id) as total FROM sensors";
+    $sql_sensors = "SELECT COUNT(id) as total FROM sensors WHERE status IN (0, 1)";
   } else {
     $sql_active = "SELECT COUNT(tapip) as total FROM sensors WHERE status = 1 AND organisation = " .$s_org;
-    $sql_sensors = "SELECT COUNT(tapip) as total FROM sensors WHERE organisation = " .$s_org;
+    $sql_sensors = "SELECT COUNT(tapip) as total FROM sensors WHERE organisation = " .$s_org. "AND status IN (0, 1)";
   }
   $result_active = pg_query($pgconn, $sql_active);
   $row = pg_fetch_assoc($result_active);
