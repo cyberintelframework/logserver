@@ -3,7 +3,7 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
+# Version 1.04.05                  #
 # 17-04-2007                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 1.04.05 Fixed another typo with the hash stuff
 # 1.04.04 Fixed a bug with the hash check stuff
 # 1.04.03 Added hash check stuff
 # 1.04.02 Changed debug stuff
@@ -120,7 +121,7 @@ if ($report_content_id > 0) {
           $m = geterror(92);
           echo $m;
         } else {
-          if ($clean['hash'] != $s_hash) {
+          if ($clean['hash'] == $s_hash) {
             // Save data
             $sql_update = "UPDATE report_content SET ";
             $sql_update .= "title = '$title', sensor_id = '$sensor_id', active = '$active', priority = '$priority', ";
