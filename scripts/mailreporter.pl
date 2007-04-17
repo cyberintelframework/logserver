@@ -2,7 +2,7 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.06                  #
+# Version 1.04.07                  #
 # 17-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
@@ -10,6 +10,7 @@
 
 #########################################################################################
 # Changelog:
+# 1.04.07 Fixed $logstamp variable
 # 1.04.06 Fixed logsearch.php url
 # 1.04.05 Added vlanid to sensor name
 # 1.04.04 Removed out of date sensor message
@@ -70,11 +71,9 @@ use POSIX qw(ceil);
 ####################
 do '/etc/surfnetids/surfnetids-log.conf';
 
-$debugfile = "/home/surfnetids/logserver/trunk/scripts/test.log";
-
 $logfile = $c_logfile;
 $logfile =~ s|.*/||;
-if ($logstamp == 1) {
+if ($c_logstamp == 1) {
   $day = localtime->mday();
   if ($day < 10) {
     $day = "0" . $day;
