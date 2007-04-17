@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 19-03-2007                       #
+# Version 1.04.04                  #
+# 17-04-2007                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.04 Fixed a bug with the hash check stuff
 # 1.04.03 Added hash check stuff
 # 1.04.02 Changed debug stuff
 # 1.04.01 Released as 1.04.01
@@ -76,7 +77,8 @@ $allowed_post = array(
 		"bool_active",
 		"int_valueuser",
 		"int_deviation",
-		"md5_hash"
+		"md5_hash",
+		"submit"
 );
 $check = extractvars($_POST, $allowed_post);
 debug_input();
@@ -186,6 +188,7 @@ if ($report_content_id > 0) {
       
       echo "<div name='threshold_user' id='threshold_user' style='position:absolute;left:400px;top:130px;border:1px solid black;padding:10px;'>Threshold: </div>";
       echo "<form method='post' onclick=\"updateThreshold();\">";
+        echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
         echo "<input type='hidden' name='action' value='edit'>";
         echo "<input type='hidden' name='int_userid' value='$user_id'>";
         echo "<input type='hidden' name='submit' value='1'>";
@@ -243,7 +246,8 @@ if ($report_content_id > 0) {
             echo "</td>\n";
           echo "</tr>\n";
         echo "</table>\n";
-        echo "<input type='submit' name='submitBtn' value='Update' class='button'>\n";
+        echo "<input type='submit' name='submitBtn' value='Update' class='button' />\n";
+        echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
         echo "&nbsp;&nbsp;";
         echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
       echo "</form>\n";
@@ -251,45 +255,47 @@ if ($report_content_id > 0) {
     } else {
       # Handle submitted data
       if (isset($tainted["submit"])) {
-        $title = $clean["title"];
-        $sensor_id = $clean["sensorid"];
-        $priority = $clean["priority"];
-        $frequency = $clean["frequency"];
-        $interval_day = $clean["intervalday"];
-        $interval_week = $clean["intervalweek"];
-        $active = $clean["active"];
-        if ($frequency == 1) {
-          $interval_db = 0;
-        } elseif ($frequency == 2) {
-          $interval_db = $interval_day;
-        } elseif ($frequency == 3) {
-          $interval_db = $interval_week;
-        }
-        if (empty($title)) {
-          $m = geterror(92);
-          echo $m;
-        } else {
-          // Save data
-          $sql_update = "UPDATE report_content SET ";
-          $sql_update .= "title = '$title', sensor_id = '$sensor_id', priority = '$priority', ";
-          $sql_update .= "frequency = '$frequency', interval = '$interval_db', active = '$active', subject = '$subject' ";
-          $sql_update .= "WHERE id = '$report_content_id'";
-          $debuginfo[] = $sql_update;
-
-          $result = pg_query($sql_update);
-          $msg = pg_errormessage();
-          if (empty($msg)) {
-            echo "<p style='color:green'><b>Data updated succesfully</b>.</p>\n";
-            // Reload title/status var
-            $sql_report_content = "SELECT * FROM report_content ";
-            $sql_report_content .= "WHERE user_id = '$user_id' AND id = '$report_content_id'";
-            $debuginfo[] = $sql_report_content;
-
-            $result_report_content = pg_query($sql_report_content);
-            $report_content = pg_fetch_assoc($result_report_content);
-          } else {
-            $m = geterror(93);
+        if ($clean['hash'] == $s_hash) {
+          $title = $clean["title"];
+          $sensor_id = $clean["sensorid"];
+          $priority = $clean["priority"];
+          $frequency = $clean["frequency"];
+          $interval_day = $clean["intervalday"];
+          $interval_week = $clean["intervalweek"];
+          $active = $clean["active"];
+          if ($frequency == 1) {
+            $interval_db = 0;
+          } elseif ($frequency == 2) {
+            $interval_db = $interval_day;
+          } elseif ($frequency == 3) {
+            $interval_db = $interval_week;
+          }
+          if (empty($title)) {
+            $m = geterror(92);
             echo $m;
+          } else {
+            // Save data
+            $sql_update = "UPDATE report_content SET ";
+            $sql_update .= "title = '$title', sensor_id = '$sensor_id', priority = '$priority', ";
+            $sql_update .= "frequency = '$frequency', interval = '$interval_db', active = '$active', subject = '$subject' ";
+            $sql_update .= "WHERE id = '$report_content_id'";
+            $debuginfo[] = $sql_update;
+
+            $result = pg_query($sql_update);
+            $msg = pg_errormessage();
+            if (empty($msg)) {
+              echo "<p style='color:green'><b>Data updated succesfully</b>.</p>\n";
+              // Reload title/status var
+              $sql_report_content = "SELECT * FROM report_content ";
+              $sql_report_content .= "WHERE user_id = '$user_id' AND id = '$report_content_id'";
+              $debuginfo[] = $sql_report_content;
+
+              $result_report_content = pg_query($sql_report_content);
+              $report_content = pg_fetch_assoc($result_report_content);
+            } else {
+              $m = geterror(93);
+              echo $m;
+            }
           }
         }
       }
@@ -318,6 +324,7 @@ if ($report_content_id > 0) {
         echo "<input type='hidden' name='int_userid' value='$user_id'>";
         echo "<input type='hidden' name='submit' value='1'>";
         echo "<input type='hidden' name='int_rcid' value='$report_content_id'>\n";
+        echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
         echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
           echo "<tr class='datatr'>\n";
             echo "<td class='datatd'>Title: </td>\n";
