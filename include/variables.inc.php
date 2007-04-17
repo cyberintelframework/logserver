@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.13                  #
-# 16-04-2007                       #
+# Version 1.04.14                  #
+# 17-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.14 Changed help message for sensorstatus - action
 # 1.04.13 Added error message for missing vlan id
 # 1.04.12 Changed help messages
 # 1.04.11 Added Argos attack
@@ -400,9 +401,16 @@ $v_help = array(
 		"tap" => "The virtual device on the tunnel server. This is in fact the tunnel endpoint on the server.",
 		"tapip" => "The IP address of the virtual device on the server.",
 		"status" => "The current status of the sensor.",
-		"action" => "Possible actions that can be given to the sensor.",
+		"action" => "Possible actions that can be given to the sensor. The action will be executed once an hour along with the sensor updates.",
 		"timestamps" => "Uptime and several other timestamps.",
-		"static" => "This is the IP address on the virtual interface on the server.<br />This IP needs to be an IP from the same network range as the sensor.<br /> It cannot be the same IP address as the local or remote address!"
+		"static" => "This is the IP address on the virtual interface on the server.<br />This IP needs to be an IP from the same network range as the sensor.<br /> It cannot be the same IP address as the local or remote address!",
+		"statusred" => "The sensor client was stopped by either a user or the server admin. The tunnel is not active at this moment.",
+		"statusgreen" => "The sensor is active and correctly running.",
+		"statusorange" => "The sensor missed a status update. These updates are used to synchronize data between the sensor and the server as well as to update the sensor scripts if needed.",
+		"statusyellow" => "The sensor is trying to start up. This status is set when the sensor is started but a tap interface and tap IP address have not yet been acquired.",
+		"statusblack" => "The sensor has been disabled by a server admin. This will mean the sensor cannot be started.",
+		"statusblue" => "The sensor needs configuration. This is a status particularly for statically configured sensors. Configure the tap IP address to fix this.",
+		"statusnone" => "The sensor is on ignore. This can be either because a different sensor of the same name is active or the sensor is manually ignored."
 	)
 );
 ?>
