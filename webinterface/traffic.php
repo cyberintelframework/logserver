@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 23-03-2007                       #
+# Version 1.04.07                  #
+# 18-04-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed display of allsensor when no admin
 # 1.04.06 Added allsensors pictures again
 # 1.04.05 Changed location debug info 
 # 1.04.04 Added online/offline status selector
@@ -87,6 +88,8 @@ $sql_getactive = "SELECT $sql_select FROM $sql_from $sql_where ORDER BY $sql_ord
 $debuginfo[] = $sql_getactive;
 $result_getactive = pg_query($pgconn, $sql_getactive);
 
+if ($s_admin == 1) {
+
 $sql_allsensors = "SELECT id FROM rrd WHERE type = 'day' AND label = 'allsensors'";
 $result_allsensors = pg_query($pgconn, $sql_allsensors);
 $row_allsensors = pg_fetch_assoc($result_allsensors);
@@ -97,6 +100,7 @@ echo "<table>\n";
     echo "<td><a href='trafficview.php?int_imgid=$allid'><img src='showtraffic.php?int_imgid=$allid' alt='All sensors' border='1' /></a></td>\n";
   echo "</tr>\n";
 echo "</table>\n";
+}
 
 while ($rowactive = pg_fetch_assoc($result_getactive)) {
   $db_orgid = $rowactive['organisation'];
