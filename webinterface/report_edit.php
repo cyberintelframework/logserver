@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 17-04-2007                       #
+# Version 1.04.06                  #
+# 23-04-2007                       #
 # Peter Arts                       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Fixed bug with subject  
 # 1.04.05 Fixed another typo with the hash stuff
 # 1.04.04 Fixed a bug with the hash check stuff
 # 1.04.03 Added hash check stuff
@@ -264,7 +265,8 @@ if ($report_content_id > 0) {
           $interval_day = $clean["intervalday"];
           $interval_week = $clean["intervalweek"];
           $active = $clean["active"];
-          if ($frequency == 1) {
+          $subject = $clean["subject"]; 
+	  if ($frequency == 1) {
             $interval_db = 0;
           } elseif ($frequency == 2) {
             $interval_db = $interval_day;
