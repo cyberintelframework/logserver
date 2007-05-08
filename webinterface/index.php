@@ -2,14 +2,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 03-04-2007                       #
+# Version 1.04.07                  #
+# 08-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed a bug with date coloring for attackers
 # 1.04.06 Fixed some layout issues
 # 1.04.05 Added dropdown box
 # 1.04.04 Added empty flag for unknown countries
@@ -165,9 +166,10 @@ echo "<table width='70%'>\n";
           $lsdb = pg_fetch_assoc($result_ls);
           $ls = $lsdb['timestamp'];
 
-          $chk = date("d", $ls);
-          $cur = date("d");
+          $chk = date("U", $ls);
+          $cur = date("U");
           $dif = $cur - $chk;
+          $dif = round($dif / (3600 * 24));
           $ls = date("d-m-Y H:i:s", $ls);
 
           echo "<tr>\n";
