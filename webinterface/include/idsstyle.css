@@ -386,7 +386,9 @@ a.searchtemplate_item {
 }
 
 #cwsandbox {
-  overflow-y:		scroll;
+  overflow:             auto;
+  overflow-x:           hidden;
+  overflow-y:           auto;
   height:		300px;
   margin:               2ex 10em 2ex 2em;
   padding:              8px;

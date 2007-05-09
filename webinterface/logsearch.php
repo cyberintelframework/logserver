@@ -535,10 +535,8 @@ if ($rapport == "idmef") {
   add_to_sql("attacks", "table");
   add_to_sql("sensors.id = attacks.sensorid", "where");
 
-  if ($q_org != "") {
-    # IP Exclusion stuff
-    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
-  }
+  # IP Exclusion stuff
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
 
@@ -632,10 +630,8 @@ if ($rapport == "idmef") {
 }
 
 if ($rapport == "pdf") {
-  if ($q_org != "") {
-    # IP Exclusion stuff
-    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
-  }
+  # IP Exclusion stuff
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
 
@@ -735,10 +731,8 @@ add_to_sql("sensors.vlanid", "select");
 add_to_sql("sensors", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
 
-if ("$q_org" != "") {
-  # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
-}
+# IP Exclusion stuff
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
 prepare_sql();
 

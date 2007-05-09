@@ -2,7 +2,7 @@
 ####################################
 # CWSandbox retrieval script       #
 # SURFnet IDS                      #
-# Version 1.04.01                  #
+# Version 1.04.02                  #
 # 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Dave De Coster (Mods for CWS)    #
@@ -10,6 +10,7 @@
 
 ###############################################
 # Changelog:
+# 1.04.02 Skipping messages without md5
 # 1.04.01 Initial release
 ###############################################
 
@@ -73,7 +74,12 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     $subject =~ s/^\s+//;
     $md5 =~ s/\"//g;
     chomp($md5);
-    print "md5: $md5\n";
+    if ("$md5" eq "") {
+      # Skip this one
+      next;
+    } else {
+      print "md5: $md5\n";
+    }
     $body = `$c_xalanbin $xml $c_surfidsdir/include/ViewAnalysis.xslt`;
     $body =~ s/'/ /g;
     $body =~ s/\\/\\\\/g;

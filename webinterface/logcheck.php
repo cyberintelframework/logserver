@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 07-05-2007                       #
+# Version 1.04.09                  #
+# 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Added IP exclusions stuff
 # 1.04.08 Set default back to weekly  
 # 1.04.07 Added possible attacks check 
 # 1.04.06 wrong amount of attacks bug fixed
@@ -203,7 +204,7 @@ if ($err != 1) {
       add_to_sql("$tsquery", "where");
 
       # IP Exclusion stuff
-      add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+      add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
       prepare_sql();
 
@@ -241,7 +242,6 @@ if ($err != 1) {
 
       $result_uniq0 = pg_query($pgconn, $sql_uniq0);
       $count_uniq0 = pg_num_rows($result_uniq0);
-
 
       reset_sql();
 

@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.11                  #
-# 17-04-2007                       #
+# Version 1.04.12                  #
+# 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 # Contribution by Bjoern Weiland   #
@@ -12,6 +12,7 @@
 
 ####################################
 # Changelog:
+# 1.04.12 Added IP exclusions stuff
 # 1.04.11 Added percentages to the stats
 # 1.04.10 Fixed typo
 # 1.04.09 Added geoip and p0f stuff
@@ -197,7 +198,7 @@ echo "<table width='100%'>\n";
   add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_attacks = "SELECT $sql_select ";
@@ -221,7 +222,7 @@ echo "<table width='100%'>\n";
   add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_downloads = "SELECT $sql_select ";
@@ -281,7 +282,7 @@ echo "<table width='100%'>\n";
               add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 
               # IP Exclusion stuff
-              add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+              add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
               prepare_sql();
               $sql_attacks = "SELECT $sql_select ";
@@ -313,7 +314,7 @@ echo "<table width='100%'>\n";
               add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 
               # IP Exclusion stuff
-              add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+              add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
               prepare_sql();
               $sql_downloads = "SELECT $sql_select ";
@@ -372,7 +373,7 @@ echo "<table width='100%'>\n";
   add_to_sql("total DESC LIMIT $c_topexploits OFFSET 0", "order");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_topexp = "SELECT $sql_select ";
@@ -501,7 +502,7 @@ echo "<table width='100%'>\n";
   add_to_sql("total DESC LIMIT $c_topsensors OFFSET 0", "order");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_top = "SELECT $sql_select";
@@ -613,7 +614,7 @@ echo "<table width='100%'>\n";
   add_to_sql("total DESC LIMIT $c_topports OFFSET 0", "order");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_topports = "SELECT $sql_select ";
@@ -629,7 +630,7 @@ echo "<table width='100%'>\n";
   add_to_sql("sensors.organisation = $q_org", "where");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_topports_org = "SELECT $sql_select ";
@@ -732,7 +733,7 @@ echo "<table width='100%'>\n";
   add_to_sql("total DESC LIMIT $c_topsourceips", "order");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_topsource = "SELECT $sql_select ";
@@ -748,7 +749,7 @@ echo "<table width='100%'>\n";
   add_to_sql("sensors.organisation = $q_org", "where");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_topsource_org = "SELECT $sql_select ";
@@ -912,7 +913,7 @@ echo "<table width='100%'>\n";
       $sql_topfiles .= " AND $tsquery ";
     }
     $sql_topfiles .= "AND type = 4  AND details.attackid = attacks.id AND ";
-    $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+    $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)) as sub ";
   $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
   $result_topfiles = pg_query($pgconn, $sql_topfiles);
 
@@ -926,7 +927,7 @@ echo "<table width='100%'>\n";
     }
     $sql_topfiles_org .= "AND sensors.id = details.sensorid AND sensors.organisation = $q_org ";
     $sql_topfiles_org .= "AND type = 4  AND details.attackid = attacks.id AND ";
-    $sql_topfiles_org .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+    $sql_topfiles_org .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)) as sub ";
   $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
   $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);
 
@@ -1028,7 +1029,7 @@ echo "<table width='100%'>\n";
       $sql_topproto .= " AND $tsquery ";
     }
     $sql_topproto .= "AND type = 4  AND details.attackid = attacks.id AND ";
-    $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+    $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)) as sub ";
   $sql_topproto .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
   $result_topproto = pg_query($pgconn, $sql_topproto);
 
@@ -1042,7 +1043,7 @@ echo "<table width='100%'>\n";
     }
     $sql_topproto_org .= "AND sensors.id = details.sensorid AND sensors.organisation = $q_org ";
     $sql_topproto_org .= "AND type = 4  AND details.attackid = attacks.id AND ";
-    $sql_topproto_org .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+    $sql_topproto_org .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)) as sub ";
   $sql_topproto_org .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
   $result_topproto_org = pg_query($pgconn, $sql_topproto_org);
 
@@ -1137,7 +1138,7 @@ echo "<table width='100%'>\n";
       $sql_topos .= " AND $tsquery ";
     }
     $sql_topos .= " AND attacks.source = system.ip_addr AND ";
-    $sql_topos .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+    $sql_topos .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)) as sub ";
   $sql_topos .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
   $result_topos = pg_query($pgconn, $sql_topos);
 
@@ -1151,7 +1152,7 @@ echo "<table width='100%'>\n";
     }
     $sql_topos_org .= "AND sensors.id = attacks.sensorid AND sensors.organisation = $q_org ";
     $sql_topos_org .= "AND attacks.source = system.ip_addr AND ";
-    $sql_topos_org .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+    $sql_topos_org .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)) as sub ";
   $sql_topos_org .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
   $result_topos_org = pg_query($pgconn, $sql_topos_org);
 
@@ -1251,7 +1252,7 @@ echo "<table width='100%'>\n";
   add_to_sql("total DESC LIMIT $c_toporgs OFFSET 0", "order");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
   $sql_organisation = "SELECT $sql_select ";

@@ -109,7 +109,7 @@ if ($err != 1) {
     add_to_sql("total", "order");
 
     # IP Exclusion stuff
-    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
     prepare_sql();
 

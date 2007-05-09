@@ -4,7 +4,7 @@
 ####################################
 # SURFnet IDS                      #
 # Version 1.04.11                  #
-# 08-05-2007                       #
+# 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
@@ -192,7 +192,7 @@ echo "<table class='datatable'>\n";
   add_to_sql("attacks.severity", "group");
 
   # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
   prepare_sql();
 

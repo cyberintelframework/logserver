@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 16-04-2007                       #
+# Version 1.04.10                  #
+# 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Added IP exclusions stuff
 # 1.04.09 Shows empty graph when no data
 # 1.04.08 Added data colors array, background color
 # 1.04.07 Added virus graphs
@@ -400,7 +401,7 @@ if (isset($clean['ports'])) {
     add_to_sql("attacks.dport", "group");
 
     # IP Exclusion stuff
-    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
     prepare_sql();
   } else {
@@ -473,7 +474,7 @@ add_to_sql("severity", "order");
 add_to_sql("COUNT(attacks.severity) as total", "select");
 
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
 
 prepare_sql();
 

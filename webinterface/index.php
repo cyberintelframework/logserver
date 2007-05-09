@@ -72,23 +72,23 @@ echo "<table width='100%'>\n";
         echo "<table width='100%' id='sensortable'>\n";
           echo "<tr>\n";
             echo "<td align='right'>\n";
-              if ($s_admin == 1) {
-                if (isset($clean['orgid'])) {
-                  $s_org = $clean['orgid'];
-                  $_SESSION['s_org'] = $s_org;
-                }
-                $sql_orgs = "SELECT id, organisation FROM organisations ORDER BY organisation";
-                $debuginfo[] = $sql_orgs;
-                $result_orgs = pg_query($pgconn, $sql_orgs);
-                echo "<select name='int_orgid' onChange='javascript: this.form.submit();'>\n";
-                  echo printOption(0, "", $org);
-                  while ($row = pg_fetch_assoc($result_orgs)) {
-                    $org_id = $row['id'];
-                    $organisation = $row['organisation'];
-                    echo printOption($org_id, $organisation, $s_org) . "\n";
-                  }
-                echo "</select>&nbsp;\n";
-              }
+#              if ($s_admin == 1) {
+#                if (isset($clean['orgid'])) {
+#                  $s_org = $clean['orgid'];
+#                  $_SESSION['s_org'] = $s_org;
+#                }
+#                $sql_orgs = "SELECT id, organisation FROM organisations ORDER BY organisation";
+#                $debuginfo[] = $sql_orgs;
+#                $result_orgs = pg_query($pgconn, $sql_orgs);
+#                echo "<select name='int_orgid' onChange='javascript: this.form.submit();'>\n";
+#                  echo printOption(0, "", $org);
+#                  while ($row = pg_fetch_assoc($result_orgs)) {
+#                    $org_id = $row['id'];
+#                    $organisation = $row['organisation'];
+#                    echo printOption($org_id, $organisation, $s_org) . "\n";
+#                  }
+#                echo "</select>&nbsp;\n";
+#              }
               echo "<select name='int_selperiod' onChange='javascript: this.form.submit();'>\n";
                 foreach ($v_index_periods as $key => $value) {
                   echo printOption($key, $value, $sel) . "\n";
