@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.25                  #
-# 08-05-2007                       #
+# Version 1.04.26                  #
+# 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.26 Fixed a bug with binname when there was no uniq_binaries record
 # 1.04.25 Added IP exclusion stuff
 # 1.04.24 Removed the fix
 # 1.04.23 Fix for newer PostgreSQL versions
@@ -479,11 +480,11 @@ if (!empty($f_filename)) {
 ####################
 if (!empty($f_binname)) {
   add_to_sql("details", "table");
-  add_to_sql("uniq_binaries", "table");
+#  add_to_sql("uniq_binaries", "table");
   add_to_sql("details.type = 8", "where");
   add_to_sql("attacks.id = details.attackid", "where");
-  add_to_sql("details.text = uniq_binaries.name", "where");
-  add_to_sql("uniq_binaries.name LIKE '$f_binname'", "where");
+  add_to_sql("details.text LIKE '$f_binname'", "where");
+#  add_to_sql("uniq_binaries.name LIKE '$f_binname'", "where");
 }
 
 ####################
