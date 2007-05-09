@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 17-04-2007                       #
+# Version 1.04.09                  #
+# 08-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.09 Added IP exclusion stuff
 # 1.04.08 Fixed group by issue with all attacks reports
 # 1.04.07 Fixed $logstamp variable
 # 1.04.06 Fixed logsearch.php url
@@ -246,8 +247,10 @@ while (@row = $email_query->fetchrow_array) {
       $sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total ";
       $sql .= "FROM attacks, sensors, severity WHERE attacks.severity = severity.val ";
       $sql .= "AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+      $sql .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
       $sql .= "AND attacks.sensorid = sensors.id $andorg $sensor_where ";
       $sql .= "GROUP BY severity.txt, severity.val ORDER BY severity.val";
+
       $overview_query = $dbh->prepare($sql);
       $execute_result = $overview_query->execute();
       $malattacks = $overview_query->rows;
@@ -265,12 +268,14 @@ while (@row = $email_query->fetchrow_array) {
         # Get details about the attacks and print them to mail.   
         # Printed in format: ip address attacker, time of attack, type of attack.   
         $message = "";
-        $sql = "SELECT DISTINCT attacks.source, attacks.timestamp, details.text, sensors.keyname, sensors.vlanid ";
-        $sql .= " FROM attacks, sensors, details WHERE details.attackid = attacks.id ";
-        $sql .= " AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
-        $sql .= " AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id ";
-        $sql .= " AND sensors.organisation = '$org' $sensor_where GROUP BY source, timestamp, text, keyname, vlanid ";
-        $sql .= " ORDER BY timestamp ASC";
+
+        $sql = "SELECT attacks.id, attacks.source, attacks.timestamp, details.text, sensors.keyname, sensors.vlanid ";
+        $sql .= "FROM attacks, sensors, details WHERE attacks.severity = 1 AND details.type = 1 ";
+        $sql .= "AND details.attackid = attacks.id AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+        $sql .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) AND attacks.sensorid = sensors.id ";
+        $sql .= "AND sensors.organisation = '$org' $sensor_where ";
+        $sql .= "ORDER BY timestamp ASC";
+        print "SQL2: $sql\n\n";
         $ipview_query = $dbh->prepare($sql);
         $execute_result = $ipview_query->execute();
         
@@ -316,6 +321,7 @@ while (@row = $email_query->fetchrow_array) {
           $sql .= "WHERE attacks.source <<= '$range' AND details.attackid = attacks.id ";
           $sql .= "AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
           $sql .= "AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id ";
+          $sql .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
           $sql .= "AND sensors.organisation = '$org' $sensor_where GROUP BY source, timestamp, text";
           $ipview_query = $dbh->prepare($sql);
           $execute_result = $ipview_query->execute();
@@ -388,6 +394,7 @@ while (@row = $email_query->fetchrow_array) {
         # Get the total amount of attacks
         $sql = "SELECT COUNT(attacks.id) as total FROM attacks, sensors ";
         $sql .= "WHERE severity = $target AND sensors.id = attacks.sensorid ";
+        $sql .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
         $sql .= "$andorg $sensor_where";
         $total_query = $dbh->prepare($sql);
         $er = $total_query->execute();
@@ -419,7 +426,9 @@ while (@row = $email_query->fetchrow_array) {
       
       # Get current value for last timespan
       $sql = "SELECT COUNT(attacks.id) FROM attacks, sensors ";
-      $sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid $andorg $sensor_where ";
+      $sql .= "WHERE attacks.severity = $target AND sensors.id = attacks.sensorid ";
+      $sql .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+      $sql .= " $andorg $sensor_where ";
       $sql .= "AND timestamp >= '$ts_start' AND timestamp <= '$ts_end'";
 
       $check_query = $dbh->prepare($sql);

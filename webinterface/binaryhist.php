@@ -91,7 +91,7 @@ if ($err == 0) {
     echo $m;
   }
 }
-$err = 0;
+
 if ($err == 0) {
   $sql_bindetail = "SELECT fileinfo, filesize FROM binaries_detail WHERE bin = $bin_id";
   $result_bindetail = pg_query($pgconn, $sql_bindetail);

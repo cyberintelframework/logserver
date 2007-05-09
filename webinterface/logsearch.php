@@ -535,8 +535,10 @@ if ($rapport == "idmef") {
   add_to_sql("attacks", "table");
   add_to_sql("sensors.id = attacks.sensorid", "where");
 
-  # IP Exclusion stuff
-  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  if ($q_org != "") {
+    # IP Exclusion stuff
+    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  }
 
   prepare_sql();
 
@@ -630,98 +632,100 @@ if ($rapport == "idmef") {
 }
 
 if ($rapport == "pdf") {
+  if ($q_org != "") {
     # IP Exclusion stuff
     add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+  }
 
-    prepare_sql();
+  prepare_sql();
 
-    ### Prepare final SQL query
-    $sql = "SELECT $sql_select ";
-    $sql .= " FROM $sql_from ";
-    $sql .= " $sql_where ";
-    if ($sql_group) {
-      $sql .= " GROUP BY $sql_group ";
-    }
+  ### Prepare final SQL query
+  $sql = "SELECT $sql_select ";
+  $sql .= " FROM $sql_from ";
+  $sql .= " $sql_where ";
+  if ($sql_group) {
+    $sql .= " GROUP BY $sql_group ";
+  }
     
-    $result = pg_query($sql);
+  $result = pg_query($sql);
 
+  flush();
+  include ('../include/class.ezpdf.php');
+
+  $pdf =& new Cezpdf();
+  $pdf->addJpegFromFile("images/logo.jpg", 20, 750, 200, 70);
+  $pdf->selectFont('../include/fonts/Helvetica.afm');
+  //$pdf->ezText(' ',20);
+  //$pdf->ezText(' ',20);
+  //$pdf->ezText(' ',20);
+  $space = '                                         ';
+  $pdf->ezText($space . 'SURFnet IDS PDF results',20);
+  $space = '                                                                                  ';
+  $pdf->ezText($space . 'Generated at ' . date("d-m-Y H:i:s") . ' by SURFnetIDS webinterface', 10);
+  $pdf->ezText('    ', 20);
+  $pdf->ezText('    ', 20);
+  $data = array();
+  while ($row = pg_fetch_assoc($result)) {
     flush();
-    include ('../include/class.ezpdf.php');
-
-    $pdf =& new Cezpdf();
-    $pdf->addJpegFromFile("images/logo.jpg", 20, 750, 200, 70);
-    $pdf->selectFont('../include/fonts/Helvetica.afm');
-    //$pdf->ezText(' ',20);
-    //$pdf->ezText(' ',20);
-    //$pdf->ezText(' ',20);
-    $space = '                                         ';
-    $pdf->ezText($space . 'SURFnet IDS PDF results',20);
-    $space = '                                                                                  ';
-    $pdf->ezText($space . 'Generated at ' . date("d-m-Y H:i:s") . ' by SURFnetIDS webinterface', 10);
-    $pdf->ezText('    ', 20);
-    $pdf->ezText('    ', 20);
-    $data = array();
-    while ($row = pg_fetch_assoc($result)) {
-      flush();
-      $id = intval($row['id']);
-      $keyname = $row['keyname'];
-      $timestamp = $row['timestamp'];
-      $source = $row['source'];
-      $sport = intval($row['sport']);
-      $dest = $row['dest'];
-      $dport = intval($row['dport']);
-      $sensorid = intval($row['sensorid']);
-      if ($sensorid > 0) {
-      	$query = pg_query("SELECT keyname, vlanid FROM sensors WHERE id = '" . $sensorid . "'");
-      	$sensorname = pg_result($query, 0);
-        $vlanid = pg_result($query, 1);
-        if ($vlanid != 0) {
-          $sensorname = "$sensorname-$vlanid";
-        }
+    $id = intval($row['id']);
+    $keyname = $row['keyname'];
+    $timestamp = $row['timestamp'];
+    $source = $row['source'];
+    $sport = intval($row['sport']);
+    $dest = $row['dest'];
+    $dport = intval($row['dport']);
+    $sensorid = intval($row['sensorid']);
+    if ($sensorid > 0) {
+      $query = pg_query("SELECT keyname, vlanid FROM sensors WHERE id = '" . $sensorid . "'");
+      $sensorname = pg_result($query, 0);
+      $vlanid = pg_result($query, 1);
+      if ($vlanid != 0) {
+        $sensorname = "$sensorname-$vlanid";
       }
-      $sev = intval($row['severity']);
-      $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
-      $result_details = pg_query($pgconn, $sql_details);
-      $numrows_details = pg_num_rows($result_details);
-
-      $sql_sev = "SELECT txt FROM severity WHERE val = '$sev'";
-      $result_sev = pg_query($pgconn, $sql_sev);
-      $row_sev = pg_fetch_assoc($result_sev);
-      $sev_text = $row_sev['txt'];
-
-      if ($numrows_details != 0) {
-        if ($sev == 1) {
-          $dia_ar = array('attackid' => $id, 'type' => 1);
-          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-          $text = $dia_result_ar[0]['text'];
-          $attack = $v_attacks_ar[$text]["Attack"];
-        } elseif ($sev == 16) {
-          $dia_ar = array('attackid' => $id);
-          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-          $text = $dia_result_ar[0]['text'];
-          $malware = basename($text);
-        }
-      }
-      //ID 	Timestamp 	Severity 	Source 	Destination 	Sensor 	Additional Info
-      $ar = array();
-      $ar["ID"] = $id;
-      $ar["Timestamp"] = date("d-m-Y H:i:s", $timestamp);
-      $ar["Severity"] = $sev_text;
-      $ar["Source"] = $source . ":" . $sport;
-      $ar["Destination"] = $dest . ":" . $dport;
-      $ar["Sensor"] = $sensorname;
-      if ($sev == 1 && $attack != "") $ar["Additional_Info"] = $attack;
-      elseif ($sev == 16 && $malware != "") $ar["Additional_Info"] = $malware;
-      else $ar["Additional_Info"] = "";
-      $data[] = $ar;
     }
-    $pdf->ezTable($data, '', '', array( 'fontSize' => 8));
-    $pdf->ezText('__________________________________________________________', 15);
-    $pdf->ezText($space . 'http://ids.surfnet.nl', 10);
-    $fn = "SURFnet_PDF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".pdf";
-    $ar = array('Content-Disposition'=>$fn);
-    $pdf->ezStream($ar);
-    exit;
+    $sev = intval($row['severity']);
+    $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
+    $result_details = pg_query($pgconn, $sql_details);
+    $numrows_details = pg_num_rows($result_details);
+
+    $sql_sev = "SELECT txt FROM severity WHERE val = '$sev'";
+    $result_sev = pg_query($pgconn, $sql_sev);
+    $row_sev = pg_fetch_assoc($result_sev);
+    $sev_text = $row_sev['txt'];
+
+    if ($numrows_details != 0) {
+      if ($sev == 1) {
+        $dia_ar = array('attackid' => $id, 'type' => 1);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $text = $dia_result_ar[0]['text'];
+        $attack = $v_attacks_ar[$text]["Attack"];
+      } elseif ($sev == 16) {
+        $dia_ar = array('attackid' => $id);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $text = $dia_result_ar[0]['text'];
+        $malware = basename($text);
+      }
+    }
+    //ID 	Timestamp 	Severity 	Source 	Destination 	Sensor 	Additional Info
+    $ar = array();
+    $ar["ID"] = $id;
+    $ar["Timestamp"] = date("d-m-Y H:i:s", $timestamp);
+    $ar["Severity"] = $sev_text;
+    $ar["Source"] = $source . ":" . $sport;
+    $ar["Destination"] = $dest . ":" . $dport;
+    $ar["Sensor"] = $sensorname;
+    if ($sev == 1 && $attack != "") $ar["Additional_Info"] = $attack;
+    elseif ($sev == 16 && $malware != "") $ar["Additional_Info"] = $malware;
+    else $ar["Additional_Info"] = "";
+    $data[] = $ar;
+  }
+  $pdf->ezTable($data, '', '', array( 'fontSize' => 8));
+  $pdf->ezText('__________________________________________________________', 15);
+  $pdf->ezText($space . 'http://ids.surfnet.nl', 10);
+  $fn = "SURFnet_PDF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".pdf";
+  $ar = array('Content-Disposition'=>$fn);
+  $pdf->ezStream($ar);
+  exit;
 }
 
 add_to_sql("attacks", "table");
@@ -731,8 +735,10 @@ add_to_sql("sensors.vlanid", "select");
 add_to_sql("sensors", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
 
-# IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+if ("$q_org" != "") {
+  # IP Exclusion stuff
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+}
 
 prepare_sql();
 

@@ -23,7 +23,8 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
 $allowed_post = array(
-                "int_selperiod"
+                "int_selperiod",
+                "int_orgid"
 );
 $check = extractvars($_POST, $allowed_post);
 debug_input();
@@ -67,10 +68,27 @@ echo "<table width='100%'>\n";
   echo "<tr>\n";
     echo "<td><h3>SURFnet IDS $c_version</h3></td>\n";
     echo "<td>\n";
-      echo "<form name='viewform' action='index.php' method='post'>\n";
+      echo "<form name='selectorg' method='post' action='index.php'>\n";
         echo "<table width='100%' id='sensortable'>\n";
           echo "<tr>\n";
             echo "<td align='right'>\n";
+              if ($s_admin == 1) {
+                if (isset($clean['orgid'])) {
+                  $s_org = $clean['orgid'];
+                  $_SESSION['s_org'] = $s_org;
+                }
+                $sql_orgs = "SELECT id, organisation FROM organisations ORDER BY organisation";
+                $debuginfo[] = $sql_orgs;
+                $result_orgs = pg_query($pgconn, $sql_orgs);
+                echo "<select name='int_orgid' onChange='javascript: this.form.submit();'>\n";
+                  echo printOption(0, "", $org);
+                  while ($row = pg_fetch_assoc($result_orgs)) {
+                    $org_id = $row['id'];
+                    $organisation = $row['organisation'];
+                    echo printOption($org_id, $organisation, $s_org) . "\n";
+                  }
+                echo "</select>&nbsp;\n";
+              }
               echo "<select name='int_selperiod' onChange='javascript: this.form.submit();'>\n";
                 foreach ($v_index_periods as $key => $value) {
                   echo printOption($key, $value, $sel) . "\n";

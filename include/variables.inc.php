@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.14                  #
-# 17-04-2007                       #
+# Version 1.04.15                  #
+# 08-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.15 Added orgipadmin.php error messages
 # 1.04.14 Changed help message for sensorstatus - action
 # 1.04.13 Added error message for missing vlan id
 # 1.04.12 Changed help messages
@@ -281,6 +282,13 @@ $v_errors = array(
 				97 => "Invalid or missing identifier!",
 				98 => "Invalid or missing identifier type!",
 				99 => "Organisation already exist!"
+			),
+	orgipadmin.php => array(
+				1 => "Succesfully added a new exclusion!",
+				2 => "Succesfully removed exclusion!",
+				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Exclusion IP was not a valid IP address!",
+				93 => "Invalid organisation ID!"
 			),
 	report_add.php => array(
 				91 => "You don't have sufficient rights to perform the requested action!",
