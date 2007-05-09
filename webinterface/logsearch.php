@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.24                  #
-# 04-04-2007                       #
+# Version 1.04.25                  #
+# 08-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.25 Added IP exclusion stuff
 # 1.04.24 Removed the fix
 # 1.04.23 Fix for newer PostgreSQL versions
 # 1.04.22 Fixed a bug with organisation ranges arrays
@@ -533,6 +534,10 @@ if ($rapport == "idmef") {
   add_to_sql("sensors", "table");
   add_to_sql("attacks", "table");
   add_to_sql("sensors.id = attacks.sensorid", "where");
+
+  # IP Exclusion stuff
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
   prepare_sql();
 
   ### Prepare final SQL query
@@ -625,6 +630,9 @@ if ($rapport == "idmef") {
 }
 
 if ($rapport == "pdf") {
+    # IP Exclusion stuff
+    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
     prepare_sql();
 
     ### Prepare final SQL query
@@ -722,6 +730,9 @@ add_to_sql("sensors.keyname", "select");
 add_to_sql("sensors.vlanid", "select");
 add_to_sql("sensors", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
+
+# IP Exclusion stuff
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 
 prepare_sql();
 

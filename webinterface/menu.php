@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 12-03-2007                       #
+# Version 1.04.09                  #
+# 09-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Added IP exclusions button
 # 1.04.08 Added home button
 # 1.04.07 Uncommented server admin
 # 1.04.06 Fixed another redirection bug with the $url variable
@@ -134,6 +135,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       $popup_useredit = "Account management page. Modify your account information here!";
       $popup_mail = "Mail report management. Manage your personal mail reports here!";
       $popup_org = "Organisation management page. Modify organisation info and add organisation identifiers!";
+      $popup_orgip = "Organisation IP management page. Modify IP exclusions!";
       $popup_server = "Tunnel server management page. Add or delete tunnel server machines!";
       $popup_stats = "Shows statistics about the tunnel server machine!";
       $popup_scanner = "Virus scanner management page. Add, change or delete virus scanners!";
@@ -150,6 +152,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           }
           if ($s_admin == 1) {
             echo "<li><a href='${address}orgadmin.php' onmouseover='return overlib(\"$popup_org\");' onmouseout='return nd();'>Organisation Admin</a></li>\n";
+            echo "<li><a href='${address}orgipadmin.php' onmouseover='return overlib(\"$popup_orgip\");' onmouseout='return nd();'>IP exclusions</a></li>\n";
+          } elseif ($s_access_user > 1) {
+            echo "<li><a href='${address}orgipadmin.php' onmouseover='return overlib(\"$popup_orgip\");' onmouseout='return nd();'>IP exclusions</a></li>\n";
           }
 #          if ($s_admin == 1) {
 #            echo "<li><a href='${address}serveradmin.php' onmouseover='return overlib(\"$popup_server\");' onmouseout='return nd();'>Server Admin</a></li>\n";

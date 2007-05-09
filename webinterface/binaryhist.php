@@ -3,13 +3,14 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.04.06                 #
+# Version 1.04.07                 #
 # 13-02-2007                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.07 Added CWS support 
 # 1.04.06 Added check for binary history info
 # 1.04.05 Added download option for binaries
 # 1.04.04 Changed data input handling
@@ -90,7 +91,7 @@ if ($err == 0) {
     echo $m;
   }
 }
-
+$err = 0;
 if ($err == 0) {
   $sql_bindetail = "SELECT fileinfo, filesize FROM binaries_detail WHERE bin = $bin_id";
   $result_bindetail = pg_query($pgconn, $sql_bindetail);
@@ -156,7 +157,22 @@ if ($err == 0) {
     echo "<b>Norman Result</b><br />\n";
     echo "<pre>$normanresult</pre>";
   }
-  
+
+  if ($c_cws == 1) {
+    $sql_cwsandbox = "SELECT result FROM cwsandbox WHERE binid = $bin_id";
+    $result_cwsandbox = pg_query($pgconn, $sql_cwsandbox);
+    $numrows_cwsandbox = pg_num_rows($result_cwsandbox);
+    $debuginfo[] = $sql_cwsandbox;
+    if ($numrows_cwsandbox != 0) {
+      $row_cwsandbox = pg_fetch_assoc($result_cwsandbox);
+      $cwsandboxresult = $row_cwsandbox['result'];
+      echo "<b>CWSandbox Result</b><br />\n";
+      echo "<div id='cwsandbox'>";
+      echo "$cwsandboxresult";
+      echo "</div>\n";
+    }
+  }
+
   echo "<b>Binary History</b><br />\n";
   echo "<table class='datatable' width='100%'>\n";
     echo "<tr>\n";
@@ -214,11 +230,8 @@ if ($err == 0) {
   }
   echo "</table>\n";
   echo "<br />\n";
- 
- 
 
-
- if ($show == "all") {
+  if ($show == "all") {
     $sql_filename = "SELECT DISTINCT text ";
     $sql_filename .= "FROM details ";
     $sql_filename .= "WHERE details.type = 4 AND attackid IN (SELECT DISTINCT attackid FROM details WHERE text = '$bin_name')";
@@ -252,11 +265,11 @@ if ($err == 0) {
   if ($i >= 10) {
     if ($show != "all") {
       echo "<tr>\n";
-        echo "<td><a href='binaryhist.php?int_bin=$bin_id&show=all'>Show full list</a></td>\n";
+        echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=all'>Show full list</a></td>\n";
       echo "</tr>\n";
     } else {
       echo "<tr>\n";
-        echo "<td><a href='binaryhist.php?int_bin=$bin_id&show=top'>Show top 10</a></td>\n";
+        echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=top'>Show top 10</a></td>\n";
       echo "</tr>\n";
     }
   }

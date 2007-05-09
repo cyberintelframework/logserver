@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 26-01-2006                       #
+# Version 1.04.08                  #
+# 07-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Set default back to weekly  
 # 1.04.07 Added possible attacks check 
 # 1.04.06 wrong amount of attacks bug fixed
 # 1.04.05 add_to_sql()
@@ -59,10 +60,10 @@ if (isset($tainted['b'])) {
   $b = $tainted['b'];
   $pattern = '/^(weekly|daily|monthly|all)$/';
   if (!preg_match($pattern, $b)) {
-    $b = "all";
+    $b = "weekly";
   }
 } else {
-  $b = "all";
+  $b = "weekly";
 }
 
 $year = date("Y");
@@ -200,6 +201,10 @@ if ($err != 1) {
       add_to_sql("attacks.sensorid = sensors.id", "where");
       add_to_sql("attacks.source <<= '$range'", "where");
       add_to_sql("$tsquery", "where");
+
+      # IP Exclusion stuff
+      add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
       prepare_sql();
 
       $sql_total1 = "SELECT COUNT(attacks.id) as total ";

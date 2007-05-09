@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 20-03-2007                       #
+# Version 1.04.09                  #
+# 08-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Added IP exclusion stuff
 # 1.04.08 Fixed missing link between sensors and attacks table
 # 1.04.07 Fixed sql bug
 # 1.04.06 add_to_sql()
@@ -71,6 +72,7 @@ if ($s_access_search == 9) {
     }
   }
 } else {
+  $q_org = $s_org;
   add_to_sql("sensors", "table");
   add_to_sql("sensors.organisation = $q_org", "where");
   add_to_sql("attacks.sensorid = sensors.id", "where");
@@ -105,6 +107,10 @@ if ($err != 1) {
     add_to_sql("details.text", "group");
     add_to_sql("stats_dialogue.id", "group");
     add_to_sql("total", "order");
+
+    # IP Exclusion stuff
+    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
     prepare_sql();
 
     ### Admin check.

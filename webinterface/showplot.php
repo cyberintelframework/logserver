@@ -32,12 +32,6 @@ $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-if ($s_access_search == 9 && isset($clean['org'])) {
-  $q_org = $clean['org'];
-} else {
-  $q_org = intval($s_org);
-}
-
 $drawerr = 0;
 $limit = "";
 $allowed_get = array(
@@ -59,6 +53,12 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+if ($s_access_search == 9 && isset($clean['org'])) {
+  $q_org = $clean['org'];
+} else {
+  $q_org = intval($s_org);
+}
+
 if ((!isset($clean['tsstart']) || empty($clean['tsstart'])) && !isset($clean['tsselect'])) {
   $drawerr = 1;
 } elseif ((!isset($clean['tsend']) || empty($clean['tsend'])) && !isset($clean['tsselect'])) {
@@ -79,17 +79,17 @@ if ($drawerr == 1) {
 ########################
 if (!isset($clean['org']) || empty($clean['org'])) {
   if ($s_admin == 1) { 
-    $q_org = ""; 
+    $query_org = ""; 
   } else {
-    $org = $s_org;
-    $q_org = " sensors.organisation = $org ";
+    $q_org = $s_org;
+    $query_org = " sensors.organisation = $q_org ";
   }	
 } else {
-  $org = $clean['org']; 
+  $q_org = $clean['org']; 
   if ($s_org == $org) {
-    $q_org = " sensors.organisation = $org ";
+    $query_org = " sensors.organisation = $q_org ";
   } elseif($s_admin == 1) {
-    $q_org = " sensors.organisation = $org ";
+    $query_org = " sensors.organisation = $q_org ";
   } else { 
     readfile("images/nodata.gif");
     exit; 
@@ -137,7 +137,7 @@ add_to_sql("sensors", "table");
 add_to_sql("DISTINCT attacks.severity", "select");
 add_to_sql("attacks", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
-add_to_sql("$q_org", "where");
+add_to_sql("$query_org", "where");
 
 ########################
 # Severity
@@ -398,6 +398,10 @@ if (isset($clean['ports'])) {
   if ($ports == "all") {
     add_to_sql("attacks.dport", "select");
     add_to_sql("attacks.dport", "group");
+
+    # IP Exclusion stuff
+    add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
     prepare_sql();
   } else {
     $ports = trim($ports, ",");
@@ -467,6 +471,10 @@ $maxcount = 0;
 
 add_to_sql("severity", "order");
 add_to_sql("COUNT(attacks.severity) as total", "select");
+
+# IP Exclusion stuff
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
 prepare_sql();
 
 $point = array();

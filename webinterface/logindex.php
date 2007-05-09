@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 30-03-2007                       #
+# Version 1.04.11                  #
+# 08-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Added IP exclusion stuff
 # 1.04.10 Changed printhelp stuff
 # 1.04.09 Fixed severity stuff
 # 1.04.08 Fixed typo
@@ -189,6 +190,10 @@ echo "<table class='datatable'>\n";
   add_to_sql("DISTINCT attacks.severity", "select");
   add_to_sql("COUNT(attacks.severity) as total", "select");
   add_to_sql("attacks.severity", "group");
+
+  # IP Exclusion stuff
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+
   prepare_sql();
 
   $sql_severity = "SELECT $sql_select ";

@@ -362,7 +362,7 @@ echo "<table>\n";
   echo "</tr>\n";
   echo "<tr>\n";
     echo "<td bgcolor='orange' align='center'>" .printhelp("statusorange"). "&nbsp;</td>\n";
-    echo "<td>Sensor not up to date</td>\n";
+    echo "<td>Sensor not synchronized but active</td>\n";
   echo "</tr>\n";
   echo "<tr>\n";
     echo "<td bgcolor='yellow' align='center'>" .printhelp("statusyellow"). "&nbsp;</td>\n";

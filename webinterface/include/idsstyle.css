@@ -384,3 +384,15 @@ a.searchtemplate_item {
   top: 10px;
   cursor: pointer;
 }
+
+#cwsandbox {
+  overflow-y:		scroll;
+  height:		300px;
+  margin:               2ex 10em 2ex 2em;
+  padding:              8px;
+  background-color:     #eee;
+  border:               1px solid #999;
+  color:                #000;
+  font-size:            7pt;
+  font-family:          monaco, courier, monospace;
+}
