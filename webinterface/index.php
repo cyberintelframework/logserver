@@ -2,14 +2,18 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 08-05-2007                       #
+# Version 1.04.08                  #
+# 11-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
+####################################
+# Contributors:                    #
+# David de Coster                  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Added link to search engine for attackers
 # 1.04.07 Fixed a bug with date coloring for attackers
 # 1.04.06 Fixed some layout issues
 # 1.04.05 Added dropdown box
@@ -224,7 +228,10 @@ echo "<table width='70%'>\n";
                   echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                 }
               }
-              echo "<a href='whois.php?ip_ip=$source'>$source</a>";
+              list($ip1, $ip2, $ip3, $ip4) = split("\.", $source);
+              echo "<a href='logsearch.php?sradio=A&sourceip%5B%5D=$ip1&sourceip%5B%5D=$ip2&sourceip%5B%5D=$ip3&sourceip%5B%5D=$ip4&int_sport=&int_smask=&dradio=A&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&int_dport=&int_dmask=&tsselect=$bs&strip_html_escape_tsstart=&strip_html_escape_tsend=&reptype=multi&int_sev=-1&int_attack=-1&strip_html_escape_virustxt=&strip_html_escape_filename=&orderm=DESC&strip_html_escape_tsstart=%3A&strip_html_escape_tsend=%3A'>$source</a>";
+              echo "  ";
+              echo "<a href='whois.php?ip_ip=$source'>[whois]</a>";
             echo "</td>\n";
             echo "<td class='datatd' style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
             echo "<td class='datatd'>$row[count]</td>\n";
