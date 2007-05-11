@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 1.04.09 Fixed a bug in the link to the search engine
 # 1.04.08 Added link to search engine for attackers
 # 1.04.07 Fixed a bug with date coloring for attackers
 # 1.04.06 Fixed some layout issues
@@ -115,6 +116,7 @@ if ($sel == 0) {
   $end = getEndDay($day, $month, $year);
   $interval_a = 3600;
   $interval_p = 3600;
+  $bs = "D";
 } elseif ($sel == 1) {
   $start = date("U") - (7 * 24 * 60 * 60);
   $end = date("U");
@@ -123,6 +125,7 @@ if ($sel == 0) {
   $ts_qs = "?strip_html_escape_tsstart=$startqs&strip_html_escape_tsend=$endqs";
   $interval_a = 3600;
   $interval_p = 86400;
+  $bs = "W";
 }
 
 echo "<table width='70%'>\n";
