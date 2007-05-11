@@ -3,15 +3,19 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.12                  #
-# 09-05-2007                       #
+# Version 1.04.13                  #
+# 11-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
-# Modified by Peter Arts           #
-# Contribution by Bjoern Weiland   #
+# Peter Arts                       #
+####################################
+# Contributors:                    #
+# Bjoern Weiland                   #
+# David de Coster                  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.13 Added links for top source addresses
 # 1.04.12 Added IP exclusions stuff
 # 1.04.11 Added percentages to the stats
 # 1.04.10 Fixed typo
@@ -73,9 +77,11 @@ if (isset($tainted['b'])) {
   $pattern = '/^(weekly|daily|monthly|all)$/';
   if (!preg_match($pattern, $b)) {
     $b = "weekly";
+    $bs = "W";
   }
 } else {
   $b = "weekly";
+  $bs = "W";
 }
 $year = date("Y");
 if ($b == "monthly") {
@@ -86,6 +92,7 @@ if ($b == "monthly") {
   $prev = $month - 1;
   $start = getStartMonth($month, $year);
   $end = getEndMonth($month, $year);
+  $bs = "M";
 } else {
   $month = date("n");
 }
@@ -97,6 +104,7 @@ if ($b == "daily") {
   $next = $day + 1;  
   $start = getStartDay($day, $month, $year);
   $end = getEndDay($day, $month, $year);
+  $bs = "D";
 } else {
   $day = date("d");
 }
@@ -112,6 +120,7 @@ if ($b == "weekly") {
 if ($b == "all") {
   $dateqs = "";
   $tsquery = "";
+  $bs = "";
 } else {
   $dateqs = "&amp;int_from=$start&amp;int_to=$end";
   $tsquery = " timestamp >= $start AND timestamp <= $end";
@@ -822,7 +831,10 @@ echo "<table width='100%'>\n";
                           echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                         }
                       }
-                      echo "<a href='whois.php?ip_ip=$key'>$key</a>";
+                    list($ip1, $ip2, $ip3, $ip4) = split("\.", $key);
+                      echo "<a href='logsearch.php?sradio=A&sourceip%5B%5D=$ip1&sourceip%5B%5D=$ip2&sourceip%5B%5D=$ip3&sourceip%5B%5D=$ip4&int_sport=&int_smask=&dradio=A&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&int_dport=&int_dmask=&tsselect=$bs&strip_html_escape_tsstart=&strip_html_escape_tsend=&reptype=multi&int_sev=-1&int_attack=-1&strip_html_escape_virustxt=&strip_html_escape_filename=&orderm=DESC&strip_html_escape_tsstart=%3A&strip_html_escape_tsend=%3A'>$key</a>";
+                      echo "  ";
+                      echo "<a href='whois.php?ip_ip=$key'>[whois]</a>";
                     echo "</td>\n";
                     $perc = round($val / $grandtotal * 100);
                     echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";
