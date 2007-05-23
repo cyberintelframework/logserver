@@ -2,14 +2,15 @@
 ####################################
 # CWSandbox retrieval script       #
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 09-05-2007                       #
+# Version 1.04.03                  #
+# 16-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Dave De Coster (Mods for CWS)    #
 ####################################
 
 ###############################################
 # Changelog:
+# 1.04.03 Added Norman sandbox support again
 # 1.04.02 Skipping messages without md5
 # 1.04.01 Initial release
 ###############################################
@@ -61,7 +62,58 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
   }
   chomp($subject);
   print "subject: $subject\n";
-  if ($subject =~ m/CWSandbox/) {
+
+  if ($subject eq " [SANDBOX] Uploaded from web") {
+    print "Found Norman sandbox report!\n";
+    ################################
+    # Norman Sandbox
+    ################################
+    $body = $pop->Body($i) . "\n";
+    open(LOG, "> $mailfile");
+    print LOG "$body";
+    close(LOG);
+    $count = `cat $mailfile | wc -l`;
+    $count = $count - 27;
+    $body = `tail -n $count $mailfile`;
+    $body =~ s/'/ /g;
+    $body =~ s/\\/\\\\/g;
+    open(LOG, "> $mailfile");
+    print LOG "$body";
+    close(LOG);
+    $count2 = `cat $mailfile | wc -l`;
+    $count2 = $count2 - 4;
+    $body = `head -n $count2 $mailfile`;
+
+    $md5 = `cat $mailfile |grep "MD5 hash:" | awk -F: '{print \$2}' |awk -F. '{print \$1}'`;
+    $subject =~ s/^\s+//;
+    $md5 =~ s/^\s+//;
+    chomp($md5);
+    $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
+        or die $DBI::errstr;
+    $sth_md5 = $dbh->prepare("SELECT id FROM uniq_binaries WHERE name='$md5'");
+    $execute_result = $sth_md5->execute();
+    $numrows_md5 = $sth_md5->rows;
+    @bin_id = $sth_md5->fetchrow_array;
+    $bin_id = $bin_id[0];
+    if ($numrows_md5 == 0) {
+      print "Adding md5: $md5 into uniq_binaries table\n";
+      $sth_putmd5 = $dbh->prepare("INSERT INTO uniq_binaries (name) VALUES ('$md5')");
+      $execute_result = $sth_putmd5->execute();
+      $sth_md5 = $dbh->prepare("SELECT id FROM uniq_binaries WHERE name='$md5'");
+      $execute_result = $sth_md5->execute();
+      $numrows_md5 = $sth_md5->rows;
+      @bin_id = $sth_md5->fetchrow_array;
+      $bin_id = $bin_id[0];
+    }
+    print "Adding new norman result info for binary ID: $bin_id\n";
+    $sth_putnorman = $dbh->prepare("INSERT INTO norman (binid, result) VALUES ('$bin_id', '$body')");
+    $execute_result = $sth_putnorman->execute();
+  }
+  elsif ($subject =~ m/CWSandbox/) {
+    print "Found CWSandbox report!\n";
+    ################################
+    # CWSandbox
+    ################################
     $body = $pop->HeadAndBody($i) . "\n";
     open(LOG, "> $mailfile");
     print LOG "$body";
@@ -114,7 +166,8 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     print "Adding new CWSandbox result info for binary ID: $bin_id\n";
     $sth_putcwsandbox = $dbh->prepare("INSERT INTO cwsandbox (binid, xml, result) VALUES ('$bin_id', '$xml2', '$body2')");
     $execute_result = $sth_putcwsandbox->execute();
-  
+  }
+  if ("$md5" ne "") {
     ##############
     # BINARIES_DETAIL
     ##############
@@ -146,6 +199,7 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
         $result_checkbin = $sth_checkbin->execute();
       } else { print "File does not exists"; }
     }
+    $md5 = "";
   }
 }
 

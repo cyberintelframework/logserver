@@ -398,3 +398,7 @@ a.searchtemplate_item {
   font-size:            7pt;
   font-family:          monaco, courier, monospace;
 }
+
+.altselect {
+  background-color:	white;
+}

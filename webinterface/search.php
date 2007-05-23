@@ -1,4 +1,4 @@
-<?php include("menu.php"); set_title("Search");
+<?php include("menu.php");
 
 ####################################
 # SURFnet IDS                      #
@@ -50,7 +50,110 @@ function check_byte(b_val,next_field) {
         }
     }
 }
+
+function changeSearch() {
+  var check = document.getElementById('arpsearch').style.display;
+
+  if (check == 'none') {
+    document.getElementById('arpsearch').style.display='';
+    document.getElementById('normalsearch').style.display='none';
+    
+  } else {
+    document.getElementById('arpsearch').style.display='none';
+    document.getElementById('normalsearch').style.display='';
+  }
+}
 </script>
+
+<div id='arpsearch' style='display: none;'>
+  <?php
+    set_title("ARP Search");
+  ?>
+  <input type='button' class='button' name='switcher' value='Switch to normal search' onClick='changeSearch();' />
+  <form action='arplog.php' method='get' name='arpsearchform'>
+  <table>
+    <tr>
+      <td>
+        <table class='datatable'>
+          <tr>
+            <td colspan=2><h4>Who</h4></td>
+          </tr>
+          <tr>
+            <td class='datatd' width=140>Sensor:</td>
+            <td class='datatd' width=250>
+              <?php
+                $sql = "SELECT sensors.id, keyname, vlanid, organisations.organisation FROM sensors, organisations ";
+                $sql .= " WHERE NOT status = 3 AND organisations.id = sensors.organisation ORDER BY sensors.id";
+                $debuginfo[] = $sql;
+                $query = pg_query($sql);
+                echo "<select name='int_filter' size='5' multiple='false' class='altselect'>";
+                  echo "<option value='0' selected>All sensors</option>\n";
+                  while ($sensor_data = pg_fetch_assoc($query)) {
+                    $id = $sensor_data['id'];
+                    $keyname = $sensor_data['keyname'];
+                    $vlanid = $sensor_data['vlanid'];
+                    if ($vlanid != 0) {
+                      $keyname = "$keyname-$vlanid";
+                    }
+                    echo "<option value='$id'>$keyname ";
+                    if ($s_admin == 1) {
+                      $org = $sensor_data['organisation'];
+                      echo "($org)";
+                    }
+                    echo "</option>\n";
+                  }
+                echo "</select>\n";
+              ?>
+            </td>
+          </tr>
+          <tr>
+            <td class='datatd'>Source:</td>
+            <td class='datatd'><input type='text' name='mac_source' /></td>
+          </tr>
+          <tr>
+            <td class='datatd'>Target:</td>
+            <td class='datatd'><input type='text' name='target' /></td>
+          </tr>
+          <tr>
+            <td colspan=2><h4>When</h4></td>
+          </tr>
+          <tr>
+            <td class="datatd">Select:</td>
+            <td class="datatd">
+              <select name="tsselect" class='altselect'>
+                <option value=""></option>
+                <option value="H">Last hour</option>
+                <option value="D">Last 24 hour</option>
+                <option value="T">Today</option>
+                <option value="W">Last week</option>
+                <option value="M">Last month</option>
+                <option value="Y">Last year</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="datatd">Between:</td>
+            <td class="datatd"><input type="text" name="strip_html_escape_tsstart" id="ts_arp_start" /> <input type="button" value="..." name="ts_arp_start_trigger" id="ts_arp_start_trigger" /></td>
+          </tr>
+          <tr>
+            <td class="datatd">And: </td>
+            <td class="datatd"><input type="text" name="strip_html_escape_tsend" id="ts_arp_end" /> <input type="button" value="..." name="ts_arp_end_trigger" id="ts_arp_end_trigger" /></td>
+          </tr>
+          <tr>
+            <td colspan=2 align="right"><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  </form>
+</div>
+
+<div id='normalsearch' style='display: inline;'>
+<?php
+  set_title("Search");
+?>
+<input type='button' class='button' name='switcher' value='Switch to ARP search' onClick='changeSearch();' />
 
 <form method="get" action="logsearch.php" name="searchform" id="searchform">
 
@@ -242,6 +345,7 @@ function check_byte(b_val,next_field) {
 </table>
 </form>
 <p>*) Wildcard is %</p>
+</div>
 
 <div id="searchtemplate">
 <div id="searchtemplate_form">
@@ -313,8 +417,8 @@ function catcalc(cal) {
     field.value = date2.print("%d-%m-%Y %H:%M");
 }
 
-  Calendar.setup(
-    {
+Calendar.setup(
+  {
       inputField  : "ts_start",
       ifFormat    : "%d-%m-%Y %H:%M",
       button      : "ts_start_trigger",
@@ -322,8 +426,8 @@ function catcalc(cal) {
       singleClick : false,
       onUpdate    : catcalc
     }
-  );
-  Calendar.setup(
+);
+Calendar.setup(
     {
       inputField  : "ts_end",
       ifFormat    : "%d-%m-%Y %H:%M",
@@ -331,7 +435,27 @@ function catcalc(cal) {
       showsTime   : true,
       singleClick : false
     }
-  );
+);
+
+Calendar.setup(
+  {
+      inputField  : "ts_arp_start",
+      ifFormat    : "%d-%m-%Y %H:%M",
+      button      : "ts_arp_start_trigger",
+      showsTime   : true,
+      singleClick : false,
+      onUpdate    : catcalc
+    }
+);
+Calendar.setup(
+    {
+      inputField  : "ts_arp_end",
+      ifFormat    : "%d-%m-%Y %H:%M",
+      button      : "ts_arp_end_trigger",
+      showsTime   : true,
+      singleClick : false
+    }
+);
 </script>
 <?php
 debug_sql();

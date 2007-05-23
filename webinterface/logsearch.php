@@ -273,10 +273,10 @@ if (in_array($ts_select, $ar_valid_values)) {
       // today
       $dt = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
       break;
-    }
-    if ($dt_sub > 0) $dt -= $dt_sub;
-    $ts_start = date("d-m-Y H:i:s", $dt);
-   $ts_end = date("d-m-Y H:i:s", time());
+  }
+  if ($dt_sub > 0) $dt -= $dt_sub;
+  $ts_start = date("d-m-Y H:i:s", $dt);
+  $ts_end = date("d-m-Y H:i:s", time());
 } else {
   $ts_start = $clean["tsstart"];
   $ts_end = $clean["tsend"];

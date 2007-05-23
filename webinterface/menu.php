@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 09-05-2007                       #
+# Version 1.04.10                  #
+# 16-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Added ARP admin button
 # 1.04.09 Added IP exclusions button
 # 1.04.08 Added home button
 # 1.04.07 Uncommented server admin
@@ -44,6 +45,7 @@ if ($file != "login.php") {
     $s_user = $_SESSION['s_user'];
     $s_access = $_SESSION['s_access'];
     $s_access_user = intval($s_access{2});
+    $s_access_sensor = intval($s_access{0});
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);
@@ -139,6 +141,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       $popup_server = "Tunnel server management page. Add or delete tunnel server machines!";
       $popup_stats = "Shows statistics about the tunnel server machine!";
       $popup_scanner = "Virus scanner management page. Add, change or delete virus scanners!";
+      $popup_arp = "ARP management page. Configure the ARP detection module!";
 
       echo "<div class='nav-sub-menu'>\n";
         echo "<ul>\n";
@@ -161,6 +164,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
 #          }
           if ($s_admin == 1) {
             echo "<li><a href='${address}serverstats.php' onmouseover='return overlib(\"$popup_stats\");' onmouseout='return nd();'>Server Info</a></li>\n";
+          }
+          if ($s_access_sensor > 1) {
+            echo "<li><a href='${address}arpadmin.php' onmouseover='return overlib(\"$popup_arp\");' onmouseout='return nd();'>ARP Admin</a></li>\n";
           }
         echo "</ul>\n";
       echo "</div>\n";

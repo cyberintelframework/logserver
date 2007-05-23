@@ -221,6 +221,67 @@ echo "<table class='datatable'>\n";
     echo "</tr>\n";
   }
 echo "</table>\n";
+echo "<br /><br />\n";
+
+reset_sql();
+
+# SELECT
+add_to_sql("DISTINCT arp_alert.type", "select");
+add_to_sql("sensors.id", "select");
+add_to_sql("keyname", "select");
+add_to_sql("organisation", "select");
+add_to_sql("COUNT(arp_alert.id) as total", "select");
+# FROM
+add_to_sql("arp_alert", "table");
+add_to_sql("sensors", "table");
+# WHERE
+add_to_sql("$tsquery", "where");
+add_to_sql("arp_alert.sensorid = sensors.id", "where");
+if ($s_access_search != 9 || ($s_access_search == 9 && $q_org != 0)) {
+  add_to_sql("sensors.organisation = $q_org", "where");
+}
+# GROUP BY
+add_to_sql("type", "group");
+add_to_sql("sensors.id", "group");
+add_to_sql("keyname", "group");
+add_to_sql("organisation", "group");
+
+prepare_sql();
+
+$sql_arp = "SELECT $sql_select ";
+$sql_arp .= " FROM $sql_from ";
+$sql_arp .= " $sql_where ";
+$sql_arp .= " GROUP BY $sql_group ";
+
+$debuginfo[] = $sql_arp;
+
+$result_arp = pg_query($pgconn, $sql_arp);
+
+echo "<table class='datatable'>\n";
+  echo "<tr>\n";
+    echo "<td class='dataheader' colspan='3' width='600'>ARP Logs</td>\n";
+  echo "</tr>\n";
+  echo "<tr>\n";
+    echo "<td class='dataheader' width='400'>Type</td>\n";
+    echo "<td class='dataheader' width='100'>Sensor</td>\n";
+    echo "<td class='dataheader' width='100'>Statistics</td>\n";
+  echo "</tr>\n";
+
+  while($row = pg_fetch_assoc($result_arp)) {
+    $id = $row['id'];
+    $type = $row['type'];
+    $type = $v_arp_alerts[$type];
+    $keyname = $row['keyname'];
+    $count = $row['total'];
+    $orgid = $row['organisation'];
+    echo "<tr>\n";
+      echo "<td class='datatd'>$type</td>\n";
+      echo "<td class='datatd'>$keyname</td>\n";
+      echo "<td class='datatd' align='right'><a href='arplog.php?int_org=$orgid&amp;int_filter=$id$searchqs'>" . nf($count) . "</a></td>\n";
+    echo "</tr>\n";
+  }
+echo "</table>\n";
+
 pg_close($pgconn);
 debug_sql();
 ?>

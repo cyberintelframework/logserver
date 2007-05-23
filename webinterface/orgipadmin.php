@@ -46,7 +46,7 @@ if ($s_admin == 1) {
     $org = $s_org;
   }
   echo "<form name='selectorg' method='get' action='orgipadmin.php'>\n";
-  $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
+  $sql_orgs = "SELECT id, organisation FROM organisations ORDER BY organisation";
   $debuginfo[] = $sql_orgs;
   $result_orgs = pg_query($pgconn, $sql_orgs);
   echo "<select name='int_orgid' onChange='javascript: this.form.submit();'>\n";

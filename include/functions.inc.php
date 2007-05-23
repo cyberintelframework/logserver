@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.12                  #
-# 30-03-2007                       #
+# Version 1.04.13                  #
+# 16-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.13 Added mac type to extractvars
 # 1.04.12 Modified printhelp
 # 1.04.11 Modified censorip()
 # 1.04.10 Added censorip()
@@ -253,6 +254,7 @@ function getEndDay($day = '', $month = '', $year = '') {
 #   bool - boolean regexp
 #   ip - ip address regexp
 #   net - network range regexp
+#   mac - mac address regexp
 # These checks should be prepended to the variable name separated by a _ character
 # Examples:
 # int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
@@ -321,6 +323,13 @@ function extractvars($source, $allowed) {
                   $ip_test = $ar_test[0];
                   $mask_test = intval($ar_test[1]);
                   if (preg_match($ipregexp, $ip_test) && $mask_test >= 0 && $mask_test <= 32) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "mac") {
+                  $macregexp = '/^([a-zA-Z0-9]{2}:){5}[a-zA-Z0-9]{2}$/';
+                  if (preg_match($macregexp, $var)) {
                     $clean[$temp] = $var;
                   } else {
                     $tainted[$temp] = $var;

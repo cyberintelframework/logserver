@@ -103,9 +103,9 @@ if ($s_access_user > 1) {
         echo "<td>$orgname</td>\n";
         echo "<td>$lastlogin</td>\n";
         echo "<td>$access</td>\n";
-        echo "<td align=center><a href='useredit.php?int_userid=$id'><font size=1>[Modify]</font></a></td>\n";
-        echo "<td align=center><a href='userdel.php?int_userid=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this user?');\"><font size=1>[Delete]</font></a></td>\n";
-        echo "<td align=center><a href='mailadmin.php?int_userid=$id'><font size=1>[Edit Mailsetting]</font></a></td>\n";
+        echo "<td align=center>[<a href='useredit.php?int_userid=$id'><font size=1>Modify</font></a>]</td>\n";
+        echo "<td align=center>[<a href='userdel.php?int_userid=$id' onclick=\"javascript: return confirm('Are you sure you want to delete this user?');\"><font size=1>Delete</font></a>]</td>\n";
+        echo "<td align=center>[<a href='mailadmin.php?int_userid=$id'><font size=1>Edit Mailsetting</font></a>]</td>\n";
       echo "</tr>\n";
     }
   echo "</table>\n";

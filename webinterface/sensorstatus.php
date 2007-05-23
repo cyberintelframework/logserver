@@ -60,7 +60,7 @@ if (isset($tainted['sort'])) {
     $direction = "DESC";
   }
   if ($type == "k") {
-    add_to_sql("ORDER BY keyname $direction", "order");
+    add_to_sql("ORDER BY keyname, vlanid $direction", "order");
   } elseif ($type == "l") {
     add_to_sql("ORDER BY tap $direction", "order");
   } elseif ($type == "o") {
@@ -68,7 +68,7 @@ if (isset($tainted['sort'])) {
   }
 } else {
   $neworder = "d";
-  add_to_sql("keyname ASC", "order");
+  add_to_sql("keyname, vlanid ASC", "order");
 }
 
 if (isset($clean['selview'])) {
@@ -208,6 +208,7 @@ echo "<table class='datatable' width='100%'>\n";
     $server = $row['server'];
     $netconf = $row['netconf'];
     $vlanid = $row['vlanid'];
+    $arp = $row['arp'];
     if ($vlanid != 0) {
       $sensor = "$sensor-$vlanid";
     }
@@ -351,6 +352,11 @@ echo "<table class='datatable' width='100%'>\n";
               echo "" . printOption("ENABLE", "Enable", $action) . "\n";
               echo "" . printOption("IGNORE", "Ignore", $action) . "\n";
               echo "" . printOption("UNIGNORE", "Unignore", $action) . "\n";
+              if ($arp == 1) {
+                echo "" . printOption("DISABLEARP", "Disable ARP", $action) . "\n";
+              } else {
+                echo "" . printOption("ENABLEARP", "Enable ARP", $action) . "\n";
+              }
             echo "</select>\n";
             echo "<td colspan='12' class='datatd' align='right'>\n";
               echo "<input type='submit' name='submit' value='Update' class='button' />";

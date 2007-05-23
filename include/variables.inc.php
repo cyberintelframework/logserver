@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.15                  #
-# 08-05-2007                       #
+# Version 1.04.16                  #
+# 21-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.16 Added v_arp_alerts array
 # 1.04.15 Added orgipadmin.php error messages
 # 1.04.14 Changed help message for sensorstatus - action
 # 1.04.13 Added error message for missing vlan id
@@ -239,6 +240,21 @@ $v_org_ident_type_ar = array(
 );
 
 $v_errors = array(
+	arpadmin.php => array(
+				1 => "Succesfully added a new static ARP entry!",
+				2 => "Succesfully deleted a static ARP entry!",
+				3 => "Succesfully cleared the ARP cache!",
+				4 => "Enabled the ARP module for this sensor!",
+				5 => "Disabled the ARP module for this sensor!",
+				90 => "You don't have sufficient rights to perform the requested action!",
+				91 => "Invalid hash!",
+				92 => "Missing or invalid MAC address!",
+				93 => "Missing or invalid IP address!",
+				94 => "Missing or invalid sensor ID!",
+				95 => "Missing or invalid ID!",
+				96 => "MAC address already exists!",
+				97 => "Missing or invalid filter ID!"
+			),
 	binaryhist.php => array(
 				91 => "No info could be found for the given binary!"
 			),
@@ -314,6 +330,8 @@ $v_errors = array(
 			),
 	sensorstatus.php => array(
 				1 => "Successfully saved the sensor status!",
+				2 => "Successfully enabled ARP detection for this sensor!",
+				3 => "Successfully disabled ARP detection for this sensor!",
 				91 => "You don't have sufficient rights to perform the requested action!",
 				92 => "Invalid or missing action!",
 				93 => "Invalid or missing sensor ID!",
@@ -390,6 +408,10 @@ $v_phplot_data_colors = array(
 );
 
 $v_help = array(
+	arpadmin.php => array(
+		"arpcache" => "This is the ARP cache that the ARP module keeps track of. This ARP cache gets filled based on ARP queries and replies that are detected by the sensor.",
+		"arpmonitor" => "These are the MAC/IP pairs that are to be scanned by the ARP module. Whenever a change is detected that differs from these pairs, an alert is generated. Add the MAC/IP pair of your important servers in here. The scripts list is updated every $c_arp_static_refresh seconds."
+	),
 	logindex.php => array(
 		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
 		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.<br /> An exploit was used to try and gain entry to the system.",
@@ -420,5 +442,9 @@ $v_help = array(
 		"statusblue" => "The sensor needs configuration. This is a status particularly for statically configured sensors. Configure the tap IP address to fix this.",
 		"statusnone" => "The sensor is on ignore. This can be either because a different sensor of the same name is active or the sensor is manually ignored."
 	)
+);
+
+$v_arp_alerts = array(
+	1 => "ARP Poisoning"
 );
 ?>
