@@ -292,6 +292,10 @@ img {
   color:		red;
   font-weight:		bold;
 }
+.ok {
+  color:		green;
+  font-weight:		bold;
+}
 .button {
   background: url(../images/nav-menu.jpg);
 }
