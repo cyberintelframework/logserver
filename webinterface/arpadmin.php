@@ -218,7 +218,7 @@ if ($s_access_sensor > 1) {
   echo "</form>\n";
 
   echo "<h4>Current ARP cache " .printhelp("arpcache"). "</h4>\n";
-  echo "<a href='arp_static_clr.php?int_org=$q_org&md5_hash=$s_hash&int_filter=$filter' onclick=\"javascript: return confirm('Are you sure you want to clear the ARP cache?');\">Clear ARP cache</a><br />\n";
+  echo "<a href='arp_cache_clr.php?int_org=$q_org&md5_hash=$s_hash&int_filter=$filter' onclick=\"javascript: return confirm('Are you sure you want to clear the ARP cache?');\">Clear ARP cache</a><br />\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td width='150' class='dataheader'><a href='$url${op}sort=mac$neworder'>MAC address</a></td>\n";
