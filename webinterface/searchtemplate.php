@@ -2,14 +2,15 @@
 
 #################################################
 # SURFnet IDS                      		#
-# Version 1.04.05                  		#
-# 13-03-2007                       		#
+# Version 1.04.06                  		#
+# 24-05-2007                       		#
 # Peter Arts 					#
 # Modified by Jan van Lith & Kees Trippelvitz   #
 #################################################
 
 #############################################
 # Changelog:
+# 1.04.06 Fixed a bug with the links (reported by Bjoern Weiland)
 # 1.04.05 Fixed a bug with timestamping
 # 1.04.04 Changed data input handling
 # 1.04.03 Added debug info	    
@@ -65,7 +66,7 @@ if ($action == "admin") {
     // list current searchtemplates
     echo " <tr class='datatr'>\n";
     echo "  <td class='datatd'>" . $row["title"] . "</td>\n";
-    echo "  <td class='datatd'>[ <a href=\"/searchtemplate.php?action=admin&int_delete=" . $row["id"] . "\" onclick=\"return confirm('Delete this searchtemplate?');\">delete</a> ]</td>\n";
+    echo "  <td class='datatd'>[ <a href=\"searchtemplate.php?action=admin&int_delete=" . $row["id"] . "\" onclick=\"return confirm('Delete this searchtemplate?');\">delete</a> ]</td>\n";
     echo " </tr>\n";
   }
   echo "</table>\n";
@@ -147,7 +148,7 @@ if ($action == "admin") {
     $m = geterror(93);
     echo $m;
   }
-  echo "<p><a href=\"/search.php\">Back to search</a></p>\n";
+  echo "<p><a href=\"search.php\">Back to search</a></p>\n";
 }
 debug_sql();
 footer(); ?>

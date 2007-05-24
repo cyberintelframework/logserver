@@ -1,3 +1,19 @@
+/*
+ * ####################################
+ * # SURFnet IDS                      #
+ * # Version 1.04.02                  #
+ * # 09-05-2007                       #
+ * # Jan van Lith & Kees Trippelvitz  #
+ * # Modified by Peter Arts           #
+ * ####################################
+ *
+ * #############################################
+ * # Changelog:
+ * # 1.04.02 Fixed searchtemplate url bug
+ * # 1.04.01 Initial release
+ * #############################################
+ */
+
 function basename (path) { return path.replace( /.*\//, "" ); }
 
 function changeId(id) {
@@ -60,7 +76,7 @@ function submitSearchTemplateFromResults(url) {
     return false;
   }
   if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
-    url = '/searchtemplate.php?' + url + '&strip_html_escape_sttitle=' + title;
+    url = 'searchtemplate.php?' + url + '&strip_html_escape_sttitle=' + title;
     url = URLDecode(url);
     window.location.href = url;
     return true;
