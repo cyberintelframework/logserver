@@ -1,10 +1,12 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.13
--- 09-05-2007
+-- Version 1.04.15
+-- 24-05-2007
 --
 
 -- Version history
+-- 1.04.15 Added manufacturer column to arp_cache
+-- 1.04.14 Added ARP tables
 -- 1.04.13 Added CWS table and org_excl table
 -- 1.04.12 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
 -- 1.04.11 Added default value for status
@@ -57,7 +59,8 @@ CREATE TABLE sensors (
     organisation integer DEFAULT 0 NOT NULL,
     server integer DEFAULT 1 NOT NULL,
     netconfdetail text,
-    vlanid integer DEFAULT 0
+    vlanid integer DEFAULT 0,
+    arp integer DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE ONLY sensors
@@ -577,3 +580,56 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE uniq_binaries TO idslog;
 GRANT SELECT,UPDATE ON TABLE uniq_binaries_id_seq TO idslog;
 GRANT INSERT,SELECT ON TABLE uniq_binaries TO nepenthes;
 GRANT SELECT,UPDATE ON TABLE uniq_binaries_id_seq TO nepenthes;
+
+--
+-- ARP_ALERT
+--
+CREATE TABLE arp_alert (
+    id serial NOT NULL,
+    sensorid integer NOT NULL,
+    "timestamp" integer NOT NULL,
+    targetmac macaddr NOT NULL,
+    sourcemac macaddr NOT NULL,
+    targetip inet NOT NULL,
+    "type" integer NOT NULL
+);
+
+ALTER TABLE ONLY arp_alert
+    ADD CONSTRAINT arp_alert_pkey PRIMARY KEY (id);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_alert TO idslog;
+GRANT SELECT,UPDATE ON TABLE arp_alert_id_seq TO idslog;
+
+--
+-- ARP_CACHE
+--
+CREATE TABLE arp_cache (
+    id serial NOT NULL,
+    mac macaddr NOT NULL,
+    ip inet NOT NULL,
+    sensorid integer NOT NULL,
+    last_seen integer NOT NULL,
+    manufacturer character varying
+);
+
+ALTER TABLE ONLY arp_cache
+    ADD CONSTRAINT arp_cache_pkey PRIMARY KEY (id);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_cache TO idslog;
+GRANT SELECT,UPDATE ON TABLE arp_cache_id_seq TO idslog;
+
+--
+-- ARP_STATIC
+--
+CREATE TABLE arp_static (
+    id serial NOT NULL,
+    mac macaddr NOT NULL,
+    ip inet NOT NULL,
+    sensorid integer NOT NULL
+);
+
+ALTER TABLE ONLY arp_static
+    ADD CONSTRAINT arp_static_pkey PRIMARY KEY (id);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_static TO idslog;
+GRANT SELECT,UPDATE ON TABLE arp_static_id_seq TO idslog;
