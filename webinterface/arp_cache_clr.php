@@ -71,7 +71,11 @@ if (isset($clean['filter'])) {
 }
 
 if ($err == 0) {
-  $sql = "DELETE FROM arp_cache WHERE sensorid = $filter";
+  if ($filter != 0) {
+    $sql = "DELETE FROM arp_cache WHERE sensorid = $filter AND sensorid IN (SELECT id FROM sensors WHERE sensors.organisation = $q_org)";
+  } else {
+    $sql = "DELETE FROM arp_cache WHERE sensorid IN (SELECT id FROM sensors WHERE organisation = $q_org)";
+  }
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
 

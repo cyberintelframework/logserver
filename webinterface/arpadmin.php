@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.01                  #
-# 16-05-2007                       #
+# Version 1.04.02                  #
+# 24-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.02 Added manufacturer stuff
 # 1.04.01 Initial release
 ####################################
 
@@ -31,7 +32,7 @@ debug_input();
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $url = str_replace("&sort=" . $sort, "", $url);
-  $pattern = '/^(ida|idd|maca|macd|ipa|ipd|keynamea|keynamed|last_seena|last_seend)$/';
+  $pattern = '/^(ida|idd|maca|macd|ipa|ipd|keynamea|keynamed|last_seena|last_seend|manufacturera|manufacturerd)$/';
   if (!preg_match($pattern, $sort)) {
     $sort = "ida";
   }
@@ -223,13 +224,14 @@ if ($s_access_sensor > 1) {
     echo "<tr class='datatr'>\n";
       echo "<td width='150' class='dataheader'><a href='$url${op}sort=mac$neworder'>MAC address</a></td>\n";
       echo "<td width='100' class='dataheader'><a href='$url${op}sort=ip$neworder'>IP address</a></td>\n";
+      echo "<td width='150' class='dataheader'><a href='$url${op}sort=manufacturer$neworder'>NIC Manufacturer</a></td>\n";
       echo "<td width='100' class='dataheader'><a href='$url${op}sort=keyname$neworder'>Sensor</a></td>\n";
       echo "<td width='150' class='dataheader'><a href='$url${op}sort=last_seen$neworder'>Last changed</a></td>\n";
       echo "<td width='50' class='dataheader'>Status</td>\n";
       echo "<td class='dataheader'></td>\n";
     echo "</tr>\n";
 
-    $sql_arp_cache = "SELECT arp_cache.id, arp_cache.mac, ip, sensors.keyname, sensors.vlanid, sensors.id as sid, arp_cache.last_seen ";
+    $sql_arp_cache = "SELECT arp_cache.id, arp_cache.mac, ip, sensors.keyname, sensors.vlanid, sensors.id as sid, arp_cache.last_seen, manufacturer ";
     $sql_arp_cache .= "FROM arp_cache, sensors WHERE arp_cache.sensorid = sensors.id AND sensors.organisation = $q_org ";
     if ($filter != 0) {
       $sql_arp_cache .= " AND sensors.id = $filter ";
@@ -245,6 +247,7 @@ if ($s_access_sensor > 1) {
       $sensor = $row_cache['keyname'];
       $vlanid = $row_cache['vlanid'];
       $sensorid = $row_cache['sid'];
+      $man = $row_cache['manufacturer'];
       $lastseen = date("d-m-Y H:i:s", $row_cache['last_seen']);
       if ($vlanid != 0) {
         $sensor = "$sensor-$vlanid";
@@ -265,6 +268,7 @@ if ($s_access_sensor > 1) {
           echo "<td><font class='warning'>$mac</font><input type='hidden' name='mac_macaddr' value='$mac' /></td>\n";
         }
         echo "<td>$ip<input type='hidden' name='ip_ipaddr' value='$ip' /></td>\n";
+        echo "<td>$man</td>\n";
         echo "<td>$sensor<input type='hidden' name='int_sensor' value='$sensorid' /></td>\n";
         echo "<td>$lastseen</td>\n";
         if ($poisoned == 0) {

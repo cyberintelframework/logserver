@@ -253,7 +253,8 @@ $v_errors = array(
 				94 => "Missing or invalid sensor ID!",
 				95 => "Missing or invalid ID!",
 				96 => "MAC address already exists!",
-				97 => "Missing or invalid filter ID!"
+				97 => "Missing or invalid filter ID!",
+				98 => "Cannot add this record. MAC/IP pair is possibly poisoned!"
 			),
 	binaryhist.php => array(
 				91 => "No info could be found for the given binary!"
