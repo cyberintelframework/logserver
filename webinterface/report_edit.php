@@ -99,6 +99,8 @@ if ($report_content_id > 0) {
     $priority = $report_content["priority"];
     $frequency = $report_content["frequency"];
     $subject = $report_content['subject'];
+    $sensor_id = $report_content['sensor_id'];
+    $active = $report_content['active'];
     
     # Template: Thresholds
     if ($template == 3) {
@@ -254,6 +256,104 @@ if ($report_content_id > 0) {
         echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
       echo "</form>\n";
       echo "<script language=\"javascript\" type=\"text/javascript\">updateThreshold();</script>\n";
+    } elseif ($template == 5) {
+      ########################
+      # ARP Template
+      ########################
+      # Handle submitted data
+      if (isset($tainted["submit"])) {
+        if ($clean['hash'] == $s_hash) {
+          $frequency = 0;
+          $interval_db = 0;
+          $priority = 2;
+          $sensor_id = $clean['sensorid'];
+
+          $sql_getsensors = "SELECT sensors.id, sensors.keyname, sensors.vlanid FROM sensors, login ";
+          $sql_getsensors .= " WHERE login.id = $user_id AND login.organisation = sensors.organisation AND sensors.id = $sensor_id";
+          $debuginfo[] = $sql_getsensors;
+
+          $query_getsensors = pg_query($sql_getsensors);
+          $data = pg_fetch_assoc($query_getsensors);  
+          $keyname = $data["keyname"];
+          $vlanid = $data["vlanid"];
+          if ($vlanid != 0) {
+            $keyname = "$keyname-$vlanid";
+          }
+          $title = "ARP Poisoning alert ($keyname)";
+          $subject = "ARP Poisoning attempt detected ($keyname)";
+
+          $active = $clean["active"];
+
+          $sql_update = "UPDATE report_content ";
+          $sql_update .= "SET user_id = '$user_id', title = '$title', priority = '$priority', sensor_id = '$sensor_id', ";
+          $sql_update .= "interval = '$interval_db', frequency = '$frequency', template = '$template', active = '$active', subject = '$subject'";
+          $sql_update .= "WHERE user_id = '$user_id' AND id = '$report_content_id'";
+          $debuginfo[] = $sql_update;
+          $query = pg_query($sql_update);
+
+          $msg = pg_errormessage();
+          if (empty($msg)) {
+            echo "<p style='color:green'><b>Data updated succesfully</b>.</p>\n";
+            echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
+          } else {
+            $m = geterror(93);
+            echo $m;
+          }
+        }
+      } else {
+        echo "<form method='post' onclick=\"updateThreshold();\">";
+        echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+        echo "<input type='hidden' name='submit' value='1'>";
+        echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
+          # Template
+          echo "<tr class='datatr'>";
+            echo "<td class='datatd'>Template: </td>\n";
+            echo "<td class='datatd'>$v_mail_template_ar[$template]</td>\n";
+          echo "</tr>\n";
+
+          # Report name
+          echo "<tr class='datatr'>";
+            echo "<td class='datatd'>Report name: </td>\n";
+            echo "<td class='datatd'>ARP Poisoning alert</td>\n";
+          echo "</tr>\n";
+
+          # Email subject
+          echo "<tr class='datatr'>";
+            echo "<td class='datatd'>Email subject: </td>\n";
+            echo "<td class='datatd'>ARP Poisoning attempt detected</td>";
+          echo "</tr>\n";
+
+          # Sensors
+          echo "<tr>\n";
+            echo "<td class='datatd'>Sensor: </td>\n";
+            echo "<td class='datatd'>\n";
+              $sql = "SELECT keyname, vlanid FROM sensors WHERE id = $sensor_id";
+              $query = pg_query($sql);
+              $sensor_data = pg_fetch_assoc($query);
+              $keyname = $sensor_data['keyname'];
+              $vlanid = $sensor_data['vlanid'];
+              if ($vlanid != 0) {
+                $keyname = "$keyname-$vlanid";
+              }
+              echo "$keyname";
+              echo "<input type='hidden' name='int_sensorid' value='$sensor_id' />\n";
+            echo "</td>\n";
+          echo "</tr>\n";
+          echo "<tr class='datatr'>\n";
+            echo "<td class='datatd'>Status: </td>\n";
+            echo "<td class='datatd'>\n";
+              echo "<select name='bool_active' style='background-color:white;'>\n";
+                echo "    " . printOption('t', "Active", $active);
+                echo "    " . printOption('f', "Inactive", $active);
+              echo "</select>\n";
+            echo "</td>\n";
+          echo "</tr>\n";
+        echo "</table>\n";
+        echo "<br />\n";
+        echo "<input type='submit' class='button' name='submitBtn' value='Update'>\n";
+        echo "<input type='button' name='b1' value='Back' onclick=\"window.location.href='mailadmin.php?int_userid=$user_id';\" class='button'>\n";
+        echo "</form>\n";
+      }
     } else {
       # Handle submitted data
       if (isset($tainted["submit"])) {

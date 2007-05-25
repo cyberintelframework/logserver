@@ -128,7 +128,7 @@ if (isset($clean["nextstep"])) {
   
   # Check fields from previous steps (submitted data)
   // Step 1:
-  if (($template < 1) || ($template > 4)) {
+  if (($template < 1) || ($template > 5)) {
     $step = 1;
   }
   // Step 2: no checks needed
@@ -140,15 +140,65 @@ if (isset($clean["nextstep"])) {
 
   if (($step == 3) && ($step == $request_step) && $err == 0) {
     # All clear, save data
-    // Table report_content
-    $sql_insert = "INSERT INTO report_content ";
-    $sql_insert .= "(user_id, title, priority, sensor_id, interval, frequency, template, active, subject) ";
-    $sql_insert .= "VALUES ('$user_id', '$title', '$priority', '$sensor_id', '$interval_db', '$frequency', '$template', 't', '$subject')";
+    if ($template == 5) {
+      $frequency = 0;
+      $interval_db = 0;
+      $priority = 2;
 
-    $debuginfo[] = $sql_insert;
+      if ($sensor_id == -1) {
+        $sql_getsensors = "SELECT sensors.id, sensors.keyname, sensors.vlanid FROM sensors, login ";
+        $sql_getsensors .= " WHERE login.id = $user_id AND login.organisation = sensors.organisation";
+        $debuginfo[] = $sql_getsensors;
 
-    $query = pg_query($sql_insert);
-    if (pg_affected_rows($query) == 1) {
+        $query_getsensors = pg_query($sql_getsensors);
+        while ($data = pg_fetch_assoc($query_getsensors)) {
+          $sid = $data["id"];
+          $keyname = $data["keyname"];
+          $vlanid = $data["vlanid"];
+          if ($vlanid != 0) {
+            $keyname = "$keyname-$vlanid";
+          }
+          $title = "ARP Poisoning alert ($keyname)";
+          $subject = "ARP Poisoning attempt detected ($keyname)";
+
+          $sql_insert = "INSERT INTO report_content ";
+          $sql_insert .= "(user_id, title, priority, sensor_id, interval, frequency, template, active, subject) ";
+          $sql_insert .= "VALUES ('$user_id', '$title', '$priority', '$sid', '$interval_db', '$frequency', '$template', 't', '$subject')";
+          $debuginfo[] = $sql_insert;
+          $query = pg_query($sql_insert);
+        }
+      } else {
+        $sql_getsensors = "SELECT sensors.id, sensors.keyname, sensors.vlanid FROM sensors, login ";
+        $sql_getsensors .= " WHERE login.id = $user_id AND login.organisation = sensors.organisation AND sensors.id = $sensor_id";
+        $debuginfo[] = $sql_getsensors;
+
+        $query_getsensors = pg_query($sql_getsensors);
+        $data = pg_fetch_assoc($query_getsensors);
+        $keyname = $data["keyname"];
+        $vlanid = $data["vlanid"];
+        if ($vlanid != 0) {
+          $keyname = "$keyname-$vlanid";
+        }
+        $title = "ARP Poisoning alert ($keyname)";
+        $subject = "ARP Poisoning attempt detected ($keyname)";
+
+        // Table report_content
+        $sql_insert = "INSERT INTO report_content ";
+        $sql_insert .= "(user_id, title, priority, sensor_id, interval, frequency, template, active, subject) ";
+        $sql_insert .= "VALUES ('$user_id', '$title', '$priority', '$sensor_id', '$interval_db', '$frequency', '$template', 't', '$subject')";
+        $debuginfo[] = $sql_insert;
+        $query = pg_query($sql_insert);
+      }
+    } else {
+      // Table report_content
+      $sql_insert = "INSERT INTO report_content ";
+      $sql_insert .= "(user_id, title, priority, sensor_id, interval, frequency, template, active, subject) ";
+      $sql_insert .= "VALUES ('$user_id', '$title', '$priority', '$sensor_id', '$interval_db', '$frequency', '$template', 't', '$subject')";
+      $debuginfo[] = $sql_insert;
+      $query = pg_query($sql_insert);
+    }
+
+    if (pg_affected_rows($query) > 0) {
       $query = pg_query("SELECT currval('report_content_id_seq') AS last_insert_id FROM report_content");
       $report_content_id = intval(@pg_result($query, 0));
       if ($template == 3) {                
@@ -265,6 +315,54 @@ echo ">\n";
       echo "</table>\n";
       echo "<br />";
       echo "<input type='submit' class='button' name='submitBtn2' value='Previous' onclick=\"document.getElementById('nextstep').value=" . ($step - 1) . "\">\n";
+    } elseif ($template == 5) {
+      ########################
+      # ARP Template
+      ########################
+      echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
+
+        # Template
+        echo "<tr class='datatr'>";
+          echo "<td class='datatd'>Template: </td>\n";
+          echo "<td class='datatd'>$v_mail_template_ar[$template]</td>\n";
+        echo "</tr>\n";
+
+        # Report name
+        echo "<tr class='datatr'>";
+          echo "<td class='datatd'>Report name: </td>\n";
+          echo "<td class='datatd'>ARP Poisoning alert</td>\n";
+        echo "</tr>\n";
+
+        # Email subject
+        echo "<tr class='datatr'>";
+          echo "<td class='datatd'>Email subject: </td>\n";
+          echo "<td class='datatd'>ARP Poisoning attempt detected</td>";
+        echo "</tr>\n";
+
+        # Sensors
+        echo "<tr>\n";
+          echo "<td class='datatd'>Sensor: </td>\n";
+          echo "<td class='datatd'>\n";
+            echo "<select name='int_sensorid' style='background-color:white;'>\n";
+              echo printOption(-1, "All sensors", $sensor_id);
+              if ($s_admin == 1) {
+                $sql = "SELECT * FROM sensors ORDER BY sensors.keyname";
+              } else {
+                $sql = "SELECT * FROM sensors WHERE organisation = '$s_org' ORDER BY keyname";
+              }
+              $debuginfo[] = $sql;
+              $query = pg_query($sql);
+              while ($sensor_data = pg_fetch_assoc($query)) {
+                $label = $sensor_data["keyname"];
+                 $vlanid = $sensor_data["vlanid"];
+	         if ($vlanid != 0) echo printOption($sensor_data["id"], "$label-$vlanid", $sensor_id);
+	         else echo printOption($sensor_data["id"], $label, $sensor_id);
+              }
+            echo "</select>\n";
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+      echo "<br />\n";
     } else {
       # Default
       echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
