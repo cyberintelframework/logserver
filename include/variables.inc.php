@@ -189,7 +189,8 @@ $v_mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
 		3 => "Threshold",
-		4 => "Sensor status"
+		4 => "Sensor status",
+		5 => "ARP Alert"
 );
 
 # Array with the mailreporting priorities
