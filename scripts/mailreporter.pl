@@ -518,6 +518,8 @@ while (@row = $email_query->fetchrow_array) {
 #          }
         }
       }
+    } else {
+      $sendit == 0;
     }
     
     if ($sendit == 1) {
