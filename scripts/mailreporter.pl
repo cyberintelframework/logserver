@@ -2,14 +2,15 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 08-05-2007                       #
+# Version 1.04.10                  #
+# 29-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################################
 # Changelog:
+# 1.04.10 Fixed a bug with the ARP template
 # 1.04.09 Added IP exclusion stuff
 # 1.04.08 Fixed group by issue with all attacks reports
 # 1.04.07 Fixed $logstamp variable
@@ -212,6 +213,10 @@ while (@row = $email_query->fetchrow_array) {
 
   print "SENDIT: $sendit\n";
   print "\n";
+
+  if ($template == 5) {
+    $sendit = 0;
+  }
 
   if ($sendit == 1) {
     # Set start and end timestamps
