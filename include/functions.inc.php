@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.13                  #
-# 16-05-2007                       #
+# Version 1.04.14                  #
+# 30-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.14 Removed / from logsearch.php url
 # 1.04.13 Added mac type to extractvars
 # 1.04.12 Modified printhelp
 # 1.04.11 Modified censorip()
@@ -431,7 +432,7 @@ function showSearchTemplates($sql) {
     }
     if (!empty($parse[$i])) $querystring .= $parse[$i];
     
-    echo "<a href=\"/logsearch.php?" . $querystring . "\" class=\"searchtemplate_item\">" . $row["title"] . "</a>\n";
+    echo "<a href=\"logsearch.php?" . $querystring . "\" class=\"searchtemplate_item\">" . $row["title"] . "</a>\n";
   }
 }
 
