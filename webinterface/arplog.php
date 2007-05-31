@@ -30,10 +30,13 @@ $allowed_get = array(
 	"strip_html_escape_tsstart",
 	"strip_html_escape_tsend",
 	"mac_source",
-	"target"
+	"mac_sourcehid",
+	"target",
+	"targethid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
+printer($_GET);
 
 if (isset($clean['m'])) {
   $m = $clean['m'];
@@ -148,6 +151,9 @@ if (!empty($ts_end)) {
 if (isset($clean['source'])) {
   $smac = $clean['source'];
   add_to_sql("arp_alert.sourcemac = '$smac'", "where");
+} elseif (isset($clean['sourcedis'])) {
+  $smac = $clean['source'];
+  add_to_sql("arp_alert.sourcemac = '$smac'", "where");
 }
 
 ####################
@@ -155,6 +161,24 @@ if (isset($clean['source'])) {
 ####################
 if (isset($tainted['target'])) {
   $target = $tainted['target'];
+  $macregexp = '/^([a-zA-Z0-9]{2}:){5}[a-zA-Z0-9]{2}$/';
+  $ipregexp = "/$v_ipregexp/";
+  if (preg_match($macregexp, $target)) {
+    add_to_sql("arp_alert.targetmac = '$target'", "where");
+  } elseif (preg_match($ipregexp, $target)) {
+    add_to_sql("arp_alert.targetip = '$target'", "where");
+  } elseif (isset($tainted['targetdis'])) {
+    $target = $tainted['targetdis'];
+    $macregexp = '/^([a-zA-Z0-9]{2}:){5}[a-zA-Z0-9]{2}$/';
+    $ipregexp = "/$v_ipregexp/";
+    if (preg_match($macregexp, $target)) {
+      add_to_sql("arp_alert.targetmac = '$target'", "where");
+    } elseif (preg_match($ipregexp, $target)) {
+      add_to_sql("arp_alert.targetip = '$target'", "where");
+    }
+  }
+} elseif (isset($tainted['targetdis'])) {
+  $target = $tainted['targetdis'];
   $macregexp = '/^([a-zA-Z0-9]{2}:){5}[a-zA-Z0-9]{2}$/';
   $ipregexp = "/$v_ipregexp/";
   if (preg_match($macregexp, $target)) {

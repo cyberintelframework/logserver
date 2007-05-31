@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.00                  #
-# 05-01-2007                       #
+# Version 1.04.01                  #
+# 30-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Code layout
 # 1.04.00 initial release
 #############################################
 
@@ -106,72 +107,65 @@ $tsquery = "timestamp >= $start AND timestamp <= $end AND";
 
 $query = false;
  
-if ( ($st = @stat("data.cache.xml")) != false )
-{
-        if ( $st['mtime'] < ( time(0) - 900 ) )
-        {
-                $query = true;
-        }
-}else
-{
-        $query = true;
+if ( ($st = @stat("data.cache.xml")) != false ) {
+  if ($st['mtime'] < ( time(0) - 900 )) {
+    $query = true;
+  }
+} else {
+  $query = true;
 }
  
-if ( $query == true && $err == 0)
-{
-        $f = fopen("/tmp/data.cache.xml","w+");  // change this path
-	$mytime = time(0) - 24 * 3600 * 9;
+if ( $query == true && $err == 0) {
+  $f = fopen("/tmp/data.cache.xml","w+");  // change this path
+  $mytime = time(0) - 24 * 3600 * 9;
 
-	$query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1'  AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC"; 
+  $query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1'  AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC"; 
 	
-	$r_hit = pg_query($pgconn, $query);
-        if( pg_num_rows($r_hit) )
-        {
-                fwrite($f,'<?xml version="1.0" encoding="ISO-8859-1"?>');
-                fwrite($f,"\n");
-                fwrite($f,"<markers>\n");
-                $ar_latlng= array();
-		while( $hit = pg_fetch_assoc($r_hit) )
-                {
-			$source = $hit['source'];
-			$count = $hit['count'];
-			$record = geoip_record_by_addr($gi, $source);
-			$country = $record->country_name;
-			$city = $record->city;
-			if ($city == "") $city = "Unkown";
-			$lat = $record->latitude;
-			$lng = $record->longitude;
-			if ($ar_latlng["$lat+$lng"]) {
-				$count = $ar_latlng["$lat+$lng"]["count"] + $count;
-			}	
-			$ar_latlng["$lat+$lng"]= array (
-							count => "$count",
-							country => "$country",
-						        city => "$city",	
-						    );
-		       
-                        
-                }
-		foreach ($ar_latlng as $key=>$val){
-			$tmp = explode("+", $key);
-	 		$lat = $tmp[0];
-	 		$lng = $tmp[1];
-		        $count = $val["count"];
-		        $country = $val["country"];
-		        $city = $val["city"];
-		        $line ='   <marker lat="'.$lat.'" lng="'.$lng.'" count="'.$count.'" country="'.$country.'" city="'.$city.'" />'."\n";
-                        fwrite($f,$line);
-	       }		
-               fwrite($f,"</markers>\n");
-        }
-        fclose($f);
-}
-else {
-        $f = fopen("/tmp/data.cache.xml","w+");  // change this path
-	$mytime = time(0) - 24 * 3600 * 9;
-	fwrite($f,"<markers>\n");
-	fwrite($f,"</markers>\n");
-        fclose($f);
+  $r_hit = pg_query($pgconn, $query);
+  if (pg_num_rows($r_hit)) {
+    fwrite($f,'<?xml version="1.0" encoding="ISO-8859-1"?>');
+    fwrite($f,"\n");
+    fwrite($f,"<markers>\n");
+    $ar_latlng = array();
+    while ($hit = pg_fetch_assoc($r_hit)) {
+      $source = $hit['source'];
+      $count = $hit['count'];
+      $record = geoip_record_by_addr($gi, $source);
+      $country = $record->country_name;
+      $city = $record->city;
+      if ($city == "") {
+        $city = "Unkown";
+      }
+      $lat = $record->latitude;
+      $lng = $record->longitude;
+      if ($ar_latlng["$lat+$lng"]) {
+        $count = $ar_latlng["$lat+$lng"]["count"] + $count;
+      }	
+      $ar_latlng["$lat+$lng"] = array (
+		count => "$count",
+		country => "$country",
+	        city => "$city",	
+      );                  
+    }
+    foreach ($ar_latlng as $key=>$val) {
+      $tmp = explode("+", $key);
+      $lat = $tmp[0];
+      $lng = $tmp[1];
+      $count = $val["count"];
+      $country = $val["country"];
+      $city = $val["city"];
+      $line ='   <marker lat="'.$lat.'" lng="'.$lng.'" count="'.$count.'" country="'.$country.'" city="'.$city.'" />'."\n";
+      fwrite($f,$line);
+    }		
+    fwrite($f,"</markers>\n");
+  }
+  fclose($f);
+} else {
+  $f = fopen("/tmp/data.cache.xml","w+");  // change this path
+  $mytime = time(0) - 24 * 3600 * 9;
+  fwrite($f,"<markers>\n");
+  fwrite($f,"</markers>\n");
+  fclose($f);
 }
 
 $f = fopen("/tmp/data.cache.xml","r");

@@ -406,3 +406,8 @@ a.searchtemplate_item {
 .altselect {
   background-color:	white;
 }
+
+.completefield {
+  background: 		none;
+  color:		#0d2474;
+}

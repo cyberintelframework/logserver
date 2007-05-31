@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 28-03-2007                       #
+# Version 1.04.10                  #
+# 31-05-2007                       #
 # Peter Arts                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Added autocomplete function
 # 1.04.09 Removed chartof stuff
 # 1.04.08 Removed libchart stuff & fixed sensors query
 # 1.04.07 Fixed a bug with the destination radiobutton
@@ -37,6 +38,7 @@ unset($_SESSION["search_num_rows"]);
 <script type="text/javascript" src="./calendar/js/calendar.js"></script>
 <script type="text/javascript" src="./calendar/js/calendar-en.js"></script>
 <script type="text/javascript" src="./calendar/js/calendar-setup.js"></script>
+<script type="text/javascript" src="maps.php?map=search"></script>
 <script type="text/javascript" language="javascript">
 function check_byte(b_val,next_field) {
     if(isNaN(b_val.value) || (b_val.value).indexOf(".") >0 || b_val.value > 255){
@@ -106,13 +108,41 @@ function changeSearch() {
               ?>
             </td>
           </tr>
-          <tr>
+          <tr style='height: 27px;'>
             <td class='datatd'>Source:</td>
-            <td class='datatd'><input type='text' name='mac_source' /></td>
+            <td class='datatd'>
+              <? if ($c_autocomplete == 1) { ?>
+                <span style='position: relative; top: 0px; left: 0px; overflow: auto;'>
+                  <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
+                    <input type='text' id='mac_sourcedis' name='mac_sourcedis' value='' style='background-color: #fff;' disabled />
+                  </span>
+                  <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
+                    <input autocomplete='off' type='text' id='mac_source' class='completefield' name='mac_source' value='' onfocus='own_autocomplete(this.id, smacmap);' onkeyup='own_autocomplete(this.id, smacmap);' onblur='fill_autocomplete(this.id);' />
+                  </span>
+                </span>
+                <input type='hidden' name='mac_sourcehid' value='' id='mac_sourcehid' />
+              <? } else { ?>
+                <input type='text' id='mac_source' name='mac_source' value='' />
+              <? } ?>
+            </td>
           </tr>
-          <tr>
+          <tr style='height: 27px;'>
             <td class='datatd'>Target:</td>
-            <td class='datatd'><input type='text' name='target' /></td>
+            <td class='datatd'>
+              <? if ($c_autocomplete == 1) { ?>
+                <span style='position: relative; top: 0px; left: 0px;'>
+                  <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
+                    <input type='text' id='targetdis' name='targetdis' value='' style='background-color: #fff;' disabled />
+                  </span>
+                  <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
+                    <input autocomplete='off' type='text' id='target' class='completefield' name='target' value='' onfocus='own_autocomplete(this.id, tmacmap);' onkeyup='own_autocomplete(this.id, tmacmap);' onblur='fill_autocomplete(this.id);' />
+                  </span>
+                </span>
+                <input type='hidden' name='targethid' value='' id='targethid' />
+              <? } else { ?>
+                <input type='text' id='mac_target' name='mac_target' value='' />
+              <? } ?>
+            </td>
           </tr>
           <tr>
             <td colspan=2><h4>When</h4></td>
@@ -310,19 +340,47 @@ function changeSearch() {
   $debuginfo[] = $sql;
   $query = pg_query($sql);
   while ($row = pg_fetch_assoc($query)) {
-  	$name = str_replace("Dialogue", "", $row["name"]);
-  	echo printOption($row["id"], $name, $f_attack);
+    $name = str_replace("Dialogue", "", $row["name"]);
+    echo printOption($row["id"], $name, $f_attack);
   }
   ?>
    </select></td>
  </tr>
  <tr id="what_3" name="what_3">
   <td class="datatd">Virus: </td>
-  <td><input type="text" name="strip_html_escape_virustxt" value="<?=$f_virus_txt;?>"> *</td>
+  <td>
+    <? if ($c_autocomplete == 1) { ?>
+      <span style='position: relative; top: 0px; left: 0px; overflow: auto;'>
+        <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
+          <input type='text' id='strip_html_escape_virustxtdis' name='strip_html_escape_virustxtdis' value='' style='background-color: #fff;' disabled />
+        </span>
+        <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
+          <input autocomplete='off' type='text' id='strip_html_escape_virustxt' class='completefield' name='strip_html_escape_virustxt' value='' onfocus='own_autocomplete(this.id, virusmap);' onkeyup='own_autocomplete(this.id, virusmap);' onblur='fill_autocomplete(this.id);' />
+        </span>
+      </span>
+      <input type='hidden' name='strip_html_escape_virustxthid' value='' id='strip_html_escape_virustxthid' /> *
+    <? } else { ?>
+      <input type='text' name='strip_html_escape_virustxt' value='' /> *
+    <? } ?>
+  </td>
  </tr>
  <tr id="what_4" name="what_4">
   <td class="datatd">Filename:</td>
-  <td class="datatd"><input type="text" name="strip_html_escape_filename" value="<?=$f_filename;?>" /> *</td>
+  <td class="datatd">
+    <? if ($c_autocomplete == 1) { ?>
+      <span style='position: relative; top: 0px; left: 0px; overflow: auto;'>
+        <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
+          <input type='text' id='strip_html_escape_filenamedis' name='strip_html_escape_filenamedis' value='' style='background-color: #fff;' disabled />
+        </span>
+        <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
+          <input autocomplete='off' type='text' id='strip_html_escape_filename' class='completefield' name='strip_html_escape_filename' value='' onfocus='own_autocomplete(this.id, filemap);' onkeyup='own_autocomplete(this.id, filemap);' onblur='fill_autocomplete(this.id);' />
+        </span>
+      </span>
+      <input type='hidden' name='strip_html_escape_filenamehid' value='' id='strip_html_escape_filenamehid' /> *
+    <? } else { ?>
+      <input type='text' name='strip_html_escape_filename' value='' /> *
+    <? } ?>
+  </td>
  </tr>
  <tr id="what_5" name="what_5">
   <td class="datatd">Binary:</td>

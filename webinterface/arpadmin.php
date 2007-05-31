@@ -194,7 +194,17 @@ if ($s_access_sensor > 1) {
       echo "</tr>\n";
     }
     echo "<tr class='datatr'>\n";
-      echo "<td><input type='text' name='mac_macaddr' value='' size='15' /></td>\n";
+      echo "<td>";
+#        echo "<span style='position: relative; top: 0px; left: 0px;'>";
+#          echo "<span style='position: absolute; top: -11px; left: 0px; z-index:2;'>";
+#            echo "<input type='text' id='mac_macdis' name='mac_macdis' value='' size='15' style='background-color: #fff; padding: 2px' disabled />";
+#          echo "</span>\n";
+#          echo "<span style='position:absolute; top: -11px; left: 0px; z-index:3;'>";
+#            echo "<input autocomplete='off' type='text' id='mac_mac' name='mac_mac' value='' size='15' style='background: none; color:#39f; padding: 2px;' onfocus='own_autocomplete(this.id, macmap);' onkeyup='own_autocomplete(this.id, macmap);' />";
+            echo "<input type='text' name='mac_macaddr' value='' size='15' />";
+#          echo "</span>\n";
+#        echo "</span>\n";
+      echo "</td>\n";
       echo "<td><input type='text' name='ip_ipaddr' value='' size='15' /></td>\n";
 
       pg_result_seek($result_sensors, 0);

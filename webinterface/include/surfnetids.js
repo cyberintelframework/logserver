@@ -14,6 +14,37 @@
  * #############################################
  */
 
+function fill_autocomplete(obj) {
+  var disobj = obj + 'dis';
+  var input = document.getElementById(disobj).value;
+  document.getElementById(obj).value = input;
+}
+
+function own_autocomplete(obj, map) {
+ var input = document.getElementById(obj).value;
+ var disobj = obj + 'dis';
+ var hidobj = obj + 'hid';
+ var len = input.length;
+ if (len!=0) {
+   for(lname in map) {
+     if(lname.substr(0,len).toLowerCase() == input.toLowerCase()) {
+       document.getElementById(disobj).value = lname;
+       document.getElementById(hidobj).value = lname;
+       document.getElementById(obj).value = lname.substr(0,len);
+       return false;
+     }
+   }
+ }
+ var sug_disp = input;
+ while (sug_disp!="" && sug_disp.charAt(sug_disp.length-1)==' ') {
+   sug_disp = sug_disp.substr(0,sug_disp.length-1);
+ }
+ document.getElementById(disobj).value = sug_disp;
+ document.getElementById(hidobj).value = sug_disp;
+ document.getElementById(obj).focus();
+ return false;
+}
+
 function basename (path) { return path.replace( /.*\//, "" ); }
 
 function changeId(id) {
