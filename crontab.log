@@ -1,0 +1,8 @@
+#* * 1 * * root /opt/surfnetids/scripts/stat_generator.pl >/dev/null
+1 * * * * root /opt/surfnetids/scripts/mailreporter.pl >/dev/null
+# These are only used when the tunnel package is not installed
+# Get these scripts from the tunnel package in the SVN repository at SourceForge.net
+# Single sensor setup
+#*/5 * * * * root /opt/surfnetids/scripts/rrd_traffic.pl >/dev/null
+#59 23 * * * root /opt/surfnetids/scripts/scanbinaries.pl >/dev/null
+

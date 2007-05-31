@@ -56,13 +56,15 @@ if ($err != 1) {
   echo "<table class='datatable'>\n";
     echo "<tr>\n";
       echo "<td class='dataheader' width='100'>AttackID</td>\n";
-      echo "<td class='dataheader' width='300'>Logging</td>\n";
+      echo "<td class='dataheader' width='100'>Type</td>\n";
+      echo "<td class='dataheader' width='300'></td>\n";
     echo "</tr>\n";
 
   while ($row = pg_fetch_assoc($result_details)) {
     $attackid = $row['attackid'];
     $logging = $row['text'];
     $type = $row['type'];
+    $typetext = $v_attacktype_ar[$type];
 
     $sql_check = "SELECT COUNT(id) as total FROM uniq_binaries WHERE name = '$logging'";
     $result_check = pg_query($pgconn, $sql_check);
@@ -73,11 +75,13 @@ if ($err != 1) {
 
     echo "<tr>\n";
       echo "<td class='datatd'>$attackid</td>\n";
+      echo "<td class='datatd'>$typetext</td>\n";
       if ($count != 0) {
         echo "<td class='datatd'><a href='binaryhist.php?md5_binname=$logging'>$logging<a/></td>\n";
       } else {
         echo "<td class='datatd'>$logging</td>\n";
       }
+
     echo "</tr>\n";
   }
 
