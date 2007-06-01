@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 17-04-2006                       #
+# Version 1.04.08                  #
+# 31-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.08 Added ARP actions
 # 1.04.07 Fixed redirection typo, ip check on same sensor
 # 1.04.06 Added ignore/unignore stuff
 # 1.04.05 Saving action for all sensors with the same keyname
@@ -101,16 +102,18 @@ if (isset($clean['sid'])) {
       $sql_updatearp = "UPDATE sensors SET arp = 1 WHERE id = '$sid' AND vlanid = '$vlanid'";
       $result_updatearp = pg_query($pgconn, $sql_updatearp);
       $m = 2;
+      pg_close($pgconn);
+      header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
+      exit;
     } elseif ($action == "DISABLEARP" && $arp == 1) {
       $sql_updatearp = "UPDATE sensors SET arp = 0 WHERE id = '$sid' AND vlanid = '$vlanid'";
       $result_updatearp = pg_query($pgconn, $sql_updatearp);
       $m = 3;
+      pg_close($pgconn);
+      header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
+      exit;
     }
-    pg_close($pgconn);
-    header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
-    exit;
   }
-
 
   if (isset($clean[tapip])) {
     $tapip = $clean[tapip];

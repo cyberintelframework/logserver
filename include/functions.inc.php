@@ -72,6 +72,7 @@
 # 3.17		getportdescr
 # 3.18		censorip
 # 3.19		printhelp
+# 3.20		printsort
 #
 # 4 Debug Functions
 # 4.01		printer
@@ -728,6 +729,16 @@ function printhelp($id) {
     return "&nbsp;[<a href='#' onmouseover='return overlib(\"$m\");' onmouseout='return nd();'>?</a>]";
   } else {
     return "";
+  }
+}
+
+# 3.20 printsort
+# Function to print a sort arrow.
+function printsort($url, $sortitem, $dir) {
+  if ($dir == "d") {
+    return "<a href='$url&sort=${sortitem}d'><img src='images/down.gif' /></a>";
+  } else {
+    return "<a href='$url&sort=${sortitem}u'><img src='images/up.gif' /></a>";
   }
 }
 

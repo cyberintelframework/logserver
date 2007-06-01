@@ -45,31 +45,27 @@ debug_input();
 
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
-  $pattern = '/^(ka|kd|ta|td|oa|od)$/';
+  $url = str_replace("&sort=" . $sort, "", $url);
+  $pattern = '/^(keynamea|keynamed|remoteipa|remoteipd|localipa|localipd|maca|macd|tapa|tapd)$/';
   if (!preg_match($pattern, $sort)) {
-    $sort = "ka";
+    $sort = "keynamea";
   }
 
-  $type = $sort{0};
-  $direction = $sort{1};
-  if ($direction == "a") {
-    $neworder = "d";
-    $direction = "ASC";
+  $sorttype = substr($sort, 0, (strlen($sort) - 1));
+  $dir = substr($sort, -1, 1);
+  if ($dir == "a") {
+    $dir = "ASC";
   } else {
-    $neworder = "a";
-    $direction = "DESC";
-  }
-  if ($type == "k") {
-    add_to_sql("ORDER BY keyname, vlanid $direction", "order");
-  } elseif ($type == "l") {
-    add_to_sql("ORDER BY tap $direction", "order");
-  } elseif ($type == "o") {
-    add_to_sql("organisations.organisation $direction", "order");
+    $dir = "DESC";
   }
 } else {
-  $neworder = "d";
-  add_to_sql("keyname, vlanid ASC", "order");
+  $sorttype = "keyname, vlanid";
+  $dir = "ASC";
 }
+if ($sorttype == "keyname") {
+  $sorttype = "keyname $dir, vlanid";
+}
+add_to_sql("$sorttype $dir", "order");
 
 if (isset($clean['selview'])) {
   $selview = $clean['selview'];
@@ -153,14 +149,15 @@ $sql_sensors .= " ORDER BY $sql_order ";
 $debuginfo[] = $sql_sensors;
 $result_sensors = pg_query($pgconn, $sql_sensors);
 
+$url = "sensorstatus.php?int_selview=$selview";
 echo "<table class='datatable' width='100%'>\n";
   echo "<tr class='datatr' align='center'>\n";
-    echo "<td class='dataheader'><a href='sensorstatus.php?sort=k$neworder&int_selview=$selview'>Sensor</a></td>\n";
-    echo "<td class='dataheader'>Remote Address</td>\n";
-    echo "<td class='dataheader'>Local Address</td>\n";
-    echo "<td class='dataheader'><a href='sensorstatus.php?sort=t$neworder&int_selview=$selview'>Tap Device</a></td>\n";
-    echo "<td class='dataheader'>Tap Device MAC</td>\n";
-    echo "<td class='dataheader'>Tap IP Address</td>\n";
+    echo "<td class='dataheader'>Sensor&nbsp;" .printsort($url, "keyname", "d") . printsort($url, "keyname", "u"). "</td>\n";
+    echo "<td class='dataheader'>Remote IP&nbsp;" .printsort($url, "remoteip", "d") . printsort($url, "remoteip", "u"). "</td>\n";
+    echo "<td class='dataheader'>Local IP&nbsp;" .printsort($url, "localip", "d") . printsort($url, "localip", "u"). "</td>\n";
+    echo "<td class='dataheader'>Dev&nbsp;" .printsort($url, "tap", "d") . printsort($url, "tap", "u"). "</td>\n";
+    echo "<td class='dataheader'>Device MAC&nbsp;" .printsort($url, "mac", "d") . printsort($url, "mac", "u"). "</td>\n";
+    echo "<td class='dataheader'>Device IP&nbsp;" .printsort($url, "tapip", "d") . printsort($url, "tapip", "u"). "</td>\n";
     echo "<td class='dataheader'>Timestamps</td>\n";
     echo "<td class='dataheader'>Status</td>\n";
     if ($s_access_sensor == 9) {

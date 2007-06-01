@@ -376,6 +376,13 @@ $v_errors = array(
 			),
 	virusadmin.php => array(
 				91 => "You don't have sufficient rights to perform the requested action!"
+			),
+	argosadmin.php => array(
+				1 => "Successfully added new argos redirect!",
+				2 => "Successfully deleted the redirect to argos!",
+				3 => "Successfully updated the argos redirect!",
+				91 => "You don't have sufficient rights to perform the requested action!",
+				99 => "Invalid or missing Argos ID!"
 			)
 );
 

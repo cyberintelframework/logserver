@@ -45,9 +45,9 @@ if (isset($clean['id'])) {
 ### Admin check
 if ($err != 1) {
   if ($s_access_search == 9) {
-    $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id;
+    $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ORDER BY type ASC";
   } else {
-    $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$s_org. "'";
+    $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$s_org. "' ORDER BY type ASC";
   }
   $result_details = pg_query($pgconn, $sql_details);
 
