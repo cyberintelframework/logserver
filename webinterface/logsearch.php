@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.24                  #
-# 04-04-2007                       #
+# Version 1.04.25                  #
+# 06-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.25 Added missing sensors table for PDF reports
 # 1.04.24 Removed the fix
 # 1.04.23 Fix for newer PostgreSQL versions
 # 1.04.22 Fixed a bug with organisation ranges arrays
@@ -625,6 +626,7 @@ if ($rapport == "idmef") {
 }
 
 if ($rapport == "pdf") {
+    add_to_sql("sensors", "table");
     prepare_sql();
 
     ### Prepare final SQL query
