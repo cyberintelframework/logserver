@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 31-05-2007                       #
+# Version 1.04.11                  #
+# 06-06-2007                       #
 # Peter Arts                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Removed PDF option (is being redone)
 # 1.04.10 Added autocomplete function
 # 1.04.09 Removed chartof stuff
 # 1.04.08 Removed libchart stuff & fixed sensors query
@@ -314,7 +315,6 @@ function changeSearch() {
     <option value="multi">Multi page</option>
     <option value="single">Single page</option>
     <option value="idmef">IDMEF</option>
-    <option value="pdf">PDF</option>
    </select>
   </td>
  </tr>

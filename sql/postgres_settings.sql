@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.15
--- 24-05-2007
+-- Version 1.04.16
+-- 01-06-2007
 --
 
 -- Version history
+-- 1.04.16 Added unique constraint for stats_dialogue
 -- 1.04.15 Added manufacturer column to arp_cache
 -- 1.04.14 Added ARP tables
 -- 1.04.13 Added CWS table and org_excl table
@@ -432,6 +433,9 @@ CREATE TABLE stats_dialogue (
 
 ALTER TABLE ONLY stats_dialogue
     ADD CONSTRAINT primary_stats_dialogue PRIMARY KEY (id);
+
+ALTER TABLE ONLY stats_dialogue
+    ADD CONSTRAINT unique_stats_dialogue UNIQUE (name);
 
 GRANT ALL ON TABLE stats_dialogue TO idslog;
 GRANT SELECT,UPDATE ON TABLE stats_dialogue_id_seq TO idslog;

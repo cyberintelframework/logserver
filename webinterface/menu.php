@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 16-05-2007                       #
+# Version 1.04.11                  #
+# 04-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Added ARGOS admin button
 # 1.04.10 Added ARP admin button
 # 1.04.09 Added IP exclusions button
 # 1.04.08 Added home button
@@ -142,6 +143,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       $popup_stats = "Shows statistics about the tunnel server machine!";
       $popup_scanner = "Virus scanner management page. Add, change or delete virus scanners!";
       $popup_arp = "ARP management page. Configure the ARP detection module!";
+      $popup_argos = "ARGOS management page. Configure redirection of sensors to ARGOS!";
 
       echo "<div class='nav-sub-menu'>\n";
         echo "<ul>\n";
@@ -167,6 +169,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           }
           if ($s_access_sensor > 1) {
             echo "<li><a href='${address}arpadmin.php' onmouseover='return overlib(\"$popup_arp\");' onmouseout='return nd();'>ARP Admin</a></li>\n";
+            echo "<li><a href='${address}argosadmin.php' onmouseover='return overlib(\"$popup_argos\");' onmouseout='return nd();'>ARGOS Admin</a></li>\n";
           }
         echo "</ul>\n";
       echo "</div>\n";
