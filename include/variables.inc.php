@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.16                  #
-# 21-05-2007                       #
+# Version 1.04.17                  #
+# 04-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.17 Added several ARGOS entries  
 # 1.04.16 Added v_arp_alerts array
 # 1.04.15 Added orgipadmin.php error messages
 # 1.04.14 Changed help message for sensorstatus - action
@@ -172,7 +173,7 @@ $v_access_ar_search = array(
 $v_access_ar_sensor = array(
 		'0'	=> 'Read only access',			# User can view all sensors of his organisation.
                 '1'	=> 'Remote control access',		# User can view and control all sensors of his organisation.
-                '2'	=> 'ARP Monitor access',		# User can add ARP monitoring entries.
+                '2'	=> 'ARP & ARGOS access',		# User can add ARP monitoring + ARGOS redirecting.
                 '9'	=> 'Total access (admin)'		# User can view and control all sensors.
 );
 
@@ -381,7 +382,13 @@ $v_errors = array(
 				1 => "Successfully added new argos redirect!",
 				2 => "Successfully deleted the redirect to argos!",
 				3 => "Successfully updated the argos redirect!",
+				11 => "Successfully added new image!",
+				12 => "Successfully deleted image and corresponding linked sensors!",
+				13 => "Successfully updated image!",
 				91 => "You don't have sufficient rights to perform the requested action!",
+				92 => "Sensor already redirected!",
+				93 => "Image name already exists!",
+				94 => "MAC Address already exists!",
 				99 => "Invalid or missing Argos ID!"
 			)
 );
