@@ -808,11 +808,13 @@ while ($row = pg_fetch_assoc($result)) {
   $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
   $result_details = pg_query($pgconn, $sql_details);
   $numrows_details = pg_num_rows($result_details);
+  $debuginfo[] = $sql_details;
 
   if ($c_enable_pof == 1) {
     $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
     $result_finger = pg_query($pgconn, $sql_finger);
     $numrows_finger = pg_num_rows($result_finger);
+    $debuginfo[] = $sql_finger;
 
     $fingerprint = pg_result($result_finger, 0);
     $finger_ar = explode(" ", $fingerprint);
@@ -906,6 +908,7 @@ while ($row = pg_fetch_assoc($result)) {
         $result_bin = pg_query($pgconn, $sql_bin);
         $numrows_bin = pg_num_rows($result_bin);
         $row_bin = pg_fetch_assoc($result_bin);
+    	$debuginfo[] = $sql_bin;
 
         echo "<td class='datatd'>";
         if ($numrows_bin != 0) {
@@ -915,6 +918,16 @@ while ($row = pg_fetch_assoc($result)) {
           echo "Suspicious";
         }
         if ($smac != "") {
+          echo "<br />$smac";
+        }
+        echo "</td>\n";
+      } elseif ($sev == 2) {
+        $dia_ar = array('attackid' => $id, 'type' => 20);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $module = $dia_result_ar[0]['text'];
+
+        echo "<td class='datatd'>$module";
+	if ($smac != "") {
           echo "<br />$smac";
         }
         echo "</td>\n";
@@ -944,7 +957,7 @@ if ($rapport == "multi") {
 
 pg_close($pgconn);
 
-#debug_sql();
+debug_sql();
 
 if ($c_searchtime == 1) {
   $timeend = microtime_float();

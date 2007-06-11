@@ -14,6 +14,42 @@
  * #############################################
  */
 
+function showhidemailtemp(si) {
+  if (si == 4) {
+    document.getElementById('attacksev').style.display='none';
+    document.getElementById('sensorsev').style.display='';
+  } else if (si == 5) {
+    document.getElementById('attacksev').style.display='none';
+    document.getElementById('sensorsev').style.display='none';
+  } else {
+    document.getElementById('attacksev').style.display='';
+    document.getElementById('sensorsev').style.display='none';
+  }
+}
+
+function showhidemail(si) {
+  if (si == 0) {
+    document.getElementById('freqdaily').style.display='none';
+    document.getElementById('freqweekly').style.display='none';
+    document.getElementById('freqthresh').style.display='none';
+  }
+  if (si == 1) {
+    document.getElementById('freqdaily').style.display='';
+    document.getElementById('freqweekly').style.display='none';
+    document.getElementById('freqthresh').style.display='none';
+  }
+  if (si == 2) {
+    document.getElementById('freqdaily').style.display='none';
+    document.getElementById('freqweekly').style.display='';
+    document.getElementById('freqthresh').style.display='none';
+  }
+  if (si == 3) {
+    document.getElementById('freqdaily').style.display='none';
+    document.getElementById('freqweekly').style.display='none';
+    document.getElementById('freqthresh').style.display='';
+  }
+}
+
 function fill_autocomplete(obj) {
   var disobj = obj + 'dis';
   var input = document.getElementById(disobj).value;
