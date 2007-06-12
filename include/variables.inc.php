@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.17                  #
-# 04-06-2007                       #
+# Version 1.04.18                  #
+# 11-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.18 Removed some unused arrays
 # 1.04.17 Added several ARGOS entries  
 # 1.04.16 Added v_arp_alerts array
 # 1.04.15 Added orgipadmin.php error messages
@@ -185,18 +186,10 @@ $v_access_ar_user = array(
                 '9'	=> 'All accounts (admin)'		# Total admin control for user and organisation administration.
 );
 
-# Array with the maillog options.
-$v_maillog_ar = array (
-		'0'	=> 'None',
-		'1'	=> 'All attacks',
-		'2'	=> 'Only from own ranges'
-);
-
 # Array with the mailreporting templates
 $v_mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
-		3 => "Threshold",
 		4 => "Sensor status",
 		5 => "ARP Alert"
 );
@@ -208,19 +201,9 @@ $v_mail_priority_ar = array(
 		3 => "High"
 );
 
-# Array with the mailreporting targets
-$v_mail_target_ar = array(
-		0 => "Possible malicious attacks",
-		1 => "Malicious attacks",
-		16 => "Malware offered",
-		32 => "Malware downloaded"
-);
-
-# Array with the mailreporting timespans
-$v_mail_timespan_ar = array(
-		1 => "Last hour",
-		2 => "Last day",
-		3 => "Last week"
+$v_sensor_sev_ar = array(
+		1 => "Sensor failed to start",
+		2 => "Sensor down"
 );
 
 # Array with the mailreporting operators
@@ -234,7 +217,15 @@ $v_mail_operator_ar = array(
 );
 
 # Array with the mailreporting frequency
-$v_mail_frequency_ar = array(
+$v_mail_frequency_attacks_ar = array(
+		1 => "Every hour",
+		2 => "Every day",
+		3 => "Every week",
+		4 => "Threshold"
+);
+
+# Array with the mailreporting frequency
+$v_mail_frequency_sensors_ar = array(
 		1 => "Every hour",
 		2 => "Every day",
 		3 => "Every week"

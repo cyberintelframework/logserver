@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.14                  #
-# 30-05-2007                       #
+# Version 1.04.15                  #
+# 11-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.15 Removed cleansql function
 # 1.04.14 Removed / from logsearch.php url
 # 1.04.13 Added mac type to extractvars
 # 1.04.12 Modified printhelp
@@ -56,7 +57,6 @@
 # 3.01		extractvars
 # 3.02		geterror
 # 3.03		showsearchtemplates
-# 3.04		cleansql
 # 3.05		checkSID
 # 3.06		getaddress
 # 3.07		genpass
@@ -435,18 +435,6 @@ function showSearchTemplates($sql) {
     
     echo "<a href=\"logsearch.php?" . $querystring . "\" class=\"searchtemplate_item\">" . $row["title"] . "</a>\n";
   }
-}
-
-# 3.04 cleansql
-# Function to cleanup a SQL statement with unwanted SQL commands
-function cleansql($s_sql) {
-  $pattern_ar = array("UNION", "JOIN", "INNER", "OUTER", "INSERT", "DELETE", "UPDATE", "INTO", "login");
-  $s_sql = strtolower($s_sql);
-  foreach($pattern_ar as $pattern) {
-    $pattern = strtolower($pattern);
-    $s_sql = str_replace($pattern, '', $s_sql);
-  }
-  return $s_sql;
 }
 
 # 3.05 checkSID
