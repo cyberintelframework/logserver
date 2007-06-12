@@ -1,52 +1,63 @@
 /*
  * ####################################
  * # SURFnet IDS                      #
- * # Version 1.04.02                  #
- * # 09-05-2007                       #
+ * # Version 1.04.03                  #
+ * # 11-06-2007                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * # Modified by Peter Arts           #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 1.04.03 Added sh_mail functions
  * # 1.04.02 Fixed searchtemplate url bug
  * # 1.04.01 Initial release
  * #############################################
  */
 
-function showhidemailtemp(si) {
+function sh_mailtemp(si) {
   if (si == 4) {
-    document.getElementById('attacksev').style.display='none';
-    document.getElementById('sensorsev').style.display='';
+    document.getElementById('attack_sev').style.display='none';
+    document.getElementById('sensor_sev').style.display='';
+
+    document.getElementById('attack_time').style.display='none';
+    document.getElementById('sensor_time').style.display='';
+    document.getElementById('thresh_freq').style.display='none';
   } else if (si == 5) {
-    document.getElementById('attacksev').style.display='none';
-    document.getElementById('sensorsev').style.display='none';
+    document.getElementById('attack_sev').style.display='none';
+    document.getElementById('sensor_sev').style.display='none';
+
+    document.getElementById('attack_time').style.display='';
+    document.getElementById('sensor_time').style.display='none';
   } else {
-    document.getElementById('attacksev').style.display='';
-    document.getElementById('sensorsev').style.display='none';
+    document.getElementById('attack_sev').style.display='';
+    document.getElementById('sensor_sev').style.display='none';
+
+    document.getElementById('sensor_time').style.display='none';
+    document.getElementById('attack_time').style.display='';
   }
 }
 
-function showhidemail(si) {
-  if (si == 0) {
-    document.getElementById('freqdaily').style.display='none';
-    document.getElementById('freqweekly').style.display='none';
-    document.getElementById('freqthresh').style.display='none';
-  }
+function sh_mailfreq(si) {
   if (si == 1) {
-    document.getElementById('freqdaily').style.display='';
-    document.getElementById('freqweekly').style.display='none';
-    document.getElementById('freqthresh').style.display='none';
+    document.getElementById('daily_freq').style.display='none';
+    document.getElementById('weekly_freq').style.display='none';
+    document.getElementById('thresh_freq').style.display='none';
   }
   if (si == 2) {
-    document.getElementById('freqdaily').style.display='none';
-    document.getElementById('freqweekly').style.display='';
-    document.getElementById('freqthresh').style.display='none';
+    document.getElementById('daily_freq').style.display='';
+    document.getElementById('weekly_freq').style.display='none';
+    document.getElementById('thresh_freq').style.display='none';
   }
   if (si == 3) {
-    document.getElementById('freqdaily').style.display='none';
-    document.getElementById('freqweekly').style.display='none';
-    document.getElementById('freqthresh').style.display='';
+    document.getElementById('daily_freqdaily').style.display='none';
+    document.getElementById('weekly_freq').style.display='';
+    document.getElementById('thresh_freq').style.display='none';
+  }
+  if (si == 4) {
+    document.getElementById('daily_freq').style.display='none';
+    document.getElementById('weekly_freq').style.display='none';
+    document.getElementById('thresh_freq').style.display='';
   }
 }
 

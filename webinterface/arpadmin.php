@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 24-05-2007                       #
+# Version 1.04.03                  #
+# 12-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.03 Fixed a bug with the sensor selector
 # 1.04.02 Added manufacturer stuff
 # 1.04.01 Initial release
 ####################################
@@ -24,7 +25,8 @@ $allowed_get = array(
 	"int_filter",
 	"int_org",
 	"sort",
-	"int_arp"
+	"int_arp",
+	"int_sensor"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -73,7 +75,12 @@ if (isset($clean['filter'])) {
 }
 
 if (isset($clean['arp'])) {
-  if ($filter != 0) {
+  if (isset($clean['sensor'])) {
+    $tempsensor = $clean['sensor'];
+  } else {
+    $tempsensor = 0;
+  }
+  if ($tempsensor != 0 && $filter == $tempsensor) {
     $arp = $clean['arp'];
     if ($s_access_sensor == 9) {
       if (isset($clean['org'])) {
@@ -84,7 +91,7 @@ if (isset($clean['arp'])) {
     } else {
       $q_org = $s_org;
     }
-    $sql_setarp = "UPDATE sensors SET arp = $arp WHERE organisation = $q_org AND id = $filter";
+    $sql_setarp = "UPDATE sensors SET arp = $arp WHERE organisation = $q_org AND id = $tempsensor";
     $debuginfo[] = $sql_setarp;
     $result_setarp = pg_query($pgconn, $sql_setarp);
     if ($arp == 1) {
@@ -140,15 +147,15 @@ if ($s_access_sensor > 1) {
         echo printOption($id, $keyname, $filter) . "\n";
       }
     echo "</select>&nbsp;\n";
-
     if ($filter != 0) {
-      $arp = $arp_array[$filter];
-      echo " is ";
-      echo "<select name='int_arp' onChange='javascript: this.form.submit();'>\n";
-        echo printOption(0, "Disabled", $arp) . "\n";
-        echo printOption(1, "Enabled", $arp) . "\n";
-      echo "</select>\n";
-      echo " !<br />\n";
+        echo "<input type='hidden' name='int_sensor' value='$filter' />\n";
+        $arp = $arp_array[$filter];
+        echo " is ";
+        echo "<select name='int_arp' onChange='javascript: this.form.submit();'>\n";
+          echo printOption(0, "Disabled", $arp) . "\n";
+          echo printOption(1, "Enabled", $arp) . "\n";
+        echo "</select>\n";
+        echo " !<br />\n";
     }
   echo "</form>\n";
 }
