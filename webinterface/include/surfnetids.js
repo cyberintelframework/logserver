@@ -15,6 +15,15 @@
  * #############################################
  */
 
+function resetmailform() {
+  document.getElementById('attack_sev').style.display='';
+  document.getElementById('sensor_sev').style.display='none';
+
+  document.getElementById('sensor_time').style.display='none';
+  document.getElementById('attack_time').style.display='';
+  document.getElementById('thresh_freq').style.display='none';
+}
+
 function sh_mailtemp(si) {
   if (si == 4) {
     document.getElementById('attack_sev').style.display='none';

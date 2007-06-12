@@ -1,4 +1,3 @@
-<?php include("menu.php"); set_title("Mailreporting"); ?>
 <?php
 
 ####################################
@@ -19,6 +18,21 @@
 # 1.03.01 Split up report.php into seperate files
 #############################################
 
+include '../include/config.inc.php';
+include '../include/connect.inc.php';
+include '../include/functions.inc.php';
+
+session_start();
+header("Cache-control: private");
+
+# Checking if the user is logged in
+if (!isset($_SESSION['s_admin'])) {
+  $address = getaddress();
+  pg_close($pgconn);
+  header("location: ${address}login.php");
+  exit;
+}
+
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
@@ -32,7 +46,7 @@ $allowed_get = array(
                 "int_userid"
 );
 $check = extractvars($_GET, $allowed_get);
-debug_input();
+#debug_input();
 
 // Make sure all access rights are correct
 if (isset($clean['userid'])) {
@@ -78,7 +92,7 @@ $allowed_post = array(
 		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
-debug_input();
+#debug_input();
 $err = 0;
 
 if (!isset($clean['subject'])) {
@@ -115,7 +129,7 @@ if (!isset($clean['frequency'])) {
       $interval = $clean['intervalweek'];
     }
   } elseif ($freq == 4) {
-    if (!isset($clean['operator']) && !isset($clean['threshold'])) {
+    if (!isset($clean['operator']) || !isset($clean['threshold'])) {
       $err = 1;
       $m = 94;
     } else {
@@ -164,10 +178,18 @@ if (!$severity) {
 }
 
 if ($err == 0) {
-  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold. severity) ";
+  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity) ";
   $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev')";
   $debuginfo[] = $sql;
+  $ec = pg_query($pgconn, $sql);
+  $m = 5;
 }
 
+pg_close($pgconn);
 debug_sql();
+if ($m == 5) {
+  header("location: mailadmin.php?int_m=$m");
+} else {
+  header("location: report_new.php?int_m=$m");
+}
 ?>

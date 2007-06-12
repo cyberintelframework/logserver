@@ -122,7 +122,7 @@ if ($s_access_user > 0) {
   echo "<br /><br />\n";
 
   echo "<b>Reports</b><br /><br />";
-  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_add.php?int_userid=$user_id&md5_hash=$s_hash';>&nbsp;&nbsp;|&nbsp;&nbsp;";
+  echo "<input type='button' value='Add report' class='button' onClick=window.location='report_new.php?int_userid=$user_id';>&nbsp;&nbsp;|&nbsp;&nbsp;";
   echo "<input type='button' value='Disable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=d&md5_hash=$s_hash';>&nbsp;&nbsp;|&nbsp;&nbsp;";
   echo "<input type='button' value='Enable all reports' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=e&md5_hash=$s_hash';>&nbsp;&nbsp;|&nbsp;&nbsp;";
   echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=r&md5_hash=$s_hash';><br /><br />";
@@ -139,9 +139,9 @@ if ($s_access_user > 0) {
     if ($s_access_user < 9) {
       $sql = "SELECT report_content.* FROM report_content, login ";
       $sql .= "WHERE user_id = $user_id AND report_content.user_id = login.id AND login.organisation = '$s_org' ";
-      $sql .= "ORDER BY title";
+      $sql .= "ORDER BY subject";
     } else {
-      $sql = "SELECT * FROM report_content WHERE user_id = $user_id ORDER BY title";
+      $sql = "SELECT * FROM report_content WHERE user_id = $user_id ORDER BY subject";
     }
     $result_report_content = pg_query($sql);
     $debuginfo[] = $sql;
@@ -161,7 +161,7 @@ if ($s_access_user > 0) {
 
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd'>";
-          echo "<a href='report_edit.php?int_userid=$user_id&int_rcid=$report_content_id'>" . $report_content["title"] . "</a>";
+          echo "<a href='report_edit.php?int_userid=$user_id&int_rcid=$report_content_id'>" . $report_content["subject"] . "</a>";
         echo "</td>\n";
         echo "<td class='datatd'>" . $last_sent . "</td>\n";
         echo "<td class='datatd'>" . $v_mail_template_ar[$report_content["template"]] . "</td>\n";
