@@ -3,13 +3,15 @@
 ####################################
 # Installation script              #
 # SURFnet IDS                      #
-# Version 1.04.02                  #
-# 04-04-2007                       #
+# Version 1.04.04                  #
+# 18-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ###############################################
 # Changelog:
+# 1.04.04 Fixed crontab stuff and typo.
+# 1.04.03 Added support for non-default webuser and unusual characters
 # 1.04.02 Added nepenthes sql functions option
 # 1.04.01 Initial release
 ###############################################
@@ -112,9 +114,11 @@ while (<CRONLOG>) {
     $file = `cat crontab.log | grep -F "$line" | awk '{print \$7}' | awk -F"/" '{print \$NF}'`;
     chomp($file);
     $chk = checkcron($file);
-    if ($chk == 0) {
-      printmsg("Adding crontab rule for $file:", "info");
-      print CRONTAB $line ."\n";
+    if ("$file" ne "") {
+      if ($chk == 0) {
+        printmsg("Adding crontab rule for $file:", "info");
+        print CRONTAB $line ."\n";
+      }
     }
   }
 }
@@ -210,13 +214,27 @@ while ($webuser eq "") {
   }
 }
 
+if ("$webuser" ne "idslog") {
+  `sed 's/idslog;/\$webuser;/' ./sql/postgres_settings.sql > ./sql/postgres_settings.sql.new`;
+  `mv ./sql/postgres_settings.sql.new ./sql/postgres_settings.sql`;
+
+  `sed 's/idslog;/\$webuser;/' ./sql/changes102-103.sql > ./sql/changes102-103.sql.new`;
+  `mv ./sql/changes102-103.sql.new ./sql/changes102-103.sql`;
+
+  `sed 's/idslog;/\$webuser;/' ./sql/changes103-104.sql > ./sql/changes103-104.sql.new`;
+  `mv ./sql/changes103-104.sql.new ./sql/changes103-104.sql`;
+
+  `sed 's/idslog;/\$webuser;/' ./sql/changes104-1041.sql > ./sql/changes104-1041.sql.new`;
+  `mv ./sql/changes104-1041.sql.new ./sql/changes104-1041.sql`;
+}
+
 print "\n";
 
 if ($confirm =~ /^(n|N)$/) {
   printmsg("Creating SURFnet IDS database:", "info");
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres createdb -q -U $dbuser -W -O $dbuser $dbname 2>>$logfile`;
+    `sudo -u postgres createdb -q -U "$dbuser" -W -O "$dbuser" "$dbname" 2>>$logfile`;
     printmsg("Creating SURFnet IDS database:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -236,7 +254,7 @@ if ($confirm =~ /^(n|N)$/) {
   printmsg("Creating webinterface database user:", "info");
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W $webuser 2>>$logfile`;
+    `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W "$webuser" 2>>$logfile`;
     printmsg("Creating webinterface database user:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -256,7 +274,7 @@ if ($confirm =~ /^(n|N)$/) {
   printmsg("Creating nepenthes database user:", "info");
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W nepenthes 2>>$logfile`;
+    `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W nepenthes 2>>$logfile`;
     printmsg("Creating nepenthes database user:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -276,7 +294,7 @@ if ($confirm =~ /^(n|N)$/) {
   printmsg("Creating p0f database user:", "info");
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres createuser -q -A -D -E -P -R -U $dbuser -W pofuser 2>>$logfile`;
+    `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W pofuser 2>>$logfile`;
     printmsg("Creating p0f database user:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -296,7 +314,7 @@ if ($confirm =~ /^(n|N)$/) {
   printmsg("Creating SURFnet IDS tables:", "info");
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres psql -q -f $targetdir/sql/postgres_settings.sql -U $dbuser -W $dbname 2>>$logfile`;
+    `sudo -u postgres psql -q -f $targetdir/sql/postgres_settings.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
     printmsg("Creating SURFnet IDS tables:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -337,7 +355,7 @@ if ($confirm =~ /^(n|N)$/) {
 
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres psql -q -f $targetdir/sql/postgres_insert.sql -U $dbuser -W $dbname 2>>$logfile`;
+    `sudo -u postgres psql -q -f $targetdir/sql/postgres_insert.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
     printmsg("Adding necessary records to the database:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -361,7 +379,7 @@ if ($confirm =~ /^(n|N)$/) {
     if ($confirm eq "1.02") {
       $e = 1;
       while ($e != 0) {
-        `sudo -u postgres psql -q -f $targetdir/sql/changes102-103.sql -U $dbuser -W $dbname 2>>$logfile`;
+        `sudo -u postgres psql -q -f $targetdir/sql/changes102-103.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
         printmsg("Upgrading the database from 1.02 to 1.03:", $?);
         if ($? != 0) { $err++; }
         $e = $?;
@@ -377,7 +395,7 @@ if ($confirm =~ /^(n|N)$/) {
       }
       $e = 1;
       while ($e != 0) {
-        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U $dbuser -W $dbname 2>>$logfile`;
+        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
         printmsg("Upgrading the database from 1.03 to 1.04:", $?);
         if ($? != 0) { $err++; }
         $e = $?;
@@ -394,7 +412,7 @@ if ($confirm =~ /^(n|N)$/) {
     } elsif ($confirm eq "1.03") {
       $e = 1;
       while ($e != 0) {
-        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U $dbuser -W $dbname 2>>$logfile`;
+        `sudo -u postgres psql -q -f $targetdir/sql/changes103-104.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
         printmsg("Upgrading the database from 1.03 to 1.04:", $?);
         if ($? != 0) { $err++; }
         $e = $?;
@@ -422,7 +440,7 @@ while ($confirm !~ /^(n|N|y|Y)$/) {
 if ($confirm =~ /^(y|Y)$/) {
   $e = 1;
   while ($e != 0) {
-    `sudo -u postgres psql -q -f $targetdir/sql/nepenthes.sql -U $dbuser -W $dbname 2>>$logfile`;
+    `sudo -u postgres psql -q -f $targetdir/sql/nepenthes.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
     printmsg("Installing the nepenthes SQL functions:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
@@ -481,7 +499,7 @@ if ($setup eq "single") {
 
     $e = 1;
     while ($e != 0) {
-      `sudo -u postgres psql -q -f $targetdir/sql/singlesensor.sql -U $dbuser -W $dbname 2>>$logfile`;
+      `sudo -u postgres psql -q -f $targetdir/sql/singlesensor.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
       printmsg("Adding necessary records to the database:", $?);
       if ($? != 0) { $err++; }
       $e = $?;
@@ -549,7 +567,7 @@ rmsvn($targetdir);
 
 print "\n";
 if ($err > 0) {
-  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_tn.pl.log' for more info.\n";
+  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_log.pl.log' for more info.\n";
   print "\n";
 }
 
