@@ -273,9 +273,13 @@ $v_errors = array(
 				2 => "Disabled all reports!",
 				3 => "Enabled all reports!",
 				4 => "Reset all timestamps!",
+				5 => "Successfully added a new report!",
+				6 => "Successfully deleted a report!",
+				7 => "Successfully saved the changes!",
 				90 => "You don't have sufficient rights to perform the requested action!",
 				91 => "Invalid hash!",
-				92 => "Invalid action method!"
+				92 => "Invalid action method!",
+				96 => "Invalid or missing report ID!"
 			),
 	orgadmin.php => array(
 				1 => "Successfully added the organisation!",
@@ -307,21 +311,33 @@ $v_errors = array(
 				92 => "Exclusion IP was not a valid IP address!",
 				93 => "Invalid organisation ID!"
 			),
-	report_add.php => array(
-				91 => "You don't have sufficient rights to perform the requested action!",
-				92 => "Data couldn't be saved (1)!",
-				93 => "Please complete all fields!"
-			),
-	report_edit.php => array(
-				91 => "You don't have sufficient rights to perform the requested action!",
-				92 => "Invalid title!",
-				93 => "Data couldn't be saved (1)!",
-				94 => "Data couldn't be saved (2)!",
-				95 => "You don't have sufficient rights to edit this report!",
-				96 => "Invalid report!"
-			),
 	report_mod.php => array(
 				91 => "You don't have sufficient rights to perform the requested action!",
+			),
+	report_new.php => array(
+				90 => "Invalid or missing subject!",
+				91 => "Invalid or missing priority!",
+				92 => "Invalid or missing frequency!",
+				93 => "Invalid or missing interval!",
+				94 => "Invalid or missing operator and/or threshold value!",
+				95 => "Invalid or missing sensor ID!",
+				96 => "Invalid or missing template!",
+				97 => "Invalid or missing severity!",
+				98 => "Invalid hash!",
+				99 => "You don't have sufficient rights to perform the requested action!"
+			),
+	report_edit.php => array(
+				89 => "Invalid or missing status!",
+				90 => "Invalid or missing subject!",
+				91 => "Invalid or missing priority!",
+				92 => "Invalid or missing frequency!",
+				93 => "Invalid or missing interval!",
+				94 => "Invalid or missing operator and/or threshold value!",
+				95 => "Invalid or missing sensor ID!",
+				96 => "Invalid or missing template!",
+				97 => "Invalid or missing severity!",
+				98 => "Invalid hash!",
+				99 => "You don't have sufficient rights to perform the requested action!"
 			),
 	searchtemplate.php => array(
 				1 => "Successfully saved searchtemplate!",

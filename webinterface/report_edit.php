@@ -64,7 +64,7 @@ if (isset($clean['userid'])) {
 }
 
 if (!isset($clean['rcid'])) {
-  $m = 91;
+  $m = 96;
   header("location: mailadmin.php?int_m=$m");
   pg_close($pgconn);
   exit;
@@ -82,15 +82,19 @@ if ($numrows > 0) {
 
   $subject = $row['subject'];
   $prio = $row['priority'];
-  $sensor = $row['sensor'];
+  $sensor = $row['sensor_id'];
   $temp = $row['template'];
   $sev = $row['severity'];
   $freq = $row['frequency'];
   $interval = $row['interval'];
   $operator = $row['operator'];
   $threshold = $row['threshold'];
+  $active = $row['active'];
 
-  echo "<form id='reportform' name='reportform' action='report_save.php?int_userid=$user_id' method='post'>\n";
+  echo "<form id='reportform' name='reportform' action='report_save.php' method='post'>\n";
+  echo "<input type='hidden' name='int_userid' value='$user_id' />\n";
+  echo "<input type='hidden' name='int_rcid' value='$reportid' />\n";
+  echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   echo "<h4>Mail options</h4>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
@@ -112,10 +116,19 @@ if ($numrows > 0) {
   echo "<h4>Report options</h4>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
-      echo "<td class='datatd' width='100'>Sensor: </td>\n";
+      echo "<td class='datatd' width='100'>Status:</td>\n";
       echo "<td class='datatd' width='200'>\n";
+        echo "<select name='bool_active'>\n";
+          echo printOption("t", "Active", $active);
+          echo printOption("f", "Inactive", $active);
+        echo "</select>\n";
+      echo "</td>\n";
+    echo "</tr>\n";
+    echo "<tr class='datatr'>\n";
+      echo "<td class='datatd'>Sensor: </td>\n";
+      echo "<td class='datatd'>\n";
         echo "<select name='int_sensorid'>\n";
-          echo printOption(-1, "All sensors", $sensor_id);
+          echo printOption(-1, "All sensors", $sensor);
           if ($s_admin == 1) {
             $sql = "SELECT * FROM sensors WHERE NOT status = 3 ORDER BY keyname ASC, vlanid ASC";
           } else {
@@ -152,8 +165,8 @@ if ($numrows > 0) {
     }
       echo "<td class='datatd' width='100'>Severity:</td>\n";
       echo "<td class='datatd' width='200'>";
-        echo "<select name='int_severity'>\n";
-          echo printOption(99, "All severities", $sev);
+        echo "<select name='int_sevattack'>\n";
+          echo printOption(-1, "All severities", $sev);
           foreach ($v_severity_ar as $key=>$val) {
             echo printOption($key, $val, $sev);
           }
@@ -167,8 +180,8 @@ if ($numrows > 0) {
     }
       echo "<td class='datatd' width='100'>Severity:</td>\n";
       echo "<td class='datatd' width='200'>";
-        echo "<select name='int_severity'>\n";
-          echo printOption(99, "All severities", $sev);
+        echo "<select name='int_sevsensor'>\n";
+          echo printOption(-1, "All severities", $sev);
           foreach ($v_sensor_sev_ar as $key=>$val) {
             echo printOption($key, $val, $sev);
           }
@@ -177,6 +190,7 @@ if ($numrows > 0) {
     echo "</tr>\n";
   echo "</table>\n";
 
+  echo "<div id='timeoptions' name='timeoptions' style='display: ;'>\n";
   echo "<h4>Time options</h4>\n";
   echo "<table class='datatable'>\n";
     if ($temp == 1 || $temp == 2) {
@@ -186,7 +200,7 @@ if ($numrows > 0) {
     }
       echo "<td class='datatd' width='100'>Frequency:</td>\n";
       echo "<td class='datatd' width='200'>";
-        echo "<select name='int_frequency' onclick='javascript: sh_mailfreq(this.value);'>\n";
+        echo "<select name='int_freqattack' onclick='javascript: sh_mailfreq(this.value);'>\n";
           foreach ($v_mail_frequency_attacks_ar as $key=>$val) {
             echo printOption($key, $val, $freq);
           }
@@ -200,7 +214,7 @@ if ($numrows > 0) {
     }
       echo "<td class='datatd' width='100'>Frequency:</td>\n";
       echo "<td class='datatd' width='200'>";
-        echo "<select name='int_frequency' onclick='javascript: sh_mailfreq(this.value);'>\n";
+        echo "<select name='int_freqsensor' onclick='javascript: sh_mailfreq(this.value);'>\n";
           foreach ($v_mail_frequency_sensors_ar as $key=>$val) {
             echo printOption($key, $val, $freq);
           }
@@ -243,6 +257,7 @@ if ($numrows > 0) {
       echo "</td>\n";
     echo "</tr>\n";
   echo "</table>\n";
+  echo "</div>\n";
 
   if ($freq == 4) {
     echo "<div id='thresh_freq' name='thresh_freq' style='display: ;'>\n";
@@ -272,15 +287,14 @@ if ($numrows > 0) {
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
       echo "<td class='datatd' width='304' align='right'>";
-        echo "<input type='reset' name='reset' value='Reset' class='button' />";
-        echo "<input type='submit' name='submit' value='Add' class='button' />";
+        echo "<input type='submit' name='submit' value='Save' class='button' />";
       echo "</td>\n";
     echo "</tr>\n";
   echo "</table>\n";
   echo "</form>\n";
   footer();
 } else {
-  $m = 92;
+  $m = 96;
   header("location: mailadmin.php?int_m=$m");
   pg_close($pgconn);
   exit;

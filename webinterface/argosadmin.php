@@ -68,8 +68,8 @@ if ($s_access_sensor > 1) {
 
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
-      echo "<td class='dataheader' width='50'>Sensor</td>\n";
-      echo "<td class='dataheader' width='50'>Device IP</td>\n";
+      echo "<td class='dataheader' width='25'>Sensor</td>\n";
+      echo "<td class='dataheader' width='25'>Device IP</td>\n";
       echo "<td class='dataheader' width='150'>Imagename</td>\n";
       echo "<td class='dataheader' width='75'>Template</td>\n";
       echo "<td class='dataheader' width='100'>Timespan</td>\n";
@@ -210,7 +210,7 @@ if ($s_access_sensor > 1) {
         echo "<td class='dataheader'>Name</td>\n";
         echo "<td class='dataheader'>Server IP</td>\n";
         echo "<td class='dataheader'>Imagename on Server</td>\n";
-        echo "<td class='dataheader'>OS Name</td>\n";
+        echo "<td class='dataheader'>OS</td>\n";
         echo "<td class='dataheader'>OS Language</td>\n";
         echo "<td class='dataheader'>Mac address</a></td>\n";
         echo "<td  ></td>\n";
@@ -230,29 +230,29 @@ if ($s_access_sensor > 1) {
         $oslang = $rowimage["oslang"];
         echo "<tr class='datatr'>\n";
           echo "<form name='argosadmin_updateimage' action='argosupdateimage.php' method='post'>\n";
-            echo "<td class='datatd'><input type='text' name='strip_html_name' size='25' value='$name' /></td>";
-            echo "<td class='datatd'><input type='text' name='ip_serverip' size='15' value='$serverip' /></td>";
-            echo "<td class='datatd'><input type='text' name='strip_html_imagename' size='15' value='$imagename' /></td>";
-            echo "<td class='datatd'>\n";
+            echo "<td><input type='text' name='strip_html_name' size='25' value='$name' /></td>";
+            echo "<td><input type='text' name='ip_serverip' size='15' value='$serverip' /></td>";
+            echo "<td><input type='text' name='strip_html_imagename' size='15' value='$imagename' /></td>";
+            echo "<td>\n";
               echo "<select name='strip_html_osname' style='background-color:white;'>\n";
                 echo printOption('win2k', 'win2k' , $osname); 
                 echo printOption('winxp', 'winxp' , $osname); 
                 echo printOption('linux', 'linux' , $osname); 
               echo "</select>\n";
             echo "</td>\n";
-            echo "<td class='datatd'>\n";
+            echo "<td>\n";
               echo "<select name='strip_html_oslang' style='background-color:white;'>\n";
                 echo printOption('nl', 'Dutch' , $oslang);
                 echo printOption('en', 'English' , $oslang);
               echo "</select>\n";
             echo "</td>\n";
-            echo "<td class='datatd'><input type='text' name='mac_macaddr' size='12' value='$macaddr' /></td>";
+            echo "<td><input type='text' name='mac_macaddr' size='12' value='$macaddr' /></td>";
             echo "<input type='hidden' name='int_imageid' value='$imageid'>\n";
-            echo "<td class='datatd'><input type='submit' class='button' style='width: 100%;' value='Update' /></td>\n";
+            echo "<td><input type='submit' class='button' style='width: 100%;' value='Update' /></td>\n";
           echo "</form>\n";
           echo "<form name='argosadmin_delimage' action='argosdelimage.php' method='post'>\n";
             echo "<input type='hidden' name='int_imageid' value='$imageid'>\n";
-            echo "<td class='datatd'><input type='submit' class='button' style='width: 100%;' value='Delete' /></td>\n";
+            echo "<td><input type='submit' class='button' style='width: 100%;' value='Delete' /></td>\n";
           echo "</form>\n";
         echo "</tr>\n";
       }

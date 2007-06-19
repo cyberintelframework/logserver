@@ -3,13 +3,14 @@
 ####################################
 # Installation script              #
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 31-05-2007                       #
+# Version 1.04.04                  #
+# 18-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ###############################################
 # Changelog:
+# 1.04.04 Fixed crontab stuff and typo.
 # 1.04.03 Added support for non-default webuser and unusual characters
 # 1.04.02 Added nepenthes sql functions option
 # 1.04.01 Initial release
@@ -112,10 +113,12 @@ while (<CRONLOG>) {
     chomp($check);
     $file = `cat crontab.log | grep -F "$line" | awk '{print \$7}' | awk -F"/" '{print \$NF}'`;
     chomp($file);
-    $chk = checkcron($file);
-    if ($chk == 0) {
-      printmsg("Adding crontab rule for $file:", "info");
-      print CRONTAB $line ."\n";
+    if ("$file" ne "") {
+      $chk = checkcron($file);
+      if ($chk == 0) {
+        printmsg("Adding crontab rule for $file:", "info");
+        print CRONTAB $line ."\n";
+      }
     }
   }
 }
@@ -564,7 +567,7 @@ rmsvn($targetdir);
 
 print "\n";
 if ($err > 0) {
-  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_tn.pl.log' for more info.\n";
+  print "[${r}Warning${n}] $err error(s) occurred while installing. Check out the logfile 'install_log.pl.log' for more info.\n";
   print "\n";
 }
 

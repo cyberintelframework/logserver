@@ -41,14 +41,28 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
-### Extracting GET variables
-$allowed_get = array(
-                "int_userid"
+### Extracting POST variables
+$allowed_post = array(
+		"int_userid",
+		"strip_html_escape_subject",
+		"int_priority",
+		"int_freqattack",
+		"int_freqsensor",
+		"int_intervalday",
+		"int_intervalweek",
+		"int_operator",
+		"int_threshold",
+		"int_sensorid",
+		"int_template",
+		"int_sevattack",
+		"int_sevsensor",
+		"md5_hash"
 );
-$check = extractvars($_GET, $allowed_get);
+$check = extractvars($_POST, $allowed_post);
 #debug_input();
+$err = 0;
 
-// Make sure all access rights are correct
+# Make sure all access rights are correct
 if (isset($clean['userid'])) {
   $user_id = $clean['userid'];
   if ($s_access_user < 1) {
@@ -63,10 +77,8 @@ if (isset($clean['userid'])) {
     $result_login = pg_query($pgconn, $sql_login);
     $numrows_login = pg_num_rows($result_login);
     if ($numrows_login == 0) {
-      $m = geterror(91);
-      echo $m;
-      footer();
-      exit;
+      $err = 1;
+      $m = 99;
     } else {
       $user_id = $clean['userid'];
     }
@@ -77,23 +89,10 @@ if (isset($clean['userid'])) {
   $user_id = $s_userid;
 }
 
-### Extracting POST variables
-$allowed_post = array(
-		"strip_html_escape_subject",
-		"int_priority",
-		"int_frequency",
-		"int_intervalday",
-		"int_intervalweek",
-		"int_operator",
-		"int_threshold",
-		"int_sensorid",
-		"int_template",
-		"int_severity",
-		"md5_hash"
-);
-$check = extractvars($_POST, $allowed_post);
-#debug_input();
-$err = 0;
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 98;
+}
 
 if (!isset($clean['subject'])) {
   $err = 1;
@@ -109,11 +108,33 @@ if (!isset($clean['priority'])) {
   $prio = $clean['priority'];
 }
 
-if (!isset($clean['frequency'])) {
+if (!isset($clean['template'])) {
+  $err = 1;
+  $m = 96;
+} else {
+  $template = $clean['template'];
+}
+
+if (!isset($clean['sevattack']) || !isset($clean['sevsensor'])) {
+  $err = 1;
+  $m = 97;
+} else {
+  if ($template == 4) {
+    $sev = $clean['sevsensor'];
+  } elseif ($template == 1 || $template == 2) {
+    $sev = $clean['sevattack'];
+  }
+}
+
+if (!isset($clean['freqattack']) || !isset($clean['freqsensor'])) {
   $err = 1;
   $m = 92;
 } else {
-  $freq = $clean['frequency'];
+  if ($template == 4) {
+    $freq = $clean['freqsensor'];
+  } else {
+    $freq = $clean['freqattack'];
+  }
   if ($freq == 2) {
     if (!isset($clean['intervalday'])) {
       $err = 1;
@@ -146,21 +167,7 @@ if (!isset($clean['sensorid'])) {
   $sensorid = $clean['sensorid'];
 }
 
-if (!isset($clean['template'])) {
-  $err = 1;
-  $m = 96;
-} else {
-  $template = $clean['template'];
-  if ($template == 1 || $template == 2) {
-    if (!isset($clean['severity'])) {
-      $err = 1;
-      $m = 97;
-    } else {
-      $sev = $clean['severity'];
-    }
-  }
-}
-
+# Setting some default values if the variables don't exist
 if (!$interval) {
   $interval = -1;
 }
@@ -173,7 +180,7 @@ if (!$threshold) {
   $threshold = -1;
 }
 
-if (!$severity) {
+if (!$sev) {
   $sev = -1;
 }
 
@@ -186,7 +193,7 @@ if ($err == 0) {
 }
 
 pg_close($pgconn);
-debug_sql();
+#debug_sql();
 if ($m == 5) {
   header("location: mailadmin.php?int_m=$m");
 } else {

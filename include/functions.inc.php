@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.15                  #
-# 11-06-2007                       #
+# Version 1.04.16                  #
+# 12-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.16 Fixed bool check in extractvars
 # 1.04.15 Removed cleansql function
 # 1.04.14 Removed / from logsearch.php url
 # 1.04.13 Added mac type to extractvars
@@ -307,13 +308,13 @@ function extractvars($source, $allowed) {
                   $var = strtolower($var);
 	          $pattern = '/^(t|true|f|false)$/';
                   if (!preg_match($pattern, $var)) {
-                    $var = "f";
+                    $tainted[$temp] = $var;
                   } else {
                     if ($var == "true" || $var == "false") {
                       $var = pgboolval($var);
                     }
+                    $clean[$temp] = $var;
                   }
-                  $clean[$temp] = $var;
                 } elseif ($check == "ip") {
                   if (!preg_match($ipregexp, $var)) {
                     $tainted[$temp] = $var;

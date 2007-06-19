@@ -1,14 +1,15 @@
 /*
  * ####################################
  * # SURFnet IDS                      #
- * # Version 1.04.03                  #
- * # 11-06-2007                       #
+ * # Version 1.04.04                  #
+ * # 18-06-2007                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * # Modified by Peter Arts           #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 1.04.04 Removed submitSearchTemplate()
  * # 1.04.03 Added sh_mail functions
  * # 1.04.02 Fixed searchtemplate url bug
  * # 1.04.01 Initial release
@@ -32,18 +33,24 @@ function sh_mailtemp(si) {
     document.getElementById('attack_time').style.display='none';
     document.getElementById('sensor_time').style.display='';
     document.getElementById('thresh_freq').style.display='none';
+
+    document.getElementById('timeoptions').style.display='none';
   } else if (si == 5) {
     document.getElementById('attack_sev').style.display='none';
     document.getElementById('sensor_sev').style.display='none';
 
     document.getElementById('attack_time').style.display='';
     document.getElementById('sensor_time').style.display='none';
+
+    document.getElementById('timeoptions').style.display='none';
   } else {
     document.getElementById('attack_sev').style.display='';
     document.getElementById('sensor_sev').style.display='none';
 
     document.getElementById('sensor_time').style.display='none';
     document.getElementById('attack_time').style.display='';
+
+    document.getElementById('timeoptions').style.display='';
   }
 }
 
@@ -59,7 +66,7 @@ function sh_mailfreq(si) {
     document.getElementById('thresh_freq').style.display='none';
   }
   if (si == 3) {
-    document.getElementById('daily_freqdaily').style.display='none';
+    document.getElementById('daily_freq').style.display='none';
     document.getElementById('weekly_freq').style.display='';
     document.getElementById('thresh_freq').style.display='none';
   }
@@ -139,22 +146,7 @@ function updateThreshold() {
   target.innerHTML += '&nbsp;then send e-mail report with priority ';
   target.innerHTML += document.getElementById('priority')[document.getElementById('priority').selectedIndex].innerHTML + '';
 }
-/*
-function submitSearchTemplate() {
-  var sform = document.getElementById('searchform');
-  //searchtemplate_title
-  var title = prompt('Please submit a title for this searchtemplate');
-  if ((title == '') || (title == null) || (title == 'undefined')) {
-    alert('Invalid title.');
-    return false;
-  }
-  if (confirm('Would you like to use \'' + title + '\' as the title for this searchtemplate?')) {
-    document.getElementById('strip_html_escape_sttitle').value = title;
-    sform.action = 'searchtemplate.php';
-    sform.submit();
-  } else return false;
-}
-*/
+
 function submitSearchTemplateFromResults(url) {
   //searchtemplate_title
   var title = prompt('Please submit a title for this searchtemplate');

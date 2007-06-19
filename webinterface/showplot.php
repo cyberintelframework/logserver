@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.10                  #
-# 09-05-2007                       #
+# Version 1.04.11                  #
+# 13-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.11 Fixed attack-dialogue graph
 # 1.04.10 Added IP exclusions stuff
 # 1.04.09 Shows empty graph when no data
 # 1.04.08 Added data colors array, background color
@@ -210,6 +211,15 @@ if ($tainted['attack']) {
       add_to_sql($tempwhere, "where");
       add_to_sql("details.text", "group");
       $title .= ") ";
+      add_to_sql("details.text", "select");
+      add_to_sql("details.type = 1", "where");
+    } else {
+      add_to_sql("details", "table");
+      add_to_sql("attacks", "table");
+      add_to_sql("attacks.id = details.attackid", "where");
+      add_to_sql("details.type = 1", "where");
+
+      add_to_sql("details.text", "group");
       add_to_sql("details.text", "select");
     }
   }
