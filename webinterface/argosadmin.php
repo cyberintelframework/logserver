@@ -211,29 +211,41 @@ if ($s_access_sensor > 1) {
      echo "<td class='dataheader'>Range or IP</td>\n";
      echo "<td  ></td>\n";
      echo "<td  ></td>\n";
-  echo "</tr>\n";
-     
-     $sql_range = "SELECT * FROM argos_ranges ORDER BY id";
+   echo "</tr>\n";
+   echo "<tr class='datatr'>\n";
+
+     if ($s_admin != 1) {
+         $where = "AND sensors.organisation = $s_org";
+     } 
+     else { $where = ""; }
+     $sql_range = "SELECT argos_ranges.id, argos_ranges.sensorid, sensors.keyname, sensors.vlanid, argos_ranges.range FROM sensors, argos_ranges WHERE sensors.id = argos_ranges.sensorid $where";
      $debuginfo[] = $sql_range;
      $query_range = pg_query($sql_range);
      while ($rowrange = pg_fetch_assoc($query_range)) {
-      $rangeid = $rowrange["id"];
-      $keyname = $rowrange["keyname"];
-      $vlanid = $rowrange["vlanid"];
-      $sensorid = $rowrange["sensorid"];
-      $range = $rowimage["range"];
-      if ($vlanid != 0) {	
-      	$sensor = "$keyname-$vlanid";
-      } else {
-      	$sensor = "$keyname";
-      }
-        echo "<tr class='datatr'>\n";
-          echo "<form name='argosadmin_updaterange' action='argosupdaterange.php' method='post'>\n";
-            echo "<td>\n";
-              echo "<select name='sensorsid' style='background-color:white;'>\n";
-                echo printOption('win2k', 'win2k' , $osname); 
-                echo printOption('winxp', 'winxp' , $osname); 
-                echo printOption('linux', 'linux' , $osname); 
+       $rangeid = $rowrange["id"];
+       $keyname = $rowrange["keyname"];
+       $vlanid = $rowrange["vlanid"];
+       $sensorid = $rowrange["sensorid"];
+       $range = $rowrange["range"];
+       if ($vlanid != 0) {	
+       	 $sensor = "$keyname-$vlanid";
+       } else {
+         $sensor = "$keyname";
+       }
+     	
+        echo "<form name='argosadmin_updaterange' action='argosupdaterange.php' method='post'>\n";
+        echo "<td>$sensor</td>";
+        echo "<td><input type='text' name='inet_range' size='12' value='$range' /></td>";
+        echo "<input type='hidden' name='int_rangeid' value='$rangeid'>\n";
+        echo "<td><input type='submit' class='button' style='width: 100%;' value='Update' /></td>\n";
+        echo "</form>\n";
+        echo "<form name='argosadmin_delrange' action='argosdelrange.php' method='post'>\n";
+        echo "<input type='hidden' name='int_rangeid' value='$rangeid'>\n";
+        echo "<td><input type='submit' class='button' style='width: 100%;' value='Delete' /></td>\n";
+        echo "</form>\n";
+   echo "</tr>\n";
+   }
+
 
    echo "<form name='argosadmin_addrange' action='argosaddrange.php' method='post'>\n";
     echo "<tr>\n";
@@ -265,8 +277,7 @@ if ($s_access_sensor > 1) {
             echo printOption($sid, $label, $sensorid);
           }
         echo "</select>\n";
-        echo "<td class='datatd'><input type='text' name='ip_range' size='12' /></td>";
- 
+        echo "<td class='datatd'><input type='text' name='inet_range' size='12' /></td>";
       echo "<td class='datatd' colspan=2><input type='submit' class='button' style='width: 100%;' value='Add' /></td>\n";
    echo "</form>\n";
  echo "</table>\n";
@@ -305,9 +316,9 @@ if ($s_access_sensor > 1) {
             echo "<td><input type='text' name='strip_html_imagename' size='15' value='$imagename' /></td>";
             echo "<td>\n";
               echo "<select name='strip_html_osname' style='background-color:white;'>\n";
-                echo printOption('win2k', 'win2k' , $osname); 
-                echo printOption('winxp', 'winxp' , $osname); 
-                echo printOption('linux', 'linux' , $osname); 
+                echo printOption('win2k', 'win2k' , '$osname'); 
+                echo printOption('winxp', 'winxp' , '$osname'); 
+                echo printOption('linux', 'linux' , '$osname'); 
               echo "</select>\n";
             echo "</td>\n";
             echo "<td>\n";

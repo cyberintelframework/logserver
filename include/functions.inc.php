@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.16                  #
-# 12-06-2007                       #
+# Version 1.04.17                  #
+# 19-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.17 Added inet check for extractvars
 # 1.04.16 Fixed bool check in extractvars
 # 1.04.15 Removed cleansql function
 # 1.04.14 Removed / from logsearch.php url
@@ -257,6 +258,7 @@ function getEndDay($day = '', $month = '', $year = '') {
 #   bool - boolean regexp
 #   ip - ip address regexp
 #   net - network range regexp
+#   inet - ip address with/without cidr
 #   mac - mac address regexp
 # These checks should be prepended to the variable name separated by a _ character
 # Examples:
@@ -327,6 +329,26 @@ function extractvars($source, $allowed) {
                   $mask_test = intval($ar_test[1]);
                   if (preg_match($ipregexp, $ip_test) && $mask_test >= 0 && $mask_test <= 32) {
                     $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "inet") {
+                  $chk = substr_count($var, "/");
+                  if ($chk == 1) {
+                    $ar_test = explode("/", $value);
+                    $ip_test = $ar_test[0];
+                    $mask_test = intval($ar_test[1]);
+                    if (preg_match($ipregexp, $ip_test) && $mask_test >= 0 && $mask_test <= 32) {
+                      $clean[$temp] = $var;
+                    } else {
+                      $tainted[$temp] = $var;
+                    }
+                  } elseif ($chk == 0) {
+                    if (preg_match($ipregexp, $value)) {
+                      $clean[$temp] = $var;
+                    } else {
+                      $tainted[$temp] = $var;
+                    }
                   } else {
                     $tainted[$temp] = $var;
                   }
