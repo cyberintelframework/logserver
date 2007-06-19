@@ -105,6 +105,7 @@ if ($err == 0) {
         echo "<td class='datatd'>\n";
           echo "" . printRadio("0 - $v_access_ar_sensor[0]", "int_asensor", 0, $access_sensor) . "<br />\n";
           echo "" . printRadio("1 - $v_access_ar_sensor[1]", "int_asensor", 1, $access_sensor) . "<br />\n";
+          echo "" . printRadio("2 - $v_access_ar_sensor[2]", "int_asensor", 2, $access_sensor) . "<br />\n";
           if ($s_access_user == 9) {
             echo "" . printRadio("9 - $v_access_ar_sensor[9]", "int_asensor", 9, $access_sensor) . "<br />\n";
           }
