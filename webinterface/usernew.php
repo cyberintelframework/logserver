@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 16-03-2007                       #
+# Version 1.04.06                  #
+# 19-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.06 Fixed no level 2 sensor (ARP & Argos) selection 
 # 1.04.05 Added hash check
 # 1.04.04 Fixed a radio button name
 # 1.04.03 Changed data input handling

@@ -480,6 +480,8 @@ if ($confirm =~ /^(n|N)$/) {
   }
 }
 
+printmsg("");
+
 $confirm = "a";
 while ($confirm !~ /^(n|N|y|Y)$/) {
   $confirm = &prompt("Do you want to install the nepenthes SQL functions? [Y/n]: ");

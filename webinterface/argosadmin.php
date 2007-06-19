@@ -202,7 +202,77 @@ if ($s_access_sensor > 1) {
     echo "</form>\n";
   echo "</table>\n";
 
-  if ($s_admin == 1) {
+ 
+  echo "<br />\n";
+  echo "<h4>Redirect to Ranges</h4>\n";
+  echo "<table class='datatable'>\n";
+   echo "<tr class='datatr'>\n";
+     echo "<td class='dataheader'>Sensor</td>\n";
+     echo "<td class='dataheader'>Range or IP</td>\n";
+     echo "<td  ></td>\n";
+     echo "<td  ></td>\n";
+  echo "</tr>\n";
+     
+     $sql_range = "SELECT * FROM argos_ranges ORDER BY id";
+     $debuginfo[] = $sql_range;
+     $query_range = pg_query($sql_range);
+     while ($rowrange = pg_fetch_assoc($query_range)) {
+      $rangeid = $rowrange["id"];
+      $keyname = $rowrange["keyname"];
+      $vlanid = $rowrange["vlanid"];
+      $sensorid = $rowrange["sensorid"];
+      $range = $rowimage["range"];
+      if ($vlanid != 0) {	
+      	$sensor = "$keyname-$vlanid";
+      } else {
+      	$sensor = "$keyname";
+      }
+        echo "<tr class='datatr'>\n";
+          echo "<form name='argosadmin_updaterange' action='argosupdaterange.php' method='post'>\n";
+            echo "<td>\n";
+              echo "<select name='sensorsid' style='background-color:white;'>\n";
+                echo printOption('win2k', 'win2k' , $osname); 
+                echo printOption('winxp', 'winxp' , $osname); 
+                echo printOption('linux', 'linux' , $osname); 
+
+   echo "<form name='argosadmin_addrange' action='argosaddrange.php' method='post'>\n";
+    echo "<tr>\n";
+      echo "<td class='datatd'>\n";
+        if ($s_admin == 1) {
+          $where = " sensors.status != 3 ";
+        } else {
+          $where = " sensors.status != 3 AND sensors.organisation = '$s_org'";
+        }
+        echo "<select name=\"int_sensorid\" style=\"background-color:white;\">\n";
+          $sql = "SELECT argos.sensorid, sensors.keyname, sensors.vlanid, organisations.organisation, sensors.tapip FROM sensors, organisations, argos ";
+          $sql .= "WHERE organisations.id = sensors.organisation AND sensors.id = argos.sensorid AND $where ORDER BY sensors.keyname";
+          $debuginfo[] = $sql;
+          $query = pg_query($sql);
+          while ($sensor_data = pg_fetch_assoc($query)) {
+            $sid = $sensor_data['id'];
+            $label = $sensor_data["keyname"];  
+            $vlanid = $sensor_data["vlanid"];
+            $org = $sensor_data["organisation"];
+            $tapip = $sensor_data["tapip"];
+            if ($vlanid != 0 ) {
+              $label .=  "-" .$vlanid. " (" .$tapip. ")";
+            } else {
+              $label .=  " (" .$tapip. ")";
+            }
+            if ($s_admin == 1) {
+              $label .= " (" .$org. ")";
+            }
+            echo printOption($sid, $label, $sensorid);
+          }
+        echo "</select>\n";
+        echo "<td class='datatd'><input type='text' name='ip_range' size='12' /></td>";
+ 
+      echo "<td class='datatd' colspan=2><input type='submit' class='button' style='width: 100%;' value='Add' /></td>\n";
+   echo "</form>\n";
+ echo "</table>\n";
+ 
+ 
+ if ($s_admin == 1) {
     echo "<br />\n";
     echo "<h4>Image</h4>\n";
     echo "<table class='datatable'>\n";
@@ -212,7 +282,7 @@ if ($s_access_sensor > 1) {
         echo "<td class='dataheader'>Imagename on Server</td>\n";
         echo "<td class='dataheader'>OS</td>\n";
         echo "<td class='dataheader'>OS Language</td>\n";
-        echo "<td class='dataheader'>Mac address</a></td>\n";
+        echo "<td class='dataheader'>Mac address</td>\n";
         echo "<td  ></td>\n";
         echo "<td  ></td>\n";
       echo "</tr>\n";
