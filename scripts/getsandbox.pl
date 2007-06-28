@@ -32,11 +32,11 @@ do '/etc/surfnetids/surfnetids-log.conf';
 ####################
 # Main script
 ####################
-$pop = new Mail::POP3Client(    USER     => $c_norman_username,
-                                PASSWORD => $c_norman_password,
-                                HOST     => $c_norman_mailhost,
-                                PORT     => $c_norman_port,
-                                USESSL   => $c_norman_usessl,
+$pop = new Mail::POP3Client(    USER     => $c_mail_username,
+                                PASSWORD => $c_mail_password,
+                                HOST     => $c_mail_mailhost,
+                                PORT     => $c_mail_port,
+                                USESSL   => $c_mail_usessl,
                                 DEBUG    => 0,
                            );
 
@@ -88,13 +88,28 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     $subject =~ s/^\s+//;
     $md5 =~ s/^\s+//;
     chomp($md5);
+    
+    if ("$md5" eq "") {
+      # Skip this one
+      next;
+    } else {
+      print "md5: $md5\n";
+    }
+    
     $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
         or die $DBI::errstr;
+    
+    ## Get all binid that are already logged
+    $sth_binid = $dbh->prepare("SELECT binid FROM norman");
+    $execute_result = $sth_binid->execute();
+    $hash_refnorman = $sth_binid->fetchall_hashref('binid');
+    
     $sth_md5 = $dbh->prepare("SELECT id FROM uniq_binaries WHERE name='$md5'");
     $execute_result = $sth_md5->execute();
     $numrows_md5 = $sth_md5->rows;
     @bin_id = $sth_md5->fetchrow_array;
     $bin_id = $bin_id[0];
+       
     if ($numrows_md5 == 0) {
       print "Adding md5: $md5 into uniq_binaries table\n";
       $sth_putmd5 = $dbh->prepare("INSERT INTO uniq_binaries (name) VALUES ('$md5')");
@@ -105,11 +120,17 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
       @bin_id = $sth_md5->fetchrow_array;
       $bin_id = $bin_id[0];
     }
-    print "Adding new norman result info for binary ID: $bin_id\n";
-    $sth_putnorman = $dbh->prepare("INSERT INTO norman (binid, result) VALUES ('$bin_id', '$body')");
-    $execute_result = $sth_putnorman->execute();
+    if (!exists $hash_refnorman->{ $bin_id }) {
+    	print "Adding new norman result info for binary ID: $bin_id\n";
+    	$sth_putnorman = $dbh->prepare("INSERT INTO norman (binid, result) VALUES ('$bin_id', '$body')");
+    	$execute_result = $sth_putnorman->execute();
+    }
+    else {
+    	print "Norman report of binary ID: $bin_id already logged\n";
+    }
   }
-  elsif ($subject =~ m/CWSandbox/) {
+#  elsif ($subject =~ m/CWSandbox/) {
+  elsif ($subject =~ m/Fwd/) {
     print "Found CWSandbox report!\n";
     ################################
     # CWSandbox
@@ -126,13 +147,15 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     $subject =~ s/^\s+//;
     $md5 =~ s/\"//g;
     chomp($md5);
+    
     if ("$md5" eq "") {
       # Skip this one
       next;
     } else {
       print "md5: $md5\n";
     }
-    $body = `$c_xalanbin $xml $c_surfidsdir/include/ViewAnalysis.xslt`;
+    
+    $body = `$c_xalanbin -in $xml -xsl $c_surfidsdir/include/ViewAnalysis.xslt`;
     $body =~ s/'/ /g;
     $body =~ s/\\/\\\\/g;
     $body =~ s/\n+/\n/g;
@@ -149,6 +172,12 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
 
     $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
         or die $DBI::errstr;
+    
+    ## Get all binid that are already logged
+    $sth_binid = $dbh->prepare("SELECT binid FROM cwsandbox");
+    $execute_result = $sth_binid->execute();
+    $hash_refcwsandbox = $sth_binid->fetchall_hashref('binid');
+    
     $sth_md5 = $dbh->prepare("SELECT id FROM uniq_binaries WHERE name = '$md5'");
     $execute_result = $sth_md5->execute();
     $numrows_md5 = $sth_md5->rows;
@@ -163,9 +192,14 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
       @bin_id = $sth_md5->fetchrow_array; 
       $bin_id = $bin_id[0];
     }
-    print "Adding new CWSandbox result info for binary ID: $bin_id\n";
-    $sth_putcwsandbox = $dbh->prepare("INSERT INTO cwsandbox (binid, xml, result) VALUES ('$bin_id', '$xml2', '$body2')");
-    $execute_result = $sth_putcwsandbox->execute();
+    if (!exists $hash_refcwsandbox->{ $bin_id }) {
+      print "Adding new CWSandbox result info for binary ID: $bin_id\n";
+      $sth_putcwsandbox = $dbh->prepare("INSERT INTO cwsandbox (binid, xml, result) VALUES ('$bin_id', '$xml2', '$body2')");
+      $execute_result = $sth_putcwsandbox->execute();
+    }
+    else {
+      print "CWSandbox report of binary ID: $bin_id already logged\n";
+    }
   }
   if ("$md5" ne "") {
     ##############
@@ -176,8 +210,6 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     $sth_checkbin = $dbh->prepare($sql_checkbin);
     $result_checkbin = $sth_checkbin->execute();
     $numrows_checkbin = $sth_checkbin->rows;
-    print "numrows in binaries_detail: $numrows_checkbin\n";
-  
     if ($numrows_checkbin == 0) {
     
       # If not, we add the filesize and file info to the database. 
@@ -197,7 +229,7 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
         $sql_checkbin = "INSERT INTO binaries_detail (bin, fileinfo, filesize) VALUES ($bin_id, '$fileinfo', $filesize)";
         $sth_checkbin = $dbh->prepare($sql_checkbin);
         $result_checkbin = $sth_checkbin->execute();
-      } else { print "File does not exists"; }
+      } else { print "File does not exists\n"; }
     }
     $md5 = "";
   }
@@ -207,14 +239,14 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
 $pop->Close();
 
 # Lets be nice and clean up our stuff
-#my $dir = "/var/tmp/mimetemp";
 my $word = "msg";
 my $word2 = "analysis";
+my $word3 = "mail";
+my $word4 = "xml";
 
 opendir (DIR,$c_cwmime);
 @files = grep(/$word/, readdir (DIR));
 closedir (DIR);
-
 foreach $file (@files) {
   unlink "$c_cwmime/$file";
 }
@@ -222,12 +254,27 @@ foreach $file (@files) {
 opendir (DIR,$c_cwmime);
 @files2 = grep(/$word2/, readdir (DIR));
 closedir (DIR);
-
 foreach $file2 (@files2) {
   unlink "$c_cwmime/$file2";
 }
 
-rmdir($c_cwmime) || warn "Cannot rmdir mimetemp: $!";
+opendir (DIR,$c_cwtemp);
+@files3 = grep(/$word3/, readdir (DIR));
+closedir (DIR);
+foreach $file3 (@files3) {
+  unlink "$c_cwtemp/$file3";
+}
+
+opendir (DIR,$c_cwtemp);
+@files4 = grep(/$word4/, readdir (DIR));
+closedir (DIR);
+foreach $file4 (@files4) {
+  unlink "$c_cwtemp/$file4";
+}
+
+if (-e $c_cwmime) {
+	rmdir($c_cwmime) || warn "Cannot rmdir mimetemp: $!";
+}
 exit;
 
 sub dump_entity {
