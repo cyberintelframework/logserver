@@ -202,4 +202,21 @@ sub printresult() {
   return 0;
 }
 
+# 3.14 readfile
+# Read the contents of a file as input and return it to a file as output.
+sub readfile { 
+  my $filename = $_[0];
+  my ($line, $output);
+  
+  $output = ""; 
+  if (-e $filename) {
+    open (FILE, "<$filename");
+    while ($line = <FILE>) {
+      $output = $output . $line;
+    }
+  }
+  
+  return $output;
+}
+
 return "true";

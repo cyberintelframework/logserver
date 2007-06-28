@@ -10,6 +10,7 @@
 
 ###############################################
 # Changelog:
+# 1.04.06 Improved non-default support and support for remote database
 # 1.04.05 Improved non-default support and added support for remote database
 # 1.04.04 Fixed crontab stuff and typo.
 # 1.04.03 Added support for non-default webuser and unusual characters
@@ -45,7 +46,7 @@ require "functions_log.pl";
 # Dependency checks
 ##########################
 
-$psqlcheck = `psql -V | head -n1 | awk '{print \$3}'`;
+$psqlcheck = `psql -V | head -n1 | awk '{print \$3}' 2>&1 2>/dev/null`;
 chomp($psqlcheck);
 if ($psqlcheck !~ /^8\.1.*$/) {
   printmsg("Checking for PostgreSQL 8.1:", "false");
@@ -82,22 +83,6 @@ if (! -e "$targetdir/") {
   printmsg("Creating $targetdir/:", $?);
   if ($? != 0) { $err++; }
 }
-
-if ( -e "$configdir/surfnetids-log.conf") {
-  $ts = time();
-  `mv -f $configdir/surfnetids-log.conf $configdir/surfnetids-log.conf-$ts 2>>$logfile`;
-  printmsg("Creating backup of surfnetids-log.conf:", $?);
-  if ($? != 0) { $err++; }
-}
-
-`cp surfnetids-log.conf $configdir/ 2>>$logfile`;
-printmsg("Copying configuration file:", $?);
-if ($? != 0) { $err++; }
-
-`cp -r ./* $targetdir/ 2>>$logfile`;
-printmsg("Copying surfnetids files:", $?);
-if ($? != 0) { $err++; }
-`rm $targetdir/surfnetids-log.conf 2>>$logfile`;
 
 ####################
 # Setting up crontab
@@ -199,6 +184,14 @@ while ($dbuser eq "") {
   }
 }
 
+$dbpass = "";
+while ($dbpass eq "") {
+  $dbpass = &prompt("Enter the password for the database user [$dbuser]: ");
+  if ($dbpass eq "") {
+    $dbpass = "enter_database_password_here";
+  }
+}
+
 $dbhost = "";
 while ($dbhost eq "") {
   $dbhost = &prompt("Enter the IP address of the database host [localhost]: ");
@@ -226,16 +219,16 @@ while ($dbname eq "") {
 $webuser = "";
 while ($webuser eq "") {
   $webuser = &prompt("Enter the name of the web user [idslog]: ");
+  chomp($webuser);
   if ($webuser eq "") {
     $webuser = "idslog";
   }
 }
-
 if ("$webuser" ne "idslog") {
   @arsql = `ls -l ./sql/ | grep sql | grep -v "nepenthes.sql" | awk '{print \$NF}'`;
   foreach $sqlfile (@arsql) {
     chomp($sqlfile);
-    `sed 's/idslog;/$webuser;/' $targetdir/sql/$sqlfile > $targetdir/sql/$sqlfile.new`;
+    `sed 's/idslog;/\"$webuser\";/' $targetdir/sql/$sqlfile > $targetdir/sql/$sqlfile.new`;
     `mv $targetdir/sql/$sqlfile.new $targetdir/sql/$sqlfile`;
   }
 }
@@ -243,15 +236,15 @@ if ("$webuser" ne "idslog") {
 print "\n";
 
 if ($confirm =~ /^(n|N)$/) {
-  printmsg("Creating SURFnet IDS database:", "info");
+  printmsg("Creating SURFnet IDS database [$dbname]:", "info");
   $e = 1;
   while ($e != 0) {
     if ($dbhost != "localhost") {
-      `createdb -h $dbhost -p $dbport -q -U "$dbuser" -W -O "$dbuser" "$dbname" 2>>$logfile`;
+      `createdb -h $dbhost -p $dbport -q -U "$dbuser" -W -O "$dbuser" "$dbname" 2>&1 | tee -a $logfile`;
     } else {
-      `sudo -u postgres createdb -q -U "$dbuser" -W -O "$dbuser" "$dbname" 2>>$logfile`;
+      `sudo -u postgres createdb -q -U "$dbuser" -W -O "$dbuser" "$dbname" 2>&1 | tee -a $logfile`;
     }
-    printmsg("Creating SURFnet IDS database:", $?);
+    printmsg("Creating SURFnet IDS database [$dbname]:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
     if ($? != 0) {
@@ -267,15 +260,15 @@ if ($confirm =~ /^(n|N)$/) {
 
   print "\n";
 
-  printmsg("Creating webinterface database user:", "info");
+  printmsg("Creating webinterface database user [$webuser]:", "info");
   $e = 1;
   while ($e != 0) {
     if ($dbhost != "localhost") {
-      `createuser -h $dbhost -p $dbport -q -A -D -E -P -R -U "$dbuser" -W "$webuser" 2>>$logfile`;
+      `createuser -h $dbhost -p $dbport -q -A -D -E -P -R -U "$dbuser" -W "$webuser" 2>&1 | tee -a $logfile`;
     } else {
-      `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W "$webuser" 2>>$logfile`;
+      `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W "$webuser" 2>&1 | tee -a $logfile`;
     }
-    printmsg("Creating webinterface database user:", $?);
+    printmsg("Creating webinterface database user [$webuser]:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
     if ($? != 0) {
@@ -291,15 +284,15 @@ if ($confirm =~ /^(n|N)$/) {
 
   print "\n";
 
-  printmsg("Creating nepenthes database user:", "info");
+  printmsg("Creating nepenthes database user [nepenthes]:", "info");
   $e = 1;
   while ($e != 0) {
     if ($dbhost != "localhost") {
-      `postgres createuser -h $dbhost -p $dbport -q -A -D -E -P -R -U "$dbuser" -W nepenthes 2>>$logfile`;
+      `createuser -h $dbhost -p $dbport -q -A -D -E -P -R -U "$dbuser" -W nepenthes 2>&1 | tee -a $logfile`;
     } else {
-      `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W nepenthes 2>>$logfile`;
+      `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W nepenthes 2>&1 | tee -a $logfile`;
     }
-    printmsg("Creating nepenthes database user:", $?);
+    printmsg("Creating nepenthes database user [nepenthes]:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
     if ($? != 0) {
@@ -315,15 +308,15 @@ if ($confirm =~ /^(n|N)$/) {
 
   print "\n";
 
-  printmsg("Creating p0f database user:", "info");
+  printmsg("Creating p0f database user [pofuser]:", "info");
   $e = 1;
   while ($e != 0) {
     if ($dbhost != "localhost") {
-      `postgres createuser -h $dbhost -p $dbport -q -A -D -E -P -R -U "$dbuser" -W pofuser 2>>$logfile`;
+      `createuser -h $dbhost -p $dbport -q -A -D -E -P -R -U "$dbuser" -W pofuser 2>&1 | tee -a $logfile`;
     } else {
-      `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W pofuser 2>>$logfile`;
+      `sudo -u postgres createuser -q -A -D -E -P -R -U "$dbuser" -W pofuser 2>&1 | tee -a $logfile`;
     }
-    printmsg("Creating p0f database user:", $?);
+    printmsg("Creating p0f database user [pofuser]:", $?);
     if ($? != 0) { $err++; }
     $e = $?;
     if ($? != 0) {
@@ -366,7 +359,7 @@ if ($confirm =~ /^(n|N)$/) {
   # Setting server hostname and configuring config files.
   $server = "";
   while ($server eq "") {
-    $server = &prompt("Server hostname.domainname or IP (example: test.domain.nl): ");
+    $server = &prompt("Honeypot FQDN or IP (example: test.domain.nl): ");
     if ($server ne "") {
       $confirm = "a";
       while ($confirm !~ /^(n|N|y|Y)$/) {
@@ -629,6 +622,40 @@ if ($err > 0) {
   print "\n";
 }
 
+
+if ( -e "$configdir/surfnetids-log.conf") {
+  $ts = time();
+
+  `mv -f $configdir/surfnetids-log.conf $configdir/surfnetids-log.conf-$ts 2>>$logfile`;
+  printmsg("Creating backup of surfnetids-log.conf:", $?);
+  if ($? != 0) { $err++; }
+}
+
+$file = readfile("surfnetids-log.conf"); 
+$dbhost_str = "\$c_pgsql_host= \"$dbhost\"";
+$dbport_str = "\$c_pgsql_port= \"$dbport\"";
+$dbname_str = "\$c_pgsql_dbname= \"$dbname\"";
+$webuser_str = "\$c_pgsql_user = \"$webuser\"";
+$dbpass_str = "\$c_pgsql_pass = \"$dbpass\"";
+$file =~ s/\\n/<newline>/gi;
+$file =~ s/\$c_pgsql_host(.*?)\;/$dbhost_str/gi;
+$file =~ s/\$c_pgsql_port(.*?)\;/$dbport_str/gi;
+$file =~ s/\$c_pgsql_dbname(.*?)\;/$dbname_str/gi;
+$file =~ s/\$c_pgsql_user(.*?)\;/$webuser_str/gi;
+$file =~ s/\$c_pgsql_pass(.*?)\;/$dbpass_str/gi;
+$file =~ s/<newline>/\\n/gi;
+open FILE, ">$configdir/surfnetids-log.conf";
+print FILE ($file);
+close (FILE);
+printmsg("Building /etc/surfnetids-log.conf configuration file:", $?);
+if ($? != 0) { $err++; }
+
+`cp -r ./* $targetdir/ 2>>$logfile`;
+printmsg("Copying surfnetids files:", $?);
+if ($? != 0) { $err++; }
+`rm $targetdir/surfnetids-log.conf 2>>$logfile`;
+
+
 print "#####################################\n";
 print "# ${g}SURFnet IDS installation complete${n} #\n";
 print "#####################################\n";
@@ -636,8 +663,6 @@ print "\n";
 print "Interesting configuration files:\n";
 print "  ${g}/etc/crontab${n}\n";
 print "  ${g}$apachev config files${n}\n";
-
-print "Still needs configuration:\n";
 print "  ${g}$configdir/surfnetids-log.conf${n}\n";
 print "\n";
 print "For more information go to http://ids.surfnet.nl/\n";
