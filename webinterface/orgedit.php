@@ -115,10 +115,12 @@ if ($err != 1) {
         echo "<td class='datatd' colspan='1'><input type='text' name='strip_html_escape_orgident' style='width: 99%;' /></td>\n";
         echo "<td class='datatd' colspan='2'>\n";
           echo "<select name='int_identtype' style='width: 99%;'>";
-            echo printOption(0, "Select a type...", 0);
+            echo printOption(-1, "Select a type...", -1);
             foreach ($v_org_ident_type_ar as $key => $val) {
-              if ($key != 1) {
-                echo printOption($key, $val, 0);
+              if ($key != 1 && $key != 0) {
+                if (($key == 4 && $c_surfnet_funcs == 1) || $key != 4) {
+                  echo printOption($key, $val, -1);
+                }
               }
             }
           echo "</select>\n";

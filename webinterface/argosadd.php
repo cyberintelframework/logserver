@@ -84,6 +84,17 @@ while ($row = pg_fetch_assoc($query)) {
     $err = 1;
   }
 }
+$sql = "SELECT organisationid FROM argos_images WHERE id = '$imageid'";
+$debuginfo[] = $sql;
+$query = pg_query($pgconn, $sql);
+while ($row = pg_fetch_assoc($query)) {
+  $orgid = $row["organisationid"];
+  if ($orgid == $s_org || $orgid == 0) {
+  } else { 
+    $m = 95;
+    $err = 1;
+  }
+}
 
 if ($err == 0) {
   $sql = "INSERT INTO argos (sensorid, imageid, templateid, timespan) VALUES ($sensorid, $imageid, $templateid, '$timespan')";

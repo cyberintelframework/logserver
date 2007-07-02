@@ -2,14 +2,16 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.11                  #
-# 06-06-2007                       #
-# Peter Arts                       #
+# Version 1.04.13                  #
+# 21-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
+# Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.13 Fixed some autocomplete stuff
+# 1.04.12 Changed source IP and destination IP address search fields
 # 1.04.11 Removed PDF option (is being redone)
 # 1.04.10 Added autocomplete function
 # 1.04.09 Removed chartof stuff
@@ -39,21 +41,10 @@ unset($_SESSION["search_num_rows"]);
 <script type="text/javascript" src="./calendar/js/calendar.js"></script>
 <script type="text/javascript" src="./calendar/js/calendar-en.js"></script>
 <script type="text/javascript" src="./calendar/js/calendar-setup.js"></script>
-<script type="text/javascript" src="maps.php?map=search"></script>
+<? if ($c_autocomplete == 1) { ?>
+  <script type="text/javascript" src="maps.php?map=search"></script>
+<? } ?>
 <script type="text/javascript" language="javascript">
-function check_byte(b_val,next_field) {
-    if(isNaN(b_val.value) || (b_val.value).indexOf(".") >0 || b_val.value > 255){
-        alert(b_val.value + " is not a valid number (0 - 254)");
-        document.getElementById(b_val.id).value = '';
-    } else {
-        if ((b_val.value).length==b_val.maxLength) {
-            if (next_field != '') {
-                document.getElementById(next_field).focus();
-            }
-        }
-    }
-}
-
 function changeSearch() {
   var check = document.getElementById('arpsearch').style.display;
 
@@ -113,12 +104,12 @@ function changeSearch() {
             <td class='datatd'>Source:</td>
             <td class='datatd'>
               <? if ($c_autocomplete == 1) { ?>
-                <span style='position: relative; top: 0px; left: 0px; overflow: auto;'>
-                  <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
-                    <input type='text' id='mac_sourcedis' name='mac_sourcedis' value='' style='background-color: #fff;' disabled />
+                <span class='autocomplete_top'>
+                  <span class='autocomplete_dis'>
+                    <input type='text' id='mac_sourcedis' name='mac_sourcedis' value='' class='autocomplete_field_dis' disabled />
                   </span>
-                  <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
-                    <input autocomplete='off' type='text' id='mac_source' class='completefield' name='mac_source' value='' onfocus='own_autocomplete(this.id, smacmap);' onkeyup='own_autocomplete(this.id, smacmap);' onblur='fill_autocomplete(this.id);' />
+                  <span class='autocomplete'>
+                    <input type='text' id='mac_source' name='mac_source' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, smacmap);' onkeyup='own_autocomplete(this.id, smacmap);' onblur='fill_autocomplete(this.id);' />
                   </span>
                 </span>
                 <input type='hidden' name='mac_sourcehid' value='' id='mac_sourcehid' />
@@ -131,12 +122,12 @@ function changeSearch() {
             <td class='datatd'>Target:</td>
             <td class='datatd'>
               <? if ($c_autocomplete == 1) { ?>
-                <span style='position: relative; top: 0px; left: 0px;'>
-                  <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
+                <span class='autocomplete_top'>
+                  <span class='autocomplete_dis'>
                     <input type='text' id='targetdis' name='targetdis' value='' style='background-color: #fff;' disabled />
                   </span>
-                  <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
-                    <input autocomplete='off' type='text' id='target' class='completefield' name='target' value='' onfocus='own_autocomplete(this.id, tmacmap);' onkeyup='own_autocomplete(this.id, tmacmap);' onblur='fill_autocomplete(this.id);' />
+                  <span class='autocomplete'>
+                    <input type='text' id='target' name='target' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, tmacmap);' onkeyup='own_autocomplete(this.id, tmacmap);' onblur='fill_autocomplete(this.id);' />
                   </span>
                 </span>
                 <input type='hidden' name='targethid' value='' id='targethid' />
@@ -227,15 +218,8 @@ function changeSearch() {
 			}
 			if ($s_admin == 1) {
 	                        $label .= " (" .$org. ")";
-				// get organisation name
-#                                $sql = "SELECT organisation FROM organisation WHERE id = '" . intval($sensor_data["organisation"]) . "'";
-#                                $debuginfo[] = $sql;
-#				$query_org = pg_query($sql);
-#				$org = pg_result($query_org, 0);
-#				$label .= " (" . $org . ")";
 			}
-			
-			  echo printOption($sid, $label, $sensorid);
+                        echo printOption($sid, $label, $sensorid);
 		}
 		echo "</select>\n";
 		echo "  </td>\n";
@@ -245,40 +229,46 @@ function changeSearch() {
  <tr>
   <td class="datatd" width=140>Source:</td>
   <td class="datatd">
-    <input type="radio" name="sradio" id="s_radioA" value="A" checked onclick="document.getElementById('source_A').style.display='';document.getElementById('source_N').style.display='none';"> 
-     <label for="s_radioA" style="cursor:pointer;">Address:Port</label> &nbsp; 
-    <input type="radio" name="sradio" id="s_radioN" value="N" onclick="document.getElementById('source_N').style.display='';document.getElementById('source_A').style.display='none';"> 
-     <label for="s_radioN" style="cursor:pointer;">Network</label><br />
-    <input type="text" name="sourceip[]" id="source_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip2');" /> . 
-    <input type="text" name="sourceip[]" id="source_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip3');" /> . 
-    <input type="text" name="sourceip[]" id="source_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'source_ip4');" />. 
-    <input type="text" name="sourceip[]" id="source_ip4" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, '');" />
-    <font id="source_A" name="source_A">
-      : <input type="text" name="int_sport" style="width:80px;" />
-    </font>
-    <font id="source_N" name="source_N" style="display:none;">
-      / <input type="text" name="int_smask" maxlength=3 style="width:40px;">
-    </font>
-   </td>
+  <? if ($c_autocomplete == 1) { ?>
+    <span class='autocomplete_top'>
+      <span class='autocomplete_dis'>
+        <input type='text' id='ip_sourceipdis' name='ip_sourceipdis' value='' class='autocomplete_field_dis' disabled />
+      </span>
+      <span class='autocomplete'>
+        <input autocomplete='off' type='text' id='ip_sourceip' name='ip_sourceip' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, samap);' onkeyup='own_autocomplete(this.id, samap);' onblur='fill_autocomplete(this.id);' />
+      </span>
+    </span>
+    <input type='hidden' name='ip_sourceiphid' id='ip_sourceiphid' value='' />
+  <? } else { ?>
+    <input type='text' id='ip_sourceip' name='ip_sourceip' maxlenght=18 />
+  <? } ?>
+  </td>
+ </tr>
+ <tr>
+   <td class='datatd'>Source port:</td>
+   <td class='datatd'><input type="text" name="int_sport" size='5' /></td>
  </tr>
  <tr>
   <td class="datatd">Destination:</td>
   <td class="datatd">
-    <input type="radio" name="dradio" id="d_radioA" value="A" checked onclick="document.getElementById('destination_A').style.display='';document.getElementById('destination_N').style.display='none';">
-      <label for="d_radioA" style="cursor:pointer;">Address:Port</label>&nbsp;
-    <input type="radio" name="dradio" id="d_radioN" value="N" onclick="document.getElementById('destination_N').style.display='';document.getElementById('destination_A').style.display='none';">
-      <label for="d_radioN" style="cursor:pointer;">Network</label><br />
-    <input type="text" name="destip[]" id="destination_ip1" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip2');" /> . 
-    <input type="text" name="destip[]" id="destination_ip2" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip3');" /> . 
-    <input type="text" name="destip[]" id="destination_ip3" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, 'destination_ip4');" />. 
-    <input type="text" name="destip[]" id="destination_ip4" maxlength=3 style="width:30px;" onKeyUp="check_byte(this, '');" />
-    <font id="destination_A">
-      : <input type="text" name="int_dport" style="width:80px;" />
-    </font>
-    <font id="destination_N" style="display:none;">
-      / <input type="text" name="int_dmask" maxlength=3 style="width:40px;">
-    </font>
-   </td>
+  <? if ($c_autocomplete == 1) { ?>
+    <span class='autocomplete_top'>
+      <span class='autocomplete_dis'>
+        <input type='text' id='ip_destipdis' name='ip_destipdis' value='' class='autocomplete_field_dis' disabled />
+      </span>
+      <span class='autocomplete'>
+        <input type='text' id='ip_destip' name='ip_destip' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, damap);' onkeyup='own_autocomplete(this.id, damap);' onblur='fill_autocomplete(this.id);' />
+      </span>
+    </span>
+    <input type='hidden' name='ip_destiphid' id='ip_destiphid' value='' />
+  <? } else { ?>
+    <input type='text' id='ip_destip' name='ip_sourceip' maxlenght=18 />
+  <? } ?>
+  </td>
+ </tr>
+ <tr>
+   <td class='datatd'>Destination port:</td>
+   <td class='datatd'><input type="text" name="int_dport" size='5' /></td>
  </tr>
  <tr>
   <td colspan=2><h4>When</h4></td>
@@ -348,14 +338,14 @@ function changeSearch() {
  </tr>
  <tr id="what_3" name="what_3">
   <td class="datatd">Virus: </td>
-  <td>
+  <td class='datatd'>
     <? if ($c_autocomplete == 1) { ?>
-      <span style='position: relative; top: 0px; left: 0px; overflow: auto;'>
-        <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
-          <input type='text' id='strip_html_escape_virustxtdis' name='strip_html_escape_virustxtdis' value='' style='background-color: #fff;' disabled />
+      <span class='autocomplete_top'>
+        <span class='autocomplete_dis'>
+          <input type='text' id='strip_html_escape_virustxtdis' name='strip_html_escape_virustxtdis' value='' class='autocomplete_field_dis' disabled />
         </span>
-        <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
-          <input autocomplete='off' type='text' id='strip_html_escape_virustxt' class='completefield' name='strip_html_escape_virustxt' value='' onfocus='own_autocomplete(this.id, virusmap);' onkeyup='own_autocomplete(this.id, virusmap);' onblur='fill_autocomplete(this.id);' />
+        <span class='autocomplete'>
+          <input type='text' id='strip_html_escape_virustxt' name='strip_html_escape_virustxt' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, virusmap);' onkeyup='own_autocomplete(this.id, virusmap);' onblur='fill_autocomplete(this.id);' />
         </span>
       </span>
       <input type='hidden' name='strip_html_escape_virustxthid' value='' id='strip_html_escape_virustxthid' /> *
@@ -368,12 +358,12 @@ function changeSearch() {
   <td class="datatd">Filename:</td>
   <td class="datatd">
     <? if ($c_autocomplete == 1) { ?>
-      <span style='position: relative; top: 0px; left: 0px; overflow: auto;'>
-        <span style='position: absolute; top: -6px; left: 0; z-index:2;'>
-          <input type='text' id='strip_html_escape_filenamedis' name='strip_html_escape_filenamedis' value='' style='background-color: #fff;' disabled />
+      <span class='autocomplete_top'>
+        <span class='autocomplete_dis'>
+          <input type='text' id='strip_html_escape_filenamedis' name='strip_html_escape_filenamedis' value='' class='autocomplete_field_dis' disabled />
         </span>
-        <span style='position: relative; top: 0px; left: 0px; z-index:3;'>
-          <input autocomplete='off' type='text' id='strip_html_escape_filename' class='completefield' name='strip_html_escape_filename' value='' onfocus='own_autocomplete(this.id, filemap);' onkeyup='own_autocomplete(this.id, filemap);' onblur='fill_autocomplete(this.id);' />
+        <span class='autocomplete'>
+          <input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, filemap);' onkeyup='own_autocomplete(this.id, filemap);' onblur='fill_autocomplete(this.id);' />
         </span>
       </span>
       <input type='hidden' name='strip_html_escape_filenamehid' value='' id='strip_html_escape_filenamehid' /> *

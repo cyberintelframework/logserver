@@ -159,6 +159,7 @@ while (@row = $email_query->fetchrow_array) {
   $interval = $row[8];
   $priority = $row[9];
   $subject = $row[10];
+  print "SUBJECT: $subject\n";
   $operator = $row[11];
   $threshold = $row[12];
   $severity = $row[13];
@@ -328,7 +329,6 @@ while (@row = $email_query->fetchrow_array) {
         $totalcount = 0;
         ############# Detail overview
         printmail("######### Detail overview #########");
-        $message = "";
         $sql = "SELECT attacks.source, attacks.timestamp, details.text, sensors.keyname, sensors.vlanid ";
         $sql .= "FROM attacks ";
         $sql .= " INNER JOIN sensors ";
@@ -514,7 +514,11 @@ while (@row = $email_query->fetchrow_array) {
               $severity = $row[0];
               $totalsev = $row[2];
               $totalcount = $totalcount + $totalsev;
-              $sevhash{$severity} = $sevhash{$severity} + $totalsev;
+              if ($sevhash{$severity}) {
+                $sevhash{$severity} = $sevhash{$severity} + $totalsev;
+              } else {
+                $sevhash{$severity} = $totalsev;
+              }
             } 
           }
           for my $key (keys %sevhash) {
@@ -526,19 +530,28 @@ while (@row = $email_query->fetchrow_array) {
         }
 
         if ($detail =~ /^(1|2)$/) {
+          $totalcount = 0;
+          printmail("######### Detail overview #########");
+          printmail("Source IP\t\tTimestamp\t\tAdditional info");
+
           foreach $range (@rangerow) {
-            $message = "";
-            $sql = "SELECT DISTINCT source, timestamp, text FROM attacks, sensors, details ";
-            $sql .= " WHERE attacks.source <<= '$range' AND details.attackid = attacks.id ";
-            $sql .= " AND details.type = '1' AND attacks.severity = '1' AND attacks.timestamp >= '$ts_start' ";
-            $sql .= " AND attacks.timestamp <= '$ts_end' AND attacks.sensorid = sensors.id ";
+            $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
+            $sql .= " FROM attacks ";
+            $sql .= " INNER JOIN sensors ";
+            $sql .= " ON attacks.sensorid = sensors.id ";
+            $sql .= " INNER JOIN severity ";
+            $sql .= " ON severity.val = attacks.severity ";
+            $sql .= " LEFT JOIN details ";
+            $sql .= " ON attacks.id = details.attackid ";
+            $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+            $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
             $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
-            $sql .= " $andorg $andsensor $andsev ";
-            $sql .= " GROUP BY source, timestamp, text";
+            $sql .= " AND attacks.source <<= '$range' ";
+            $sql .= " $andorg $andsensor $andsev";
+            $sql .= " ORDER BY timestamp ASC";
             $ipview_query = $dbh->prepare($sql);
             $ec = $ipview_query->execute();
 
-            $totalcount = 0;
             while (@row = $ipview_query->fetchrow_array) {
               $totalcount++;
               $ip = "";
@@ -547,13 +560,105 @@ while (@row = $email_query->fetchrow_array) {
               $ip = $row[0];
               $timestamp = $row[1];
               $time = getdatetime($timestamp);
-              $attacktype = $row[2];
-              $attacktype =~ s/Dialogue//;
-              printmail("\t$ip\t$time\t$attacktype");
+              if ($row[2]) {
+                $attacktype = $row[2];
+                $attacktype =~ s/Dialogue//;
+              } else {
+                $attacktype = "";
+              }
+              printmail("$ip\t\t$time\t$attacktype");
             }
-            printmail("");
           } #/foreach
+          printmail("");
         } #/detail
+
+        if ($detail == 3) {
+          $totalcount = 0;
+          printattach("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+          printattach("<!DOCTYPE IDMEF-Message PUBLIC \"-//IETF//DTD RFC XXXX IDMEF v1.0//EN\" \"idmef-message.dtd\">");
+          printattach("<idmef:IDMEF-Message version=\"1.0\" xmlns:idmef=\"http://iana.org/idmef\">");
+
+          foreach $range (@rangerow) {
+            $sql = "SELECT attacks.id, sensors.keyname, sensors.vlanid, attacks.timestamp, attacks.severity, severity.txt, attacks.source, ";
+            $sql .= " attacks.sport, attacks.dest, attacks.dport, details.text ";
+            $sql .= " FROM attacks ";
+            $sql .= " INNER JOIN sensors ";
+            $sql .= " ON attacks.sensorid = sensors.id ";
+            $sql .= " INNER JOIN severity ";
+            $sql .= " ON severity.val = attacks.severity ";
+            $sql .= " LEFT JOIN details ";
+            $sql .= " ON attacks.id = details.attackid ";
+            $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+            $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+            $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+            $sql .= " AND attacks.source <<= '$range' ";
+            $sql .= " $andorg $andsensor $andsev";
+            $sql .= " ORDER BY timestamp ASC";
+            $ipview_query = $dbh->prepare($sql);
+            $ec = $ipview_query->execute();
+
+            while (@row = $ipview_query->fetchrow_array) {
+              $totalcount++;
+              $attackid = $row[0];
+              $keyname = $row[1];
+              $vlanid = $row[2];
+              if ($vlanid != 0) {
+                $keyname = "$keyname-$vlanid";
+              }
+              $timestamp = $row[3];
+              $sev = $row[4];
+              $sev_text = $row[5];
+              $source = $row[6];
+              $sport = $row[7];
+              $dest = $row[8];
+              $dport = $row[9];
+              $dtext = $row[10];
+
+              printattach("<idmef:Alert messageid=\"$attackid\">");
+              printattach("<idmef:Analyzer analyzerid=\"$keyname\">");
+              printattach("</idmef:Analyzer>");
+              printattach("<idmef:CreateTime>$timestamp</idmef:CreateTime>");
+              printattach("<idmef:Classification ident=\"$sev\" text=\"$sev_text\"></idmef:Classification>");
+              printattach("<idmef:Source>");
+              printattach("  <idmef:Node>");
+              printattach("    <idmef:Address category=\"ipv4-addr\">");
+              printattach("      <idmef:address>$source</idmef:address>");
+              printattach("    </idmef:Address>");
+              printattach("  </idmef:Node>");
+              printattach("  <idmef:Service>");
+              printattach("    <idmef:port>$sport</idmef:port>");
+              printattach("  </idmef:Service>");
+              printattach("</idmef:Source>");
+              printattach("<idmef:Target>");
+              printattach("  <idmef:Node>");
+              printattach("    <idmef:Address category=\"ipv4-addr\">");
+              printattach("      <idmef:address>$dest</idmef:address>");
+              printattach("    </idmef:Address>");
+              printattach("  </idmef:Node>");
+              printattach("  <idmef:Service>");
+              printattach("    <idmef:port>$dport</idmef:port>");
+              printattach("  </idmef:Service>");
+              printattach("</idmef:Target>");
+
+              if ($sev == 1) {
+                $dtext =~ s/Dialogue//;
+                printattach("<idmef:AdditionalData type=\"string\" meaning=\"attack-type\">");
+                printattach("  <idmef:string>$dtext</idmef:string>");
+                printattach("</idmef:AdditionalData>");
+              } elsif ($sev == 16) {
+                printattach("<idmef:AdditionalData type=\"string\" meaning=\"file-offered\">");
+                printattach("  <idmef:string>$dtext</idmef:string>");
+                printattach("</idmef:AdditionalData>");
+              } elsif ($sev == 32) {
+                printattach("<idmef:AdditionalData type=\"string\" meaning=\"file-downloaded\">");
+                printattach("  <idmef:string>$dtext</idmef:string>");
+                printattach("</idmef:AdditionalData>");
+              }
+              printattach("</idmef:Alert>");
+            }
+          }
+          printattach("</idmef:IDMEF-Message>");
+        }
 
         # Checking for threshold stuff
         if ($threshold > -1) {
@@ -735,7 +840,7 @@ sub sendmail {
     $msg->attach (
       Type => 'text/xml',
       Path => $attachdata,
-      Filename => "IDMEF-$ts_now.xml",
+      Filename => "IDMEF-$id-$ts_now.xml",
       Disposition => 'attachment'
     ) or die "Error adding $attachdata: $!\n";
   }

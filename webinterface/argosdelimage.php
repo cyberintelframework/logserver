@@ -47,7 +47,6 @@ if (!isset($clean['imageid']) ) {
   $imageid = $clean['imageid'];
 }
 
-
 if ($err == 0) {
   $sql = "DELETE FROM argos_images WHERE id = '$imageid'";
   $debuginfo[] = $sql;

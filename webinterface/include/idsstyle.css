@@ -25,9 +25,14 @@ A:hover
 }
 
 select {
+  font-size: 		9pt;
   border: 		1px solid gray;
   background-color: 	#f1f1f9;
   color: 		#0d2474;
+}
+
+input {
+  font-size: 		8pt;
 }
 
 .sensorinput {
@@ -371,10 +376,11 @@ PRE {
   padding: 0px;
 }
 a.searchtemplate_item {
+  font-size: 9pt;
   display: block;
   position: relative;
   width: 290px;
-  height: 18px;
+  height: 16px;
   background-image: url('/images/nav-menu.jpg');
   background-repeat: repeat-x;
   background-position: 0% 100%;
@@ -407,7 +413,32 @@ a.searchtemplate_item {
   background-color:	white;
 }
 
-.completefield {
+.autocomplete_field {
   background: 		none;
   color:		#0d2474;
+}
+
+.autocomplete_field_dis {
+  background-color: 	#fff;
+}
+
+.autocomplete_top {
+  position: 		relative;
+  top:			0px;
+  left:			0px;
+  overflow:		auto;
+}
+
+.autocomplete_dis {
+  position:		absolute;
+  top:			-3px;
+  left:			0;
+  z-index:		2;
+}
+
+.autocomplete {
+  position:		relative;
+  top:			0px;
+  left:			0px;
+  z-index:		3;
 }

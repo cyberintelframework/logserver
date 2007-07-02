@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 19-06-2007                       #
+# Version 1.04.09                  #
+# 20-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.09 Fixed a bug with displaying organisation and the all sensors image 
 # 1.04.08 Fixed a bug when no traffic graphs are present and user is admin
 # 1.04.07 Fixed display of allsensor when no admin
 # 1.04.06 Added allsensors pictures again
@@ -48,6 +49,7 @@ if (isset($clean['onoff'])) {
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
+$db_org_name = pg_result($result_getorg, 0);
 
 $debuginfo[] = $sql_getorg;
 
@@ -61,18 +63,14 @@ if ($s_admin == 1) {
 debug_input();
 
 echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
+echo "Display: ";
   echo "<select name='int_onoff' onChange='javascript: this.form.submit();'>\n";
-    echo printOption(1, "Online", $onoff) . "\n";
-    echo printOption(0, "Offline", $onoff) . "\n";
-    echo printOption(2, "All", $onoff) . "\n";
+    echo printOption(1, "Online Sensors", $onoff) . "\n";
+    echo printOption(0, "Offline Sensors", $onoff) . "\n";
+    echo printOption(2, "All Sensors", $onoff) . "\n";
   echo "</select>&nbsp;\n";
 echo "</form>\n";
 echo "<br />\n";
-
-$sql_getorg = "SELECT organisation FROM organisations WHERE id = $s_org";
-$debuginfo[] = $sql_getorg;
-$result_getorg = pg_query($pgconn, $sql_getorg);
-$db_org_name = pg_result($result_getorg, 0);
 
 add_to_sql("organisation", "select");
 add_to_sql("keyname", "select");
@@ -95,7 +93,7 @@ if ($s_admin == 1) {
   $row_allsensors = pg_fetch_assoc($result_allsensors);
   $allid = $row_allsensors['id'];
 
-  if ($allid != "") {
+  if ($allid != "" && $onoff != 0) {
     echo "<table>\n";
       echo "<tr>\n";
         echo "<td><a href='trafficview.php?int_imgid=$allid'><img src='showtraffic.php?int_imgid=$allid' alt='All sensors' border='1' /></a></td>\n";

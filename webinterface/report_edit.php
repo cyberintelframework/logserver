@@ -29,7 +29,8 @@ $s_access_user = intval($s_access{2});
 ### Extracting GET variables
 $allowed_get = array(
                 "int_userid",
-		"int_rcid"
+		"int_rcid",
+		"int_m"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -72,6 +73,12 @@ if (!isset($clean['rcid'])) {
   $reportid = $clean['rcid'];
 }
 
+if (isset($clean['m'])) {
+  $m = $clean['m'];
+  $m = geterror($m);
+  echo $m;
+}
+
 $sql = "SELECT * FROM report_content WHERE id = '$reportid'";
 $debuginfo[] = $sql;
 $result = pg_query($pgconn, $sql);
@@ -90,6 +97,7 @@ if ($numrows > 0) {
   $operator = $row['operator'];
   $threshold = $row['threshold'];
   $active = $row['active'];
+  $detail = $row['detail'];
 
   echo "<form id='reportform' name='reportform' action='report_save.php' method='post'>\n";
   echo "<input type='hidden' name='int_userid' value='$user_id' />\n";
@@ -154,6 +162,20 @@ if ($numrows > 0) {
         echo "<select name='int_template' onclick='javascript: sh_mailtemp(this.value);'>\n";
           foreach ($v_mail_template_ar as $key=>$val) {
             echo printOption($key, $val, $temp);
+          }
+        echo "</select>\n";
+      echo "</td>\n";
+    echo "</tr>\n";
+    if ($temp == 4 || $temp == 5) {
+      echo "<tr class='datatr' id='repdetail' name='repdetail' style='display:none;'>";
+    } else {
+      echo "<tr class='datatr' id='reptdetal' name='repdetail' style='display:;'>";
+    }
+      echo "<td class='datatd' width='100'>Report detail:</td>\n";
+      echo "<td class='datatd' width='200'>";
+        echo "<select name='int_detail'>\n";
+          foreach ($v_mail_detail_ar as $key=>$val) {
+            echo printOption($key, $val, $detail);
           }
         echo "</select>\n";
       echo "</td>\n";
@@ -279,6 +301,16 @@ if ($numrows > 0) {
       echo "<tr class='datatr'>\n";
         echo "<td class='datatd' width='100'>Threshold amount:</td>\n";
         echo "<td class='datatd' width='200'><input type='text' name='int_threshold' value='$threshold' /></td>\n";
+      echo "</tr>\n";
+      echo "<tr class='datatr'>\n";
+        echo "<td class='datatd' width='100'>Timespan:</td>\n";
+        echo "<td class='datatd' width='200'>";
+          echo "<select name='int_intervalthresh'>\n";
+            foreach ($v_mail_timespan_ar as $key => $val) {
+              echo printOption($key, $val, $interval);
+            }
+          echo "</select>\n";
+        echo "</td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</div>\n";

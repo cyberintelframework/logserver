@@ -50,12 +50,14 @@ $allowed_post = array(
 		"int_freqsensor",
 		"int_intervalday",
 		"int_intervalweek",
+		"int_intervalthresh",
 		"int_operator",
 		"int_threshold",
 		"int_sensorid",
 		"int_template",
 		"int_sevattack",
 		"int_sevsensor",
+		"int_detail",
 		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
@@ -150,12 +152,13 @@ if (!isset($clean['freqattack']) || !isset($clean['freqsensor'])) {
       $interval = $clean['intervalweek'];
     }
   } elseif ($freq == 4) {
-    if (!isset($clean['operator']) || !isset($clean['threshold'])) {
+    if (!isset($clean['operator']) || !isset($clean['threshold']) || !isset($clean['intervalthresh'])) {
       $err = 1;
       $m = 94;
     } else {
       $operator = $clean['operator'];
       $threshold = $clean['threshold'];
+      $interval = $clean['intervalthresh'];
     }
   }
 }
@@ -167,6 +170,12 @@ if (!isset($clean['sensorid'])) {
   $sensorid = $clean['sensorid'];
 }
 
+if (!isset($clean['detail'])) {
+  $detail = 0;
+} else {
+  $detail = $clean['detail'];
+}
+
 # Setting some default values if the variables don't exist
 if (!$interval) {
   $interval = -1;
@@ -176,17 +185,17 @@ if (!$operator) {
   $operator = -1;
 }
 
-if (!$threshold) {
+if ("$threshold" == "") {
   $threshold = -1;
 }
 
-if (!$sev) {
+if ("$sev" == "") {
   $sev = -1;
 }
 
 if ($err == 0) {
-  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity) ";
-  $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev')";
+  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity, detail) ";
+  $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev', '$detail')";
   $debuginfo[] = $sql;
   $ec = pg_query($pgconn, $sql);
   $m = 5;

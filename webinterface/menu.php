@@ -90,7 +90,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       echo "<table border='0' width='100%'>\n";
         echo "<tr>\n";
           echo "<td width='20%'></td>\n";
-          echo "<td width='60%' align='center'><img src='${address}images/logo.jpg' alt='Logo' /></td>\n";
+          echo "<td width='60%' align='center'><img src='${address}images/logo.gif' alt='Logo' /></td>\n";
           echo "<td width='20%' class='menustats'>";
             if ($file != "login.php") {
               echo "logged in as: <b>$s_user</b><br />";

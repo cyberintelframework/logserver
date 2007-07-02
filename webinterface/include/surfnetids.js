@@ -35,6 +35,7 @@ function sh_mailtemp(si) {
     document.getElementById('thresh_freq').style.display='none';
 
     document.getElementById('timeoptions').style.display='none';
+    document.getElementById('repdetail').style.display='none';
   } else if (si == 5) {
     document.getElementById('attack_sev').style.display='none';
     document.getElementById('sensor_sev').style.display='none';
@@ -43,6 +44,7 @@ function sh_mailtemp(si) {
     document.getElementById('sensor_time').style.display='none';
 
     document.getElementById('timeoptions').style.display='none';
+    document.getElementById('repdetail').style.display='none';
   } else {
     document.getElementById('attack_sev').style.display='';
     document.getElementById('sensor_sev').style.display='none';
@@ -51,6 +53,7 @@ function sh_mailtemp(si) {
     document.getElementById('attack_time').style.display='';
 
     document.getElementById('timeoptions').style.display='';
+    document.getElementById('repdetail').style.display='';
   }
 }
 

@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.28                  #
-# 06-06-2007                       #
+# Version 1.04.29                  #
+# 20-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #########################################################################
 # Changelog:
+# 1.04.29 Changed source and destination IP address search fields
 # 1.04.28 Removed PDF generation stuff (this will be redone)
 # 1.04.27 Fixed a bug with pdf 
 # 1.04.26 Fixed a bug with binname when there was no uniq_binaries record
@@ -96,14 +97,10 @@ $allowed_get = array(
 		"ip_searchip",
 		"int_org",
 		"sensorid",
-		"sourceip",
-		"sradio",
+		"ip_sourceip",
 		"int_sport",
-		"int_smask",
-		"destip",
-		"dradio",
+		"ip_destip",
 		"int_dport",
-		"int_dmask",
 		"tsselect",
 		"strip_html_escape_tsstart",
 		"strip_html_escape_tsend",
@@ -182,62 +179,6 @@ if (@is_array($tainted["sensorid"])) {
     $sensorid = 0;
   }
 } else $sensorid = intval($tainted['sensorid']);
-
-####################
-# Source IP address
-####################
-$source_ip = $tainted['sourceip'];
-$full_source_ip = "";
-if (!empty($source_ip)) {
-  foreach ($source_ip as $key => $val) {
-    $val = intval(trim($val));
-    if ($key > 0) $full_source_ip .= ".";
-    $full_source_ip .= $val;
-  }
-} else {
-  $full_source_ip = "0.0.0.0";
-}
-if ($full_source_ip == "0.0.0.0") $full_source_ip = -1;
-elseif (ip2long($full_source_ip) === -1) $full_source_ip = -2;
-
-$sradio_pattern = '/^(A|N)$/';
-if (preg_match($sradio_pattern, $tainted['sradio'])) {
-  if ($tainted['sradio'] == "A") {
-    $source_port = $clean['sport'];
-    $source_mask = -1;
-  } else {
-    $source_port = -1;
-    $source_mask = $clean['smask'];
-  }
-}
-
-####################
-# Destination IP address
-####################
-$destination_ip = $tainted['destip'];
-$full_destination_ip = "";
-if (!empty($destination_ip)) {
-  foreach ($destination_ip as $key=>$val) {
-    $val = intval(trim($val));
-    if ($key > 0) $full_destination_ip .= ".";
-    $full_destination_ip .= $val;
-  }
-} else {
-  $full_destination_ip = "0.0.0.0";
-}
-if ($full_destination_ip == "0.0.0.0") $full_destination_ip = -1;
-elseif (ip2long($full_destination_ip) === -1) $full_destination_ip = -2;
-
-$dradio_pattern = '/^(A|N)$/';
-if (preg_match($dradio_pattern, $tainted['dradio'])) {
-  if ($tainted["dradio"] == "A") {
-    $destination_port = $clean['dport'];
-    $destination_mask = -1;
-  } else {
-    $destination_port = -1;
-    $destination_mask = $clean['dmask'];
-  }
-}
 
 ####################
 # WHEN timestamping stuff
@@ -333,50 +274,46 @@ $f_reptype = $rapport;
 # Sensor ID's
 ####################
 if ($sensorid > 0) {
-	add_to_sql("sensors", "table");
-	add_to_sql("sensors.id = '$sensorid'", "where");
+  add_to_sql("sensors", "table");
+  add_to_sql("sensors.id = '$sensorid'", "where");
 } elseif ($sensorid == -1) {
-	// multiple sensors
-	add_to_sql("sensors", "table");
-	$count = count($ar_sensorid);
-	$tmp_where = "sensors.id IN (";
-	for ($i = 0; $i < $count; $i++) {
-		if ($i != ($count - 1)) {
-			$tmp_where .= "$ar_sensorid[$i], ";
-		} else {
-			$tmp_where .= "$ar_sensorid[$i]";
-		}
-	}
-	$tmp_where .= ")";
-	add_to_sql($tmp_where, "where");
+  # multiple sensors
+  add_to_sql("sensors", "table");
+  $count = count($ar_sensorid);
+  $tmp_where = "sensors.id IN (";
+  for ($i = 0; $i < $count; $i++) {
+    if ($i != ($count - 1)) {
+      $tmp_where .= "$ar_sensorid[$i], ";
+    } else {
+      $tmp_where .= "$ar_sensorid[$i]";
+    }
+  }
+  $tmp_where .= ")";
+  add_to_sql($tmp_where, "where");
 }
 
 ####################
 # Source IP address
 ####################
-if ($full_source_ip > 0) {
+if (isset($clean['sourceip'])) {
+  $source_ip = $clean['sourceip'];
   add_to_sql("attacks", "table");
-  if ($source_mask > 0) {
-    // Network address
-    $source_ip = $full_source_ip . "/" . $source_mask;
-    add_to_sql("attacks.source <<= '$source_ip'", "where");
-  } else {
-    $source_ip = $full_source_ip;
-    add_to_sql("attacks.source = '$source_ip'", "where");
-    if ($source_port > 0) {
-      add_to_sql("attacks.sport = '$source_port'", "where");
-    }
+  add_to_sql("attacks.source <<= '$source_ip'", "where");
+}
+if (isset($clean['sport'])) {
+  $sport = $clean['sport'];
+  if ($sport != 0) {
+    add_to_sql("attacks", "table");
+    add_to_sql("attacks.sport = '$sport'", "where");
   }
-} elseif ($source_port > 0) {
-  add_to_sql("attacks", "table");
-  add_to_sql("attacks.sport = '$source_port'", "where");
-} elseif (isset($clean['searchnet'])) {
-  // Input from other page
+}
+if (isset($clean['searchnet'])) {
+  # Input from other page
   $input = $clean['searchnet'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source <<= '$input'", "where");
 } elseif (isset($clean['searchip'])) {
-  // Input from other page
+  # Input from other page
   $input = $clean['searchip'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source = '$input'", "where");
@@ -385,20 +322,17 @@ if ($full_source_ip > 0) {
 ####################
 # Destination IP address
 ####################
-if ($full_destination_ip > 0) {
+if (isset($clean['destip'])) {
+  $destination_ip = $clean['destip'];
   add_to_sql("attacks", "table");
-  if ($destination_mask > 0) {
-    // Network address
-    $destination_ip = $full_destination_ip . "/" . $destination_mask;
-    add_to_sql("attacks.dest <<= '$destination_ip'", "where");
-  } else {
-    $destination_ip = $full_destination_ip;
-    add_to_sql("attacks.dest = '$destination_ip'", "where");
-    add_to_sql("attacks.dport = '$destination_port'", "where");
+  add_to_sql("attacks.dest <<= '$destination_ip'", "where");
+}
+if (isset($clean['dport'])) {
+  $dport = $clean['dport'];
+  if ($dport != 0) {
+    add_to_sql("attacks", "table");
+    add_to_sql("attacks.dport = '$dport'", "where");
   }
-} elseif ($destination_port >= 0 && $destination_port != "") {
-  add_to_sql("attacks", "table");
-  add_to_sql("attacks.dport = '$destination_port'", "where");
 }
 
 ####################
@@ -406,7 +340,7 @@ if ($full_destination_ip > 0) {
 ####################
 if (!empty($ts_start)) {
   $ts_start = getepoch($ts_start);
-  // Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
+  # Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
   add_to_sql("attacks", "table");
   add_to_sql("attacks.timestamp >= '$ts_start'", "where");
 } elseif (isset($clean['from'])) {
@@ -419,7 +353,7 @@ if (!empty($ts_start)) {
 # End timestamp
 ####################
 if (!empty($ts_end)) {
-  // Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
+  # Expect: 24-05-2006 11:30 (dd-mm-yyyy hh:mm)
   $ts_end = getepoch($ts_end);
   add_to_sql("attacks", "table");
   add_to_sql("attacks.timestamp <= '$ts_end'", "where");

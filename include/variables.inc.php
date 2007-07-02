@@ -1,14 +1,16 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.18                  #
-# 11-06-2007                       #
+# Version 1.04.21                  #
+# 02-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
-# Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.21 Added IP address organisation identifier
+# 1.04.20 Added detail array
+# 1.04.19 Changed some variables values  
 # 1.04.18 Removed some unused arrays
 # 1.04.17 Added several ARGOS entries  
 # 1.04.16 Added v_arp_alerts array
@@ -187,6 +189,14 @@ $v_access_ar_user = array(
 );
 
 # Array with the mailreporting templates
+$v_mail_detail_ar = array(
+		0 => "Summary", 
+		1 => "Detail", 
+		2 => "Summary + Detail",
+		3 => "IDMEF Detail"
+);
+
+# Array with the mailreporting templates
 $v_mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
@@ -231,8 +241,16 @@ $v_mail_frequency_sensors_ar = array(
 		3 => "Every week"
 );
 
+# Array with the mailreporting frequency
+$v_mail_timespan_ar = array(
+		1 => "Last hour",
+		2 => "Last 24 hours",
+		3 => "Last 7 days"
+);
+
 # Array with the organisation identifier types
 $v_org_ident_type_ar = array(
+		0 => "IP address",
 		1 => "Random Identifier String",
 		2 => "WHOIS netname",
 		3 => "Domain name",
@@ -276,6 +294,7 @@ $v_errors = array(
 				5 => "Successfully added a new report!",
 				6 => "Successfully deleted a report!",
 				7 => "Successfully saved the changes!",
+				86 => "Invalid or missing report ID!",
 				90 => "You don't have sufficient rights to perform the requested action!",
 				91 => "Invalid hash!",
 				92 => "Invalid action method!",
@@ -399,6 +418,7 @@ $v_errors = array(
 				92 => "Sensor already redirected!",
 				93 => "Image name already exists!",
 				94 => "MAC Address already exists!",
+				95 => "You are not allowed to add a redirect to this image!",
 				99 => "Invalid or missing Argos ID!"
 			)
 );
@@ -448,7 +468,7 @@ $v_help = array(
 	logindex.php => array(
 		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
 		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.<br /> An exploit was used to try and gain entry to the system.",
-		2 => "Argos has detected a buffer overflow in a connection to the honeypot.",
+		2 => "Argos detected a control flow diversion (e.g. caused by a buffer overflow or code injection).",
 		16 => "A piece of malware is offered to the honeypot. The honeypot will try to download it.",
 		32 => "The malware was succesfully downloaded to the honeypot."
 	),
@@ -474,7 +494,15 @@ $v_help = array(
 		"statusblack" => "The sensor has been disabled by a server admin. This will mean the sensor cannot be started.",
 		"statusblue" => "The sensor needs configuration. This is a status particularly for statically configured sensors. Configure the tap IP address to fix this.",
 		"statusnone" => "The sensor is on ignore. This can be either because a different sensor of the same name is active or the sensor is manually ignored."
+	),
+	argosadmin.php => array(
+		"sensor" => "The name of the sensor (VLAN number included if applicable).",
+		"deviceip" => "The virtual device on the tunnel server. This IP address will be configured on the argos image",
+		"imagename" => "The name of the Argos image.",
+		"template" => "The template to be used. This will redirect IP addresses to the argos image you selected.<br /> The redirection is done by getting the possible malicious attacks that where not malicious after that.",
+		"timespan" => "The timespan used to calculate the IP addresses that will be redirected.",
 	)
+
 );
 
 $v_arp_alerts = array(

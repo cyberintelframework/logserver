@@ -41,12 +41,13 @@ if ($s_access_sensor == 0) {
 
 $allowed_post = array(
                 "int_imageid",
-                "strip_html_name",
-                "strip_html_imagename",
+                "strip_html_escape_name",
+                "strip_html_escape_imagename",
                 "ip_serverip",
                 "mac_macaddr",
-                "strip_html_osname",
-                "strip_html_oslang",
+                "strip_html_escape_osname",
+                "strip_html_escape_oslang",
+                "int_orgid",
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -89,16 +90,22 @@ if (isset($clean['oslang'])) {
   $m = 99;
   $err = 1;
 }
+if (isset($clean['orgid'])) {
+  $orgid = $clean['orgid'];
+} else {
+  $m = 99;
+  $err = 1;
+}
 
 if ($err == 0) {
   if (isset($clean['macaddr'])) {
     $macaddr = $clean['macaddr'];
-    $sql = "UPDATE argos_images SET name = '$name', serverip = '$serverip', macaddr = '$macaddr', imagename = '$imagename', osname = '$osname', oslang = '$oslang' WHERE id = '$imageid'";
+    $sql = "UPDATE argos_images SET name = '$name', serverip = '$serverip', macaddr = '$macaddr', imagename = '$imagename', osname = '$osname', oslang = '$oslang', organisationid = '$orgid' WHERE id = '$imageid'";
     $debuginfo[] = $sql;
     $query = pg_query($pgconn, $sql);
     $m = 13;
   } else {
-    $sql = "UPDATE argos_images SET name = '$name', serverip = '$serverip', imagename = '$imagename', osname = '$osname', oslang = '$oslang' WHERE id = '$imageid'";
+    $sql = "UPDATE argos_images SET name = '$name', serverip = '$serverip', imagename = '$imagename', osname = '$osname', oslang = '$oslang', organisationid = '$orgid'  WHERE id = '$imageid'";
     $debuginfo[] = $sql;
     $query = pg_query($pgconn, $sql);
     $m = 11;	

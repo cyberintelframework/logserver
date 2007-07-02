@@ -165,9 +165,9 @@ if ($s_access_sensor > 1) {
   echo "<form name='arp_static' action='arp_static_add.php?int_org=$q_org' method='post'>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
-      echo "<td width='150' class='dataheader'><a href='$url${op}sort=mac$neworder'>MAC address</a></td>\n";
-      echo "<td width='150' class='dataheader'><a href='$url${op}sort=ip$neworder'>IP address</a></td>\n";
-      echo "<td width='100' class='dataheader'><a href='$url${op}sort=keyname$neworder'>Sensor</a></td>\n";
+      echo "<td width='75' class='dataheader'><a href='$url${op}sort=mac$neworder'>MAC address</a></td>\n";
+      echo "<td width='75' class='dataheader'><a href='$url${op}sort=ip$neworder'>IP address</a></td>\n";
+      echo "<td class='dataheader'><a href='$url${op}sort=keyname$neworder'>Sensor</a></td>\n";
       echo "<td class='dataheader'>Action</td>\n";
     echo "</tr>\n";
 
@@ -212,7 +212,7 @@ if ($s_access_sensor > 1) {
 #          echo "</span>\n";
 #        echo "</span>\n";
       echo "</td>\n";
-      echo "<td><input type='text' name='ip_ipaddr' value='' size='15' /></td>\n";
+      echo "<td><input type='text' name='ip_ipaddr' value='' size='13' /></td>\n";
 
       pg_result_seek($result_sensors, 0);
       echo "<td>";

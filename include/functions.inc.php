@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.17                  #
-# 19-06-2007                       #
+# Version 1.04.18                  #
+# 20-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.18 Fixed typo in inet check
 # 1.04.17 Added inet check for extractvars
 # 1.04.16 Fixed bool check in extractvars
 # 1.04.15 Removed cleansql function
@@ -335,7 +336,7 @@ function extractvars($source, $allowed) {
                 } elseif ($check == "inet") {
                   $chk = substr_count($var, "/");
                   if ($chk == 1) {
-                    $ar_test = explode("/", $value);
+                    $ar_test = explode("/", $var);
                     $ip_test = $ar_test[0];
                     $mask_test = intval($ar_test[1]);
                     if (preg_match($ipregexp, $ip_test) && $mask_test >= 0 && $mask_test <= 32) {
@@ -344,7 +345,7 @@ function extractvars($source, $allowed) {
                       $tainted[$temp] = $var;
                     }
                   } elseif ($chk == 0) {
-                    if (preg_match($ipregexp, $value)) {
+                    if (preg_match($ipregexp, $var)) {
                       $clean[$temp] = $var;
                     } else {
                       $tainted[$temp] = $var;

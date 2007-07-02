@@ -42,10 +42,11 @@ if ($s_access_sensor == 0) {
 $allowed_post = array(
                 "ip_serverip",
                 "mac_macaddr",
-                "strip_html_name",
-                "strip_html_imagename",
-                "strip_html_osname",
-                "strip_html_oslang",
+                "strip_html_escape_name",
+                "strip_html_escape_imagename",
+                "strip_html_escape_osname",
+                "strip_html_escape_oslang",
+                "int_orgid",
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -78,6 +79,12 @@ if (isset($clean['imagename'])) {
 }
 if (isset($clean['serverip'])) {
   $serverip = $clean['serverip'];
+} else {
+  $m = 99;
+  $err = 1;
+}
+if (isset($clean['orgid'])) {
+  $orgid = $clean['orgid'];
 } else {
   $m = 99;
   $err = 1;
@@ -117,12 +124,12 @@ if (isset($clean['macaddr'])) {
 if ($err == 0) {
   if (isset($clean['macaddr'])) {
     $macaddr = $clean['macaddr'];
-    $sql = "INSERT INTO argos_images (name, serverip, macaddr, imagename, osname, oslang) VALUES ('$name', '$serverip', '$macaddr', '$imagename', '$osname', '$oslang')";
+    $sql = "INSERT INTO argos_images (name, serverip, macaddr, imagename, osname, oslang, organisationid) VALUES ('$name', '$serverip', '$macaddr', '$imagename', '$osname', '$oslang', '$orgid')";
     $debuginfo[] = $sql;
     $query = pg_query($pgconn, $sql);
     $m = 11;	
   } else {
-    $sql = "INSERT INTO argos_images (name, serverip, imagename, osname, oslang) VALUES ('$name', '$serverip', '$imagename', '$osname', '$oslang')";
+    $sql = "INSERT INTO argos_images (name, serverip, imagename, osname, oslangi, organisationid) VALUES ('$name', '$serverip', '$imagename', '$osname', '$oslang', '$orgid')";
     $debuginfo[] = $sql;
     $query = pg_query($pgconn, $sql);
     $m = 11;	

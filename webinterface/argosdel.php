@@ -35,7 +35,8 @@ $s_access_user = intval($s_access{2});
 $err = 0;
 
 $allowed_post = array(
-                "int_argosid"
+                "int_argosid",
+                "int_sensorid",
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -47,9 +48,19 @@ if (!isset($clean['argosid']) ) {
   $argosid = $clean['argosid'];
 }
 
+if (!isset($clean['sensorid']) ) {
+  $m = 99;
+  $err = 1;
+} else {
+  $sensorid = $clean['sensorid'];
+}
+
 if ($err == 0) {
-  // Delete argosid 
+  # Delete argosid 
   $sql = "DELETE FROM argos WHERE id = '$argosid'";
+  $debuginfo[] = $sql;
+  $query = pg_query($pgconn, $sql);
+  $sql = "DELETE FROM argos_ranges WHERE sensorid = '$sensorid'";
   $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
 

@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 15-12-2006                       #
+# Version 1.04.05                  #
+# 22-06-2007                       #
 # Hiroshi Suzuki of NTT-CERT       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.05 Added support for multiple servers 
 # 1.04.04 Changed data input handling
 # 1.04.03 Changed debug stuff
 # 1.04.02 Changed the database storage to base64 + pg_close
@@ -43,7 +44,7 @@ if (isset($clean['imgid'])) {
 
 $sql_server = "SELECT * FROM serverstats ";
 $sql_server .= " WHERE label = (SELECT label FROM serverstats WHERE id = $iid) ";
-$sql_server .= " AND type = (SELECT type FROM serverstats WHERE id = $iid) ORDER BY id";
+$sql_server .= " AND type = (SELECT type FROM serverstats WHERE id = $iid) AND server = (SELECT server FROM serverstats WHERE id = $iid) ORDER BY id";
 $result_server = pg_query($pgconn, $sql_server);
 $debuginfo[] = $sql_server;
 
@@ -56,7 +57,11 @@ while ($row = pg_fetch_assoc($result_server)) {
   $interval = $row['interval'];
 
   if ($checklabel == 0) {
-    echo "<h3>$type - $label</h3>\n";
+    if ($type == "memory" || $type == "cpu") {
+      echo "<h3>$type</h3>\n";
+    } else {
+      echo "<h3>$type - $label</h3>\n";
+    }
     $checklabel = 1;
   }
 
