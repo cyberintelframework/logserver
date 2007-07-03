@@ -187,7 +187,7 @@ print "\n";
 
 $confirm = "a";
 while ($confirm !~ /^(n|N|y|Y)$/) {
-  $confirm = &prompt("Is the database already installed? [y/n]: ");
+  $confirm = &prompt("Do you want to install the database? [y/n]: ");
 }
 
 $dbuser = "";
@@ -241,7 +241,7 @@ if ("$webuser" ne "idslog") {
 
 print "\n";
 
-if ($confirm =~ /^(n|N)$/) {
+if ($confirm =~ /^(y|Y)$/) {
   $e = 1;
   while ($e != 0) {
     if ($dbhost != "localhost") {
@@ -621,17 +621,18 @@ rmsvn($targetdir);
 $webpass = "enter_database_password_here";
 
 $file = readfile("${installdir}surfnetids-log.conf"); 
-$dbhost_str = "\$c_pgsql_host= \"$dbhost\"";
-$dbport_str = "\$c_pgsql_port= \"$dbport\"";
-$dbname_str = "\$c_pgsql_dbname= \"$dbname\"";
-$webuser_str = "\$c_pgsql_user = \"$webuser\"";
-$webpass_str = "\$c_pgsql_pass = \"$webpass\"";
+$dbhost_str = "\$c_pgsql_host = \"$dbhost\";";
+$dbport_str = "\$c_pgsql_port = \"$dbport\";";
+$dbname_str = "\$c_pgsql_dbname = \"$dbname\";";
+$webuser_str = "\$c_pgsql_user = \"$webuser\";";
+$webpass_str = "\$c_pgsql_pass = \"$webpass\";";
+
 $file =~ s/\\n/<newline>/gi;
-$file =~ s/\$c_pgsql_host(.*?)\;/$dbhost_str/gi;
-$file =~ s/\$c_pgsql_port(.*?)\;/$dbport_str/gi;
-$file =~ s/\$c_pgsql_dbname(.*?)\;/$dbname_str/gi;
-$file =~ s/\$c_pgsql_user(.*?)\;/$webuser_str/gi;
-$file =~ s/\$c_pgsql_pass(.*?)\;/$webpass_str/gi;
+$file =~ s/\$c_pgsql_host =.*/$dbhost_str/gi;
+$file =~ s/\$c_pgsql_port =.*/$dbport_str/gi;
+$file =~ s/\$c_pgsql_dbname =.*/$dbname_str/gi;
+$file =~ s/\$c_pgsql_user =.*/$webuser_str/gi;
+$file =~ s/\$c_pgsql_pass =.*/$webpass_str/gi;
 $file =~ s/<newline>/\\n/gi;
 open(FILE, ">$configdir/surfnetids-log.conf");
 print FILE ($file);
