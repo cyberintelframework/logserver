@@ -3,13 +3,14 @@
 ####################################
 # Installation script              #
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 19-06-2007                       #
+# Version 1.04.07                  #
+# 05-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ###############################################
 # Changelog:
+# 1.04.07 Fixed some stuff with building the config
 # 1.04.06 Improved non-default support and support for remote database
 # 1.04.05 Improved non-default support and added support for remote database
 # 1.04.04 Fixed crontab stuff and typo.
@@ -629,17 +630,16 @@ $webuser_str = "\$c_pgsql_user = \"$webuser\"";
 $webpass_str = "\$c_pgsql_pass = \"$webpass\"";
 
 $file =~ s/\\n/<newline>/gi;
-$file =~ s/^\$c_pgsql_host =.*/$dbhost_str\;/gi;
-$file =~ s/^\$c_pgsql_port =.*/$dbport_str\;/gi;
-$file =~ s/^\$c_pgsql_dbname =.*/$dbname_str\;/gi;
-$file =~ s/^\$c_pgsql_user =.*/$webuser_str\;/gi;
-$file =~ s/^\$c_pgsql_pass =.*/$webpass_str\;/gi;
+$file =~ s/\$c_pgsql_host =.*/$dbhost_str\;/gi;
+$file =~ s/\$c_pgsql_port =.*/$dbport_str\;/gi;
+$file =~ s/\$c_pgsql_dbname =.*/$dbname_str\;/gi;
+$file =~ s/\$c_pgsql_user =.*/$webuser_str\;/gi;
+$file =~ s/\$c_pgsql_pass =.*/$webpass_str\;/gi;
 $file =~ s/<newline>/\\n/gi;
 open(FILE, ">$configdir/surfnetids-log.conf") ;
-print(FILE) ($file);
+print FILE ($file);
 close(FILE);
-printmsg("Building /etc/surfnetids-log.conf configuration file:", $?);
-if ($? != 0) { $err++; }
+printmsg("Building surfnetids-log.conf configuration file:", $?);
 
 print "\n";
 if ($err > 0) {
