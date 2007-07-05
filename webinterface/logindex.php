@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.11                  #
-# 09-05-2007                       #
+# Version 1.04.12                  #
+# 03-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.12 Added yearly option 
 # 1.04.11 Added IP exclusion stuff
 # 1.04.10 Changed printhelp stuff
 # 1.04.09 Fixed severity stuff
@@ -68,7 +69,7 @@ $debuginfo[] = $sql_getorg;
 ### Default browse method is weekly.
 if (isset($tainted['b'])) {
   $b = $tainted['b'];
-  $pattern = '/^(weekly|daily|monthly|all)$/';
+  $pattern = '/^(weekly|daily|monthly|yearly|all)$/';
   if (!preg_match($pattern, $b)) {
     $b = "weekly";
   }
@@ -77,6 +78,17 @@ if (isset($tainted['b'])) {
 }
 
 $year = date("Y");
+if ($b == "yearly") {
+  $yearly = $tainted['i'];
+  if ($yearly == "") { $yearly = date("Y"); }
+  $yearly = intval($yearly);
+  $next = $yearly + 1;
+  $prev = $yearly - 1;
+  $start = mktime(0, 0, 0, 1, 1, $yearly);
+  $end = mktime(23, 59, 59, 12, 31, $yearly);
+} else {
+  $yearly = date("Y");
+}
 if ($b == "monthly") {
   $month = $tainted['i'];
   if ($month == "") { $month = date("n"); }
@@ -130,6 +142,7 @@ echo "<form name='selectorg' method='get' action='logindex.php?int_org=$q_org'>\
     echo printOption("daily", "Daily", $b) . "\n";
     echo printOption("weekly", "Weekly", $b) . "\n";
     echo printOption("monthly", "Monthly", $b) . "\n";
+    echo printOption("yearly", "Yearly", $b) . "\n";
   echo "</select>\n";
 
   if ($s_access_search == 9) {

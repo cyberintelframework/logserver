@@ -2,8 +2,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 11-05-2007                       #
+# Version 1.04.10                  #
+# 03-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 1.04.10 Fixed a bug in the link to the search engine
 # 1.04.09 Fixed a bug in the link to the search engine
 # 1.04.08 Added link to search engine for attackers
 # 1.04.07 Fixed a bug with date coloring for attackers
@@ -231,8 +232,7 @@ echo "<table width='70%'>\n";
                   echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                 }
               }
-              list($ip1, $ip2, $ip3, $ip4) = split("\.", $source);
-              echo "<a href='logsearch.php?sradio=A&sourceip%5B%5D=$ip1&sourceip%5B%5D=$ip2&sourceip%5B%5D=$ip3&sourceip%5B%5D=$ip4&int_sport=&int_smask=&dradio=A&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&int_dport=&int_dmask=&tsselect=$bs&strip_html_escape_tsstart=&strip_html_escape_tsend=&reptype=multi&int_sev=-1&int_attack=-1&strip_html_escape_virustxt=&strip_html_escape_filename=&orderm=DESC&strip_html_escape_tsstart=%3A&strip_html_escape_tsend=%3A'>$source</a>";
+              echo "<a href='logsearch.php?sradio=A&ip_sourceip=$source&tsselect=$bs&reptype=multi&int_sev=-1&int_attack=-1&=&orderm=timestamp'>$source</a>";
               echo "  ";
               echo "[<a href='whois.php?ip_ip=$source'>whois</a>]";
             echo "</td>\n";
@@ -268,7 +268,7 @@ echo "<table width='70%'>\n";
         $result_portcountqry = pg_query($pgconn, $sql_port_countqry);
         while ($row = pg_fetch_assoc($result_portcountqry)) {
           echo "<tr>\n";
-            echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$row[dport]&orderm=DESC&strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin'>$row[dport]</a></td>\n";
+            echo "<td class='datatd'><a href='logsearch.php?dradio=A&int_dport=$row[dport]&orderm=timestamp&strip_html_escape_tsstart=$startqs%3A$startqsmin&strip_html_escape_tsend=$endqs%3A$endqsmin'>$row[dport]</a></td>\n";
             echo "<td class='datatd'><a target='_blank' href='http://www.iss.net/security_center/advice/Exploits/Ports/$row[dport]'>".getPortDescr($row[dport])."</a></td>\n";
             echo "<td class='datatd'>$row[total]</td>\n";
           echo "</tr>\n";

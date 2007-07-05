@@ -129,8 +129,7 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     	print "Norman report of binary ID: $bin_id already logged\n";
     }
   }
-#  elsif ($subject =~ m/CWSandbox/) {
-  elsif ($subject =~ m/Fwd/) {
+  elsif ($subject =~ m/CWSandbox/) {
     print "Found CWSandbox report!\n";
     ################################
     # CWSandbox

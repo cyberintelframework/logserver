@@ -15,6 +15,7 @@
 
 ####################################
 # Changelog:
+# 1.04.14 Fixed links to logsearch + added vlan support for top 10 sensors
 # 1.04.13 Added links for top source addresses
 # 1.04.12 Added IP exclusions stuff
 # 1.04.11 Added percentages to the stats
@@ -74,7 +75,7 @@ $debuginfo[] = $sql_getorg;
 ### Default browse method is weekly.
 if (isset($tainted['b'])) {
   $b = $tainted['b'];
-  $pattern = '/^(weekly|daily|monthly|all)$/';
+  $pattern = '/^(weekly|daily|monthly|yearly|all)$/';
   if (!preg_match($pattern, $b)) {
     $b = "weekly";
     $bs = "W";
@@ -84,6 +85,18 @@ if (isset($tainted['b'])) {
   $bs = "W";
 }
 $year = date("Y");
+if ($b == "yearly") {
+  $yearly = $tainted['i'];
+  if ($yearly == "") { $yearly = date("Y"); }
+  $yearly = intval($yearly);
+  $next = $yearly + 1;
+  $prev = $yearly - 1;
+  $start = mktime(0, 0, 0, 1, 1, $yearly);
+  $end = mktime(23, 59, 59, 12, 31, $yearly);
+  $bs = "Y";
+} else {
+  $yearly = date("Y");
+}
 if ($b == "monthly") {
   $month = $tainted['i'];
   if ($month == "") { $month = date("n"); }
@@ -139,6 +152,7 @@ echo "<form name='selectorg' method='get' action='rank.php?org=$q_org'>\n";
     echo printOption("daily", "Daily", $b) . "\n";
     echo printOption("weekly", "Weekly", $b) . "\n";
     echo printOption("monthly", "Monthly", $b) . "\n";
+    echo printOption("yearly", "Yearly", $b) . "\n";
   echo "</select>\n";
 
   if ($s_access_search == 9) {
@@ -498,6 +512,7 @@ echo "<table width='100%'>\n";
 ########################## Top 10 sensors
   add_to_sql("DISTINCT sensors.organisation", "select");
   add_to_sql("sensors.keyname", "select");
+  add_to_sql("sensors.vlanid", "select");
   add_to_sql("COUNT(details.*) as total", "select");
   add_to_sql("attacks", "table");
   add_to_sql("details", "table");
@@ -507,6 +522,7 @@ echo "<table width='100%'>\n";
   add_to_sql("attacks.id = details.attackid", "where");
   add_to_sql("$tsquery", "where");
   add_to_sql("sensors.keyname", "group");
+  add_to_sql("sensors.vlanid", "group");
   add_to_sql("sensors.organisation", "group");
   add_to_sql("total DESC LIMIT $c_topsensors OFFSET 0", "order");
 
@@ -561,15 +577,18 @@ echo "<table width='100%'>\n";
                 $debuginfo[] = $sql_getorg;
 
                 $keyname = $row['keyname'];
+                $vlanid = $row['vlanid'];
                 $total = $row['total'];
-                $rank_ar[$keyname] = $i;
+                $rank_ar["$keyname-$vlanid"] = $i;
                 if ($i <= $c_topsensors) {
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd' align='right'>$i.&nbsp;</td>\n";
                     if ($s_admin == 1) {
-                      echo "<td class='datatd'>$db_org_name - $keyname</td>\n";
+                      if ($vlanid == 0) { echo "<td class='datatd'>$db_org_name - $keyname</td>\n"; }
+ 		      else { echo "<td class='datatd'>$db_org_name - $keyname-$vlanid</td>\n"; }
                     } elseif ($q_org == $db_org) {
-                      echo "<td class='datatd'>$keyname</td>\n";
+                      if ($vlanid == 0) { echo "<td class='datatd'>$keyname</td>\n"; }
+ 		      else { echo "<td class='datatd'>$keyname-$vlanid</td>\n"; }
                     } else {
                       echo "<td class='datatd'>&nbsp;</td>\n";
                     }
@@ -596,10 +615,12 @@ echo "<table width='100%'>\n";
                   echo "<tr class='datatr'>\n";
                     echo "<td class='datatd' align='right' align='right'>$i.&nbsp;</td>\n";
                     $keyname = $row_top_org['keyname'];
+                    $vlanid = $row_top_org['vlanid'];
                     $total = $row_top_org['total'];
-                    $rank_all = $rank_ar[$keyname];
+                    $rank_all = $rank_ar["$keyname-$vlanid"];
                     echo "<td class='datatd' align='right'># $rank_all&nbsp;</td>\n";
-                    echo "<td class='datatd'>$keyname</td>\n";
+                    if ($vlanid == 0) { echo "<td class='datatd'>$keyname</td>\n"; }
+ 		    else { echo "<td class='datatd'>$keyname-$vlanid</td>\n"; }
                     echo "<td class='datatd' align='right'	>" . nf($total) . "&nbsp;</td>\n";
                   echo "</tr>\n";
                   $i++;
@@ -831,8 +852,7 @@ echo "<table width='100%'>\n";
                           echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                         }
                       }
-                      list($ip1, $ip2, $ip3, $ip4) = split("\.", $key);
-                      echo "<a href='logsearch.php?sradio=A&sourceip%5B%5D=$ip1&sourceip%5B%5D=$ip2&sourceip%5B%5D=$ip3&sourceip%5B%5D=$ip4&int_sport=&int_smask=&dradio=A&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&destip%5B%5D=&int_dport=&int_dmask=&tsselect=$bs&strip_html_escape_tsstart=&strip_html_escape_tsend=&reptype=multi&int_sev=-1&int_attack=-1&strip_html_escape_virustxt=&strip_html_escape_filename=&orderm=DESC&strip_html_escape_tsstart=%3A&strip_html_escape_tsend=%3A'>$key</a>";
+                      echo "<a href='logsearch.php?sradio=A&ip_sourceip=$key&tsselect=$bs&reptype=multi&int_sev=-1&int_attack=-1&orderm=timestamp&'>$key</a>";
                       echo "  ";
                       echo "[<a href='whois.php?ip_ip=$key'>whois</a>]";
                     echo "</td>\n";
@@ -900,7 +920,9 @@ echo "<table width='100%'>\n";
                               echo "<img src='images/worldflags/flag.gif'  onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
                             }
                           }
-                          echo "<a href='whois.php?ip_ip=$key'>$key</a>";
+                        echo "<a href='logsearch.php?sradio=A&ip_sourceip=$key&tsselect=$bs&reptype=multi&int_sev=-1&int_attack=-1&orderm=timestamp&'>$key</a>";
+                        echo "  ";
+                        echo "[<a href='whois.php?ip_ip=$key'>whois</a>]";
                         echo "</td>\n";
                         $perc = round($val / $grandtotal * 100);
                         echo "<td class='datatd'>$val&nbsp;(${perc}%)</td>\n";

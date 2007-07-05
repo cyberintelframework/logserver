@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 20-06-2007                       #
+# Version 1.04.10                  #
+# 03-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Removed offline choice 
 # 1.04.09 Fixed a bug with displaying organisation and the all sensors image 
 # 1.04.08 Fixed a bug when no traffic graphs are present and user is admin
 # 1.04.07 Fixed display of allsensor when no admin
@@ -66,7 +67,6 @@ echo "<form name='selectonoff' method='get' action='traffic.php'>\n";
 echo "Display: ";
   echo "<select name='int_onoff' onChange='javascript: this.form.submit();'>\n";
     echo printOption(1, "Online Sensors", $onoff) . "\n";
-    echo printOption(0, "Offline Sensors", $onoff) . "\n";
     echo printOption(2, "All Sensors", $onoff) . "\n";
   echo "</select>&nbsp;\n";
 echo "</form>\n";
@@ -78,7 +78,7 @@ add_to_sql("vlanid", "select");
 add_to_sql("sensors", "table");
 add_to_sql("keyname", "order");
 
-if ($onoff != 2) {
+if ($onoff == 1) {
   add_to_sql("status = $onoff", "where");
 }
 prepare_sql();
@@ -93,7 +93,7 @@ if ($s_admin == 1) {
   $row_allsensors = pg_fetch_assoc($result_allsensors);
   $allid = $row_allsensors['id'];
 
-  if ($allid != "" && $onoff != 0) {
+  if ($allid != "") {
     echo "<table>\n";
       echo "<tr>\n";
         echo "<td><a href='trafficview.php?int_imgid=$allid'><img src='showtraffic.php?int_imgid=$allid' alt='All sensors' border='1' /></a></td>\n";

@@ -3,13 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.00                  #
-# 05-01-2007                       #
+# Version 1.04.02                  #
+# 03-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Added Legend 
+# 1.04.01 Code layout 
 # 1.04.00 initial release 
 #############################################
 $s_org = intval($_SESSION['s_org']);
@@ -146,12 +148,24 @@ if ($b == "daily") {
 ?>
 
 
+
       
 
-
+<table>
+<tr>
+<td>
 
 <div id="map" style="width: 800px; height: 400px">
 </div>
+</td>
+<td>
+<img src="http://labs.google.com/ridefinder/images/mm_20_yellow.png"> <= 5 Attacks<br />
+<img src="http://labs.google.com/ridefinder/images/mm_20_orange.png"> <= 25  Attacks<br />
+<img src="http://labs.google.com/ridefinder/images/mm_20_red.png"> <= 250  Attacks<br />
+<img src="http://labs.google.com/ridefinder/images/mm_20_black.png"> > 250 Attacks<br />
+</td>
+</tr>
+</table>
 
 </div>
 <?php
@@ -161,10 +175,10 @@ echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=$c_googl
 //<![CDATA[
  
 var map = new GMap(document.getElementById("map"));
-//    map.addControl(new GSmallMapControl());
 map.addControl(new GMapTypeControl());
 map.addControl(new GLargeMapControl());
-map.centerAndZoom(new GPoint(0.0, 18.0), 15);
+map.centerAndZoom(new GPoint(12.0,25.0),15);
+//map.setMapType(G_SATELLITE_TYPE);
 //]]>
  
 var yellowicon = new GIcon();
@@ -232,6 +246,7 @@ var request = GXmlHttp.create();
 echo "request.open('GET', 'googlemapdata.xml.php$xmlquery', true);";
 ?>
 
+
 request.onreadystatechange = function() {
     
     if (request.readyState == 4) {
@@ -255,6 +270,7 @@ request.onreadystatechange = function() {
 request.send(null);
 
 </script>
+
 
 
 
