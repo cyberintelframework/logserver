@@ -141,6 +141,7 @@ $sql_email .= " report_content.subject, report_content.operator, report_content.
 $sql_email .= " report_content.severity, report_content.detail, login.gpg ";
 $sql_email .= " FROM login, report_content ";
 $sql_email .= " WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
+$sql_email .= " AND report_content.detail < 10 ";
 
 $email_query = $dbh->prepare($sql_email);
 $ec = $email_query->execute();

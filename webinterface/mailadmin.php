@@ -88,7 +88,7 @@ if ($s_access_user > 0) {
     $sql_user = "SELECT email, gpg FROM login ";
     $sql_user .= "WHERE id = $user_id AND login.organisation = '$s_org' ";
   } else {
-    $sql_user = "SELECT email, gpg FROM login WHERE id = $user_id";
+    $sql_user = "SELECT email, gpg FROM login WHERE id = $user_id ";
   }
   $debuginfo[] = $sql_user;
   $result_user = pg_query($sql_user);
@@ -131,7 +131,8 @@ if ($s_access_user > 0) {
       echo "<td class='datatd' width='400'>Title</td>\n";
       echo "<td class='datatd' width='150'>Last sent</td>\n";
       echo "<td class='datatd' width='100'>Template</td>\n";
-      echo "<td class='datatd' width='100'>Status</td>\n";
+      echo "<td class='datatd' width='140'>Type</td>\n";
+      echo "<td class='datatd' width='60'>Status</td>\n";
       echo "<td class='datatd'>Delete</td>\n";
     echo "</tr>\n";
 
@@ -139,10 +140,10 @@ if ($s_access_user > 0) {
     if ($s_access_user < 9) {
       $sql = "SELECT report_content.* FROM report_content, login ";
       $sql .= "WHERE user_id = $user_id AND report_content.user_id = login.id AND login.organisation = '$s_org' ";
-      $sql .= "ORDER BY subject";
     } else {
-      $sql = "SELECT * FROM report_content WHERE user_id = $user_id ORDER BY subject";
+      $sql = "SELECT * FROM report_content WHERE user_id = $user_id ";
     }
+    $sql .= " ORDER BY subject ";
     $result_report_content = pg_query($sql);
     $debuginfo[] = $sql;
 
@@ -165,6 +166,7 @@ if ($s_access_user > 0) {
         echo "</td>\n";
         echo "<td class='datatd'>" . $last_sent . "</td>\n";
         echo "<td class='datatd'>" . $v_mail_template_ar[$report_content["template"]] . "</td>\n";
+        echo "<td class='datatd'>" . $v_mail_detail_ar[$report_content["detail"]] . "</td>\n";
         echo "<td class='datatd'>" . $status . "</td>\n";
         echo "<td align='center'><a href='report_del.php?int_userid=$user_id&int_rcid=$report_content_id' onclick=\"javascript: return confirm('Are you sure you want to delete this report?');\">[Delete]</a></td>\n";
       echo "</tr>\n";

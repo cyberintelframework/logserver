@@ -4,8 +4,7 @@
 # SURFnet IDS                      #
 # Version 1.04.05                  #
 # 19-03-2007                       #
-# Peter Arts                       #
-# Modified by Kees Trippelvitz     #
+# Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################

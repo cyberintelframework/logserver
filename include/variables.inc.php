@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.21                  #
-# 02-07-2007                       #
+# Version 1.04.22                  #
+# 05-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.22 Added some more options to v_mail_detail array
 # 1.04.21 Added IP address organisation identifier
 # 1.04.20 Added detail array
 # 1.04.19 Changed some variables values  
@@ -190,10 +191,13 @@ $v_access_ar_user = array(
 
 # Array with the mailreporting templates
 $v_mail_detail_ar = array(
-		0 => "Summary", 
-		1 => "Detail", 
-		2 => "Summary + Detail",
-		3 => "IDMEF Detail"
+		0 => "Mail - Summary", 
+		1 => "Mail - Detail", 
+		2 => "Mail - Summary + Detail",
+		3 => "Mail - IDMEF Detail",
+		10 => "RSS - Summary",
+		11 => "RSS - Detail",
+		12 => "RSS - Summary + Detail"
 );
 
 # Array with the mailreporting templates

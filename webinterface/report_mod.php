@@ -4,7 +4,7 @@
 # SURFnet IDS                      #
 # Version 1.04.04                  #
 # 19-03-2007                       #
-# Kees Trippelvitz                 #
+# Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################

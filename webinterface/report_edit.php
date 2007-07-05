@@ -5,8 +5,7 @@
 # SURFnet IDS                      #
 # Version 1.04.05                  #
 # 19-03-2007                       #
-# Peter Arts                       #
-# Modified by Kees Trippelvitz     #
+# Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
@@ -157,7 +156,7 @@ if ($numrows > 0) {
       echo "</td>\n";
     echo "</tr>\n";
     echo "<tr class='datatr'>";
-      echo "<td class='datatd' width='100'>Report type:</td>\n";
+      echo "<td class='datatd' width='100'>Report template:</td>\n";
       echo "<td class='datatd' width='200'>";
         echo "<select name='int_template' onclick='javascript: sh_mailtemp(this.value);'>\n";
           foreach ($v_mail_template_ar as $key=>$val) {
@@ -171,7 +170,7 @@ if ($numrows > 0) {
     } else {
       echo "<tr class='datatr' id='reptdetal' name='repdetail' style='display:;'>";
     }
-      echo "<td class='datatd' width='100'>Report detail:</td>\n";
+      echo "<td class='datatd' width='100'>Report type:</td>\n";
       echo "<td class='datatd' width='200'>";
         echo "<select name='int_detail'>\n";
           foreach ($v_mail_detail_ar as $key=>$val) {

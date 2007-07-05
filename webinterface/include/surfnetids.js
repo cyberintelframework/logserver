@@ -1,14 +1,15 @@
 /*
  * ####################################
  * # SURFnet IDS                      #
- * # Version 1.04.04                  #
- * # 18-06-2007                       #
+ * # Version 1.04.05                  #
+ * # 05-07-2007                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * # Modified by Peter Arts           #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 1.04.05 Added sh_mailreptype()
  * # 1.04.04 Removed submitSearchTemplate()
  * # 1.04.03 Added sh_mail functions
  * # 1.04.02 Fixed searchtemplate url bug
@@ -23,6 +24,14 @@ function resetmailform() {
   document.getElementById('sensor_time').style.display='none';
   document.getElementById('attack_time').style.display='';
   document.getElementById('thresh_freq').style.display='none';
+}
+
+function sh_mailreptype(si) {
+  if (si < 10) {
+    document.getElementById('timeoptions').style.display='';
+  } else {
+    document.getElementById('timeoptions').style.display='none';
+  }
 }
 
 function sh_mailtemp(si) {
