@@ -5,7 +5,9 @@
 # Version 1.04.04                  #
 # 16-03-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
-# Modified by Peter Arts           #
+####################################
+# Contributors:                    #
+# Peter Arts                       #
 ####################################
 
 #############################################

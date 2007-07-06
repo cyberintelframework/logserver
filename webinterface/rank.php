@@ -6,11 +6,11 @@
 # Version 1.04.13                  #
 # 11-05-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
-# Peter Arts                       #
 ####################################
 # Contributors:                    #
 # Bjoern Weiland                   #
 # David de Coster                  #
+# Peter Arts                       #
 ####################################
 
 ####################################

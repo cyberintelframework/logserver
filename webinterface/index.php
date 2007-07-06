@@ -5,7 +5,6 @@
 # Version 1.04.10                  #
 # 03-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
-# Peter Arts                       #
 ####################################
 # Contributors:                    #
 # David de Coster                  #

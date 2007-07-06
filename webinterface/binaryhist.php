@@ -5,7 +5,10 @@
 # SURFnet IDS                     #
 # Version 1.04.07                 #
 # 13-02-2007                      #
-# Kees Trippelvitz & Peter Arts   #
+# Jan van Lith & Kees Trippelvitz #
+###################################
+# Contributors:                   #
+# Peter Arts                      #
 ###################################
 
 #############################################

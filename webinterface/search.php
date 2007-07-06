@@ -5,6 +5,8 @@
 # Version 1.04.13                  #
 # 21-06-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
+####################################
+# Contributors:                    #
 # Peter Arts                       #
 ####################################
 
