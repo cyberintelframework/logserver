@@ -3,13 +3,14 @@
 ####################################
 # Installation script              #
 # SURFnet IDS                      #
-# Version 1.04.07                  #
-# 05-07-2007                       #
+# Version 1.04.08                  #
+# 10-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ###############################################
 # Changelog:
+# 1.04.08 Fixed GeoIP database handling
 # 1.04.07 Fixed some stuff with building the config
 # 1.04.06 Improved non-default support and support for remote database
 # 1.04.05 Improved non-default support and added support for remote database
@@ -584,12 +585,12 @@ if ($? == 0) {
   }
   if ($confirm =~ /^(Y|y)$/) {
     printmsg("Downloading GeoIP database:", "info");
-    `wget $geoiploc`;
+    `wget -O ${targetdir}/GeoLiteCity.dat.gz $geoiploc`;
     if ($? != 0) { $err++; }
     print "\n";
 
     printdelay("Unzipping GeoIP database:");
-    `gunzip $targetdir/GeoLiteCity.dat.gz 2>>$logfile`;
+    `gunzip ${targetdir}/GeoLiteCity.dat.gz 2>>$logfile`;
     if ($? != 0) { $err++; }
     printresult($?);
 
