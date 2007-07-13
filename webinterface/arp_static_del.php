@@ -87,9 +87,12 @@ if ($err == 0) {
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
 
+  $sql = "DELETE FROM sniff_hosttypes WHERE staticid = $id";
+  $debuginfo[] = $sql;
+  $execute = pg_query($pgconn, $sql);
+
   $m = 2;
 }
-$debuginfo[] = "M: $m";
 pg_close($pgconn);
 #debug_sql();
 header("location: arpadmin.php?int_m=$m&int_org=$q_org&int_filter=$filter");

@@ -95,7 +95,8 @@ $tsquery = "timestamp >= $start AND timestamp <= $end";
 ### BROWSE MENU
 $today = date("U");
 
-echo "<div id=\"search_wait\"><center>Your request is being processed...<br /><br />Please be patient.<br /></center></div>\n";
+echo "<div id=\"search_wait\"><center>Your request is being processed...<br /><br />Please be patient.<br /><img src='images/1-0.gif' /></center></div>\n";
+flush();
 echo "<form name='selectorg' method='get' action='googlemap.php'>\n";
   if ($b != "all") {
     echo "<input type='button' value='Prev' class='button' onClick=window.location='googlemap.php?b=$b&amp;i=$prev&amp;int_org=$q_org';>\n";

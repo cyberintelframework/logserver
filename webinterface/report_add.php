@@ -57,6 +57,7 @@ $allowed_post = array(
 		"int_sevattack",
 		"int_sevsensor",
 		"int_detail",
+		"int_sdetail",
 		"md5_hash"
 );
 $check = extractvars($_POST, $allowed_post);
@@ -169,8 +170,10 @@ if (!isset($clean['sensorid'])) {
   $sensorid = $clean['sensorid'];
 }
 
-if (!isset($clean['detail'])) {
+if (!isset($clean['detail']) || !isset($clean['sdetail'])) {
   $detail = 0;
+} elseif ($template == 4) {
+  $detail = $clean['sdetail'];
 } else {
   $detail = $clean['detail'];
 }

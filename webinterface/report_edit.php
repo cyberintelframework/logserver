@@ -172,9 +172,23 @@ if ($numrows > 0) {
     }
       echo "<td class='datatd' width='100'>Report type:</td>\n";
       echo "<td class='datatd' width='200'>";
-        echo "<select name='int_detail'>\n";
+        echo "<select name='int_detail' onclick='javascript: sh_mailreptype(this.value);'>\n";
           foreach ($v_mail_detail_ar as $key=>$val) {
             echo printOption($key, $val, $detail);
+          }
+        echo "</select>\n";
+      echo "</td>\n";
+    echo "</tr>\n";
+    if ($temp == 4) {
+      echo "<tr class='datatr' style='display:;' id='srepdetail' name='srepdetail'>";
+    } else {
+      echo "<tr class='datatr' style='display:none;' id='srepdetail' name='srepdetail'>";
+    }
+      echo "<td class='datatd' width='100'>Report type:</td>\n";
+      echo "<td class='datatd' width='200'>";
+        echo "<select name='int_sdetail'>\n";
+          foreach ($v_mail_sdetail_ar as $key=>$val) {
+            echo printOption($key, $val, -1);
           }
         echo "</select>\n";
       echo "</td>\n";
@@ -211,107 +225,113 @@ if ($numrows > 0) {
     echo "</tr>\n";
   echo "</table>\n";
 
-  echo "<div id='timeoptions' name='timeoptions' style='display: ;'>\n";
-  echo "<h4>Time options</h4>\n";
-  echo "<table class='datatable'>\n";
-    if ($temp == 1 || $temp == 2) {
-      echo "<tr class='datatr' id='attack_time' name='attack_time' style='display: ;'>";
-    } else {
-      echo "<tr class='datatr' id='attack_time' name='attack_time' style='display: none;'>";
-    }
-      echo "<td class='datatd' width='100'>Frequency:</td>\n";
-      echo "<td class='datatd' width='200'>";
-        echo "<select name='int_freqattack' onclick='javascript: sh_mailfreq(this.value);'>\n";
-          foreach ($v_mail_frequency_attacks_ar as $key=>$val) {
-            echo printOption($key, $val, $freq);
-          }
-        echo "</select>\n";
-      echo "</td>\n";
-    echo "</tr>\n";
-    if ($temp == 4) {
-      echo "<tr class='datatr' id='sensor_time' name='sensor_time' style='display: ;'>";
-    } else {
-      echo "<tr class='datatr' id='sensor_time' name='sensor_time' style='display: none;'>";
-    }
-      echo "<td class='datatd' width='100'>Frequency:</td>\n";
-      echo "<td class='datatd' width='200'>";
-        echo "<select name='int_freqsensor' onclick='javascript: sh_mailfreq(this.value);'>\n";
-          foreach ($v_mail_frequency_sensors_ar as $key=>$val) {
-            echo printOption($key, $val, $freq);
-          }
-        echo "</select>\n";
-      echo "</td>\n";
-    echo "</tr>\n";
-    if ($freq == 2) {
-      echo "<tr class='datatr' id='daily_freq' name='daily_freq' style='display: ;'>\n";
-    } else {
-      echo "<tr class='datatr' id='daily_freq' name='daily_freq' style='display: none;'>\n";
-    }
-      echo "<td class='datatd'>Time:</td>\n";
-      echo "<td class='datatd'>";
-        echo "<select name='int_intervalday'>\n";
-          for ($i = 0; $i < 24; $i++) {
-            $time = "$i:00 hour";
-            if ($i < 10) {
-              $time = "0" . $time;
-            }
-            echo printOption($i, $time, $interval);
-          }
-        echo "</select>\n";
-      echo "</td>\n";
-    echo "</tr>\n";
-    if ($freq == 3) {
-      echo "<tr class='datatr' id='weekly_freq' name='weekly_freq' style='display: ;'>";
-    } else {
-      echo "<tr class='datatr' id='weekly_freq' name='weekly_freq' style='display: none;'>";
-    }
-      echo "<td class='datatd'>Day:</td>\n";
-      echo "<td class='datatd'>";
-        echo "<select name='int_intervalweek'>\n";
-          $j = (4 * 86400); // monday
-          for ($i = 1; $i < 8; $i++) {
-            // use php's date function to print the day
-            echo printOption($i, date("l", $j), $interval);
-            $j += 86400; // add one day
-          }
-        echo "</select>\n";
-      echo "</td>\n";
-    echo "</tr>\n";
-  echo "</table>\n";
-  echo "</div>\n";
-
-  if ($freq == 4) {
-    echo "<div id='thresh_freq' name='thresh_freq' style='display: ;'>\n";
+  if ($detail < 10) {
+    echo "<div id='timeandthresh' name='timeandthresh' style='display: ;'>\n";
   } else {
-    echo "<div id='thresh_freq' name='thresh_freq' style='display: none;'>\n";
+    echo "<div id='timeandthresh' name='timeandthresh' style='display: none;'>\n";
   }
-    echo "<h4>Threshold options</h4>\n";
+    echo "<div id='timeoptions' name='timeoptions' style='display: ;'>\n";
+    echo "<h4>Time options</h4>\n";
     echo "<table class='datatable'>\n";
-      echo "<tr class='datatr'>\n";
-        echo "<td class='datatd' width='100'>Operator:</td>\n";
+      if ($temp == 1 || $temp == 2) {
+        echo "<tr class='datatr' id='attack_time' name='attack_time' style='display: ;'>";
+      } else {
+        echo "<tr class='datatr' id='attack_time' name='attack_time' style='display: none;'>";
+      }
+        echo "<td class='datatd' width='100'>Frequency:</td>\n";
         echo "<td class='datatd' width='200'>";
-          echo "<select name='int_operator'>\n";
-            foreach ($v_mail_operator_ar as $key => $val) {
-              echo printOption($key, $val, $operator);
+          echo "<select name='int_freqattack' onclick='javascript: sh_mailfreq(this.value);'>\n";
+            foreach ($v_mail_frequency_attacks_ar as $key=>$val) {
+              echo printOption($key, $val, $freq);
             }
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
-      echo "<tr class='datatr'>\n";
-        echo "<td class='datatd' width='100'>Threshold amount:</td>\n";
-        echo "<td class='datatd' width='200'><input type='text' name='int_threshold' value='$threshold' /></td>\n";
-      echo "</tr>\n";
-      echo "<tr class='datatr'>\n";
-        echo "<td class='datatd' width='100'>Timespan:</td>\n";
+      if ($temp == 4) {
+        echo "<tr class='datatr' id='sensor_time' name='sensor_time' style='display: ;'>";
+      } else {
+        echo "<tr class='datatr' id='sensor_time' name='sensor_time' style='display: none;'>";
+      }
+        echo "<td class='datatd' width='100'>Frequency:</td>\n";
         echo "<td class='datatd' width='200'>";
-          echo "<select name='int_intervalthresh'>\n";
-            foreach ($v_mail_timespan_ar as $key => $val) {
-              echo printOption($key, $val, $interval);
+          echo "<select name='int_freqsensor' onclick='javascript: sh_mailfreq(this.value);'>\n";
+            foreach ($v_mail_frequency_sensors_ar as $key=>$val) {
+              echo printOption($key, $val, $freq);
+            }
+          echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      if ($freq == 2) {
+        echo "<tr class='datatr' id='daily_freq' name='daily_freq' style='display: ;'>\n";
+      } else {
+        echo "<tr class='datatr' id='daily_freq' name='daily_freq' style='display: none;'>\n";
+      }
+        echo "<td class='datatd'>Time:</td>\n";
+        echo "<td class='datatd'>";
+          echo "<select name='int_intervalday'>\n";
+            for ($i = 0; $i < 24; $i++) {
+              $time = "$i:00 hour";
+              if ($i < 10) {
+                $time = "0" . $time;
+              }
+              echo printOption($i, $time, $interval);
+            }
+          echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      if ($freq == 3) {
+        echo "<tr class='datatr' id='weekly_freq' name='weekly_freq' style='display: ;'>";
+      } else {
+        echo "<tr class='datatr' id='weekly_freq' name='weekly_freq' style='display: none;'>";
+      }
+        echo "<td class='datatd'>Day:</td>\n";
+        echo "<td class='datatd'>";
+          echo "<select name='int_intervalweek'>\n";
+            $j = (4 * 86400); // monday
+            for ($i = 1; $i < 8; $i++) {
+              // use php's date function to print the day
+              echo printOption($i, date("l", $j), $interval);
+              $j += 86400; // add one day
             }
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
     echo "</table>\n";
+    echo "</div>\n";
+
+    if ($freq == 4) {
+      echo "<div id='thresh_freq' name='thresh_freq' style='display: ;'>\n";
+    } else {
+      echo "<div id='thresh_freq' name='thresh_freq' style='display: none;'>\n";
+    }
+      echo "<h4>Threshold options</h4>\n";
+      echo "<table class='datatable'>\n";
+        echo "<tr class='datatr'>\n";
+          echo "<td class='datatd' width='100'>Operator:</td>\n";
+          echo "<td class='datatd' width='200'>";
+            echo "<select name='int_operator'>\n";
+              foreach ($v_mail_operator_ar as $key => $val) {
+                echo printOption($key, $val, $operator);
+              }
+            echo "</select>\n";
+          echo "</td>\n";
+        echo "</tr>\n";
+        echo "<tr class='datatr'>\n";
+          echo "<td class='datatd' width='100'>Threshold amount:</td>\n";
+          echo "<td class='datatd' width='200'><input type='text' name='int_threshold' value='$threshold' /></td>\n";
+        echo "</tr>\n";
+        echo "<tr class='datatr'>\n";
+          echo "<td class='datatd' width='100'>Timespan:</td>\n";
+          echo "<td class='datatd' width='200'>";
+            echo "<select name='int_intervalthresh'>\n";
+              foreach ($v_mail_timespan_ar as $key => $val) {
+                echo printOption($key, $val, $interval);
+              }
+            echo "</select>\n";
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    echo "</div>\n";
   echo "</div>\n";
 
   echo "<br />\n";

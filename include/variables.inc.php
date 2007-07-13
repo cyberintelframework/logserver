@@ -196,8 +196,13 @@ $v_mail_detail_ar = array(
 		2 => "Mail - Summary + Detail",
 		3 => "Mail - IDMEF Detail",
 		10 => "RSS - Summary",
-		11 => "RSS - Detail",
-		12 => "RSS - Summary + Detail"
+		11 => "RSS - Summary + Detail"
+);
+
+# Array with the mailreporting templates
+$v_mail_sdetail_ar = array(
+		2 => "Mail - Summary + Detail",
+		11 => "RSS - Summary + Detail"
 );
 
 # Array with the mailreporting templates
@@ -274,7 +279,7 @@ $v_errors = array(
 				93 => "Missing or invalid IP address!",
 				94 => "Missing or invalid sensor ID!",
 				95 => "Missing or invalid ID!",
-				96 => "MAC address already exists!",
+				96 => "This entry already exists!",
 				97 => "Missing or invalid filter ID!",
 				98 => "Cannot add this record. MAC/IP pair is possibly poisoned!"
 			),
@@ -511,5 +516,16 @@ $v_help = array(
 
 $v_arp_alerts = array(
 	1 => "ARP Poisoning"
+);
+
+$v_host_types = array(
+	1 => "Router/Gateway",
+	2 => "DHCP Server"
+);
+
+$v_proto_types = array(
+	1 => "Ethernet",
+	2 => "IP",
+	3 => "ICMP"
 );
 ?>

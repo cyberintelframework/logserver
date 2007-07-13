@@ -28,9 +28,9 @@ function resetmailform() {
 
 function sh_mailreptype(si) {
   if (si < 10) {
-    document.getElementById('timeoptions').style.display='';
+    document.getElementById('timeandthresh').style.display='';
   } else {
-    document.getElementById('timeoptions').style.display='none';
+    document.getElementById('timeandthresh').style.display='none';
   }
 }
 
@@ -45,6 +45,7 @@ function sh_mailtemp(si) {
 
     document.getElementById('timeoptions').style.display='none';
     document.getElementById('repdetail').style.display='none';
+    document.getElementById('srepdetail').style.display='';
   } else if (si == 5) {
     document.getElementById('attack_sev').style.display='none';
     document.getElementById('sensor_sev').style.display='none';
@@ -54,6 +55,7 @@ function sh_mailtemp(si) {
 
     document.getElementById('timeoptions').style.display='none';
     document.getElementById('repdetail').style.display='none';
+    document.getElementById('srepdetail').style.display='none';
   } else {
     document.getElementById('attack_sev').style.display='';
     document.getElementById('sensor_sev').style.display='none';
@@ -63,6 +65,7 @@ function sh_mailtemp(si) {
 
     document.getElementById('timeoptions').style.display='';
     document.getElementById('repdetail').style.display='';
+    document.getElementById('srepdetail').style.display='none';
   }
 }
 

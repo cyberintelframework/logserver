@@ -36,7 +36,8 @@ $allowed_post = array(
                 "mac_macaddr",
                 "ip_ipaddr",
                 "int_sensor",
-		"md5_hash"
+		"md5_hash",
+		"type"
 );
 $check = extractvars($_POST, $allowed_post);
 
@@ -65,15 +66,6 @@ if ($clean['hash'] != $s_hash) {
 
 if (isset($clean['macaddr'])) {
   $mac = $clean['macaddr'];
-
-  $sql_check = "SELECT mac FROM arp_static WHERE arp_static.mac = '$mac'";
-  $debuginfo[] = $sql_check;
-  $result_check = pg_query($pgconn, $sql_check);
-  $numrows_check = pg_num_rows($result_check);
-  if ($numrows_check == 1) {
-    $m = 96;
-    $err = 1;
-  }
 } else {
   $err = 1;
   $m = 92;
@@ -134,10 +126,40 @@ if ($rows == 0) {
 } 
 
 if ($err != 1) {
+  $sql_check = "SELECT mac FROM arp_static WHERE mac = '$mac' AND sensorid = '$sensorid' AND ip = '$ip' ";
+  $debuginfo[] = $sql_check;
+  $result_check = pg_query($pgconn, $sql_check);
+  $numrows_check = pg_num_rows($result_check);
+  if ($numrows_check == 1) {
+    $m = 96;
+    $err = 1;
+  }
+}
+
+if ($err != 1) {
   $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
   $sql .= "VALUES ('$ip', '$mac', '$sensorid')";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
+
+  if (isset($tainted['type'])) {
+    $type = $tainted['type'];
+    $sql = "SELECT id FROM arp_static WHERE ip = '$ip' AND mac = '$mac' AND sensorid = '$sensorid'";
+    $debuginfo[] = $sql;
+    $result = pg_query($pgconn, $sql);
+    $row = pg_fetch_assoc($result);
+    $id = $row['id'];
+
+    foreach ($type as $key => $val) {
+      $pattern = '/^(1|2)$/';
+      if (preg_match($pattern, $val)) {
+        $sql = "INSERT INTO sniff_hosttypes (staticid, type) VALUES ('$id', '$val')";
+        $debuginfo[] = $sql;
+        $execute = pg_query($pgconn, $sql);
+      }
+    }
+  }
+
   $m = 1;
 }
 

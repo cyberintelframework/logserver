@@ -128,7 +128,8 @@ if ($s_access_user > 0) {
   echo "<input type='button' value='Reset all report timestamps' class='button' onClick=window.location='report_mod.php?int_userid=$user_id&a=r&md5_hash=$s_hash';><br /><br />";
   echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
     echo "<tr class='dataheader'>\n";
-      echo "<td class='datatd' width='400'>Title</td>\n";
+      echo "<td class='datatd' width='20'>ID</td>\n";
+      echo "<td class='datatd' width='380'>Title</td>\n";
       echo "<td class='datatd' width='150'>Last sent</td>\n";
       echo "<td class='datatd' width='100'>Template</td>\n";
       echo "<td class='datatd' width='140'>Type</td>\n";
@@ -143,32 +144,46 @@ if ($s_access_user > 0) {
     } else {
       $sql = "SELECT * FROM report_content WHERE user_id = $user_id ";
     }
-    $sql .= " ORDER BY subject ";
+    $sql .= " ORDER BY id ";
     $result_report_content = pg_query($sql);
     $debuginfo[] = $sql;
 
     while ($report_content = pg_fetch_assoc($result_report_content)) {
-      $report_content_id = $report_content["id"];
-      if ($report_content["active"] == "t") {
+      $rcid = $report_content['id'];
+      $subject = $report_content['subject'];
+      $active = $report_content['active'];
+      $last_sent = $report_content['last_sent'];
+      $template = $report_content['template'];
+      $detail = $report_content['detail'];
+      if ($active == "t") {
         $status = "<font style='color:green;'>Active</font";
       } else {
         $status = "<font style='color:red;'>Inactive</font>";
       }
-      if ($report_content["last_sent"] == null) {
+      if ($last_sent == null) {
         $last_sent = "<i>never</i>";
       } else {
-        $last_sent = date("d-m-Y H:i", $report_content["last_sent"]);
+        $last_sent = date("d-m-Y H:i", $last_sent);
+      }
+
+      if ($detail > 9) {
+        echo "<link rel='alternate' title='SURF IDS RSS: $subject' type='application/rss+xml' href='$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid'>\n";
       }
 
       echo "<tr class='datatr'>\n";
+        if ($detail < 10) {
+          echo "<td class='datatd'>$rcid</td>\n";
+        } else {
+          echo "<td class='datatd'><a href='rssfeed.php?int_rcid=$rcid'>$rcid</a></td>\n";
+        }
         echo "<td class='datatd'>";
-          echo "<a href='report_edit.php?int_userid=$user_id&int_rcid=$report_content_id'>" . $report_content["subject"] . "</a>";
+          echo "<a href='report_edit.php?int_userid=$user_id&int_rcid=$rcid'>$subject</a>";
         echo "</td>\n";
         echo "<td class='datatd'>" . $last_sent . "</td>\n";
-        echo "<td class='datatd'>" . $v_mail_template_ar[$report_content["template"]] . "</td>\n";
-        echo "<td class='datatd'>" . $v_mail_detail_ar[$report_content["detail"]] . "</td>\n";
+        echo "<td class='datatd'>" . $v_mail_template_ar[$template] . "</td>\n";
+        echo "<td class='datatd'>" . $v_mail_detail_ar[$detail] . "</td>\n";
         echo "<td class='datatd'>" . $status . "</td>\n";
-        echo "<td align='center'><a href='report_del.php?int_userid=$user_id&int_rcid=$report_content_id' onclick=\"javascript: return confirm('Are you sure you want to delete this report?');\">[Delete]</a></td>\n";
+        echo "<td align='center'><a href='report_del.php?int_userid=$user_id&int_rcid=$rcid' onclick=\"javascript: return confirm('Are you sure you want to delete this report?');\">[Delete]</a></td>\n";
       echo "</tr>\n";
     }
   echo "</table>\n";
