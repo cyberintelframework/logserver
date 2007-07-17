@@ -19,6 +19,7 @@
 # 1.04.01 Initial version
 #############################################
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "action",
                 "int_delete",

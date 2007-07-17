@@ -29,9 +29,11 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
+# Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
   $address = getaddress();
@@ -39,6 +41,7 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -46,6 +49,7 @@ $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "savetype",
 		"int_orgid",
@@ -54,6 +58,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
 		"int_orgid",
 		"strip_html_escape_ranges",
@@ -78,12 +83,14 @@ if (!preg_match($pattern, $type)) {
   $m = 95;
 }
 
+# Checking access
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;
 }
 
 if ($type == "ident") {
+  # Save type is ident (orgedit.php)
   $orgid = $clean['orgid'];
   $orgname = $clean['orgname'];
   $ranges = $clean['ranges'];
@@ -124,6 +131,7 @@ if ($type == "ident") {
     }
   }
 } elseif ($type == "org") {
+  # Save type is org (orgadmin.php)
   if (isset($clean['orgname'])) {
     $orgname = $clean['orgname'];
     $orgcheck = strtoupper($orgname);
@@ -141,6 +149,7 @@ if ($type == "ident") {
     $err = 1;
   }
 } elseif ($type == "md5") {
+  # Save type is md5 (RIS)
   if (isset($clean['orgid'])) {
     $orgid = $clean['orgid'];
     $ident = genpass(32);

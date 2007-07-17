@@ -45,11 +45,13 @@ if ($c_geoip_enable == 1) {
   $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_org",
 		"b",
@@ -58,6 +60,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Setting up organisation
 if ($s_access_search == 9 && isset($clean['org'])) {
   $q_org = $clean['org'];
 } elseif ($s_access_search == 9) {
@@ -69,7 +72,6 @@ if ($s_access_search == 9 && isset($clean['org'])) {
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
 $db_org_name = pg_result($result_getorg, 0);
-
 $debuginfo[] = $sql_getorg;
 
 ### Default browse method is weekly.

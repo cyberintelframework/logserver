@@ -18,21 +18,25 @@
 # 1.04.01 Initial release by Mr. Hiroshi Suzuki
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
+# Checking access
 if ($s_admin != 1) {
   pg_close($pgconn);
   header("Location: index.php");
   exit;
 }
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_imgid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking $_GET'ed variables
 if (isset($clean['imgid'])) {
   $iid = $clean['imgid'];
   $err = 0;

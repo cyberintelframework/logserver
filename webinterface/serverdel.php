@@ -21,9 +21,11 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
+# Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
   $address = getaddress();
@@ -31,16 +33,19 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_serverid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking access
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;

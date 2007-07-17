@@ -16,6 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -27,12 +28,14 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "int_orgid",
                 "ip_exclusion",
@@ -41,11 +44,13 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
+# Checking access
 if ($s_access_user < 2) {
   $err = 1;
   $m = 91;
 }
 
+# Setting up organisation
 if ($s_admin == 1) {
   if (isset($clean['orgid'])) {
     $org = $clean['orgid'];
@@ -59,6 +64,7 @@ if ($s_admin == 1) {
 } else {
   $org = $s_org;
 }
+
 
 if ($clean['hash'] != $s_hash) {
   $err = 1;

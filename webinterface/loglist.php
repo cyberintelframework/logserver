@@ -77,7 +77,7 @@ if (isset($tainted['b'])) {
   $b = "weekly";
 }
 
-### Checking sort method.
+# Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $pattern = '/^(ip|count)$/';

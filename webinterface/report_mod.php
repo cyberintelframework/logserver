@@ -19,6 +19,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -30,6 +31,7 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
@@ -38,6 +40,7 @@ $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_userid",
                 "a",
@@ -46,7 +49,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
-// Make sure all access rights are correct
+# Make sure all access rights are correct
 if (isset($clean['userid'])) {
   $user_id = $clean['userid'];
   if ($s_access_user < 1) {

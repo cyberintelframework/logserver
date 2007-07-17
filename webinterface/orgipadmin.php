@@ -13,6 +13,7 @@
 # 1.04.01 Initial release
 ####################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -20,6 +21,7 @@ $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
 		"sort",
@@ -28,17 +30,20 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking access
 if ($s_access_user < 2) {
   $err = 1;
   $clean['m'] = 91;
 }
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);
   echo $m;
 }
 
+# Setting up organisation
 if ($s_admin == 1) {
   if (isset($clean['orgid'])) {
     $org = $clean['orgid'];
@@ -63,6 +68,7 @@ if ($s_admin == 1) {
 }
 
 if ($err == 0) {
+  # Setting up sorting stuff
   if (isset($tainted['sort'])) {
     $sort = $tainted['sort'];
     $pattern = '/^(ia|id)$/';

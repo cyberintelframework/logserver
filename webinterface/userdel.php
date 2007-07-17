@@ -2,8 +2,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 17-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #############################################
 # Changelog:
+# 1.04.04 Changed stuff relating to the reports (report_content)
 # 1.04.03 Changed data input handling
 # 1.04.02 Added debug info
 # 1.04.01 Released as 1.04.01
@@ -26,6 +27,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -37,18 +39,21 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_userid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking $_GET'ed variables
 if (!isset($clean['userid']) ) {
   $m = 96;
   $err = 1;
@@ -56,6 +61,7 @@ if (!isset($clean['userid']) ) {
   $userid = $clean['userid'];
 }
 
+# Checking access
 if ($s_access_user < 2) {
   $m = 91;
   $err = 1;
@@ -71,24 +77,12 @@ if ($s_access_user < 2) {
 }
 
 if ($err == 0) {
-  # Mailreporting records
-  // report_content_threshold
-  $sql = "SELECT id FROM report_content WHERE report_content.user_id = '$userid' AND report_content.template = 3";
-  $debuginfo[] = $sql;
-  $query = pg_query($pgconn, $sql);
-  while ($row = pg_fetch_assoc($query)) {
-    $report_content_id = $row["id"];
-    $sql_template = "DELETE FROM report_template_threshold WHERE report_content_id = '$report_content_id'";
-    $debuginfo[] = $sql_template;
-    $query_template = pg_query($pgconn, $sql_template);
-  }
-
-  // report_content
+  # Deleting all mailreports from the user
   $sql = "DELETE FROM report_content WHERE user_id = '$userid'";
   $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
 
-  // Login records
+  # Deleting the actual user records
   $sql = "DELETE FROM login WHERE id = $userid";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);

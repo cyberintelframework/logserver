@@ -19,15 +19,18 @@
 # 1.02.01 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
+# Checking access
 if ( $s_admin != 1 ) {
   $err = 1;
   $m = 91;
 }
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_c",
 		"int_m"
@@ -35,6 +38,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
 

@@ -16,6 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -27,6 +28,7 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -67,6 +69,7 @@ if ($c_autocomplete == 1) {
   $debuginfo[] = $sql_dsa;
   $debuginfo[] = $sql_dda;
 
+  # Retrieving posted variables from $_GET
   $allowed_get = array(
         "map"
   );

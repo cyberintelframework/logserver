@@ -30,6 +30,7 @@
 # 1.02.01 Initial release
 #############################################
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -44,11 +45,14 @@ $address = getaddress();
 
 if ($file != "login.php") {
   if (isset($_SESSION['s_admin'])) {
+    # Retrieving some session variables
     $s_admin = intval($_SESSION['s_admin']);
     $s_user = $_SESSION['s_user'];
     $s_access = $_SESSION['s_access'];
     $s_access_user = intval($s_access{2});
     $s_access_sensor = intval($s_access{0});
+
+    # Validate the session_id() against the SID in the database
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);

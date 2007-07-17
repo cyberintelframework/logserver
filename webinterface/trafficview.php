@@ -20,9 +20,11 @@
 # 1.02.01 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_imgid"
 );
@@ -70,6 +72,7 @@ if (isset($clean['imgid'])) {
     echo "</tr>\n";
   echo "</table>\n";
 } else {
+  # Showing info/error messages if any
   $m = geterror(92);
   echo $m;
 }

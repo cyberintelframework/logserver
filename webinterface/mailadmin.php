@@ -55,6 +55,7 @@ if (isset($clean['userid'])) {
   $user_id = $s_userid;
 }
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "int_gpg",
 		"strip_html_escape_email"
@@ -79,6 +80,7 @@ if (isset($clean['email']) && isset($_POST['submit'])) {
   $clean['m'] = 1;
 }
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);

@@ -21,6 +21,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -32,6 +33,7 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
@@ -40,7 +42,7 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
-### Extracting POST variables
+# Retrieving posted variables from $_POST
 $allowed_post = array(
 		"int_userid",
 		"strip_html_escape_subject",
@@ -96,6 +98,7 @@ if ($clean['hash'] != $s_hash) {
   $m = 98;
 }
 
+# Checking $_POST'ed variables
 if (!isset($clean['subject'])) {
   $err = 1;
   $m = 90;

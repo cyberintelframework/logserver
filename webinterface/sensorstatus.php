@@ -29,11 +29,13 @@
 # 1.02.06 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "sort",
                 "int_selview",
@@ -43,6 +45,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $url = str_replace("&sort=" . $sort, "", $url);
@@ -73,6 +76,7 @@ if (isset($clean['selview'])) {
   $selview = intval($c_selview);
 }
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
 

@@ -26,6 +26,7 @@
 # 1.02.02 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
@@ -33,7 +34,11 @@ $s_hash = md5($_SESSION['s_hash']);
 $s_access_user = intval($s_access{2});
 $err = 0;
 
-$allowed_get = array("int_userid", "int_m");
+# Retrieving posted variables from $_GET
+$allowed_get = array(
+		"int_userid",
+		"int_m"
+);
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
@@ -52,6 +57,7 @@ $debuginfo[] = $sql_user;
 $result_user = pg_query($pgconn, $sql_user);
 $numrows_user = pg_num_rows($result_user);
 
+# Checking if the user exists
 if ($numrows_user == 0) {
   $err = 1;
   $clean['m'] = 96;
@@ -63,6 +69,7 @@ if ($numrows_user == 0) {
   $access_user = intval($access_user{2});
 }
 
+# Checking access
 if ($s_access_user < $access_user) {
   $err = 1;
   $clean['m'] = 91;
@@ -70,6 +77,7 @@ if ($s_access_user < $access_user) {
   exit;
 }
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);

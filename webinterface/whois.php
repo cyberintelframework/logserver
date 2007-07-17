@@ -18,6 +18,7 @@
 # 1.02.01 Initial release
 #############################################
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "ip_ip",
 		"strip_html_s"

@@ -23,18 +23,25 @@
 # 1.02.01 Initial release
 ####################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 
-$allowed_get = array("int_m", "sort");
+# Retrieving posted variables from $_GET
+$allowed_get = array(
+		"int_m",
+		"sort"
+);
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);
   echo $m;
 }
 
+# Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $pattern = '/^(ua|ud|la|ld|oa|od)$/';

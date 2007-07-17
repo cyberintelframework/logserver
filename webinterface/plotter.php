@@ -49,6 +49,7 @@ function shlinks(id) {
 </script>
 
 <?
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access_search = intval($s_access{1});

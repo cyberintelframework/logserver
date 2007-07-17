@@ -27,15 +27,18 @@
 # 1.02.01 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access_search = intval($_SESSION['s_access_search']);
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
 	"int_onoff"
 );
 $check = extractvars($_GET, $allowed_get);
 
+# Setting up the organisation
 if ($s_access_search == 9) {
   $q_org = 0;
 } else {
@@ -88,6 +91,7 @@ $debuginfo[] = $sql_getactive;
 $result_getactive = pg_query($pgconn, $sql_getactive);
 
 if ($s_admin == 1) {
+  # User is admin, show the graphs for all sensors
   $sql_allsensors = "SELECT id FROM rrd WHERE type = 'day' AND label = 'allsensors'";
   $result_allsensors = pg_query($pgconn, $sql_allsensors);
   $row_allsensors = pg_fetch_assoc($result_allsensors);

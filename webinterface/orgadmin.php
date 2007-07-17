@@ -24,8 +24,7 @@
 # 1.02.01 Initial release
 ####################################
 
-### Access level: s_admin == 1
-
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -33,6 +32,7 @@ $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
 		"sort"
@@ -40,11 +40,13 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking access
 if ($s_admin != 1) {
   $err = 1;
   $m = 91;
 }
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);
@@ -52,6 +54,7 @@ if (isset($clean['m'])) {
 }
 
 if ($err == 0) {
+  # Setting up sorting stuff
   if (isset($tainted['sort'])) {
     $sort = $tainted['sort'];
     $pattern = '/^(oa|od|ia|id)$/';

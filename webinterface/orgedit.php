@@ -25,17 +25,17 @@
 # 1.02.01 Initial release
 ####################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_hash = md5($_SESSION['s_hash']);
-# $s_access is obsolete again because $s_admin needs to be 1 to gain access
-$s_access = $_SESSION['s_access'];
-$s_access_user = intval($s_access{2});
 
+# Checking access
 if ( $s_admin != 1 ) {
   $err = 1;
 }
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_orgid",
                 "int_m"
@@ -43,12 +43,14 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking $_GET'ed variables
 if (!isset($clean['orgid'])) {
   $err = 1;
 } else {
   $orgid = $clean['orgid'];
 }
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);

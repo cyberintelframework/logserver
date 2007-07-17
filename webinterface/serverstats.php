@@ -18,9 +18,11 @@
 # 1.04.01 Initial release by Mr. Hiroshi Suzuki
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
+# Checking access
 if ($s_admin != 1) {
   pg_close($pgconn);
   header("Location: index.php");
@@ -29,8 +31,9 @@ if ($s_admin != 1) {
 
 echo "<h3>Serverinfo</h3>";
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
-  "strip_html_escape_server"
+	"strip_html_escape_server"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -39,30 +42,28 @@ if (isset($clean['server'])) {
   $server = $clean['server'];
 }
 
-
+# Showing available servers
 $sql_server = "SELECT DISTINCT(server) FROM serverstats";
 $debuginfo[] = $sql_server;
 $result_server = pg_query($pgconn, $sql_server);
 
 echo "<form name='selectserver' method='get' action='serverstats.php'>\n";
-echo "Display: ";
-echo "<select name='strip_html_escape_server' onChange='javascript: this.form.submit();'>\n";
-echo printOption("", "", "") . "\n";
-while ($row = pg_fetch_assoc($result_server)) {
-  $fserver = $row['server'];
-  echo printOption("$fserver", "$fserver", "$server") . "\n";
-}
-echo "</select>&nbsp;\n";
+  echo "Display: ";
+  echo "<select name='strip_html_escape_server' onChange='javascript: this.form.submit();'>\n";
+    echo printOption("", "", "") . "\n";
+    while ($row = pg_fetch_assoc($result_server)) {
+      $fserver = $row['server'];
+      echo printOption("$fserver", "$fserver", "$server") . "\n";
+    }
+  echo "</select>&nbsp;\n";
 echo "</form>\n";
 
 if ($server == '') { $server = $fserver; }
 
+# Showing the actual server stats
 $sql_server = "SELECT * FROM serverstats WHERE interval = 'day' AND server = '$server' ORDER BY type";
 $debuginfo[] = $sql_server;
 $result_server = pg_query($pgconn, $sql_server);
-
-$labelcheck = 0;
-
 
 while ($row = pg_fetch_assoc($result_server)) {
   $imgid = $row['id'];

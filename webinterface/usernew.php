@@ -26,6 +26,7 @@
 # 1.02.02 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_user = intval($_SESSION['s_userid']);
 $s_hash = md5($_SESSION['s_hash']);
@@ -33,10 +34,12 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+# Setting up default access values
 $access_sensor = 0;
 $access_search = 1;
 $access_user = 0;
 
+# Checking access
 if ($s_access_user < 2) {
   $err = 1;
   $m = 91;

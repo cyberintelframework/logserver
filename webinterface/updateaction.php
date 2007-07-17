@@ -27,9 +27,11 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
+# Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
   $address = getaddress();
@@ -37,17 +39,20 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_selview"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+# Checking access
 if ($s_access_sensor == 0) {
   $m = 91;
   pg_close($pgconn);
@@ -61,6 +66,7 @@ if (isset($clean['selview'])) {
   $selview = intval($selview);
 }
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "int_sid",
                 "int_vlanid",

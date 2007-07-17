@@ -23,6 +23,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -34,6 +35,7 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_access = $_SESSION['s_access'];
@@ -41,6 +43,7 @@ $s_auser = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
 		"strip_html_escape_username",
 		"int_asensor",
@@ -57,6 +60,7 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
+# Checking if the logged in user actually requested this action.                                    
 if ($clean['hash'] != $s_hash) {
   $err = 1;
   $m = 91;
@@ -142,6 +146,7 @@ if ($rows == 1) {
 }
 
 if ($err != 1) {
+  # Only change the password if any was given
   if ($pass == "") {
     $passwordstring = "";
   } else {

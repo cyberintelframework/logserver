@@ -33,6 +33,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $url = str_replace("&sort=" . $sort, "", $url);

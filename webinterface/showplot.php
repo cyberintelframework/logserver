@@ -27,8 +27,10 @@ include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 
+# Starting the session
 session_start();
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -36,6 +38,8 @@ $s_access_search = intval($s_access{1});
 
 $drawerr = 0;
 $limit = "";
+
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_interval",
                 "strip_html_escape_tsselect",
@@ -55,12 +59,14 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+# Setting up organisation
 if ($s_access_search == 9 && isset($clean['org'])) {
   $q_org = $clean['org'];
 } else {
   $q_org = intval($s_org);
 }
 
+# Checking if a timespan was correctly given
 if ((!isset($clean['tsstart']) || empty($clean['tsstart'])) && !isset($clean['tsselect'])) {
   $drawerr = 1;
 } elseif ((!isset($clean['tsend']) || empty($clean['tsend'])) && !isset($clean['tsselect'])) {
@@ -68,6 +74,7 @@ if ((!isset($clean['tsstart']) || empty($clean['tsstart'])) && !isset($clean['ts
 }
 
 if ($drawerr == 1) {
+  # No timespan info available, show nodata.gif
   header("Content-type: image/png");
   header("Cache-control: no-cache");
   header("Pragma: no-cache");
@@ -321,8 +328,8 @@ if (in_array($tsselect, $ar_valid_values)) {
   $date_month = 31 * $date_day;
   $date_year = 365 * $date_day;
   $dt_sub = 0;
-  // determine substitute value
-  //"H", "D", "T", "W", "M", "Y"
+  # determine substitute value
+  # "H", "D", "T", "W", "M", "Y"
   switch ($tsselect) {
     case "Y":
       $dt_sub = $date_year;
@@ -466,7 +473,6 @@ $title .= "\n From $textstart to $textend";
 ##############
 
 require_once "$c_phplot";  // here we include the PHPlot code 
-#$plot =& new PHPlot(990,600);    // here we define the variable
 $plot =& new PHPlot($width,$heigth);    // here we define the variable
 
 $plot->SetTitle($title);

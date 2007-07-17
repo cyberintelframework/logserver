@@ -53,6 +53,7 @@ if (isset($clean['filter'])) {
   $filter = 0;
 }
 
+# Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
   $url = str_replace("&sort=" . $sort, "", $url);
