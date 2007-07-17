@@ -1,9 +1,10 @@
 --
 -- SURFnet IDS Nepenthes functions
--- Version 1.04.04
+-- Version 1.04.05
 --
 
 --
+-- 1.04.05 Fixed quoted variables
 -- 1.04.04 Fixed a bug with the detail_add functions
 -- 1.04.03 m_check declarations added
 -- 1.04.02 Modifed surfnet_detail_add functions
@@ -104,7 +105,7 @@ BEGIN
         SELECT INTO m_sensorid surfnet_sensorid_get(p_localhost);
 
         IF p_type = 1 THEN
-          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = 'p_data';
+          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = p_data;
           IF m_check = 0 THEN
             INSERT INTO stats_dialogue (name) VALUES (p_data);
           END IF;
@@ -130,7 +131,7 @@ CREATE FUNCTION surfnet_detail_add_by_id(integer, integer, integer, character va
 	m_check INTEGER;
 BEGIN
         IF p_type = 1 THEN
-          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = 'p_data';
+          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = p_data;
           IF m_check = 0 THEN
             INSERT INTO stats_dialogue (name) VALUES (p_data);
           END IF;
@@ -162,7 +163,7 @@ BEGIN
                 p_localhost, 0,
                 NULL,m_sensorid);
 
-        SELECT COUNT(name) INTO m_check FROM uniq_binaries WHERE name = 'p_hash';
+        SELECT COUNT(name) INTO m_check FROM uniq_binaries WHERE name = p_hash;
 
         IF m_check = 0 THEN
           INSERT INTO uniq_binaries (name) VALUES (p_hash); 
