@@ -15,11 +15,13 @@
 include '../include/config.inc.php';
 include '../include/functions.inc.php';
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "md5_binname"
 );
 $check = extractvars($_GET, $allowed_get);
 
+# Starting the session and setting some headers
 session_start();
 header("Cache-control: private");
 header('HTTP/1.1 200 OK');
@@ -31,6 +33,7 @@ header("Content-Disposition: inline; filename=\"" .$clean['binname']. ".bin\"");
 
 $s_admin = intval($_SESSION['s_admin']);
 
+# Checking if downloads are enabled and if the user is an administrator
 if ($s_admin != 1 && $c_download_binaries == 1) {
   $absfile = $_SERVER['SCRIPT_NAME'];
   $file = basename($absfile);

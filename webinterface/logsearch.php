@@ -62,11 +62,14 @@ $valid_reptype = array("multi", "single", "idmef");
 if (in_array($_GET['reptype'], $valid_reptype)) $rapport = pg_escape_string($_GET['reptype']);
 else $rapport = "multi";
 
+# Check the type of report
 $ar_non_headers = array("idmef");
 if (in_array($rapport, $ar_non_headers)) {
+  # Type of report = idmef, we need to include all the stuff that is
+  # normally done in menu.php
   session_start();
   if (intval(@strlen($_SESSION["s_user"])) == 0) {
-    // User not logged in
+    # User not logged in
     header("Location: /login.php");
     exit;
   }
@@ -76,6 +79,7 @@ if (in_array($rapport, $ar_non_headers)) {
   include '../include/variables.inc.php';
 
   if ($rapport == "idmef") {
+    # Setting headers
     header("Content-type: text/xml");
 	  
     header("Cache-control: private");
@@ -93,6 +97,7 @@ if (in_array($rapport, $ar_non_headers)) {
   }
 }
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "reptype",
 		"net_searchnet",
@@ -129,11 +134,6 @@ if ($rapport != "idmef") {
 if ((!in_array($rapport, $ar_non_headers)) && $rapport != "idmef") {
   echo "<div id=\"search_wait\">Search is being processed...<br /><br />Please be patient.</div>\n";
 }
-
-#include 'include/config.inc.php';
-#include 'include/connect.inc.php';
-#include 'include/functions.inc.php';
-#include 'include/variables.inc.php';
 
 if ($c_searchtime == 1) {
   $timestart = microtime_float();
@@ -593,7 +593,7 @@ if (isset($tainted['order'])) {
   $sql_order_by = $order_by_tbl[$tainted['order']];
 }
 if (empty($sql_order_by) || !isset($sql_order_by)) $sql_order_by = $order_by_tbl["id"];
-// Order method (ascending or descending, default ASC)
+# Order method (ascending or descending, default ASC)
 if (isset($tainted['orderm'])) {
   if ($tainted['orderm'] == "DESC") $asc_desc = "DESC";
   else $asc_desc = "ASC";
@@ -611,9 +611,9 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
   $sql_count .= " $sql_where ";
   $debuginfo[] = $sql_count;
 
-  // SQL-count query
+  # SQL-count query
   $query_count = pg_query($sql_count);
-  // Don't use pg_num_rows, slow's down factor 2-4!
+  # Don't use pg_num_rows, slow's down factor 2-4!
   $num_rows = pg_result($query_count, 0);
   ### Check for config option.
   if ($c_search_cache == 1) {
@@ -623,6 +623,7 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
 $num_rows = intval($_SESSION["search_num_rows"]);
 
 if ($num_rows == 0) {
+  # If there are no search results
   debug_sql();
   echo "<p>No matching results found!</p>\n";
   ?>
@@ -667,6 +668,8 @@ for ($i = ($page_nr - 3); $i <= ($page_nr + 3); $i++) {
     else $nav .= "<a href=\"$url&int_page=$i\">$i</a>&nbsp;";
   }
 }
+
+# Setting up the navigation html
 $nav .= "<br />\n";
 if ($page_nr == 1) $nav .= "&lt;&lt;&nbsp;First&nbsp;&nbsp;";
 else $nav .= "<a href=\"$url&int_page=1\">&lt;&lt;&nbsp;First</a>&nbsp;&nbsp;";
@@ -678,13 +681,13 @@ else $nav .= "&nbsp;&nbsp;Next&nbsp;&gt;\n";
 if ($page_nr == $last_page) $nav .= "&nbsp;&nbsp;Last&nbsp;&gt;&gt;";
 else $nav .= "&nbsp;&nbsp;<a href=\"$url&int_page=$last_page\">Last&nbsp;&gt;&gt;</a>";
 
-// XML IDMEF logging button
+# XML IDMEF logging button
 $idmef_url = $_SERVER['REQUEST_URI'];
 if (intval(strpos($idmef_url, "reptype")) == 0) $idmef_url .= "&reptype=idmef";
 else $idmef_url = str_replace("reptype=" . $tainted["reptype"], "&reptype=idmef", $idmef_url);
 echo "<div id=\"xml_idmef\"><a href=\"$idmef_url\" title=\"Download these results as IDMEF format XML file\"><img src=\"./images/xml.png\" border=\"0\" width=\"48\" height=\"52\"></a><br>IDMEF</div>\n";
 
-// Personal search templates
+# Personal search templates
 echo "<div id=\"personal_searchtemplate\"><a href=\"#\" onclick=\"submitSearchTemplateFromResults('" . $_SERVER['QUERY_STRING'] . "');\"><img src='images/searchtemplate_add.png' alt='Add this search query to my personal search templates' title='Add this search query to my personal search templates' border='0'></a><br>Search-<br>template</div>\n";
 
 flush();
@@ -792,16 +795,7 @@ while ($row = pg_fetch_assoc($result)) {
     }
     echo "<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
     $dest = censorip($dest, $orgranges_ar);
-#    if ($c_hide_dest_ip == 1 && $s_admin == 0) {
-#      $range_check = matchCIDR($dest, $ranges_ar);
-#      if ($range_check == 1) {
-        echo "<td class='datatd'>$dest:$dport</td>\n";
-#      } else {
-#        echo "<td class='datatd'>&lt;hidden&gt;</td>\n";
-#      }
-#    } else {
-#      echo "<td class='datatd'>$dest:$dport</td>\n";
-#    }
+    echo "<td class='datatd'>$dest:$dport</td>\n";
     echo "<td class='datatd'>$sensorname</td>\n";
     if ($numrows_details != 0) {
       if ($sev == 1) {
@@ -886,15 +880,15 @@ while ($row = pg_fetch_assoc($result)) {
 echo "</table>\n";
 
 if ($rapport == "multi") {
-	echo "<br />\n";
-	echo "<div id=\"lognav\" align=\"center\">$nav</div>\n";
-	echo "<br />\n";
+  echo "<br />\n";
+  echo "<div id=\"lognav\" align=\"center\">$nav</div>\n";
+  echo "<br />\n";
 }
 
 pg_close($pgconn);
-
 debug_sql();
 
+# Search time stuff
 if ($c_searchtime == 1) {
   $timeend = microtime_float();
   $gen = $timeend - $timestart;

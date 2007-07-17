@@ -13,17 +13,19 @@
 # 1.04.01 Initial release
 ####################################
 
-
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access_sensor = intval($s_access{0});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);
@@ -31,7 +33,7 @@ if (isset($clean['m'])) {
 }
 
 if ($s_access_sensor > 1) {
-
+  # Building SQL query
   add_to_sql("argos.id", "select");
   add_to_sql("sensors.keyname", "select");
   add_to_sql("sensors.vlanid", "select");

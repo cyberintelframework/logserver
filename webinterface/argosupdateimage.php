@@ -112,6 +112,7 @@ if ($err == 0) {
   }
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: argosadmin.php?int_m=$m");

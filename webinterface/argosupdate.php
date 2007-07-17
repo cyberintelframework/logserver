@@ -94,6 +94,7 @@ if ($err == 0) {
   $m = 3;
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: argosadmin.php?int_m=$m");

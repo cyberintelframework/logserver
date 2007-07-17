@@ -157,6 +157,8 @@ if ($err != 1) {
     }
   }
 }
+
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: useradmin.php?int_m=$m");

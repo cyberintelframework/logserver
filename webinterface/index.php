@@ -24,9 +24,11 @@
 # 1.04.01 Added changelog and GD check
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "int_selperiod",
                 "int_orgid"
@@ -34,6 +36,7 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 debug_input();
 
+# Checking $_POST'ed variables
 if (isset($clean['selperiod'])) {
   $sel = $clean['selperiod'];
 } else {
@@ -107,6 +110,7 @@ echo "<table width='100%'>\n";
   echo "</tr>\n";
 echo "</table>\n";
 
+# Setting up timestamping stuff
 if ($sel == 0) {
   $ts_qs = "?strip_html_escape_tsselect=T";
   $day = date("d");

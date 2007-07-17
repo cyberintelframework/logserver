@@ -80,6 +80,8 @@ if ($err != 1) {
   $execute = pg_query($pgconn, $sql);
   $m = 1;
 }
+
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: orgipadmin.php?int_m=$m&int_orgid=$org");

@@ -57,6 +57,8 @@ if ($err != 1) {
   $execute_save = pg_query($pgconn, $sql_save);
   $m = 1;
 }
+
+# Close connection and redirect
 pg_close($pgconn);
 header("location: serveradmin.php?int_m=$m");
 ?>

@@ -20,18 +20,20 @@
 # 1.02.02 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_id"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
-### Variables check
+# Checking $_GET'ed variables
 if (isset($clean['id'])) {
   $id = $clean['id'];
 } else {
@@ -84,9 +86,9 @@ if ($err != 1) {
 
     echo "</tr>\n";
   }
-
   echo "</table>\n";
 }
+
 pg_close($pgconn);
 debug_sql();
 ?>

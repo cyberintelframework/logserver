@@ -28,10 +28,12 @@
 # 1.02.03 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_binid",
                 "md5_binname",

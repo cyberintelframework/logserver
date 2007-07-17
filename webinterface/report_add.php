@@ -203,6 +203,7 @@ if ($err == 0) {
   $m = 5;
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 if ($m == 5) {

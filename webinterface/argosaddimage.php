@@ -16,9 +16,11 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
+# Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
   $address = getaddress();
@@ -26,12 +28,13 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 
-
+# Checking access
 if ($s_access_sensor == 0) {
   $m = 91;
   pg_close($pgconn);
@@ -39,6 +42,7 @@ if ($s_access_sensor == 0) {
   exit;
 }
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "ip_serverip",
                 "mac_macaddr",
@@ -53,6 +57,7 @@ $check = extractvars($_POST, $allowed_post);
 
 $err = 0;
 
+# Checking $_POST'ed variables
 if (isset($clean['name'])) {
   $name = $clean['name'];
 } else {
@@ -90,6 +95,7 @@ if (isset($clean['orgid'])) {
   $err = 1;
 }
 
+# Checking for existance of a record with $_POST'ed name and imagename
 $sql = "SELECT name, imagename FROM argos_images";
 $debuginfo[] = $sql;
 $query = pg_query($pgconn, $sql);
@@ -106,6 +112,7 @@ while ($row = pg_fetch_assoc($query)) {
   }
 }
 
+# Checking for existance of $_POST'ed MAC address
 if (isset($clean['macaddr'])) {
   $macaddr = $clean['macaddr'];
   $sql = "SELECT macaddr FROM argos_images";
@@ -120,8 +127,8 @@ if (isset($clean['macaddr'])) {
   }
 }
 
-
 if ($err == 0) {
+  # No errors found, insert record
   if (isset($clean['macaddr'])) {
     $macaddr = $clean['macaddr'];
     $sql = "INSERT INTO argos_images (name, serverip, macaddr, imagename, osname, oslang, organisationid) VALUES ('$name', '$serverip', '$macaddr', '$imagename', '$osname', '$oslang', '$orgid')";
@@ -136,6 +143,7 @@ if ($err == 0) {
   }
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: argosadmin.php?int_m=$m");

@@ -29,6 +29,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "strip_html_escape_user",
                 "md5_pass",
@@ -37,6 +38,7 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
 		"strip_html_url"
 );
@@ -50,6 +52,7 @@ $sql_user = "SELECT id, access, password, serverhash, organisation FROM login WH
 $result_user = pg_query($pgconn, $sql_user);
 $numrows_user = pg_num_rows($result_user);
 
+# Checking if the user exists
 if ($numrows_user == 1) {
   $row = pg_fetch_assoc($result_user);
   $id = $row['id'];
@@ -57,6 +60,7 @@ if ($numrows_user == 1) {
   $pass = $row['password'];
   $hash = $row['serverhash'];
 
+  # Checking which login method is configured
   if ($c_login_method == 1) {
     $checkstring = $pass;
   } else {
@@ -67,6 +71,7 @@ if ($numrows_user == 1) {
   }
 
   $db_org = intval($row['organisation']);
+  # Checking if the supplied password was correct
   if ($checkstring == $f_pass) {
     $sql_getorg = "SELECT organisation FROM organisations WHERE id = " . $db_org;
     $result_getorg = pg_query($pgconn, $sql_getorg);
@@ -89,7 +94,7 @@ if ($numrows_user == 1) {
     $_SESSION['s_userid'] = intval($id);
     $_SESSION['s_hash'] = $hash;
 
-    // Adding the session - IP pair to the sessions table
+    # Adding the session - IP pair to the sessions table
     $timestamp = time();
     $remoteip = pg_escape_string($_SERVER['REMOTE_ADDR']);
     $useragent = md5($_SERVER['HTTP_USER_AGENT']);
@@ -106,7 +111,7 @@ if ($numrows_user == 1) {
       $result_upd_session = pg_query($sql_upd_session);
     }
 
-    // Cleaning up the sessions table
+    # Cleaning up the sessions table
     $sql_session = "SELECT * FROM sessions";
     $result_session = pg_query($sql_session);
     while ($row = pg_fetch_assoc($result_session)) {
@@ -119,17 +124,13 @@ if ($numrows_user == 1) {
       }
     }
 
-#    if ($login_method == 1) {
-      $newserverhash = genpass();
-      $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
-#      $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp WHERE username = '" .$f_user. "'";
-      $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
-#    } else {
-#      $newserverhash = genpass();
-#      $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
-#      $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
-#    }
+    # Generate a new serverhash and update it to the database
+    $newserverhash = genpass();
+    $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
+    $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
+
     if (isset($clean['url'])) {
+      # URL was set, redirect to URL instead of index
       $url = $clean['url'];
       pg_close($pgconn);
       $address = getaddress();

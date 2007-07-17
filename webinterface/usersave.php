@@ -160,6 +160,8 @@ if ($err != 1) {
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
 }
+
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: useradmin.php?int_m=$m");

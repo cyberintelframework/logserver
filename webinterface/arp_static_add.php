@@ -16,6 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -27,11 +28,13 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "mac_macaddr",
                 "ip_ipaddr",
@@ -41,6 +44,7 @@ $allowed_post = array(
 );
 $check = extractvars($_POST, $allowed_post);
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
 		"int_org",
 		"int_filter"
@@ -48,6 +52,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+# Checking $_POST'ed and $_GET'ed variables
 if (isset($clean['filter'])) {
   $filter = $clean['filter'];
 } else {
@@ -137,6 +142,7 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
+  # No errors found, insert record (including the host type)
   $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
   $sql .= "VALUES ('$ip', '$mac', '$sensorid')";
   $debuginfo[] = $sql;
@@ -163,6 +169,7 @@ if ($err != 1) {
   $m = 1;
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: arpadmin.php?int_m=$m&int_org=$q_org&int_filter=$filter");

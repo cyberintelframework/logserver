@@ -103,6 +103,7 @@ if ($err == 0) {
   $query = pg_query($sql_mod);
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 header("location: mailadmin.php?int_userid=$user_id&int_m=$m");
 ?>

@@ -14,10 +14,13 @@
 # 1.04.01 Code layout 
 # 1.04.00 initial release 
 #############################################
+
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_org",
                 "b",
@@ -27,7 +30,6 @@ $allowed_get = array(
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
-
 
 if ($s_access_search == 9 && isset($clean['org'])) {
   $q_org = $clean['org'];
@@ -39,9 +41,7 @@ if ($s_access_search == 9 && isset($clean['org'])) {
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = $q_org";
 $result_getorg = pg_query($pgconn, $sql_getorg);
-
 $debuginfo[] = $sql_getorg;
-
 
 ### Default browse method is weekly.
 if (isset($tainted['b'])) {
@@ -138,34 +138,30 @@ echo "<form name='selectorg' method='get' action='googlemap.php'>\n";
   }
 echo "</form>\n";
 echo "<br />\n";
+
 if ($b == "daily") {
-      $datestart = date("d-m-Y", $start);
-      echo "<h4>Results from $datestart</h4>\n";
+  $datestart = date("d-m-Y", $start);
+  echo "<h4>Results from $datestart</h4>\n";
 } else {
-      $datestart = date("d-m-Y", $start);
-      $dateend = date("d-m-Y", $end);
-      echo "<h4>Results from $datestart to $dateend</h4>\n";
+  $datestart = date("d-m-Y", $start);
+  $dateend = date("d-m-Y", $end);
+  echo "<h4>Results from $datestart to $dateend</h4>\n";
 }
 ?>
 
-
-
-      
-
 <table>
-<tr>
-<td>
-
-<div id="map" style="width: 800px; height: 400px">
-</div>
-</td>
-<td>
-<img src="http://labs.google.com/ridefinder/images/mm_20_yellow.png"> <= 5 Attacks<br />
-<img src="http://labs.google.com/ridefinder/images/mm_20_orange.png"> <= 25  Attacks<br />
-<img src="http://labs.google.com/ridefinder/images/mm_20_red.png"> <= 250  Attacks<br />
-<img src="http://labs.google.com/ridefinder/images/mm_20_black.png"> > 250 Attacks<br />
-</td>
-</tr>
+  <tr>
+    <td>
+      <div id="map" style="width: 800px; height: 400px">
+      </div>
+    </td>
+    <td>
+      <img src="http://labs.google.com/ridefinder/images/mm_20_yellow.png"> <= 5 Attacks<br />
+      <img src="http://labs.google.com/ridefinder/images/mm_20_orange.png"> <= 25  Attacks<br />
+      <img src="http://labs.google.com/ridefinder/images/mm_20_red.png"> <= 250  Attacks<br />
+      <img src="http://labs.google.com/ridefinder/images/mm_20_black.png"> > 250 Attacks<br />
+    </td>
+  </tr>
 </table>
 
 </div>
@@ -217,29 +213,27 @@ blackicon.infoWindowAnchor = new GPoint(5, 1);
  
 function createMarker(point,country,city,count)
 {
+  var marker;
+  if ( count <= 5){
+   marker = new GMarker(point,yellowicon);
+  }else
+  if ( count <= 25){
+   marker = new GMarker(point,orangeicon);
+  }else
+  if ( count <= 250){
+   marker = new GMarker(point,redicon);
+  }else
+  {
+   marker = new GMarker(point,blackicon);
+  }
  
-    var marker;
-    if ( count <= 5){
-     marker = new GMarker(point,yellowicon);
-    }else
-    if ( count <= 25){
-     marker = new GMarker(point,orangeicon);
-    }else
-    if ( count <= 250){
-     marker = new GMarker(point,redicon);
-    }else
-    {
-     marker = new GMarker(point,blackicon);
-    }
- 
-    var msg = "<small><b>Country:</b> " + country +"<br/>";
-    msg = msg+"<b>City:</b> " + city +"<br/>";
-    msg = msg+"<b>Count:</b> " + count +"<br/>";
-    msg = msg+"</small>";
-    GEvent.addListener(marker, "click", function(){marker.openInfoWindowHtml(msg);});
-    return marker;
+  var msg = "<small><b>Country:</b> " + country +"<br/>";
+  msg = msg+"<b>City:</b> " + city +"<br/>";
+  msg = msg+"<b>Count:</b> " + count +"<br/>";
+  msg = msg+"</small>";
+  GEvent.addListener(marker, "click", function(){marker.openInfoWindowHtml(msg);});
+  return marker;
 }
- 
  
 var request = GXmlHttp.create();
 
@@ -247,38 +241,29 @@ var request = GXmlHttp.create();
 echo "request.open('GET', 'googlemapdata.xml.php$xmlquery', true);";
 ?>
 
-
 request.onreadystatechange = function() {
-    
-    if (request.readyState == 4) {
-     if (request.status == 200) {
-        document.getElementById('search_wait').style.display='none';
-	var xmlDoc = request.responseXML;
-        var markers = xmlDoc.documentElement.getElementsByTagName("marker");
+  if (request.readyState == 4) {
+    if (request.status == 200) {
+      document.getElementById('search_wait').style.display='none';
+      var xmlDoc = request.responseXML;
+      var markers = xmlDoc.documentElement.getElementsByTagName("marker");
  
-        for (var i = 0; i < markers.length; i++) {
-            var point = new GPoint(parseFloat(markers[i].getAttribute("lng")),
-                                   parseFloat(markers[i].getAttribute("lat")));
-            var city = markers[i].getAttribute("city");
-            var country = markers[i].getAttribute("country");
-            var count = markers[i].getAttribute("count");
-            var marker = new createMarker(point,country,city,count);
-            map.addOverlay(marker);
-        }
-     }
+      for (var i = 0; i < markers.length; i++) {
+        var point = new GPoint(
+          parseFloat(markers[i].getAttribute("lng")),
+          parseFloat(markers[i].getAttribute("lat"))
+        );
+        var city = markers[i].getAttribute("city");
+        var country = markers[i].getAttribute("country");
+        var count = markers[i].getAttribute("count");
+        var marker = new createMarker(point,country,city,count);
+        map.addOverlay(marker);
+      }
     }
+  }
 }
 request.send(null);
-
 </script>
-
-
-
-
-
-
 </body>
-
-
 </html>
 

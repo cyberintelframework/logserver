@@ -17,10 +17,12 @@
 # 1.03.01 Initial release
 ####################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_hash = md5($_SESSION['s_hash']);
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_userid",
 		"int_m"
@@ -28,7 +30,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
-// Make sure all access rights are correct
+# Make sure all access rights are correct
 if (isset($clean['userid'])) {
   $user_id = $clean['userid'];
   if ($s_access_user < 1) {

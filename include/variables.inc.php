@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.22                  #
-# 05-07-2007                       #
+# Version 1.04.23                  #
+# 16-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.23 Modified some comments to correctly describe the variables
 # 1.04.22 Added some more options to v_mail_detail array
 # 1.04.21 Added IP address organisation identifier
 # 1.04.20 Added detail array
@@ -142,7 +143,7 @@ $v_attacks_ar = array(
 						'URL'		=> 'http://nepenthes.sourceforge.net/documentation:modules:vulnerability:vuln_wins')
 );
 
-# Array with the severity as assigned by Nepenthes. The integers are set by Nepenthes, the text can be modified.
+# Array with the severity of the attack.
 $v_severity_ar = array(
 		'0'	=> 'Possible malicious attack',
 		'1'	=> 'Malicious attack',
@@ -151,7 +152,15 @@ $v_severity_ar = array(
 		'32'	=> 'Malware downloaded'
 );
 
-# Array with the type of attack as assigned by Nepenthes. The integers are set by Nepenthes, the text can be modified.
+# Array with the type of malicious attack.
+$v_severity_type_ar = array(
+		0 => "Nepenthes",
+		1 => "Argos",
+		2 => "ARP Poisoning",
+		3 => "Rogue DHCP server"
+);
+
+# Array with the type of detail info record.
 $v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
 		'2'	=> 'Shellcodehandler',
@@ -189,7 +198,7 @@ $v_access_ar_user = array(
                 '9'	=> 'All accounts (admin)'		# Total admin control for user and organisation administration.
 );
 
-# Array with the mailreporting templates
+# Array with the kind of report.
 $v_mail_detail_ar = array(
 		0 => "Mail - Summary", 
 		1 => "Mail - Detail", 
@@ -199,13 +208,13 @@ $v_mail_detail_ar = array(
 		11 => "RSS - Summary + Detail"
 );
 
-# Array with the mailreporting templates
+# Array with the kind of report for sensor status.
 $v_mail_sdetail_ar = array(
 		2 => "Mail - Summary + Detail",
 		11 => "RSS - Summary + Detail"
 );
 
-# Array with the mailreporting templates
+# Array with the mailreporting templates.
 $v_mail_template_ar = array(
 		1 => "All attacks", 
 		2 => "Own ranges", 
@@ -213,13 +222,14 @@ $v_mail_template_ar = array(
 		5 => "ARP Alert"
 );
 
-# Array with the mailreporting priorities
+# Array with the mailreporting priorities.
 $v_mail_priority_ar = array(
 		1 => "Low",
 		2 => "Normal",
 		3 => "High"
 );
 
+# Array with the different severities for the sensor status report template.
 $v_sensor_sev_ar = array(
 		1 => "Sensor failed to start",
 		2 => "Sensor down"
@@ -235,7 +245,7 @@ $v_mail_operator_ar = array(
 		6 => "!="
 );
 
-# Array with the mailreporting frequency
+# Array with the mailreporting frequency for the attacks templates.
 $v_mail_frequency_attacks_ar = array(
 		1 => "Every hour",
 		2 => "Every day",
@@ -243,21 +253,21 @@ $v_mail_frequency_attacks_ar = array(
 		4 => "Threshold"
 );
 
-# Array with the mailreporting frequency
+# Array with the mailreporting frequency for the sensor status template.
 $v_mail_frequency_sensors_ar = array(
 		1 => "Every hour",
 		2 => "Every day",
 		3 => "Every week"
 );
 
-# Array with the mailreporting frequency
+# Array with the timespan for threshold reports.
 $v_mail_timespan_ar = array(
 		1 => "Last hour",
 		2 => "Last 24 hours",
 		3 => "Last 7 days"
 );
 
-# Array with the organisation identifier types
+# Array with the organisation identifier types.
 $v_org_ident_type_ar = array(
 		0 => "IP address",
 		1 => "Random Identifier String",
@@ -266,6 +276,7 @@ $v_org_ident_type_ar = array(
 		4 => "SURFnet SOAP"
 );
 
+# Array with the different kind of error messages for the webinterface.
 $v_errors = array(
 	arpadmin.php => array(
 				1 => "Succesfully added a new static ARP entry!",
@@ -432,6 +443,7 @@ $v_errors = array(
 			)
 );
 
+# Array for the different types of plots available.
 $v_plottertypes = array(
 				1 => "bars",
 				2 => "lines",
@@ -443,11 +455,13 @@ $v_plottertypes = array(
 				8 => "squared"
 );
 
+# Regular expression for an IP address.
 $v_ipregexp = '^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
 $v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
 $v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
 $v_ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$';
 
+# Array with the colors used in the index page.
 $v_indexcolors = array(
 			0 => "Red",
 			1 => "DarkOrange",
@@ -458,17 +472,20 @@ $v_indexcolors = array(
 			6 => "SeaGreen"
 );
 
+# Array with the different views for the index page.
 $v_index_periods = array(
 			0 => "Today",
 			1 => "Last 7 days"
 );
 
+# Array with the different colors that are useable by phplot.
 $v_phplot_data_colors = array(
 	"beige", "black", "blue", "brown", "cyan", "DarkGreen", "DimGrey", "gold", "green", "lavender", "magenta", "maroon", "navy", 
 	"orange", "orchid", "PeachPuff", "peru", "pink", "plum", "purple", "red", "salmon", "SkyBlue", "SlateBlue", "tan", "violet", 
 	"wheat", "yellow", "YellowGreen"
 );
 
+# Array with the different help messages for the webinterface.
 $v_help = array(
 	arpadmin.php => array(
 		"arpcache" => "This is the ARP cache that the ARP module keeps track of. This ARP cache gets filled based on ARP queries and replies that are detected by the sensor.",
@@ -514,18 +531,22 @@ $v_help = array(
 
 );
 
+# Array with the different ARP alerts.
 $v_arp_alerts = array(
 	1 => "ARP Poisoning"
 );
 
+# Array with the different host types.
 $v_host_types = array(
 	1 => "Router/Gateway",
 	2 => "DHCP Server"
 );
 
+# Array with the different protocols detected by the sniffer.
 $v_proto_types = array(
 	1 => "Ethernet",
 	2 => "IP",
-	3 => "ICMP"
+	3 => "ICMP",
+	4 => "IGMP"
 );
 ?>

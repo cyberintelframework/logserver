@@ -37,12 +37,14 @@
 # 1.02.04 Added number formatting
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 $querystring = "";
 $q_org = $s_org;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_sev",
 		"int_org",
@@ -116,7 +118,6 @@ if ($err != 1) {
     prepare_sql();
 
     ### Admin check.
-#    $sql_count = "SELECT count(DISTINCT details.attackid) as total, details.text, stats_dialogue.id ";
     $sql_count = "SELECT $sql_select ";
     $sql_count .= "FROM $sql_from ";
     $sql_count .= " $sql_where ";

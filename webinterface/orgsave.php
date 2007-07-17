@@ -185,6 +185,8 @@ if ($err != 1) {
   }
   $m = 1;
 }
+
+# Close connection and redirect
 pg_close($pgconn);
 if ($type == "org") {
   header("location: orgadmin.php?int_m=$m");

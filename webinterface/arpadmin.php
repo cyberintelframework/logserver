@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.04                  #
-# 09-07-2007                       #
+# Version 1.04.05                  #
+# 16-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.04.05 Fixed a bug with flagstring
 # 1.04.04 Split the different selector forms
 # 1.04.03 Fixed a bug with the sensor selector
 # 1.04.02 Added manufacturer stuff
@@ -258,9 +259,9 @@ if ($s_access_sensor > 1) {
   echo "<h4>Detected protocols</h4>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
-      echo "<td class='dataheader' width='150'>Ethernet/IP</td>\n";
-      echo "<td class='dataheader' width='150'>Protocol Number</td>\n";
-      echo "<td class='dataheader' width='300'>Protocol</td>\n";
+      echo "<td class='dataheader' width='150'>Parent Protocol</td>\n";
+      echo "<td class='dataheader' width='150'>Type Number</td>\n";
+      echo "<td class='dataheader' width='300'>Type</td>\n";
     echo "</tr>\n";
 
     $sql_protos = "SELECT head, number, protocol FROM sniff_protos WHERE sensorid = '$filter' ORDER BY head, number";
@@ -335,12 +336,10 @@ if ($s_access_sensor > 1) {
         echo "<td>$ip<input type='hidden' name='ip_ipaddr' value='$ip' /></td>\n";
         if ("$flags" != "") {
           $flags_ar = split(",", $flags);
+          $flagstring = "";
           foreach ($flags_ar as $key => $val) {
-#            $flagstring .= "<a href='#' onmouseover='return overlib(\"$v_host_types[$val]\");' onmouseout='return nd();' />$val</a>, ";
             $flagstring .= "<img src='images/hosttypes/$val.gif' onmouseover='return overlib(\"$v_host_types[$val]\");' onmouseout='return nd();' />&nbsp;";
           }
-#          $flagstring = rtrim($flagstring);
-#          $flagstring = rtrim($flagstring, ",");
           echo "<td>$flagstring</td>\n";
         } else {
           echo "<td></td>\n";

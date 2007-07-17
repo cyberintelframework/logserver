@@ -16,6 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -27,6 +28,7 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
@@ -34,6 +36,7 @@ $s_access_sensor = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_id",
 		"int_org",
@@ -43,6 +46,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+# Checking $_GET'ed variables
 if (isset($clean['id']) ) {
   $id = $clean['id'];
 } else {
@@ -83,6 +87,7 @@ if (isset($clean['filter'])) {
 }
 
 if ($err == 0) {
+  # No errors found, delete record
   $sql = "DELETE FROM arp_static WHERE id = $id";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
@@ -93,6 +98,8 @@ if ($err == 0) {
 
   $m = 2;
 }
+
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: arpadmin.php?int_m=$m&int_org=$q_org&int_filter=$filter");

@@ -81,6 +81,7 @@ if ($err == 0) {
   $m = 100;
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 if ($m == 100) {
   header("location: serveradmin.php?int_m=$m&int_c=$numrows_check");

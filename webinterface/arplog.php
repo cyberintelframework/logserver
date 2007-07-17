@@ -13,11 +13,13 @@
 # 1.04.01 Initial release
 ####################################
 
+# Retrieving some session and server variables
 $s_org = intval($_SESSION['s_org']);
 $s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
 $url = $_SERVER['REQUEST_URI'];
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
 	"int_m",
 	"int_filter",
@@ -36,14 +38,15 @@ $allowed_get = array(
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
-printer($_GET);
 
+# Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];
   $m = geterror($m);
   echo $m;
 }
 
+# Checking $_GET'ed variables
 if (isset($clean['filter'])) {
   $filter = $clean['filter'];
 } else {
@@ -230,7 +233,6 @@ if ($s_access_sensor > 1) {
 }
 
 if ($s_access_sensor > 1) {
-
   add_to_sql("arp_alert.id", "select");
   add_to_sql("arp_alert", "table");
   add_to_sql("sensors", "table");
@@ -362,6 +364,7 @@ if ($s_access_sensor > 1) {
   }
 }
 
+# Close connection
 pg_close($pgconn);
 debug_sql();
 footer();

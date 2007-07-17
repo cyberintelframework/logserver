@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.03                  #
-# 15-12-2006                       #
+# Version 1.04.04                  #
+# 17-07-2007                       #
 # Peter Arts & Kees Trippelvitz    #
 ####################################
 
 #################################################
 # Changelog:
+# 1.04.04 Cleaned up code a bit
 # 1.04.03 Changed data input handling
 # 1.04.02 Changed debug stuff
 # 1.04.01 Rereleased as 1.04.01
@@ -21,10 +22,12 @@
 # 1.02.03 Bugfix full list (sensor querystring)
 #################################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
 		"int_y",
 		"int_org",
@@ -34,6 +37,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
 		"int_y",
 		"int_org"
@@ -41,6 +45,7 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 debug_input();
 
+# Checking $_GET'ed variables
 if (isset($tainted['full'])) {
   $full = $tainted['full'];
   $pattern = '/^(malicious|viruses)$/';
@@ -56,14 +61,14 @@ if ($year < 2004) $year = date("Y");
 if (isset($clean['org']) && $s_access_search == 9) $s_org = $clean['org'];
 $s_sensor = -1;
 if (isset($clean['sensor'])) {
-	// check for permissions
-	$query = pg_query("SELECT * FROM sensors WHERE id = '" . $clean['sensor'] . "' AND organisation = '" . $s_org . "' LIMIT 1");
-	if (pg_num_rows($query) == 1) $s_sensor = $clean['sensor'];
+  # check for permissions
+  $query = pg_query("SELECT * FROM sensors WHERE id = '" . $clean['sensor'] . "' AND organisation = '" . $s_org . "' LIMIT 1");
+  if (pg_num_rows($query) == 1) $s_sensor = $clean['sensor'];
 }
 if (intval($s_sensor) <= 0) {
-	// set default sensor
-	$query = pg_query("SELECT id FROM sensors WHERE organisation = '" . $s_org . "' ORDER BY keyname LIMIT 1");
-	$s_sensor = pg_result($query, 0);
+  # set default sensor
+  $query = pg_query("SELECT id FROM sensors WHERE organisation = '" . $s_org . "' ORDER BY keyname LIMIT 1");
+  $s_sensor = pg_result($query, 0);
 }
 
 $sql_getorg = "SELECT organisation FROM organisations WHERE id = '$s_org'";
@@ -143,135 +148,140 @@ if ($err != 1) {
     echo "<input type='button' value='Next' class='button' onClick=window.location='loghistory.php?int_m=$nextmonth&int_y=$nextyear&int_org=$s_org';>\n";
     echo "</form>\n";
 
-	$mts = mktime(0,0,0,$month,1,$year);
-	$monthname = date("F", $mts);
-	echo "<h4>History data for $monthname $year</h4>\n";
-	
-	$sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
-        $debuginfo[] = $sql;
-        
-	$query = pg_query($sql);
-	if (pg_num_rows($query) == 0) {
-		echo "<p>No data present for this month.</p>\n";
-	} else {
-		$org_id = $clean["org"];
-		$sensorid = $clean["sensor"];
-		echo "<table border=0 cellspacing=0 cellpadding=0><tr><td valign=\"top\">\n";
+    $mts = mktime(0,0,0,$month,1,$year);
+    $monthname = date("F", $mts);
+    echo "<h4>History data for $monthname $year</h4>\n";
 
-		$sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
-                $debuginfo[] = $sql;
+    $sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
+    $debuginfo[] = $sql;
+    $query = pg_query($sql);
+    if (pg_num_rows($query) == 0) {
+      echo "<p>No data present for this month.</p>\n";
+    } else {
+      $org_id = $clean["org"];
+      $sensorid = $clean["sensor"];
+      echo "<table border=0 cellspacing=0 cellpadding=0>";
+        echo "<tr>\n";
+          echo "<td valign='top'>\n";
 
-		$query = pg_query($sql);
-		$stats_history = pg_fetch_assoc($query);
-		$history_id = intval($stats_history["id"]);
+            $sql = "SELECT * FROM stats_history WHERE sensorid = '" . intval($s_sensor) . "' AND year = '" . intval($year) . "' AND month = '" . intval($month) . "' LIMIT 1";
+            $debuginfo[] = $sql;
+            $query = pg_query($sql);
 
-		echo "<table class='datatable'>\n";
-		echo " <tr>\n";
-		echo "  <td class='dataheader' width='300' colspan=2 align='center'><h3>General statistics</h3></td>\n";
-		echo " </tr>\n";
-		echo " <tr>\n";
-		echo "  <td class='datatd' width=200>Possible malicious attack</td>\n";
-		echo "  <td class='datatd' align='right'>" . number_format($stats_history["count_possible"], 0, '.', ',') . "&nbsp;</td>\n";
-		echo " </tr>\n";
-		$count_malicious = number_format($stats_history["count_malicious"], 0, '.', ',');
-		echo " <tr>\n";
-		echo "  <td class='datatd' width=200>Malicious attack</td>\n";
-		echo "  <td class='datatd' align='right'>" . $count_malicious . "&nbsp;</td>\n";
-		echo " </tr>\n";
-		echo " <tr>\n";
-		echo "  <td class='datatd' width=200>Malware offered</td>\n";
-		echo "  <td class='datatd' align='right'>" . number_format($stats_history["count_offered"], 0, '.', ',') . "&nbsp;</td>\n";
-		echo " </tr>\n";
-		echo " <tr>\n";
-		echo "  <td class='datatd' width=200>Malware downloaded</td>\n";
-		echo "  <td class='datatd' align='right'>" . number_format($stats_history["count_downloaded"], 0, '.', ',') . "&nbsp;</td>\n";
-		echo " </tr>\n";
-		echo "</table>\n";
+            $stats_history = pg_fetch_assoc($query);
+            $history_id = intval($stats_history["id"]);
+
+            echo "<table class='datatable'>\n";
+              echo " <tr>\n";
+                echo "  <td class='dataheader' width='300' colspan=2 align='center'><h3>General statistics</h3></td>\n";
+              echo " </tr>\n";
+              echo " <tr>\n";
+                echo "  <td class='datatd' width=200>Possible malicious attack</td>\n";
+                echo "  <td class='datatd' align='right'>" . number_format($stats_history["count_possible"], 0, '.', ',') . "&nbsp;</td>\n";
+              echo " </tr>\n";
+
+              $count_malicious = number_format($stats_history["count_malicious"], 0, '.', ',');
+              echo " <tr>\n";
+                echo "  <td class='datatd' width=200>Malicious attack</td>\n";
+                echo "  <td class='datatd' align='right'>" . $count_malicious . "&nbsp;</td>\n";
+              echo " </tr>\n";
+              echo " <tr>\n";
+                echo "  <td class='datatd' width=200>Malware offered</td>\n";
+                echo "  <td class='datatd' align='right'>" . number_format($stats_history["count_offered"], 0, '.', ',') . "&nbsp;</td>\n";
+              echo " </tr>\n";
+              echo " <tr>\n";
+                echo "  <td class='datatd' width=200>Malware downloaded</td>\n";
+                echo "  <td class='datatd' align='right'>" . number_format($stats_history["count_downloaded"], 0, '.', ',') . "&nbsp;</td>\n";
+              echo " </tr>\n";
+            echo "</table>\n";
+            echo "<p>&nbsp;</p>\n";
+          echo "</td>\n";
+          echo "<td width=50>&nbsp;</td>\n";
+          echo "<td valign='top'>\n";
 		
-		echo "<p>&nbsp;</p>\n";
-		
-		echo "</td><td width=50>&nbsp;</td><td valign=\"top\">\n";
-		
-		// Malicious attacks
-		if ($full == "malicious") {
-			$show = "full list";
-			$limit = "";
-			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid\">Show top 5</a><br /><br />\n";
-		} else {
-			$show = "top 5";
-			$limit = "LIMIT 5";
-			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid&full=malicious\">Show full list</a><br /><br />\n";
-		}
-		echo "<table class='datatable'>\n";
-		echo " <tr>\n";
-		echo "  <td class='dataheader' width='400' colspan=2 align='center'><h3>Malicious attacks ($show)</h3></td>\n";
-		echo " </tr>\n";
-		$sql = "SELECT * FROM stats_history_dialogue AS shd, stats_dialogue AS sd WHERE shd.dialogueid = sd.id AND shd.historyid = '" . $history_id . "' ORDER BY count DESC $limit";
-                $debuginfo[] = $sql;
-		$query = pg_query($sql);
-		$i = 1;
-		$list_count_malicious = 0;
+          # Malicious attacks
+            if ($full == "malicious") {
+              $show = "full list";
+              $limit = "";
+              $link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid\">Show top 5</a><br /><br />\n";
+            } else {
+              $show = "top 5";
+              $limit = "LIMIT 5";
+              $link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid&full=malicious\">Show full list</a><br /><br />\n";
+            }
+            echo "<table class='datatable'>\n";
+              echo " <tr>\n";
+                echo "  <td class='dataheader' width='400' colspan=2 align='center'><h3>Malicious attacks ($show)</h3></td>\n";
+              echo " </tr>\n";
 
-		while ($dia = pg_fetch_assoc($query)) {
-			$attack_name = preg_replace("/Dialogue/", "", $dia["name"]);
-			echo " <tr>\n";
-			echo "  <td class='datatd' width=300>" . $i . ". " . $attack_name . "</td>\n";
-			echo "  <td class='datatd' align='right'>" . number_format($dia["count"], 0, '.', ',') . "&nbsp;</td>\n";
-			echo " </tr>\n";
-			$list_count_malicious += intval($dia["count"]);
-			$i++;
-		}
-		echo " <tr>\n";
-		echo "  <td class='dataheader' colspan=2 align='right'>Total: ";
-		if ($show == "top 5") echo number_format($list_count_malicious, 0, '.', ',') . " of ";
-		echo $count_malicious . "</td>\n";
-		echo " </tr>\n";
-		echo "</table>\n";
-		echo $link;
-		
-		// Viruses
-		if ($full == "viruses") {
-			$show = "full list";
-			$limit = "";
-			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid\">Show top 5</a><br /><br />\n";
-		} else {
-			$show = "top 5";
-			$limit = "LIMIT 5";
-			$link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid&full=viruses\">Show full list</a><br /><br />\n";
-		}
-		echo "<table class='datatable'>\n";
-		echo " <tr>\n";
-		echo "  <td class='dataheader' width='400' colspan=2 align='center'><h3>Viruses ($show)</h3></td>\n";
-		echo " </tr>\n";
+              $sql = "SELECT * FROM stats_history_dialogue AS shd, stats_dialogue AS sd WHERE shd.dialogueid = sd.id AND shd.historyid = '" . $history_id . "' ORDER BY count DESC $limit";
+              $debuginfo[] = $sql;
+              $query = pg_query($sql);
+              $i = 1;
+              $list_count_malicious = 0;
 
-		$sql = "SELECT * FROM stats_history_virus AS shv, stats_virus AS sv WHERE shv.virusid = sv.id AND sv.name <> 'Suspicious' AND shv.historyid = '" . $history_id . "' ORDER BY count DESC $limit";
-		$sql_count = "SELECT SUM(count) FROM stats_history_virus AS shv, stats_virus AS sv WHERE shv.virusid = sv.id AND shv.historyid = '" . $history_id . "'";
-                $debuginfo[] = $sql;
-                $debuginfo[] = $sql_count;
-		$query_count = pg_query($sql_count);
-		$total = pg_result($query_count, 0);
-		$query = pg_query($sql);
-		$i = 1;
-		$list_count_virus = 0;
-
-		while ($dia = pg_fetch_assoc($query)) {
-			echo " <tr>\n";
-			echo "  <td class='datatd' width=300>" . $i . ". " . $dia["name"] . "</td>\n";
-			echo "  <td class='datatd' align='right'>" . number_format($dia["count"], 0, '.', ',') . "&nbsp;</td>\n";
-			echo " </tr>\n";
-			$list_count_virus += intval($dia["count"]);
-			$i++;
-		}
-		echo " <tr>\n";
-		echo "  <td class='dataheader' colspan=2 align='right'>Total: ";
-		if ($show == "top 5") echo number_format($list_count_virus, 0, '.', ',') . " of ";
-		echo number_format($total, 0, '.', ',') . "</td>\n";
-		echo " </tr>\n";
-		echo "</table>\n";
-		echo $link;
+              while ($dia = pg_fetch_assoc($query)) {
+                $attack_name = preg_replace("/Dialogue/", "", $dia["name"]);
+                echo " <tr>\n";
+                  echo "  <td class='datatd' width=300>" . $i . ". " . $attack_name . "</td>\n";
+                  echo "  <td class='datatd' align='right'>" . number_format($dia["count"], 0, '.', ',') . "&nbsp;</td>\n";
+                echo " </tr>\n";
+                $list_count_malicious += intval($dia["count"]);
+                $i++;
+              }
+              echo " <tr>\n";
+                echo "  <td class='dataheader' colspan=2 align='right'>Total: ";
+                if ($show == "top 5") echo number_format($list_count_malicious, 0, '.', ',') . " of ";
+                echo $count_malicious . "</td>\n";
+              echo " </tr>\n";
+            echo "</table>\n";
+            echo $link;
 		
-		echo "</td></tr></table>\n";
-	}
+            # Viruses
+            if ($full == "viruses") {
+              $show = "full list";
+              $limit = "";
+              $link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid\">Show top 5</a><br /><br />\n";
+            } else {
+              $show = "top 5";
+              $limit = "LIMIT 5";
+              $link = "<a href=\"loghistory.php?int_m=$month&int_y=$year&int_org=$org_id&int_sid=$sensorid&full=viruses\">Show full list</a><br /><br />\n";
+            }
+            echo "<table class='datatable'>\n";
+              echo " <tr>\n";
+                echo "  <td class='dataheader' width='400' colspan=2 align='center'><h3>Viruses ($show)</h3></td>\n";
+              echo " </tr>\n";
+
+              $sql = "SELECT * FROM stats_history_virus AS shv, stats_virus AS sv WHERE shv.virusid = sv.id AND sv.name <> 'Suspicious' AND shv.historyid = '" . $history_id . "' ORDER BY count DESC $limit";
+              $sql_count = "SELECT SUM(count) FROM stats_history_virus AS shv, stats_virus AS sv WHERE shv.virusid = sv.id AND shv.historyid = '" . $history_id . "'";
+              $debuginfo[] = $sql;
+              $debuginfo[] = $sql_count;
+              $query_count = pg_query($sql_count);
+              $total = pg_result($query_count, 0);
+              $query = pg_query($sql);
+              $i = 1;
+              $list_count_virus = 0;
+
+              while ($dia = pg_fetch_assoc($query)) {
+                echo " <tr>\n";
+                  echo "  <td class='datatd' width=300>" . $i . ". " . $dia["name"] . "</td>\n";
+                  echo "  <td class='datatd' align='right'>" . number_format($dia["count"], 0, '.', ',') . "&nbsp;</td>\n";
+                echo " </tr>\n";
+                $list_count_virus += intval($dia["count"]);
+                $i++;
+              }
+              echo " <tr>\n";
+                echo "  <td class='dataheader' colspan=2 align='right'>Total: ";
+                if ($show == "top 5") echo number_format($list_count_virus, 0, '.', ',') . " of ";
+                echo number_format($total, 0, '.', ',') . "</td>\n";
+              echo " </tr>\n";
+            echo "</table>\n";
+            echo $link;
+          echo "</td>\n";
+        echo "</tr>\n";
+      echo "</table>\n";
+    }
+  echo "</form>\n";
 }
 pg_close($pgconn);
 debug_sql();

@@ -37,14 +37,17 @@
 # 1.02.03 Added number formatting
 #############################################
 
+# Unsetting the total search result count if it is set
 if (isset($_SESSION['s_total_search_records'])) {
   unset($_SESSION['s_total_search_records']);
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_org",
                 "b",
@@ -55,6 +58,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+# Checking access
 if ($s_access_search == 9 && isset($clean['org'])) {
   $q_org = $clean['org'];
 } elseif ($s_access_search == 9) {
@@ -215,9 +219,7 @@ echo "<table class='datatable'>\n";
   $sql_severity .= " FROM $sql_from ";
   $sql_severity .= " $sql_where ";
   $sql_severity .= " GROUP BY $sql_group ";
-
   $debuginfo[] = $sql_severity;
-
   $result_severity = pg_query($pgconn, $sql_severity);
 
   while($row = pg_fetch_assoc($result_severity)) {

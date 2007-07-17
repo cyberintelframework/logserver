@@ -169,6 +169,7 @@ if ($err != 1) {
   }
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 if ($m != 1) {
   header("location: sensorstatus.php?int_selview=$selview&int_m=$m&strip_html_key=$keyname");

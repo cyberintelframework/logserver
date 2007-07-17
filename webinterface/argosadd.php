@@ -16,9 +16,11 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
+# Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
   $address = getaddress();
@@ -26,12 +28,13 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 
-
+# Checking access
 if ($s_access_sensor == 0) {
   $m = 91;
   pg_close($pgconn);
@@ -39,6 +42,7 @@ if ($s_access_sensor == 0) {
   exit;
 }
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "int_sensorid",
                 "int_imageid",
@@ -50,6 +54,7 @@ $check = extractvars($_POST, $allowed_post);
 
 $err = 0;
 
+# Checking $_POST'ed variables
 if (isset($clean['sensorid'])) {
   $sensorid = $clean['sensorid'];
 } else {
@@ -74,6 +79,7 @@ if (isset($clean['timespan'])) {
   $m = 99;
   $err = 1;
 }
+
 $sql = "SELECT sensorid FROM argos";
 $debuginfo[] = $sql;
 $query = pg_query($pgconn, $sql);
@@ -84,6 +90,7 @@ while ($row = pg_fetch_assoc($query)) {
     $err = 1;
   }
 }
+
 $sql = "SELECT organisationid FROM argos_images WHERE id = '$imageid'";
 $debuginfo[] = $sql;
 $query = pg_query($pgconn, $sql);
@@ -97,6 +104,7 @@ while ($row = pg_fetch_assoc($query)) {
 }
 
 if ($err == 0) {
+  # No errors found, insert record
   $sql = "INSERT INTO argos (sensorid, imageid, templateid, timespan) VALUES ($sensorid, $imageid, $templateid, '$timespan')";
   $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
@@ -104,6 +112,7 @@ if ($err == 0) {
   $m = 1;
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: argosadmin.php?int_m=$m");

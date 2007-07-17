@@ -33,10 +33,12 @@
 # 1.02.02 Initial release
 #############################################
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_org",
 		"b",

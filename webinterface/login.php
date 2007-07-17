@@ -22,11 +22,14 @@
 echo "<center>\n";
 echo "<h3>Login</h3>\n";
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
 		"strip_html_url"
 );
 $check = extractvars($_GET, $allowed_get);
+
+# Checking $_POST'ed variables
 $allowed_post = array(
                 "strip_html_escape_user"
 );

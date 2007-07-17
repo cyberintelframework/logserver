@@ -12,14 +12,16 @@
 # 1.04.00 initial release
 #############################################
 
-
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
+
+# Starting the session
 session_start();
 header("Cache-control: private");
 
+# Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
   pg_close($pgconn);
   $address = getaddress();
@@ -30,22 +32,24 @@ if (!isset($_SESSION['s_admin'])) {
 header('Content-Type: text/xml');
 
 if ($c_geoip_enable == 1) {
-    include ('../include/' .$c_geoip_module);
-    $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
+  include ('../include/' .$c_geoip_module);
+  $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
 
+# Retrieving some session variables
 $s_admin = intval($_SESSION['s_admin']);
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $err = 0;
 
+# Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_org",
                 "b",
                 "i",
 		"int_to",
 		"int_from"
-		);
+);
 $check = extractvars($_GET, $allowed_get);
 
 if (isset($clean['org'])) {

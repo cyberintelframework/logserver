@@ -16,6 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 
+# Starting the session
 session_start();
 header("Cache-control: private");
 
@@ -27,18 +28,21 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+# Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $err = 0;
 
+# Retrieving posted variables from $_POST
 $allowed_post = array(
                 "int_imageid"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
+# Checking $_POST'ed variables
 if (!isset($clean['imageid']) ) {
   $m = 99;
   $err = 1;
@@ -47,6 +51,7 @@ if (!isset($clean['imageid']) ) {
 }
 
 if ($err == 0) {
+  # No errors found, delete record (including child records in argos)
   $sql = "DELETE FROM argos_images WHERE id = '$imageid'";
   $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
@@ -57,6 +62,7 @@ if ($err == 0) {
   $m = 12;
 }
 
+# Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 header("location: argosadmin.php?int_m=$m");
