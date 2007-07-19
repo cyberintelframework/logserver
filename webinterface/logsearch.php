@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.29                  #
-# 20-06-2007                       #
+# Version 1.04.30                  #
+# 18-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 1.04.30 Fixed a bug with the wrong checks for binname
 # 1.04.29 Changed source and destination IP address search fields
 # 1.04.28 Removed PDF generation stuff (this will be redone)
 # 1.04.27 Fixed a bug with pdf 
@@ -87,7 +88,7 @@ if (in_array($rapport, $ar_non_headers)) {
     header("Content-disposition: attachment; filename=$fn");
   }
 } else {
-  include("menu.php");
+  include 'menu.php';
   set_title("Search");
 
   ### GEOIP STUFF
@@ -104,15 +105,18 @@ $allowed_get = array(
 		"ip_searchip",
 		"int_org",
 		"sensorid",
+		"mac_sourcemac",
 		"ip_sourceip",
 		"int_sport",
+		"mac_destmac",
 		"ip_destip",
 		"int_dport",
 		"tsselect",
 		"strip_html_escape_tsstart",
 		"strip_html_escape_tsend",
 		"int_sev",
-		"md5_binname",
+		"int_sevtype",
+		"strip_html_escape_binname",
 		"int_attack",
 		"strip_html_escape_virustxt",
 		"strip_html_escape_filename",
@@ -238,6 +242,16 @@ if (isset($clean['sev'])) {
 }
 
 ####################
+# Severity Type
+####################
+if (isset($clean['sevtype'])) {
+  $f_sevtype = $clean['atype'];
+  if (!array_key_exists($f_sevtype, $v_severity_type_ar)) {
+    unset($f_sevtype);
+  }
+}
+
+####################
 # Binary name
 ####################
 $bin_pattern = '/^[a-zA-Z0-9%]{1,33}$/';
@@ -297,6 +311,11 @@ if ($sensorid > 0) {
 ####################
 # Source IP address
 ####################
+if (isset($clean['sourcemac'])) {
+  $source_mac = $clean['sourcemac'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.src_mac = '$source_mac'", "where");
+}
 if (isset($clean['sourceip'])) {
   $source_ip = $clean['sourceip'];
   add_to_sql("attacks", "table");
@@ -324,6 +343,11 @@ if (isset($clean['searchnet'])) {
 ####################
 # Destination IP address
 ####################
+if (isset($clean['destmac'])) {
+  $dest_mac = $clean['destmac'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.dst_mac = '$dest_mac'", "where");
+}
 if (isset($clean['destip'])) {
   $destination_ip = $clean['destip'];
   add_to_sql("attacks", "table");
@@ -371,6 +395,14 @@ if (!empty($ts_end)) {
 if (isset($f_sev)) {
   add_to_sql("attacks", "table");
   add_to_sql("attacks.severity = '$f_sev'", "where");
+}
+
+####################
+# Severity type
+####################
+if (isset($f_sevtype)) {
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.atype = '$f_sevtype'", "where");
 }
 
 ####################
@@ -719,13 +751,13 @@ $ar_search = array("&order=" . $tainted["order"], "&orderm=" . $tainted["orderm"
 $url = str_replace($ar_search, "", $url);
 echo "<table class='datatable' width='100%'>\n";
   echo "<tr>\n";
-    echo "<td class='dataheader' width='5%'><a href=\"$url&order=id" . $order_m_url["id"] . "\">ID</a></td>\n";
+    echo "<td class='dataheader' width='3%'><a href=\"$url&order=id" . $order_m_url["id"] . "\">ID</a></td>\n";
     echo "<td class='dataheader' width='15%'><a href=\"$url&order=timestamp" . $order_m_url["timestamp"] . "\">Timestamp</a></td>\n";
-    echo "<td class='dataheader' width='20%'><a href=\"$url&order=severity" . $order_m_url["severity"] . "\">Severity</a></td>\n";
+    echo "<td class='dataheader' width='15%'><a href=\"$url&order=severity" . $order_m_url["severity"] . "\">Severity</a></td>\n";
     echo "<td class='dataheader' width='20%'><a href=\"$url&order=source" . $order_m_url["source"] . "\">Source</a></td>\n";
     echo "<td class='dataheader' width='17%'><a href=\"$url&order=dest" . $order_m_url["dest"] . "\">Destination</a></td>\n";
     echo "<td class='dataheader' width='8%'><a href=\"$url&order=keyname" . $order_m_url["keyname"] . "\">Sensor</a></td>\n";
-    echo "<td class='dataheader' width='15%'>Additional Info</td>\n";
+    echo "<td class='dataheader' width='12%'>Additional Info</td>\n";
   echo "</tr>\n";
 
 while ($row = pg_fetch_assoc($result)) {
@@ -734,6 +766,8 @@ while ($row = pg_fetch_assoc($result)) {
   $ts = date("d-m-Y H:i:s", $row['timestamp']);
   $sev = $row['severity'];
   $severity = $v_severity_ar[$sev];
+  $sevtype = $row['type'];
+  $stype = $v_severity_type_ar[$sevtype];
   $source = $row['source'];
   $sport = $row['sport'];
   $dest = $row['dest'];
@@ -743,6 +777,7 @@ while ($row = pg_fetch_assoc($result)) {
   $sensorname = $row['keyname'];
   if ($vlanid != 0){ $sensorname = "$sensorname-$vlanid";}
   $smac = $row['src_mac'];
+  $dmac = $row['dst_mac'];
 
   $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
   $result_details = pg_query($pgconn, $sql_details);
@@ -798,7 +833,7 @@ while ($row = pg_fetch_assoc($result)) {
     echo "<td class='datatd'>$dest:$dport</td>\n";
     echo "<td class='datatd'>$sensorname</td>\n";
     if ($numrows_details != 0) {
-      if ($sev == 1) {
+      if ($sev == 1 && $sevtype == 0) {
         $dia_ar = array('attackid' => $id, 'type' => 1);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $text = $dia_result_ar[0]['text'];
@@ -816,6 +851,16 @@ while ($row = pg_fetch_assoc($result)) {
         }
         if ($smac != "") {
           echo "$smac";
+        }
+        echo "</td>\n";
+      } elseif ($sev == 1 && $sevtype == 1) {
+        $dia_ar = array('attackid' => $id, 'type' => 20);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $module = $dia_result_ar[0]['text'];
+
+        echo "<td class='datatd'>$module";
+	if ($smac != "") {
+          echo "<br />$smac";
         }
         echo "</td>\n";
       } elseif ($sev == 16) {
@@ -848,16 +893,6 @@ while ($row = pg_fetch_assoc($result)) {
           echo "Suspicious";
         }
         if ($smac != "") {
-          echo "<br />$smac";
-        }
-        echo "</td>\n";
-      } elseif ($sev == 2) {
-        $dia_ar = array('attackid' => $id, 'type' => 20);
-        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-        $module = $dia_result_ar[0]['text'];
-
-        echo "<td class='datatd'>$module";
-	if ($smac != "") {
           echo "<br />$smac";
         }
         echo "</td>\n";

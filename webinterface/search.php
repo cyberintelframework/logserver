@@ -46,139 +46,11 @@ unset($_SESSION["search_num_rows"]);
 <? if ($c_autocomplete == 1) { ?>
   <script type="text/javascript" src="maps.php?map=search"></script>
 <? } ?>
-<script type="text/javascript" language="javascript">
-function changeSearch() {
-  var check = document.getElementById('arpsearch').style.display;
-
-  if (check == 'none') {
-    document.getElementById('arpsearch').style.display='';
-    document.getElementById('normalsearch').style.display='none';
-    
-  } else {
-    document.getElementById('arpsearch').style.display='none';
-    document.getElementById('normalsearch').style.display='';
-  }
-}
-</script>
-
-<div id='arpsearch' style='display: none;'>
-  <?php
-    set_title("ARP Search");
-  ?>
-  <input type='button' class='button' name='switcher' value='Switch to normal search' onClick='changeSearch();' />
-  <form action='arplog.php' method='get' name='arpsearchform'>
-  <table>
-    <tr>
-      <td>
-        <table class='datatable'>
-          <tr>
-            <td colspan=2><h4>Who</h4></td>
-          </tr>
-          <tr>
-            <td class='datatd' width=140>Sensor:</td>
-            <td class='datatd' width=250>
-              <?php
-                $sql = "SELECT sensors.id, keyname, vlanid, organisations.organisation FROM sensors, organisations ";
-                $sql .= " WHERE NOT status = 3 AND organisations.id = sensors.organisation ORDER BY sensors.id";
-                $debuginfo[] = $sql;
-                $query = pg_query($sql);
-                echo "<select name='int_filter' size='5' multiple='false' class='altselect'>";
-                  echo "<option value='0' selected>All sensors</option>\n";
-                  while ($sensor_data = pg_fetch_assoc($query)) {
-                    $id = $sensor_data['id'];
-                    $keyname = $sensor_data['keyname'];
-                    $vlanid = $sensor_data['vlanid'];
-                    if ($vlanid != 0) {
-                      $keyname = "$keyname-$vlanid";
-                    }
-                    echo "<option value='$id'>$keyname ";
-                    if ($s_admin == 1) {
-                      $org = $sensor_data['organisation'];
-                      echo "($org)";
-                    }
-                    echo "</option>\n";
-                  }
-                echo "</select>\n";
-              ?>
-            </td>
-          </tr>
-          <tr style='height: 27px;'>
-            <td class='datatd'>Source:</td>
-            <td class='datatd'>
-              <? if ($c_autocomplete == 1) { ?>
-                <span class='autocomplete_top'>
-                  <span class='autocomplete_dis'>
-                    <input type='text' id='mac_sourcedis' name='mac_sourcedis' value='' class='autocomplete_field_dis' disabled />
-                  </span>
-                  <span class='autocomplete'>
-                    <input type='text' id='mac_source' name='mac_source' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, smacmap);' onkeyup='own_autocomplete(this.id, smacmap);' onblur='fill_autocomplete(this.id);' />
-                  </span>
-                </span>
-                <input type='hidden' name='mac_sourcehid' value='' id='mac_sourcehid' />
-              <? } else { ?>
-                <input type='text' id='mac_source' name='mac_source' value='' />
-              <? } ?>
-            </td>
-          </tr>
-          <tr style='height: 27px;'>
-            <td class='datatd'>Target:</td>
-            <td class='datatd'>
-              <? if ($c_autocomplete == 1) { ?>
-                <span class='autocomplete_top'>
-                  <span class='autocomplete_dis'>
-                    <input type='text' id='targetdis' name='targetdis' value='' style='background-color: #fff;' disabled />
-                  </span>
-                  <span class='autocomplete'>
-                    <input type='text' id='target' name='target' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, tmacmap);' onkeyup='own_autocomplete(this.id, tmacmap);' onblur='fill_autocomplete(this.id);' />
-                  </span>
-                </span>
-                <input type='hidden' name='targethid' value='' id='targethid' />
-              <? } else { ?>
-                <input type='text' id='mac_target' name='mac_target' value='' />
-              <? } ?>
-            </td>
-          </tr>
-          <tr>
-            <td colspan=2><h4>When</h4></td>
-          </tr>
-          <tr>
-            <td class="datatd">Select:</td>
-            <td class="datatd">
-              <select name="tsselect" class='altselect'>
-                <option value=""></option>
-                <option value="H">Last hour</option>
-                <option value="D">Last 24 hour</option>
-                <option value="T">Today</option>
-                <option value="W">Last week</option>
-                <option value="M">Last month</option>
-                <option value="Y">Last year</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td class="datatd">Between:</td>
-            <td class="datatd"><input type="text" name="strip_html_escape_tsstart" id="ts_arp_start" /> <input type="button" value="..." name="ts_arp_start_trigger" id="ts_arp_start_trigger" /></td>
-          </tr>
-          <tr>
-            <td class="datatd">And: </td>
-            <td class="datatd"><input type="text" name="strip_html_escape_tsend" id="ts_arp_end" /> <input type="button" value="..." name="ts_arp_end_trigger" id="ts_arp_end_trigger" /></td>
-          </tr>
-          <tr>
-            <td colspan=2 align="right"><input type="submit" name="submit" value="Show" class="button" style="cursor:pointer;" /></td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-  </form>
-</div>
 
 <div id='normalsearch' style='display: inline;'>
 <?php
   set_title("Search");
 ?>
-<input type='button' class='button' name='switcher' value='Switch to ARP search' onClick='changeSearch();' />
-
 <form method="get" action="logsearch.php" name="searchform" id="searchform">
 
 <table border='0'>
@@ -228,8 +100,27 @@ function changeSearch() {
 		echo " </tr>\n";
 	}
     ?>
+ <tr><td>&nbsp;</td></tr>
+ <tr style='height: 27px;'>
+   <td class='datatd'>Source MAC:</td>
+   <td class='datatd'>
+   <? if ($c_autocomplete == 1) { ?>
+     <span class='autocomplete_top'>
+       <span class='autocomplete_dis'>
+         <input type='text' id='mac_sourcemacdis' name='mac_sourcemacdis' value='' class='autocomplete_field_dis' disabled />
+       </span>
+       <span class='autocomplete'>
+          <input type='text' id='mac_sourcemac' name='mac_sourcemac' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, smacmap);' onkeyup='own_autocomplete(this.id, smacmap);' onblur='fill_autocomplete(this.id);' />
+       </span>
+     </span>
+     <input type='hidden' name='mac_sourcemachid' value='' id='mac_sourcemachid' />
+   <? } else { ?>
+     <input type='text' id='mac_sourcemac' name='mac_sourcemac' value='' />
+   <? } ?>
+   </td>
+ </tr>
  <tr>
-  <td class="datatd" width=140>Source:</td>
+  <td class="datatd" width=140>Source IP:</td>
   <td class="datatd">
   <? if ($c_autocomplete == 1) { ?>
     <span class='autocomplete_top'>
@@ -250,8 +141,27 @@ function changeSearch() {
    <td class='datatd'>Source port:</td>
    <td class='datatd'><input type="text" name="int_sport" size='5' /></td>
  </tr>
+ <tr><td>&nbsp;</td></tr>
+ <tr style='height: 27px;'>
+   <td class='datatd'>Destination MAC:</td>
+   <td class='datatd'>
+   <? if ($c_autocomplete == 1) { ?>
+     <span class='autocomplete_top'>
+       <span class='autocomplete_dis'>
+         <input type='text' id='mac_destmacdis' name='mac_destmacdis' value='' style='background-color: #fff;' disabled />
+       </span>
+       <span class='autocomplete'>
+          <input type='text' id='mac_destmac' name='mac_destmac' autocomplete='off' class='autocomplete_field' value='' onfocus='own_autocomplete(this.id, tmacmap);' onkeyup='own_autocomplete(this.id, tmacmap);' onblur='fill_autocomplete(this.id);' />
+       </span>
+     </span>
+     <input type='hidden' name='mac_destmachid' value='' id='mac_destmachid' />
+   <? } else { ?>
+     <input type='text' id='mac_destmac' name='mac_destmac' value='' />
+   <? } ?>
+   </td>
+ </tr>
  <tr>
-  <td class="datatd">Destination:</td>
+  <td class="datatd">Destination IP:</td>
   <td class="datatd">
   <? if ($c_autocomplete == 1) { ?>
     <span class='autocomplete_top'>
@@ -320,6 +230,16 @@ function changeSearch() {
   $f_sev = -1;
   echo printOption(-1, "", $f_sev);
   foreach ( $v_severity_ar as $index=>$severity ) echo printOption($index, $severity, $f_sev);
+  ?>
+   </select></td>
+ </tr>
+ <tr id="what_1" name="what_1">
+  <td class="datatd">Attack type: </td>
+  <td class="datatd"><select name="int_sevtype" style="background-color:white;">
+  <?
+  $f_sevtype = -1;
+  echo printOption(-1, "", $f_sevtype);
+  foreach ( $v_severity_type_ar as $index=>$sevtype ) echo printOption($index, $sevtype, $f_sevtype);
   ?>
    </select></td>
  </tr>
@@ -482,26 +402,6 @@ Calendar.setup(
       inputField  : "ts_end",
       ifFormat    : "%d-%m-%Y %H:%M",
       button      : "ts_end_trigger",
-      showsTime   : true,
-      singleClick : false
-    }
-);
-
-Calendar.setup(
-  {
-      inputField  : "ts_arp_start",
-      ifFormat    : "%d-%m-%Y %H:%M",
-      button      : "ts_arp_start_trigger",
-      showsTime   : true,
-      singleClick : false,
-      onUpdate    : catcalc
-    }
-);
-Calendar.setup(
-    {
-      inputField  : "ts_arp_end",
-      ifFormat    : "%d-%m-%Y %H:%M",
-      button      : "ts_arp_end_trigger",
       showsTime   : true,
       singleClick : false
     }

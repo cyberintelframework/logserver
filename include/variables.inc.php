@@ -147,17 +147,17 @@ $v_attacks_ar = array(
 $v_severity_ar = array(
 		'0'	=> 'Possible malicious attack',
 		'1'	=> 'Malicious attack',
-		'2'	=> 'Argos attack',
+#		'2'	=> 'Argos attack',
 		'16'	=> 'Malware offered',
 		'32'	=> 'Malware downloaded'
 );
 
 # Array with the type of malicious attack.
 $v_severity_type_ar = array(
-		0 => "Nepenthes",
-		1 => "Argos",
-		2 => "ARP Poisoning",
-		3 => "Rogue DHCP server"
+		0 => "Nepenthes attack",
+		1 => "Argos attack",
+		10 => "ARP Poisoning",
+		11 => "Rogue DHCP server"
 );
 
 # Array with the type of detail info record.

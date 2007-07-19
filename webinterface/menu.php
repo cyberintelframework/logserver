@@ -30,14 +30,32 @@
 # 1.02.01 Initial release
 #############################################
 
-# Starting the session
-session_start();
-header("Cache-control: private");
-
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
+
+# Starting the session
+session_start();
+
+if ($c_enablepdf == 1) {
+  if ($_SERVER['QUERY_STRING']) {
+    $qs = $_SERVER['QUERY_STRING'];
+    $createpdf = substr_count($qs, "createpdf=1");
+    if ($createpdf > 0) {
+      ob_start();
+      # We'll be outputting a PDF
+      header('Content-type: application/pdf');
+
+      # It will be called surfids-pdf-report.pdf
+      header('Content-Disposition: attachment; filename="surfids-pdf-report.pdf"');
+    } else {
+      header("Cache-control: private");
+    }
+  }
+} else {
+  $createpdf = 0;
+}
 
 $absfile = $_SERVER['SCRIPT_NAME'];
 $file = basename($absfile);
@@ -81,6 +99,7 @@ if ($file != "login.php") {
   $total_sensors = $row['total'];
 }
 
+if ($createpdf == 0) {
 echo "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>\n";
 echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
   echo "<head>\n";
@@ -103,6 +122,17 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
               echo "total sensors: <b>$total_sensors</b><br />";
               echo "total active: <b>$total_active</b><br />";
               echo "version: <b>$c_version</b>\n";
+              if ($c_enablepdf == 1) {
+                $absfile = $_SERVER['SCRIPT_NAME'];
+                $file = basename($absfile);
+                if ($_SERVER['QUERY_STRING']) {
+                  $qs = $_SERVER['QUERY_STRING'];
+                  $add = "?$qs&createpdf=1";
+                } else {
+                  $add = "?createpdf=1";
+                }
+                echo "<br /><a href='$file$add'><img src='images/pdf.gif' width='16' height='16' /></a>\n";
+              }
             }
           echo "</td>\n";
         echo "</tr>\n";
@@ -181,6 +211,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       echo "</div>\n";
       echo "<div class='filler'></div>\n";
     }
+}
     echo "<div class='content'>\n";
 
 function set_title($title) {
@@ -188,13 +219,39 @@ function set_title($title) {
 }
 
 function footer() {
+  global $createpdf, $c_surfidsdir, $s_org;
+
   if (isset($pgconn)) {
     pg_close($pgconn);
   }
 
-  echo "</div>\n"; 
-  echo "<div id='footer'><a href='http://validator.w3.org/'>Valid XHTML</a> - &copy; SURFnet</div>\n"; 
-  echo "</body>\n";
-  echo "</html>\n";
+  echo "</div>\n";
+  if ($createpdf > 0) {
+#    # We'll be outputting a PDF
+#    header('Content-type: application/pdf');
+
+#    # It will be called downloaded.pdf
+#    header('Content-Disposition: attachment; filename="test.pdf"');
+
+    $buffer = ob_get_contents();
+    ob_end_clean();
+
+    $ts = time();
+    $ts = "$s_org" . "-" . $ts;
+    $handle = fopen("$c_surfidsdir/temp/$ts.html", "w");
+    fwrite($handle, $buffer);
+    fclose($handle);
+
+    exec("html2ps $c_surfidsdir/temp/$ts.html > $c_surfidsdir/temp/$ts.ps");
+    exec("ps2pdf $c_surfidsdir/temp/$ts.ps $c_surfidsdir/temp/$ts.pdf");
+    readfile("$c_surfidsdir/temp/$ts.pdf");
+    unlink("$c_surfidsdir/temp/$ts.html");
+    unlink("$c_surfidsdir/temp/$ts.ps");
+    unlink("$c_surfidsdir/temp/$ts.pdf");
+  } else {
+    echo "<div id='footer'><a href='http://validator.w3.org/'>Valid XHTML</a> - &copy; SURFnet</div>\n";
+    echo "</body>\n";
+    echo "</html>\n";
+  }
 }
 ?>
