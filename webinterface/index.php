@@ -2,14 +2,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.06                  #
-# 03-04-2007                       #
+# Version 1.04.07                  #
+# 08-09-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed a port link when today was selected
 # 1.04.06 Fixed some layout issues
 # 1.04.05 Added dropdown box
 # 1.04.04 Added empty flag for unknown countries
@@ -90,6 +91,9 @@ if ($sel == 0) {
   $year = date("Y");
   $start = getStartDay($day, $month, $year);
   $end = getEndDay($day, $month, $year);
+  $startqs = date("d-m-Y H:i:s", $start);
+  $endqs = date("d-m-Y H:i:s", $end);
+  $ts_qs = "?strip_html_escape_tsstart=$startqs&strip_html_escape_tsend=$endqs";
   $interval_a = 3600;
   $interval_p = 3600;
 } elseif ($sel == 1) {

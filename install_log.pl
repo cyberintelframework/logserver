@@ -3,13 +3,14 @@
 ####################################
 # Installation script              #
 # SURFnet IDS                      #
-# Version 1.04.08                  #
-# 10-07-2007                       #
+# Version 1.04.09                  #
+# 17-08-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ###############################################
 # Changelog:
+# 1.04.09 Fixed a bug that prevented upgrading the database
 # 1.04.08 Fixed GeoIP database handling
 # 1.04.07 Fixed some stuff with building the config
 # 1.04.06 Improved non-default support and support for remote database
@@ -407,7 +408,7 @@ if ($confirm =~ /^(y|Y)$/) {
       }
     }
   }
-} elsif ($confirm =~ /^(Y|y)$/) {
+} else {
   $confirm = "a";
   while ($confirm !~ /^(1\.02|1\.03|skip)$/) {
     $confirm = &prompt("Upgrade database from which version [1.02/1.03/skip]?: ");

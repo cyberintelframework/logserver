@@ -99,3 +99,4 @@ GRANT SELECT,UPDATE ON TABLE org_id_id_seq TO idslog;
 ALTER TABLE login ADD COLUMN serverhash character varying;
 ALTER TABLE login ADD COLUMN gpg integer;
 
+ALTER TABLE attacks ADD COLUMN src_mac macaddr;

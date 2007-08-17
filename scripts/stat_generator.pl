@@ -1,16 +1,19 @@
 #!/usr/bin/perl
 
-###########################################
-# Backup script for IDS server database   #
-# SURFnet IDS                             #
-# Version 1.04.01                         #
-# 16-02-2007                              #
-# Peter Arts                              #
-# Kees Trippelvitz & Jan van Lith         #
-###########################################
+####################################
+# Backup script                    #
+# SURFnet IDS                      #
+# Version 1.04.02                  #
+# 09-08-2007                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
+# Contributors:                    #
+# Peter Arts                       #
+####################################
 
 #############################################
 # Changelog:
+# 1.04.02 Fixed viruses sql
 # 1.04.01 Removed -w switch
 # 1.03.01 Released as part of the 1.03 package
 # 1.02.01 Initial release
@@ -288,8 +291,8 @@ if (! $dbh eq "") {
        $sql .="  AND  details.type = 8 ";
        $sql .="  AND  details.text = binaries.bin ";
        $sql .="  AND  binaries.info = stats_virus.name ";
-       $sql .="  AND  binaries.scanner = 'ClamAV'";
-      $sql.="GROUP BY binaries.info, stats_virus.id ";
+       $sql .="  AND  binaries.scanner = 1";
+       $sql .=" GROUP BY binaries.info, stats_virus.id ";
 
        $query = $dbh->prepare($sql);
        $result = $query->execute();
