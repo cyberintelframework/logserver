@@ -222,80 +222,52 @@ echo "<table class='datatable'>\n";
   $debuginfo[] = $sql_severity;
   $result_severity = pg_query($pgconn, $sql_severity);
 
+  $sql_type = "SELECT DISTINCT attacks.atype, COUNT(attacks.atype) as total ";
+  $sql_type .= "FROM $sql_from ";
+  $sql_type .= "$sql_where ";
+  $sql_type .= " AND severity = 1 ";
+  $sql_type .= "GROUP BY atype ";
+
   while($row = pg_fetch_assoc($result_severity)) {
     $severity = $row['severity'];
     $count = $row['total'];
     $description = $v_severity_ar[$severity];
-    echo "<tr>\n";
-      echo "<td class='datatd'>$description " .printhelp($severity). "</td>\n";
-      if ($severity == 0 || $severity == 16) {
+    if ($severity == 0 || $severity == 16) {
+      echo "<tr>\n";
+        echo "<td class='datatd'>$description " .printhelp($severity). "</td>\n";
         echo "<td class='datatd' align='right'><a href='logsearch.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
-      } elseif ($severity == 1 || $severity == 32) {
+      echo "</tr>\n";
+    } elseif ($severity == 1) {
+      echo "<tr>\n";
+        echo "<td class='datatd'>$description " .printhelp($severity). "</td>\n";
         echo "<td class='datatd' align='right'><a href='logattacks.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
-      } else {
-        echo "<td class='datatd' align='right'><a href='logsearch.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+      echo "</tr>\n";
+      $debuginfo[] = $sql_type;
+      $result_type = pg_query($pgconn, $sql_type);
+      while ($row_type = pg_fetch_assoc($result_type)) {
+        $atype = $row_type['atype'];
+        $total = $row_type['total'];
+        $desc = $v_severity_atype_ar[$atype];
+          
+        echo "<tr>\n";
+          echo "<td class='datatd'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$desc</td>\n";
+          if ($atype == 0) {
+            echo "<td class='datatd' align='right'><a href='logattacks.php?int_sev=$severity&sevtype=$atype&amp;int_org=$q_org$searchqs'>" . nf($total) . "</a>&nbsp;</td>\n";
+          } else {
+            echo "<td class='datatd' align='right'><a href='logsearch.php?int_sevtype=$atype&amp;int_org=$q_org$searchqs'>" . nf($total) . "</a>&nbsp;</td>\n";
+          }
+        echo "</tr>\n";
       }
-    echo "</tr>\n";
-  }
-echo "</table>\n";
-echo "<br /><br />\n";
-
-reset_sql();
-
-# SELECT
-add_to_sql("DISTINCT arp_alert.type", "select");
-add_to_sql("sensors.id", "select");
-add_to_sql("keyname", "select");
-add_to_sql("organisation", "select");
-add_to_sql("COUNT(arp_alert.id) as total", "select");
-# FROM
-add_to_sql("arp_alert", "table");
-add_to_sql("sensors", "table");
-# WHERE
-add_to_sql("$tsquery", "where");
-add_to_sql("arp_alert.sensorid = sensors.id", "where");
-if ($s_access_search != 9 || ($s_access_search == 9 && $q_org != 0)) {
-  add_to_sql("sensors.organisation = $q_org", "where");
-}
-# GROUP BY
-add_to_sql("type", "group");
-add_to_sql("sensors.id", "group");
-add_to_sql("keyname", "group");
-add_to_sql("organisation", "group");
-
-prepare_sql();
-
-$sql_arp = "SELECT $sql_select ";
-$sql_arp .= " FROM $sql_from ";
-$sql_arp .= " $sql_where ";
-$sql_arp .= " GROUP BY $sql_group ";
-
-$debuginfo[] = $sql_arp;
-
-$result_arp = pg_query($pgconn, $sql_arp);
-
-echo "<table class='datatable'>\n";
-  echo "<tr>\n";
-    echo "<td class='dataheader' colspan='3' width='600'>ARP Logs</td>\n";
-  echo "</tr>\n";
-  echo "<tr>\n";
-    echo "<td class='dataheader' width='400'>Type</td>\n";
-    echo "<td class='dataheader' width='100'>Sensor</td>\n";
-    echo "<td class='dataheader' width='100'>Statistics</td>\n";
-  echo "</tr>\n";
-
-  while($row = pg_fetch_assoc($result_arp)) {
-    $id = $row['id'];
-    $type = $row['type'];
-    $type = $v_arp_alerts[$type];
-    $keyname = $row['keyname'];
-    $count = $row['total'];
-    $orgid = $row['organisation'];
-    echo "<tr>\n";
-      echo "<td class='datatd'>$type</td>\n";
-      echo "<td class='datatd'>$keyname</td>\n";
-      echo "<td class='datatd' align='right'><a href='arplog.php?int_org=$orgid&amp;int_filter=$id$searchqs'>" . nf($count) . "</a></td>\n";
-    echo "</tr>\n";
+    } elseif ($severity == 32) {
+      echo "<tr>\n";
+        echo "<td class='datatd'>$description " .printhelp($severity). "</td>\n";
+        echo "<td class='datatd' align='right'><a href='logattacks.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+      echo "</tr>\n";
+    } else {
+      echo "<tr>\n";
+        echo "<td class='datatd' align='right'><a href='logsearch.php?int_sev=$severity&amp;int_org=$q_org$searchqs'>" . nf($count) . "</a>&nbsp;</td>\n";
+      echo "</tr>\n";
+    }
   }
 echo "</table>\n";
 

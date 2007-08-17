@@ -48,7 +48,6 @@ debug_input();
 # Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $sort = $tainted['sort'];
-  $url = str_replace("&sort=" . $sort, "", $url);
   $pattern = '/^(keynamea|keynamed|remoteipa|remoteipd|localipa|localipd|maca|macd|tapa|tapd)$/';
   if (!preg_match($pattern, $sort)) {
     $sort = "keynamea";

@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 08-05-2007                       #
+# Version 1.05.01                  #
+# 24-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 1.05.01 Fixed binname in url to logsearch
 # 1.04.09 Added IP exclusion stuff
 # 1.04.08 Fixed missing link between sensors and attacks table
 # 1.04.07 Fixed sql bug
@@ -256,7 +257,7 @@ if ($err != 1) {
               }
               echo "<td class='datatd'>$virus</td>\n";
             }
-            echo "<td class='datatd'><a href='logsearch.php?int_org=" . $q_org . "&md5_binname=$malware$dateqs'>$count</a></td>\n";
+            echo "<td class='datatd'><a href='logsearch.php?int_org=" . $q_org . "&strip_html_escape_binname=$malware$dateqs'>$count</a></td>\n";
             pg_result_seek($result_scanners, 0);
           echo "</tr>\n";
         }

@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.08
--- 01-06-2007
+-- Version: 1.04.09
+-- 13-08-2007
 
 -- Changelog
+-- 1.04.09 Added some missing changes
 -- 1.04.08 Fixed a bug with netconfdetail
 -- 1.04.07 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
 -- 1.04.06 Added default value for sensors.status
@@ -11,6 +12,23 @@
 -- 1.04.03 Added column subject to table report_content
 -- 1.04.02 Added f-prot updater
 -- 1.04.01 Initial release
+
+--
+-- ATTACKS
+--
+CREATE INDEX index_attacks_dest ON attacks USING btree (dest);
+CREATE UNIQUE INDEX index_attacks_id ON attacks USING btree (id);
+ALTER TABLE attacks CLUSTER ON index_attacks_id;
+CREATE INDEX index_attacks_sensorid ON attacks USING btree (sensorid);
+CREATE INDEX index_attacks_severity ON attacks USING btree (severity);
+CREATE INDEX index_attacks_source ON attacks USING btree (source);
+CREATE INDEX index_attacks_timestamp ON attacks USING btree ("timestamp");
+
+--
+-- DETAILS
+--
+CREATE UNIQUE INDEX index_details_id ON details USING btree (id);
+ALTER TABLE details CLUSTER ON index_details_id;
 
 --
 -- NORMAN
@@ -112,6 +130,17 @@ ALTER TABLE binaries ALTER COLUMN bin TYPE integer USING binaries.bin::integer;
 UPDATE binaries SET scanner = scanners.id WHERE scanner = scanners.name;
 ALTER TABLE binaries ALTER COLUMN scanner TYPE integer USING binaries.scanner::integer;
 
+CREATE INDEX index_binaries_info ON binaries USING btree (info);
+
+--
+-- BINARIES_DETAIL
+--
+UPDATE binaries_detail SET bin = uniq_binaries.id WHERE bin = uniq_binaries.name;
+ALTER TABLE binaries_detail ALTER COLUMN bin TYPE integer USING binaries_detail.bin::integer;
+CREATE UNIQUE INDEX index_binaries_detail_bin ON binaries_detail USING btree (bin);
+CREATE UNIQUE INDEX index_binaries_detail_id ON binaries_detail USING btree (id);
+ALTER TABLE binaries_detail CLUSTER ON index_binaries_detail_id;
+
 --
 -- ORG_ID
 --
@@ -126,15 +155,23 @@ UPDATE sensors SET netconf = 'static' WHERE NOT netconf IN ('vlans', 'vland', 'd
 ALTER TABLE sensors ADD COLUMN vlanid integer DEFAULT 0;
 ALTER TABLE sensors ALTER COLUMN status SET DEFAULT 0;
 
+CREATE UNIQUE INDEX index_sensors_id ON sensors USING btree (id);
+ALTER TABLE sensors CLUSTER ON index_sensors_id;
+
 --
 -- SESSIONS
 --
 ALTER TABLE sessions ADD COLUMN useragent character varying;
+UPDATE sessions SET username = login.id WHERE username = login.username;
+ALTER TABLE sessions ALTER COLUMN username TYPE integer USING sessions.username::integer;
 
 --
 -- LOGIN
 --
 ALTER TABLE login ADD COLUMN gpg integer DEFAULT 0;
+ALTER TABLE login DROP COLUMN alltreshold;
+ALTER TABLE login DROP COLUMN owntreshold;
+ALTER TABLE login DROP COLUMN timeunit;
 
 --
 -- REPORT_CONTENT
@@ -147,4 +184,3 @@ ALTER TABLE report_content ADD COLUMN subject character varying;
 --
 GRANT INSERT,SELECT ON TABLE stats_dialogue TO nepenthes;
 GRANT SELECT,UPDATE ON TABLE stats_dialogue_id_seq TO nepenthes;
-

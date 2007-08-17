@@ -153,9 +153,9 @@ $v_severity_ar = array(
 );
 
 # Array with the type of malicious attack.
-$v_severity_type_ar = array(
-		0 => "Nepenthes attack",
-		1 => "Argos attack",
+$v_severity_atype_ar = array(
+		0 => "Nepenthes",
+		1 => "Argos",
 		10 => "ARP Poisoning",
 		11 => "Rogue DHCP server"
 );
@@ -284,6 +284,8 @@ $v_errors = array(
 				3 => "Succesfully cleared the ARP cache!",
 				4 => "Enabled the ARP module for this sensor!",
 				5 => "Disabled the ARP module for this sensor!",
+				6 => "Added host type!",
+				7 => "Deleted host type!",
 				90 => "You don't have sufficient rights to perform the requested action!",
 				91 => "Invalid hash!",
 				92 => "Missing or invalid MAC address!",
@@ -292,7 +294,9 @@ $v_errors = array(
 				95 => "Missing or invalid ID!",
 				96 => "This entry already exists!",
 				97 => "Missing or invalid filter ID!",
-				98 => "Cannot add this record. MAC/IP pair is possibly poisoned!"
+				98 => "Cannot add this record. MAC/IP pair is possibly poisoned!",
+				99 => "Missing or invalid action!",
+				100 => "Missing or invalid type!"
 			),
 	binaryhist.php => array(
 				91 => "No info could be found for the given binary!"
@@ -544,9 +548,10 @@ $v_host_types = array(
 
 # Array with the different protocols detected by the sniffer.
 $v_proto_types = array(
-	1 => "Ethernet",
-	2 => "IP",
-	3 => "ICMP",
-	4 => "IGMP"
+	0 => "Ethernet",
+	1 => "Internet IP (IPv4)",
+	11 => "ICMP",
+	12 => "IGMP",
+	11768 => "DHCP"
 );
 ?>

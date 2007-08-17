@@ -17,6 +17,34 @@
  * #############################################
  */
 
+function swTab(id) {
+  if (id == 'static') {
+    document.getElementById('static').style.display='';
+    document.getElementById('detected').style.display='none';
+    document.getElementById('cache').style.display='none';
+
+    document.getElementById('butstatic').className='tabsel';
+    document.getElementById('butdetect').className='tab';
+    document.getElementById('butcache').className='tab';
+  } else if (id == 'detected') {
+    document.getElementById('static').style.display='none';
+    document.getElementById('detected').style.display='';
+    document.getElementById('cache').style.display='none';
+
+    document.getElementById('butstatic').className='tab';
+    document.getElementById('butdetect').className='tabsel';
+    document.getElementById('butcache').className='tab';
+  } else {
+    document.getElementById('static').style.display='none';
+    document.getElementById('detected').style.display='none';
+    document.getElementById('cache').style.display='';
+
+    document.getElementById('butstatic').className='tab';
+    document.getElementById('butdetect').className='tab';
+    document.getElementById('butcache').className='tabsel';
+  }
+}
+
 function resetmailform() {
   document.getElementById('attack_sev').style.display='';
   document.getElementById('sensor_sev').style.display='none';

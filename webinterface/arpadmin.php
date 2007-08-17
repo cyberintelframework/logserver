@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.05                  #
-# 16-07-2007                       #
+# Version 1.05.01                  #
+# 23-07-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 1.05.01 Fixed a bug with url
 # 1.04.05 Fixed a bug with flagstring
 # 1.04.04 Split the different selector forms
 # 1.04.03 Fixed a bug with the sensor selector
@@ -20,7 +21,7 @@
 $s_org = intval($_SESSION['s_org']);
 $s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
-$url = $_SERVER['REQUEST_URI'];
+$url = basename($_SERVER['REQUEST_URI']);
 
 $allowed_get = array(
 	"int_m",
@@ -107,11 +108,9 @@ if (isset($clean['arp'])) {
   }
 }
 
-$url = ltrim($url, "/");
-
 if ($s_access_sensor > 1) {
   echo "<div style='float: left;'>\n";
-  echo "<form name='orgselector' action='$url' method='get'>\n";
+  echo "<form name='orgselector' action='' method='get'>\n";
     if ($s_access_sensor == 9) {
       if (isset($clean['org'])) {
         $q_org = $clean['org'];
@@ -171,7 +170,13 @@ if ($s_access_sensor > 1) {
   echo "</div>\n";
 }
 
+echo "<br />\n";
+echo "<input type='button' class='tabsel' id='butstatic' name='butstatic' value='Monitoring list' onclick='swTab(\"static\");' />\n";
+echo "<input type='button' class='tab' id='butdetect' name='butdetect' value='Detected protocols' onclick='swTab(\"detected\");' />\n";
+echo "<input type='button' class='tab' id='butcache' name='butcache' value='ARP cache' onclick='swTab(\"cache\");' />\n";
+
 if ($s_access_sensor > 1) {
+  echo "<div id='static' style='display:;'>\n";
   echo "<h4>Monitored MAC addresses " .printhelp("arpmonitor"). "</h4>\n";
   echo "<form name='arp_static' action='arp_static_add.php?int_org=$q_org' method='post'>\n";
   echo "<table class='datatable'>\n";
@@ -180,7 +185,7 @@ if ($s_access_sensor > 1) {
       echo "<td width='100' class='dataheader'><a href='$url${op}sort=ip$neworder'>IP address</a></td>\n";
       echo "<td width='200' class='dataheader'>Type</td>\n";
       echo "<td width='100' class='dataheader'><a href='$url${op}sort=keyname$neworder'>Sensor</a></td>\n";
-      echo "<td width='100' class='dataheader'>Action</td>\n";
+      echo "<td width='350' class='dataheader'>Action</td>\n";
     echo "</tr>\n";
 
     $sql_arp_static = "SELECT arp_static.id, arp_static.mac, arp_static.ip, sensors.keyname, sensors.vlanid ";
@@ -210,17 +215,33 @@ if ($s_access_sensor > 1) {
       $sql_getht = "SELECT type FROM sniff_hosttypes WHERE staticid = '$id'";
       $debuginfo[] = $sql_getht;
       $result_getht = pg_query($pgconn, $sql_getht);
+      $types = array();
       while ($row_ht = pg_fetch_assoc($result_getht)) {
         $type = $row_ht['type'];
+        $types[$type] = 0;
         $typestring .= "<img src='images/hosttypes/$type.gif' onmouseover='return overlib(\"$v_host_types[$type]\");' onmouseout='return nd();' />&nbsp;";
       }
+
+      printer($types);
 
       echo "<tr class='datatr'>\n";
         echo "<td>$mac</td>\n";
         echo "<td>$ip</td>\n";
         echo "<td>$typestring</td>\n";
         echo "<td>$keyname</td>\n";
-        echo "<td>[<a href='arp_static_del.php?int_org=$q_org&md5_hash=$s_hash&int_id=$id&int_filter=$filter' onclick=\"javascript: return confirm('Are you sure you want to delete this entry?');\">delete</a>]</td>\n";
+        echo "<td>";
+          echo "[<a href='arp_static_del.php?int_org=$q_org&md5_hash=$s_hash&int_id=$id&int_filter=$filter' onclick=\"javascript: return confirm('Are you sure you want to delete this entry?');\">delete</a>]&nbsp;&nbsp;";
+          if (array_key_exists(1, $types)) {
+            echo "[<a href='arp_modtype.php?int_id=$id&action=del&int_type=1&int_org=$q_org&md5_hash=$s_hash&int_filter=$filter'>Del router</a>]&nbsp;&nbsp;";
+          } else {
+            echo "[<a href='arp_modtype.php?int_id=$id&action=add&int_type=1&int_org=$q_org&md5_hash=$s_hash&int_filter=$filter'>Add router</a>]&nbsp;&nbsp;";
+          }
+          if (array_key_exists(2, $types)) {
+            echo "[<a href='arp_modtype.php?int_id=$id&action=del&int_type=2&int_org=$q_org&md5_hash=$s_hash&int_filter=$filter'>Del DHCP</a>]";
+          } else {
+            echo "[<a href='arp_modtype.php?int_id=$id&action=add&int_type=2&int_org=$q_org&md5_hash=$s_hash&int_filter=$filter'>Add DHCP</a>]";
+          }
+        echo "</td>\n";
       echo "</tr>\n";
     }
     echo "<tr class='datatr'>\n";
@@ -251,12 +272,17 @@ if ($s_access_sensor > 1) {
           }
         echo "</select>\n";
       echo "</td>\n";
-      echo "<td align='right'><input type='submit' class='button' name='submit' value='Add' size='15' /></td>\n";
+      echo "<td align='right'>";
+        echo "<input type='submit' class='button' name='submit' value='Add' size='15' />";
+      echo "</td>\n";
     echo "</tr>\n";
   echo "</table>\n";
   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   echo "</form>\n";
+  echo "</div>\n";
 
+  echo "<div id='detected' style='display: none;'>\n";
+  echo "<span class='warning'>Under construction</span>\n";
   echo "<h4>Detected protocols</h4>\n";
   echo "<table class='datatable'>\n";
     echo "<tr class='datatr'>\n";
@@ -265,12 +291,12 @@ if ($s_access_sensor > 1) {
       echo "<td class='dataheader' width='300'>Type</td>\n";
     echo "</tr>\n";
 
-    $sql_protos = "SELECT head, number, protocol FROM sniff_protos WHERE sensorid = '$filter' ORDER BY head, number";
+    $sql_protos = "SELECT parent, number, protocol FROM sniff_protos WHERE sensorid = '$filter' ORDER BY parent, number";
     $debuginfo[] = $sql_protos;
     $result_protos = pg_query($pgconn, $sql_protos);
 
     while ($row_protos = pg_fetch_assoc($result_protos)) {
-      $head = $row_protos['head'];
+      $head = $row_protos['parent'];
       $number = $row_protos['number'];
       $proto = $row_protos['protocol'];
 
@@ -281,7 +307,9 @@ if ($s_access_sensor > 1) {
       echo "</tr>\n";
     }
   echo "</table>\n";
+  echo "</div>\n";
 
+  echo "<div id='cache' style='display:none;'>\n";
   echo "<h4>Current ARP cache " .printhelp("arpcache"). "</h4>\n";
   echo "<a href='arp_cache_clr.php?int_org=$q_org&md5_hash=$s_hash&int_filter=$filter' onclick=\"javascript: return confirm('Are you sure you want to clear the ARP cache?');\">Clear ARP cache</a><br />\n";
   echo "<table class='datatable'>\n";
@@ -340,6 +368,7 @@ if ($s_access_sensor > 1) {
           $flagstring = "";
           foreach ($flags_ar as $key => $val) {
             $flagstring .= "<img src='images/hosttypes/$val.gif' onmouseover='return overlib(\"$v_host_types[$val]\");' onmouseout='return nd();' />&nbsp;";
+            echo "<input type='hidden' name='type[]' value='$val' />\n";
           }
           echo "<td>$flagstring</td>\n";
         } else {
@@ -361,6 +390,7 @@ if ($s_access_sensor > 1) {
       echo "</form>\n";
     }
   echo "</table>\n";
+  echo "</div>\n";
 }
 
 pg_close($pgconn);

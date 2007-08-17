@@ -245,8 +245,8 @@ if (isset($clean['sev'])) {
 # Severity Type
 ####################
 if (isset($clean['sevtype'])) {
-  $f_sevtype = $clean['atype'];
-  if (!array_key_exists($f_sevtype, $v_severity_type_ar)) {
+  $f_sevtype = $clean['sevtype'];
+  if (!array_key_exists($f_sevtype, $v_severity_atype_ar)) {
     unset($f_sevtype);
   }
 }
@@ -752,10 +752,10 @@ $url = str_replace($ar_search, "", $url);
 echo "<table class='datatable' width='100%'>\n";
   echo "<tr>\n";
     echo "<td class='dataheader' width='3%'><a href=\"$url&order=id" . $order_m_url["id"] . "\">ID</a></td>\n";
-    echo "<td class='dataheader' width='15%'><a href=\"$url&order=timestamp" . $order_m_url["timestamp"] . "\">Timestamp</a></td>\n";
-    echo "<td class='dataheader' width='15%'><a href=\"$url&order=severity" . $order_m_url["severity"] . "\">Severity</a></td>\n";
-    echo "<td class='dataheader' width='20%'><a href=\"$url&order=source" . $order_m_url["source"] . "\">Source</a></td>\n";
-    echo "<td class='dataheader' width='17%'><a href=\"$url&order=dest" . $order_m_url["dest"] . "\">Destination</a></td>\n";
+    echo "<td class='dataheader' width='12%'><a href=\"$url&order=timestamp" . $order_m_url["timestamp"] . "\">Timestamp</a></td>\n";
+    echo "<td class='dataheader' width='20%'><a href=\"$url&order=severity" . $order_m_url["severity"] . "\">Severity</a></td>\n";
+    echo "<td class='dataheader' width='19%'><a href=\"$url&order=source" . $order_m_url["source"] . "\">Source</a></td>\n";
+    echo "<td class='dataheader' width='16%'><a href=\"$url&order=dest" . $order_m_url["dest"] . "\">Destination</a></td>\n";
     echo "<td class='dataheader' width='8%'><a href=\"$url&order=keyname" . $order_m_url["keyname"] . "\">Sensor</a></td>\n";
     echo "<td class='dataheader' width='12%'>Additional Info</td>\n";
   echo "</tr>\n";
@@ -764,27 +764,37 @@ while ($row = pg_fetch_assoc($result)) {
   flush();
   $id = pg_escape_string($row['id']);
   $ts = date("d-m-Y H:i:s", $row['timestamp']);
+  $smac = $row['src_mac'];
   $sev = $row['severity'];
-  $severity = $v_severity_ar[$sev];
-  $sevtype = $row['type'];
-  $stype = $v_severity_type_ar[$sevtype];
-  $source = $row['source'];
-  $sport = $row['sport'];
-  $dest = $row['dest'];
-  $dport = $row['dport'];
+  $sevtype = $row['atype'];
+  if ($sev == 1) {
+    $sevtext = "$v_severity_ar[$sev] - $v_severity_atype_ar[$sevtype]";
+  } else {
+    $sevtext = "$v_severity_ar[$sev]";
+  }
+  if ($sevtype == 10) {
+    $source = $row['src_mac'];
+    $sport = $row['sport'];
+    $dest = $row['dest'];
+    $dport = $row['dport'];
+    $smac = "";
+  } else {
+    $source = $row['source'];
+    $sport = $row['sport'];
+    $dest = $row['dest'];
+    $dport = $row['dport'];
+  }
   $sensorid = $row['sensorid'];
   $vlanid = $row['vlanid'];
   $sensorname = $row['keyname'];
   if ($vlanid != 0){ $sensorname = "$sensorname-$vlanid";}
-  $smac = $row['src_mac'];
-  $dmac = $row['dst_mac'];
 
   $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
   $result_details = pg_query($pgconn, $sql_details);
   $numrows_details = pg_num_rows($result_details);
   $debuginfo[] = $sql_details;
 
-  if ($c_enable_pof == 1) {
+  if ($c_enable_pof == 1 && $sevtype != 10) {
     $sql_finger = "SELECT name FROM system WHERE ip_addr = '" .$source. "' ORDER BY last_tstamp DESC";
     $result_finger = pg_query($pgconn, $sql_finger);
     $numrows_finger = pg_num_rows($result_finger);
@@ -804,7 +814,7 @@ while ($row = pg_fetch_assoc($result)) {
       echo "<td class='datatd'>$id</td>\n";
     }
     echo "<td class='datatd'>$ts</td>\n";
-    echo "<td class='datatd'>$severity</td>\n";
+    echo "<td class='datatd'>$sevtext</td>\n";
     echo "<td class='datatd'>";
     if ($numrows_finger != 0) {
       $osimg = "$c_surfidsdir/webinterface/images/$os.gif";
@@ -828,9 +838,22 @@ while ($row = pg_fetch_assoc($result)) {
         echo "<img src='images/worldflags/flag.gif' onmouseover='return overlib(\"No Country Info\");' onmouseout='return nd();' style='width: 18px;' />&nbsp;";
       }
     }
-    echo "<a href='whois.php?ip_ip=$source'>$source:$sport</a></td>\n";
+    if ($sport == 0) {
+      $sp = "";
+    } else {
+      $sp = ":$sport";
+    }
+    if ($sevtype == 10 || $sevtype == 11) {
+      echo "$source$sp</td>\n";
+    } else {
+      echo "<a href='whois.php?ip_ip=$source'>$source$sp</a></td>\n";
+    }
     $dest = censorip($dest, $orgranges_ar);
-    echo "<td class='datatd'>$dest:$dport</td>\n";
+    if ($dport == 0) {
+      echo "<td class='datatd'>$dest</td>\n";
+    } else {
+      echo "<td class='datatd'>$dest:$dport</td>\n";
+    }
     echo "<td class='datatd'>$sensorname</td>\n";
     if ($numrows_details != 0) {
       if ($sev == 1 && $sevtype == 0) {

@@ -239,7 +239,7 @@ unset($_SESSION["search_num_rows"]);
   <?
   $f_sevtype = -1;
   echo printOption(-1, "", $f_sevtype);
-  foreach ( $v_severity_type_ar as $index=>$sevtype ) echo printOption($index, $sevtype, $f_sevtype);
+  foreach ( $v_severity_atype_ar as $index=>$sevtype ) echo printOption($index, $sevtype, $f_sevtype);
   ?>
    </select></td>
  </tr>

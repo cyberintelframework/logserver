@@ -1,8 +1,10 @@
--- SURFnet IDS SQL Version 1.041
--- Version: 1.04.01
--- 09-05-2007
+-- SURFnet IDS SQL Version 1.05
+-- Version: 1.05.02
+-- 23-07-2007
 
 -- Changelog
+-- 1.05.02 Added missing flags column to arp_cache
+-- 1.05.01 Added sniff_ tables
 -- 1.04.01 Initial release
 
 --
@@ -62,7 +64,8 @@ CREATE TABLE arp_cache (
     ip inet NOT NULL,
     sensorid integer NOT NULL,
     last_seen integer NOT NULL,
-    manufacturer character varying
+    manufacturer character varying,
+    flags character varying
 );
 
 ALTER TABLE ONLY arp_cache
@@ -87,3 +90,43 @@ ALTER TABLE ONLY arp_static
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_static TO idslog;
 GRANT SELECT,UPDATE ON TABLE arp_static_id_seq TO idslog;
 
+--
+-- SNIFF_HOSTTYPES
+--
+CREATE TABLE sniff_hosttypes (
+    id serial NOT NULL,
+    staticid integer NOT NULL,
+    "type" integer NOT NULL
+);
+
+ALTER TABLE ONLY sniff_hosttypes
+    ADD CONSTRAINT sniff_hosttypes_pkey PRIMARY KEY (id);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE sniff_hosttypes TO idslog;
+GRANT SELECT,UPDATE ON TABLE sniff_hosttypes_id_seq TO idslog;
+
+--
+-- SNIFF_PROTOS
+--
+CREATE TABLE sniff_protos (
+    id serial NOT NULL,
+    sensorid integer NOT NULL,
+    head integer NOT NULL,
+    number integer NOT NULL,
+    protocol character varying NOT NULL
+);
+
+ALTER TABLE ONLY sniff_protos
+    ADD CONSTRAINT sniff_protos_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY sniff_protos
+    ADD CONSTRAINT unique_sniff_protos UNIQUE (sensorid, head, number);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE sniff_protos TO idslog;
+GRANT SELECT,UPDATE ON TABLE sniff_protos_id_seq TO idslog;
+
+--
+-- ATTACKS
+--
+ALTER TABLE attacks ADD COLUMN dst_mac macaddr;
+ALTER TABLE attacks ADD COLUMN atype integer DEFAULT 0 NOT NULL;
