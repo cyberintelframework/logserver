@@ -1,0 +1,18 @@
+<Files rssfeed.php>
+AuthUserFile /dev/null
+AuthName "Authenticate RSS"
+AuthType Basic
+AuthBasicAuthoritative Off
+Auth_PG_host localhost
+Auth_PG_port 5432
+Auth_PG_user idslog
+Auth_PG_pwd enter_database_pass_here
+Auth_PG_database idsserver
+Auth_PG_hash_type MD5
+Auth_PG_pwd_table login
+Auth_PG_uid_field username
+Auth_PG_pwd_field password
+
+Require valid-user
+</Files>
+
