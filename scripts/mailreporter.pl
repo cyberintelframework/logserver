@@ -2,8 +2,8 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 13-09-2007                       #
+# Version 2.00.02                  #
+# 23-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 2.10.01 Added Cymru mail report
 # 2.00.01 version 2.00 - improved mailreporter
 # 1.04.10 Fixed a bug with the ARP template
 # 1.04.09 Added IP exclusion stuff
@@ -68,6 +69,7 @@ use Time::Local;
 use Time::localtime qw(localtime);
 use Net::SMTP;
 use MIME::Lite;
+use Net::Abuse::Utils qw( :all );
 use GnuPG qw( :algo );
 use POSIX qw(floor);
 use POSIX qw(ceil);
@@ -75,7 +77,7 @@ use POSIX qw(ceil);
 ####################
 # Variables used
 ####################
-do '/etc/surfnetids/surfnetids-log.conf';
+do '/etc/surfnetids/2.10-log.conf';
 
 $logfile = $c_logfile;
 $logfile =~ s|.*/||;
@@ -294,14 +296,18 @@ while (@row = $email_query->fetchrow_array) {
     }
     
     # Date/time when report was generated
-    printmail("Mailreport generated at " . getdatetime(time));
+    if ($detail != 4) {
+      printmail("Mailreport generated at " . getdatetime(time));
+    }
     
     if ($template == 1) {
       ################################
       # ALL ATTACKS TEMPLATE
       ################################
-      printmail("Results from " . getdatetime($ts_start) . " till " . getdatetime($ts_end));
-      printmail("");
+      if ($detail != 4) {
+        printmail("Results from " . getdatetime($ts_start) . " till " . getdatetime($ts_end));
+        printmail("");
+      }
 
       $totalcount = 0;
       if ($detail =~ /^(0|2)$/) {
@@ -455,6 +461,62 @@ while (@row = $email_query->fetchrow_array) {
         }
         printattach("</idmef:IDMEF-Message>");
       }
+
+      if ($detail == 4) {
+        $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
+        $sql .= "FROM attacks ";
+        $sql .= " INNER JOIN sensors ";
+        $sql .= " ON attacks.sensorid = sensors.id ";
+        $sql .= " LEFT JOIN details ";
+        $sql .= " ON attacks.id = details.attackid ";
+        $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+        $sql .= " AND attacks.severity = 1 ";
+        $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+        $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+        if ($severity == 0) {
+          # Get the ranges of the organisation
+          $sql_ranges = "SELECT DISTINCT ranges FROM organisations WHERE id = $org AND NOT ranges IS NULL";
+          $sql_ranges = $dbh->prepare($sql_ranges);
+          $result_ranges = $sql_ranges->execute();
+          @rangerow = $sql_ranges->fetchrow_array;
+          $count = @rangerow;
+
+          if ($count > 0) {
+            @rangerow = split(/;/, "@rangerow");
+            foreach $range (@rangerow) {
+              $sql .= " AND attacks.source !<< '$range' "
+            }
+          }        
+        }
+        $sql .= " $andorg $andsensor";
+        $sql .= " ORDER BY timestamp ASC";
+        $ipview_query = $dbh->prepare($sql);
+        $ec = $ipview_query->execute();
+
+        while (@row = $ipview_query->fetchrow_array) {
+          $ip = $row[0];
+          $timestamp = $row[1];
+          $time = getdatetime($timestamp);
+          if ($row[2]) {
+            $attacktype = $row[2]; 
+            $attacktype =~ s/Dialogue//;
+          } else {
+            $attacktype = "";
+          }
+
+          @asninfo = get_asn_info($ip);
+          $asn = $asninfo[0];
+          if ("$asn" ne "") {
+            $desc = get_as_description($asn);
+          } else {
+            $desc = "";
+          }
+
+          $totalcount++;
+          printmail("$asn | $ip | $time $attacktype | $desc");
+        }
+      }
+
       # Checking for threshold stuff
       if ($threshold > -1) {
         $sendit = 0;

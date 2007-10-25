@@ -84,6 +84,10 @@ function showtab(selected) {
  ***********************************/
 
 function sh_mailtemp(si) {
+  $('#int_detail').selectOptions("0");
+  $('#int_sdetail').selectOptions("0");
+  $('#timeandthresh').show();
+  $('#filter').hide();
   if (si == 4) {
     $('#attack_sev').hide();
     $('#sensor_sev').show();
@@ -130,9 +134,20 @@ function sh_mailtemp(si) {
 
 function sh_mailreptype(si) {
   if (si < 10) {
-    $('#timeandthresh').show();
+    if (si < 4) {
+      $('#timeandthresh').show();
+      $('#filter').hide();
+      $('#attack_sev').show();
+    } else if (si == 4) {
+      $('#timeandthresh').show();
+      $('#filter').show();
+      $('#attack_sev').hide();
+      $('#int_template').selectOptions(1);
+    }
   } else {
     $('#timeandthresh').hide();
+    $('#filter').hide();
+    $('#attack_sev').show();
   }
 }
 

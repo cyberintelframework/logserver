@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 10-10-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.04 No additional info for ARP attacks
 # 2.00.03 Fixed a bug in the navigation
 # 2.00.02 Changed the info you see with Rogue DHCP attacks
@@ -132,7 +133,7 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
-echo "<div id=\"search_wait\">Search is being processed...<br /><br />Please be patient.</div>\n";
+echo "<div id=\"search_wait\">" .$l['ls_process']. "<br /><br />" .$l['gm_patient']. ".</div>\n";
 if ($c_searchtime == 1) {
   $timestart = microtime_float();
 }
@@ -474,18 +475,18 @@ echo "<div class='leftmed'>";
   echo "<div class='block'>";
     echo "<div class='actionBlock'>\n";
       echo "<div class='blockHeader'>\n";
-        echo "<div class='blockHeaderLeft'>Criteria</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['ls_crit']. "</div>\n";
         echo "<div class='blockHeaderRight'>\n";
-          echo "<div class='searchheader'>&nbsp;<a href='logsearch.php'>clear</a>&nbsp;</div>\n";
+          echo "<div class='searchheader'>&nbsp;<a href='logsearch.php'>" .$l['ls_clear']. "</a>&nbsp;</div>\n";
         echo "</div>\n";
       echo "</div>\n";
       echo "<div class='blockContent'>\n";
         echo "<form method='get' action='logsearch.php' name='searchform' id='searchform'>\n";
           echo "<table class='actiontable'>\n";
             echo "<tr>\n";
-              echo "<td width='18%'>Destination:</td>\n";
+              echo "<td width='18%'>" .$l['ls_dest']. ":</td>\n";
               echo "<th width='65%'>\n";
-                if (!isset($destination_ip) && !isset($dest_mac) && $sensorid == 0) echo "ALL";
+                if (!isset($destination_ip) && !isset($dest_mac) && $sensorid == 0) echo $l['ls_all'];
                 if (isset($sensorid)) {
                   if ($sensorid == 0) {} 
                   elseif ($sensorid > 0) echo "$sensorid";
@@ -522,7 +523,7 @@ echo "<div class='leftmed'>";
                 if (isset($dest_mac)) echo "$dest_mac";
                 if (isset($dport)) echo ":$dport";
               echo "</th>\n";
-              echo "<td width='17%' class='aright'><a onclick='\$(\"#search_dest\").toggle();'>change</a></td>\n";
+              echo "<td width='17%' class='aright'><a onclick='\$(\"#search_dest\").toggle();'>" .$l['ls_change']. "</a></td>\n";
             echo "</tr>\n";
           echo "</table>\n";
           echo "<table class='searchtable' id='search_dest' style='display: none;'>";
@@ -541,12 +542,12 @@ echo "<div class='leftmed'>";
                 echo "<td id='dest' style='display:none;'>";
               }
                 if ($c_autocomplete == 1) { 
-                  echo "<input type='text' id='inet_dest' name='inet_dest' alt='Destination IP' onkeyup='searchSuggest(1);' autocomplete='off' value='$destination_ip' />";
+                  echo "<input type='text' id='inet_dest' name='inet_dest' alt='" .$l['ls_destip']. "' onkeyup='searchSuggest(1);' autocomplete='off' value='$destination_ip' />";
                   echo "<div id='search_suggest'>\n";
                     echo "<div id='search_suggest_1'></div>\n";
                   echo "</div>\n";
                 } else {
-                  echo "<input type='text' id='inet_dest' name='inet_dest' maxlenght=18  value='$destination_ip'/>";
+                  echo "<input type='text' id='inet_dest' name='inet_dest' alt='" .$l['ls_destip']. "' maxlenght=18  value='$destination_ip'/>";
                 } 
               echo "</td>";
               $select_size = 5;
@@ -599,21 +600,21 @@ echo "<div class='leftmed'>";
                 echo "<td id='destmac' style='display:none;'>";
               }
               if ($c_autocomplete == 1) {
-                echo "<input type='text' id='mac_destmac' name='mac_destmac' alt='Destination MAC' onkeyup='searchSuggest(2);' autocomplete='off' value='$dest_mac' />";
+                echo "<input type='text' id='mac_destmac' name='mac_destmac' alt='" .$l['ls_destmac']. "' onkeyup='searchSuggest(2);' autocomplete='off' value='$dest_mac' />";
                 echo "<div id='search_suggest'>\n";
                   echo "<div id='search_suggest_2'></div>\n";
                 echo "</div>\n"; 
               } else {
-                echo "<input type='text' id='mac_destmac' name='mac_destmac' value='$dest_mac' />";
+                echo "<input type='text' id='mac_destmac' name='mac_destmac' alt='" .$l['ls_destmac']. "' value='$dest_mac' />";
               }
             echo "</td>";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>Port:</td>\n";
+            echo "<td>" .$l['ls_port']. ":</td>\n";
             echo "<td><input type='text' name='int_dport' size='5' value='$dport' /></td>";
           echo "</tr>";
           echo "<tr>\n";
-            echo "<td><input type='submit' value='Submit' class='sbutton' /></td>";
+            echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
           echo "</tr>";
         echo "</table>"; 
         echo "<hr>\n";
@@ -624,28 +625,28 @@ echo "<div class='leftmed'>";
           $debuginfo[] = $sql_exclusion;
           $nr_exclusionrows = intval(@pg_result($query, 0));
           if ($nr_exclusionrows > 1) {
-            $ip_excl = "<a href='orgipadmin.php'>IP Exclusion on</a>";
+            $ip_excl = "<a href='orgipadmin.php'>" .$l['ls_ipex_on']. "</a>";
           } else { 
             $ip_excl = "<a href='orgipadmin.php'>IP Exclusion off</a>"; 
           } 
           echo "<tr>\n";
-            echo "<td width='18%'>Source:</td>\n";
+            echo "<td width='18%'>" .$l['ls_source']. ":</td>\n";
             echo "<th width='52%'>\n";
-              if (!isset($source_ip) && !isset($source_mac)) echo "ALL ";
-              if ($f_sourcechoice == 3 && !isset($source_ip)) echo "Own Ranges";
+              if (!isset($source_ip) && !isset($source_mac)) echo $l['ls_all']. " ";
+              if ($f_sourcechoice == 3 && !isset($source_ip)) echo $l['ls_own'];
               if (isset($source_ip)) echo "$source_ip";
               if (isset($source_mac)) echo "$source_mac";
               if (isset($sport)) echo ":$sport";
             echo "</th>\n";
             echo "<td width='30%' class='aright'>";
-              if ($nr_exclusionrows > 1) echo " (IP Exclusion ON) ";
-              else echo " (IP Exclusion OFF) ";
-	    echo "<a onclick='\$(\"#search_source\").toggle();'>change</a></td>\n";
+              if ($nr_exclusionrows > 1) echo " (" .$l['ls_ipex_on']. ") ";
+              else echo " (" .$l['ls_ipex_off']. ") ";
+	    echo "<a onclick='\$(\"#search_source\").toggle();'>" .$l['ls_change']. "</a></td>\n";
           echo "</tr>\n";
 	echo "</table>\n";
         echo "<table class='searchtable' id='search_source' style='display: none;'>";
           echo "<tr>\n";
-            echo "<td>Address:</td>";
+            echo "<td>" .$l['ls_address']. ":</td>";
             echo "<td>";
               echo "<select name='int_sourcechoice' onchange='javascript: sh_search_src(this.value);'>\n";
                 foreach ($v_search_src_ar as $key=>$val) {
@@ -659,12 +660,12 @@ echo "<div class='leftmed'>";
               echo "<td id='source' style='display:none;'>";
             }
               if ($c_autocomplete == 1) { 
-                echo "<input type='text' id='inet_source' name='inet_source' alt='Source IP' onkeyup='searchSuggest(3);' autocomplete='off' value='$source_ip' />";
+                echo "<input type='text' id='inet_source' name='inet_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' value='$source_ip' />";
                 echo "<div id='search_suggest'>\n";
                   echo "<div id='search_suggest_3'></div>\n";
                 echo "</div>\n"; 
                } else { 
-                echo "<input type='text' id='inet_source' name='inet_source' maxlenght='18' value='$source_ip' />";
+                echo "<input type='text' id='inet_source' name='inet_source' alt='" .$l['ls_sourceip']. "' maxlenght='18' value='$source_ip' />";
               }
             echo "</td>";
             if ($f_sourcechoice == 2) {
@@ -673,12 +674,12 @@ echo "<div class='leftmed'>";
               echo "<td id='sourcemac' style='display:none;'>";
             }
               if ($c_autocomplete == 1) {
-                echo "<input type='text' id='mac_sourcemac' name='mac_sourcemac' alt='Source MAC' onkeyup='searchSuggest(4);' autocomplete='off' value='$source_mac' />";
+                echo "<input type='text' id='mac_sourcemac' name='mac_sourcemac' alt='" .$l['ls_sourcemac']. "' onkeyup='searchSuggest(4);' autocomplete='off' value='$source_mac' />";
                 echo "<div id='search_suggest'>\n";
                   echo "<div id='search_suggest_4'></div>\n";
                 echo "</div>\n"; 
               } else { 
-                echo "<input type='text' id='mac_sourcemac' name='mac_sourcemac' value='$source_mac' />";
+                echo "<input type='text' id='mac_sourcemac' name='mac_sourcemac' alt='" .$l['ls_sourcemac']. "' value='$source_mac' />";
               }
             echo "</td>\n";
             if ($f_sourcechoice == 3) {
@@ -691,12 +692,12 @@ echo "<div class='leftmed'>";
               $result_ranges = pg_query($pgconn, $sql_ranges);
               $row = pg_fetch_assoc($result_ranges);
               if ($row['ranges'] == "") {
-                echo "<input type='text' value='No ranges present' />";
+                echo "<input type='text' value='" .$l['ls_noranges']. "' />";
               } else {
                 echo "<select name='inet_source' id='inet_source'>\n";
                   $ranges_ar = explode(";", $row['ranges']);
                   sort($ranges_ar);
-                  echo printOption("", "All ranges", "" );
+                  echo printOption("", $l['ls_allranges'], "" );
                   foreach ($ranges_ar as $range) {
                     if (trim($range) != "") {
                       echo printOption("$range", "$range", "$source_ip" );
@@ -707,7 +708,7 @@ echo "<div class='leftmed'>";
             echo "</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>Port:</td>\n";
+            echo "<td>" .$l['ls_port']. ":</td>\n";
             echo "<td><input type='text' name='int_sport' size='5' value='$sport' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
@@ -715,41 +716,41 @@ echo "<div class='leftmed'>";
             echo "<td>$ip_excl</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td><input type='submit' value='Submit' class='sbutton' /></td>";
+            echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
           echo "</tr>\n";
         echo "</table>"; 
         echo "<hr>\n";
         echo "<table class='actiontable'>\n";
           echo "<tr>\n";
-            echo "<td width='18%'>Characteristics: </td>";
+            echo "<td width='18%'>" .$l['ls_chars']. ":</td>";
             echo "<td width='65%'></td>\n";
-            echo "<td width='17%' class='aright'><a onclick='\$(\"#search_charac\").toggle();'>change</a></td>\n";
+            echo "<td width='17%' class='aright'><a onclick='\$(\"#search_charac\").toggle();'>" .$l['ls_change']. "</a></td>\n";
           echo "</tr>\n";
         echo "</table>\n";
         echo "<table class='actiontable'>\n";
           echo "<tr>";
             echo "<td width='18%'></td>";
             echo "<td width='80%'>";
-              if (isset($f_sev)) echo "Severity: <font class='btext'>$v_severity_ar[$f_sev]</font><br />";
-              if (isset($f_sevtype)) echo "Severity Type: <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
+              if (isset($f_sev)) echo $l['ls_sev']. ": <font class='btext'>$v_severity_ar[$f_sev]</font><br />";
+              if (isset($f_sevtype)) echo $l['ls_sevtype']. ": <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
               if (isset($f_attack)) {
                 $sql_g = "SELECT name FROM stats_dialogue WHERE id = '$f_attack'";
                 $result_g = pg_query($pgconn, $sql_g);
                 $row_g = pg_fetch_assoc($result_g);
                 $expl = $row_g['name'];
                 $expl = str_replace("Dialogue", "", $expl);
-                if ($expl != "") echo "Exploit: <font class='btext'>$expl</font><br />";
+                if ($expl != "") echo $l['ls_exp']. ": <font class='btext'>$expl</font><br />";
               }
-              if (isset($f_binname)) echo "Binary Name: <font class='btext'>$f_binname</font><br />";
-              if (isset($f_virus_txt)) echo "Virus: <font class='btext'>$f_virus_txt</font><br />";
-              if (isset($f_filename)) echo "Filename: <font class='btext'>$f_filename</font><br />";
+              if (isset($f_binname)) echo $l['ls_binname']. ": <font class='btext'>$f_binname</font><br />";
+              if (isset($f_virus_txt)) echo $l['ls_virus']. ": <font class='btext'>$f_virus_txt</font><br />";
+              if (isset($f_filename)) echo $l['ls_filename']. ": <font class='btext'>$f_filename</font><br />";
             echo "</td>\n";
             echo "<td width='2%'></td>\n";
           echo "</tr>\n";
         echo "</table>\n";
         echo "<table class='searchtable' id='search_charac' style='display: none;'>\n";
           echo "<tr id='sev' style=''>\n";
-            echo "<td>Severity:</td>\n";
+            echo "<td>" .$l['ls_sev']. ":</td>\n";
             echo "<td>\n";
               echo "<select id='int_sev' name='int_sev' onchange='javascript: sh_search_charac(this.value);'>\n";
                 if(!isset($f_sev)) $f_sev=-1;
@@ -766,11 +767,11 @@ echo "<div class='leftmed'>";
             } else {
               echo "<tr id='sevtype' style='display: none;'>\n";
             }
-              echo "<td>Attack-type: </td>";
+              echo "<td>" .$l['ls_att_type']. ": </td>";
               echo "<td>";
                 echo "<select id='int_sevtype' name='int_sevtype' onchange='javascript: sh_search_charac_sevtype(this.value);'>\n";
                   if(!isset($f_sevtype)) $f_sevtype=-1;
-                  echo printOption(-1, "All", -1);
+                  echo printOption(-1, $l['g_all'], -1);
                   foreach ($v_severity_atype_ar as $index=>$sevtype) {
                     echo printOption($index, $sevtype, $f_sevtype);
                   }
@@ -782,7 +783,7 @@ echo "<div class='leftmed'>";
             } else {
               echo "<tr id='attacktype' style='display:none;'>\n";
             }
-              echo "<td>Exploit: </td>";
+              echo "<td>" .$l['ls_exp']. ":</td>";
               echo "<td>";
                 echo "<select name='int_attack' id='int_attack'>";
                   echo printOption(-1, "All exploits", $f_attack);
@@ -801,15 +802,15 @@ echo "<div class='leftmed'>";
             } else {
               echo "<tr id='virus' style='display:none;'>\n";
             }
-              echo "<td>Virus: </td>";
+              echo "<td>" .$l['ls_virus']. :</td>";
               echo "<td>\n";
                 if ($c_autocomplete == 1) { 
-                  echo "<input type='text' id='strip_html_escape_virustxt' name='strip_html_escape_virustxt' alt='Search Criteria' onkeyup='searchSuggest(5);' autocomplete='off' value='$f_virus_txt' />Wildcard is %";
+                  echo "<input type='text' id='strip_html_escape_virustxt' name='strip_html_escape_virustxt' onkeyup='searchSuggest(5);' autocomplete='off' value='$f_virus_txt' />" .$l['ls_wildcard']. " %";
                   echo "<div id='search_suggest'>\n";
                     echo "<div id='search_suggest_5\"></div>\n";
                   echo "</div>\n"; 
                 } else {
-                  echo "<input type='text' name='strip_html_escape_virustxt' id='strip_html_escape_virustxt' value='$f_virus_txt' /> Wildcard is %\n";
+                  echo "<input type='text' name='strip_html_escape_virustxt' id='strip_html_escape_virustxt' value='$f_virus_txt' />" .$l['ls_wildcard']. " %\n";
                 }
               echo "</td>\n";
             echo "</tr>\n";
@@ -818,15 +819,15 @@ echo "<div class='leftmed'>";
             } else {
               echo "<tr id='filename' style='display:none;'>\n";
             }
-              echo "<td>Filename:</td>";
+              echo "<td>" .$l['ls_filename']. ":</td>";
               echo "<td>\n";
                 if ($c_autocomplete == 1) { 
-                  echo "<input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' alt='Search Criteria' onkeyup='searchSuggest(6);' autocomplete='off' value='$f_filename' /> Wildcard is %";
+                  echo "<input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' onkeyup='searchSuggest(6);' autocomplete='off' value='$f_filename' />" .$l['ls_wildcard']. " %";
                   echo "<div id='search_suggest'>\n";
                     echo "<div id='search_suggest_6'></div>\n";
                   echo "</div>\n"; 
                 } else {
-                  echo "<input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' value='$f_filename' /> Wildcard is %\n";
+                  echo "<input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' value='$f_filename' />" .$l['ls_wildcard']. " %\n";
                 }
               echo "</td>\n";
             echo "</tr>\n";
@@ -836,11 +837,11 @@ echo "<div class='leftmed'>";
               echo "<tr id='binary' style='display:none;'>\n";
             }
               echo "<td>Binary:</td>";
-              echo "<td><input type='text' id='strip_html_escape_binname' name='strip_html_escape_binname' value='$f_binname' /> Wildcard is %</td>";
+              echo "<td><input type='text' id='strip_html_escape_binname' name='strip_html_escape_binname' value='$f_binname' />" .$l['ls_wildcard']. " %</td>";
             echo "</tr>";
           echo "</div>";
         echo "<tr>\n";
-          echo "<td><input type='submit' value='Submit' class='sbutton' /></td>";
+          echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
         echo "</tr>\n";
         echo "</table>";
         echo "</form>";
@@ -853,21 +854,21 @@ echo "</div>\n"; #</leftsmall>
 echo "<div class='leftmed'>\n";
   echo "<div class='block'>\n";
     echo "<div class='actionBlock'>\n";
-      echo "<div class='blockHeader'>Actions</div>\n";
+      echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
       echo "<div class='blockContent'>\n";
         $qs = $_SERVER['QUERY_STRING'];
-        echo "<a href='logsearch_pdf.php?$qs'>Save as PDF</a><br />";
-        echo "<a href='logsearch_idmef.php?$qs'>Save as IDMEF</a><br />";
-        echo "<a onclick='\$(\"#templates\").toggle();'>Save as search template</a>";
+        echo "<a href='logsearch_pdf.php?$qs'>" .$l['ls_saveas']. " PDF</a><br />";
+        echo "<a href='logsearch_idmef.php?$qs'>" .$l['ls_saveas']. " IDMEF</a><br />";
+        echo "<a onclick='\$(\"#templates\").toggle();'>" .$l['ls_saveas']. " " .$l['ls_stemp']. "</a>";
         echo "<div id='templates' style='display: none;'>\n";
           echo "<form name='temp' action='template_add.php?$qs' method='post'>\n";
             echo "<table class='searchtable'>\n"; 
               echo "<tr>\n";
-                echo "<td>Template title</td>\n";
+                echo "<td>" .$l['ls_temp_title']. "</td>\n";
                 echo "<td><input type='text' name='strip_html_escape_temptitle' /></td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td>Timespan options</td>\n";
+                echo "<td>" .$l['ls_time_options']. "</td>\n";
                 echo "<td>";
                   $per = $to - $from;
                   if ($per <= 3600) {
@@ -886,12 +887,12 @@ echo "<div class='leftmed'>\n";
                   $to_date = date("d-m-Y H:i", $to);
                   echo printRadio("$perstr", int_timespan, 1, 0) . "<br />";
                   echo printRadio("$from_date - $to_date", int_timespan, 2, 0) . "<br />";
-                  echo printRadio("Don't save timespan info", int_timespan, 3, 3) . "<br />";
+                  echo printRadio($l['ls_dontsave'], int_timespan, 3, 3) . "<br />";
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
                 echo "<td></td>\n";
-                echo "<td><input type='submit' value='Save' class='sbutton' /></td>\n";
+                echo "<td><input type='submit' value='" .$l['g_save']. "' class='sbutton' /></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
             echo "<input type='hidden' value='$s_hash' name='md5_hash' />\n";
@@ -918,7 +919,7 @@ if ($num_rows == 0) {
           echo "</div>\n";
         echo "</div>\n";
         echo "<div class='blockContent'>\n";
-          echo "<div><h3>No matching results found!</h3></div>\n";
+          echo "<div><h3>" .$l['ls_noresults']. "</h3></div>\n";
         echo "</div>\n";
       echo "</div>\n";
     echo "</div>\n";
@@ -953,8 +954,8 @@ for ($i = ($page_nr - 2); $i <= ($page_nr + 2); $i++) {
 }
 if ($page_nr < $last_page) $nav .= "..&nbsp;<a href='$url&int_page=$last_page'>$last_page</a>&nbsp;<a href=\"$url&int_page=" . ($page_nr + 1) . "\"><img src='images/selector_arrow_right.gif'></a>\n";
 else $nav .= "<img src='images/selector_arrow_right.gif'>\n";
-if ($rapport == "single") $nav .= "&nbsp;<a href='$url&reptype='>Multi</a>&nbsp;\n";
-if ($rapport == "multi") $nav .= "&nbsp;<a href='$url&reptype=single'>All</a>&nbsp;\n";
+if ($rapport == "single") $nav .= "&nbsp;<a href='$url&reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
+if ($rapport == "multi") $nav .= "&nbsp;<a href='$url&reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
 
 ####################
 # BUILDING SEARCH QUERY
@@ -973,9 +974,9 @@ $result = pg_query($sql);
 ####################
 # BUILDING TABLE HEADER
 ####################
-if ($last_page > 1) $page_lbl = "pages";
-else $page_lbl = "page";
-$navheader = "<font class='btext'>Results</font> (page $page_nr:  $first_result - $last_result of " . number_format($num_rows, 0, ".", ",") . ")\n";
+if ($last_page > 1) $page_lbl = $l['ls_pages'];
+else $page_lbl = $l['ls_page'];
+$navheader = "<font class='btext'>" .$l['ls_results']. "</font> (page $page_nr:  $first_result - $last_result of " . number_format($num_rows, 0, ".", ",") . ")\n";
 
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
@@ -990,14 +991,14 @@ echo "<div class='centerbig'>\n";
 
 echo "<table class='datatable'>\n";
   echo "<tr>\n";
-    echo "<th width='14%'>" .printsort("Timestamp", "timestamp"). "</th>\n";
-    echo "<th width='23%'>" .printsort("Severity", "severity"). "</th>\n";
-    echo "<th width='17%'>" .printsort("Source", "source"). "</th>\n";
-    echo "<th width='5%'>" .printsort("Port", "sport"). "</th>\n";
-    echo "<th width='12%'>" .printsort("Destination", "dest"). "</th>\n";
-    echo "<th width='5%'>" .printsort("Port", "dport"). "</th>\n";
-    echo "<th width='8%'>" .printsort("Sensor", "sensorid"). "</th>\n";
-    echo "<th width='16%'>Additional Info</th>\n";
+    echo "<th width='14%'>" .printsort($l['ls_timestamp'], "timestamp"). "</th>\n";
+    echo "<th width='23%'>" .printsort($l['ls_sev'], "severity"). "</th>\n";
+    echo "<th width='17%'>" .printsort($l['ls_source'], "source"). "</th>\n";
+    echo "<th width='5%'>" .printsort($l['ls_port'], "sport"). "</th>\n";
+    echo "<th width='12%'>" .printsort($l['ls_dest'], "dest"). "</th>\n";
+    echo "<th width='5%'>" .printsort($l['ls_port'], "dport"). "</th>\n";
+    echo "<th width='8%'>" .printsort($l['g_sensor'], "sensorid"). "</th>\n";
+    echo "<th width='16%'>" .$l['ls_additional']. "</th>\n";
   echo "</tr>\n";
 
 while ($row = pg_fetch_assoc($result)) {
@@ -1052,7 +1053,7 @@ while ($row = pg_fetch_assoc($result)) {
     if ($numrows_finger != 0) {
       echo printosimg($os, $fingerprint);
     } else {
-      echo printosimg("Blank", "No Info");
+      echo printosimg("Blank", $l['ls_noinfo']);
     }
 
     if ($c_geoip_enable == 1) {
@@ -1163,7 +1164,7 @@ while ($row = pg_fetch_assoc($result)) {
         echo "</td>\n";
       } else {
         if ($smac != "") {
-          echo "<td>Source MAC: $smac</td>\n";
+          echo "<td>" .$l['ls_sourcemac']. ": $smac</td>\n";
         } else { 
           echo "<td></td>\n";
         }
@@ -1172,7 +1173,7 @@ while ($row = pg_fetch_assoc($result)) {
       if ($smac == "") {
         echo "<td></td>\n";
       } elseif ($sevtype == 11) {
-        echo "<td>Source IP: $source</td>\n";
+        echo "<td>" .$l['ls_sourceip']. ": $source</td>\n";
       } elseif ($sevtype == 10) {
         echo "<td></td>\n";
       } else {
@@ -1196,7 +1197,7 @@ if ($c_searchtime == 1) {
   $mili_gen = number_format(($gen * 1000), 0);
   echo "<div class='all'>\n";
   echo "<div class='textcenter'>\n";
-    echo "Page rendered in $mili_gen ms.";
+    echo $l['ls_rendered']. " $mili_gen ms.";
   echo "</div>\n";
   echo "</div>\n";
 }

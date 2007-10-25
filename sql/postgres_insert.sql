@@ -1,10 +1,12 @@
 --
 -- SURFnet IDS database structure
--- Version 2.00.02
--- 12-10-2007
+-- Version 2.00.05
+-- 25-10-2007
 --
 
 -- Version history
+-- 2.00.05 Updated F-prot commands
+-- 2.00.04 Updated BitDefender commands
 -- 2.00.03 Added scheme record for p0f-db
 -- 2.00.02 Added argos_templates stuff
 -- 2.00.01 version 2.00
@@ -50,10 +52,10 @@ INSERT INTO organisations (id, organisation) VALUES (nextval('organisations_id_s
 --
 -- SCANNERS
 --
-INSERT INTO scanners VALUES (5, 'F-Prot', '/opt/f-prot/f-prot !bindir!/!file! | grep !file! | grep -v Search: | grep -vi error | awk ''{print $NF}''', '/opt/f-prot/tools/check-updates.pl', 1, '/opt/f-prot/f-prot -verno | grep -i "program version" | awk -F: ''{print $2}'' | awk ''{print $1}''', '');
+INSERT INTO scanners VALUES (5, 'F-Prot', '/opt/f-prot/fpscan --report !bindir!/!file! | grep !file! |  sed -e ''s/.* <//g'' -e ''s/ .*//g''', '/opt/f-prot/tools/check-updates.pl', 1, '/opt/f-prot/fpscan --version  | grep -i "Antivirus version" | sed -e ''s/.*version //g''', '');
 INSERT INTO scanners VALUES (6, 'Kaspersky', '/opt/kav/5.5/kav4unix/bin/kavscanner !bindir!/!file! | grep !file! | tail -n1 | awk ''{print $NF}'' | grep -v ^OK$', '/opt/kav/5.5/kav4unix/bin/keepup2date', 1, '/opt/kav/5.5/kav4unix/bin/kavscanner -v | grep -i version', '');
-INSERT INTO scanners VALUES (4, 'AVAST', E'/opt/avast4workstation-1.0.8/bin/avast !bindir!/!file! | grep !file! | grep -v "\\[OK\\]" | tail -n1 | awk -F "infected by:" ''{print $2}'' | awk ''{print $1}'' | awk -F "]" ''{print $1}''', '/opt/avast4workstation-1.0.8/bin/avast-update', 1, '/opt/avast4workstation-1.0.8/bin/avast --version | head -n1', '');
-INSERT INTO scanners VALUES (3, 'BitDefender', 'bdc --files !bindir!/!file! | grep !file! | awk ''{print $3}''', 'bdc --update', 1, 'bdc -info | head -n1', '');
+INSERT INTO scanners VALUES (4, 'AVAST', '/opt/avast4workstation-1.0.8/bin/avast !bindir!/!file! | grep !file! | grep -v "\\[OK\\]" | tail -n1 | awk -F "infected by:" ''{print $2}'' | awk ''{print $1}'' | awk -F "]" ''{print $1}''', '/opt/avast4workstation-1.0.8/bin/avast-update', 1, '/opt/avast4workstation-1.0.8/bin/avast --version | head -n1', '');
+INSERT INTO scanners VALUES (3, 'BitDefender', 'bdscan --files !bindir!/!file! | grep !file! | awk '{print $3}'', 'bdscan --update', 1, 'bdscan -info | head -n1', '');
 INSERT INTO scanners VALUES (2, 'Antivir', 'antivir -rs !bindir!/!file! | grep !file! | awk ''{print $2}'' | awk -F [ ''{print $2}'' | awk -F ] ''{print $1}''', 'antivir --update', 1, 'antivir --version | head -n1', '');
 INSERT INTO scanners VALUES (1, 'ClamAV', 'clamscan --no-summary !bindir!/!file! | grep !file! | awk ''{print $2}'' | grep -v ^OK$', 'freshclam', 1, 'clamscan --version', '');
 

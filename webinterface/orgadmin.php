@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 10-10-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Changed unauthorized access error message
 # 2.00.01 version 2.00
 # 1.04.05 Added hash check stuff
@@ -86,15 +87,15 @@ if ($err == 0) {
   echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Domains</div>";
+        echo "<div class='blockHeader'>" .$l['me_domains']. "</div>";
         echo "<div class='blockContent'>\n";
           echo "<form name='orgadmin' action='orgsave.php?savetype=org' method='post'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<th width='50'>" .printsort("ID", "id"). "</th>\n";
-                echo "<th width='200'>" .printsort("Domain", "organisation"). "</th>\n";
-                echo "<th width='100'># of identifiers</th>\n";
-                echo "<th width='100'>Actions</th>\n";
+                echo "<th width='50'>" .printsort($l['g_id'], "id"). "</th>\n";
+                echo "<th width='200'>" .printsort($l['g_domain'], "organisation"). "</th>\n";
+                echo "<th width='100'># " .$l['oa_identifiers']. "</th>\n";
+                echo "<th width='100'>" .$l['g_actions']. "</th>\n";
               echo "</tr>\n";
 
               while ($row = pg_fetch_assoc($result_orgs)) {
@@ -110,14 +111,14 @@ if ($err == 0) {
                   } else {
                     echo "<td>$count</td>\n";
                   }
-                  echo "<td><a href='orgedit.php?int_orgid=$id' alt='Edit this domain' class='linkbutton'><font size=1>[Edit]</font></a></td>\n";
+                  echo "<td><a href='orgedit.php?int_orgid=$id' alt='" .$l['oa_editdomain']. "' class='linkbutton'><font size=1>[" .$l['g_edit']. "]</font></a></td>\n";
                 echo "</tr>\n";
               }
 
               echo "<tr>\n";
                 echo "<td>#</td>\n";
                 echo "<td colspan='2'><input type='text' name='strip_html_escape_orgname' size='40' /></td>\n";
-                echo "<td><input type='submit' class='button' style='width: 100%;' value='Insert' /></td>\n";
+                echo "<td><input type='submit' class='button' style='width: 100%;' value='" .$l['g_insert']. "' /></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
             echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";

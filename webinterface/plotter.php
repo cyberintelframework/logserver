@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 09-10-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.03 Fixed some layout issues
 # 2.00.02 Graphs now shown in popups
 # 2.00.01 2.00 version
@@ -112,14 +113,14 @@ if ($_GET['int_type']) {
   echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>Actions</div>\n";
+        echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<div class='tabselect'>\n";
-            echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='Severity' onclick='javascript: shlinks(\"severity\", myplots);' />\n";
-            echo "<input class='tab' id='button_attacks' type='button' name='button_attacks' value='Attack' onclick='javascript: shlinks(\"attacks\");' />\n";
-            echo "<input class='tab' id='button_ports' type='button' name='button_ports' value='Port' onclick='javascript: shlinks(\"ports\");' />\n";
-            echo "<input class='tab' id='button_os' type='button' name='button_os' value='OS' onclick='javascript: shlinks(\"os\");' />\n";
-            echo "<input class='tab' id='button_virus' type='button' name='button_virus' value='Virus' onclick='javascript: shlinks(\"virus\");' />\n";
+            echo "<input class='tabsel' id='button_severity' type='button' name='button_severity' value='" .$l['pl_sev']. "' onclick='javascript: shlinks(\"severity\", myplots);' />\n";
+            echo "<input class='tab' id='button_attacks' type='button' name='button_attacks' value='" .$l['pl_attack']. "' onclick='javascript: shlinks(\"attacks\");' />\n";
+            echo "<input class='tab' id='button_ports' type='button' name='button_ports' value='" .$l['pl_port']. "' onclick='javascript: shlinks(\"ports\");' />\n";
+            echo "<input class='tab' id='button_os' type='button' name='button_os' value='" .$l['pl_os']. "' onclick='javascript: shlinks(\"os\");' />\n";
+            echo "<input class='tab' id='button_virus' type='button' name='button_virus' value='" .$l['pl_virus']. "' onclick='javascript: shlinks(\"virus\");' />\n";
           echo "</div>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
@@ -130,7 +131,7 @@ if ($_GET['int_type']) {
   echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Graphs</div>\n";
+        echo "<div class='blockHeader'>" .$l['pl_graphs']. "</div>\n";
         echo "<div class='blockContent'>\n";
   ################
   # SEVERITY
@@ -140,7 +141,7 @@ if ($_GET['int_type']) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>Sensors:</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
             echo printOption("", "All sensors", $sid);
@@ -163,10 +164,10 @@ if ($_GET['int_type']) {
       echo "</tr>\n";
       # SEVERITY
       echo "<tr>\n";
-        echo "<td>Severity:</td>\n";
+        echo "<td>" .$l['pl_sev']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='severity[]' size='5' multiple='true'>\n";
-            echo printOption(99, "All attacks", 99);
+            echo printOption(99, $l['pl_allattacks'], 99);
             foreach ($v_severity_ar as $key => $val) {
               echo printOption($key, $val, 99);
             }
@@ -174,12 +175,12 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Interval</td>\n";
+        echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, "Hour", 3600);
-            echo printOption(86400, "Day", 0);
-            echo printOption(604800, "Week", 0);
+            echo printOption(3600, $l['pl_hour'], 3600);
+            echo printOption(86400, $l['pl_day'], 0);
+            echo printOption(604800, $l['pl_week'], 0);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -194,7 +195,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td colspan='2' align='right'><input type='button' name='submit' value='Show' class='button' onclick='buildqs();' /></td>\n";
+        echo "<td colspan='2' align='right'><input type='button' name='submit' value='" .$l['pl_show']. "' class='button' onclick='buildqs();' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -210,8 +211,6 @@ if ($_GET['int_type']) {
       echo "<tr>\n";
         echo "<td width='185'>Sensors:</td>\n";
         echo "<td>\n";
-
-
           echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
@@ -238,10 +237,10 @@ if ($_GET['int_type']) {
       $result_getattacks = pg_query($sql_getattacks);
 
       echo "<tr>\n";
-        echo "<td>Attack:</td>\n";
+        echo "<td>" .$l['pl_attack']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='attack[]' size='5' multiple='true'>\n";
-            echo printOption(99, "All attacks", 99);
+            echo printOption(99, $l['pl_allattacks'], 99);
             while ($attack_data = pg_fetch_assoc($result_getattacks)) {
               $id = $attack_data['id'];
               $name = $attack_data['name'];
@@ -252,12 +251,12 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Interval</td>\n";
+        echo "<td>" .$l['pl_int']. </td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, "Hour", 3600);
-            echo printOption(86400, "Day", 0);
-            echo printOption(604800, "Week", 0);
+            echo printOption(3600, $l['pl_hour'], 3600);
+            echo printOption(86400, $l['pl_day'], 0);
+            echo printOption(604800, $l['pl_week'], 0);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -272,7 +271,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='Show' class='button' /></td>\n";
+        echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -286,7 +285,7 @@ if ($_GET['int_type']) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>Sensors:</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -309,17 +308,17 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Destination ports/ranges:<br />example:<br />80,100-1000,!445,!137-145 or all</td>\n";
+        echo "<td>" .$l['pl_dports']. ":<br />" .$l['pl_example']. ":<br />80,100-1000,!445,!137-145 or " .$l['pl_all']. "</td>\n";
         echo "<td>\n";
           echo "<input type='text' name='strip_html_escape_ports' size='20' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       # SEVERITY
       echo "<tr>\n";
-        echo "<td>Severity:</td>\n";
+        echo "<td>" .$l['pl_sev']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='severity[]' size='3' multiple='true'>\n";
-            echo printOption(99, "All attacks", 99);
+            echo printOption(99, $l['pl_allattacks'], 99);
             foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
                 echo printOption($key, $val, 99);
@@ -332,9 +331,9 @@ if ($_GET['int_type']) {
         echo "<td>Interval</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, "Hour", 3600);
-            echo printOption(86400, "Day", 0);
-            echo printOption(604800, "Week", 0);
+            echo printOption(3600, $l['pl_hour'], 3600);
+            echo printOption(86400, $l['pl_day'], 0);
+            echo printOption(604800, $l['pl_week'], 0);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -349,7 +348,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='Show' class='button' /></td>\n";
+        echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -363,7 +362,7 @@ if ($_GET['int_type']) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>Sensors:</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -392,7 +391,7 @@ if ($_GET['int_type']) {
       $result_os = pg_query($pgconn, $sql_os);
 
       echo "<tr>\n";
-        echo "<td>OS type:</td>\n";
+        echo "<td>" .$l['pl_ostype']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='os[]' size='4' multiple='true'>\n";
             echo printOption("all", "All OS types", "all");
@@ -408,7 +407,7 @@ if ($_GET['int_type']) {
         echo "<td>Severity:</td>\n";
         echo "<td>\n";
           echo "<select name='severity[]' size='3' multiple='true'>\n";
-            echo printOption(99, "All attacks", 99);
+            echo printOption(99, $l['pl_allattacks'], 99);
             foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
                 echo printOption($key, $val, 99);
@@ -418,17 +417,17 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Interval</td>\n";
+        echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, "Hour", 3600);
-            echo printOption(86400, "Day", 0);
-            echo printOption(604800, "Week", 0);
+            echo printOption(3600, $l['pl_hour'], 3600);
+            echo printOption(86400, $l['pl_day'], 0);
+            echo printOption(604800, $l['pl_week'], 0);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Plot type</td>\n";
+        echo "<td>" .$l['pl_plottype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
@@ -438,7 +437,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='Show' class='button' /></td>\n";
+        echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -452,7 +451,7 @@ if ($_GET['int_type']) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>Sensors:</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -477,11 +476,11 @@ if ($_GET['int_type']) {
 
       # VIRUS
       echo "<tr>\n";
-        echo "<td>Virus info:</td>\n";
+        echo "<td>" .$l['pl_virusinfo']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='virus[]' size='2' multiple='true'>\n";
-            echo printOption("all", "All virusses", "all");
-            echo printOption("top10", "Top 10 virusses", "none");
+            echo printOption("all", $l['pl_allvirii'], "all");
+            echo printOption("top10", $l['pl_top10virii'], "none");
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -492,7 +491,7 @@ if ($_GET['int_type']) {
 
       # SCANNERS
       echo "<tr>\n";
-        echo "<td>Scanner:</td>\n";
+        echo "<td>" .$l['pl_scanner']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='int_scanner' size='5'>\n";
             while ($scanner_data = pg_fetch_assoc($result_scanner)) {
@@ -504,17 +503,17 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Interval</td>\n";
+        echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, "Hour", 3600);
-            echo printOption(86400, "Day", 0);
-            echo printOption(604800, "Week", 0);
+            echo printOption(3600, $l['pl_hour'], 3600);
+            echo printOption(86400, $l['pl_day'], 0);
+            echo printOption(604800, $l['pl_week'], 0);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Plot type</td>\n";
+        echo "<td>" .$l['pl_plottype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
@@ -524,7 +523,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td colspan='2' align='right'><input type='button' name='submit' value='Show' class='button' onclick='buildqs();' /></td>\n";
+        echo "<td colspan='2' align='right'><input type='button' name='submit' value='" .$l['pl_show']. "' class='button' onclick='buildqs();' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";

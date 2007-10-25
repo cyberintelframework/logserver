@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 10-10-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.03 Fixed a bug with adding new exclusions as non-admin
 # 2.00.02 Layout stuff
 # 2.00.01 Initial release
@@ -56,7 +57,7 @@ if ($err == 0) {
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>";
-          echo "<div class='blockHeaderLeft'>Exclusions</div>\n";
+          echo "<div class='blockHeaderLeft'>" .$l['oi_excl']. "</div>\n";
           echo "<div class='blockHeaderRight'>\n";
             echo "<form name='viewform' action='$url' method='GET'>\n";
               if ($s_access_search == 9) {
@@ -79,20 +80,20 @@ if ($err == 0) {
           echo "<form name='orgadmin' action='orgipadd.php' method='post'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<th width='80%'>Exclusion</th>\n";
-                echo "<th width='20%'>Actions</th>\n";
+                echo "<th width='80%'>" .$l[oi_excl']. "</th>\n";
+                echo "<th width='20%'>" .$l[oi_actions']. "</th>\n";
               echo "</tr>\n";
               while ($row = pg_fetch_assoc($result_ex)) {
                 $id = $row['id'];
                 $excl = $row['exclusion'];
                 echo "<tr>\n";
                   echo "<td>$excl</td>\n";
-                  echo "<td><a href='orgipdel.php?int_id=$id&int_orgid=$q_org' onclick=\"javascript: return confirm('Are you sure you want to delete this record?');\">[Delete]</a></td>\n";
+                  echo "<td><a href='orgipdel.php?int_id=$id&int_orgid=$q_org' onclick=\"javascript: return confirm('" .$l['oi_confirmdel']. "?');\">[" .$l['g_delete']. "]</a></td>\n";
                 echo "</tr>\n";
               }
               echo "<tr>\n";
                 echo "<td><input type='hidden' name='int_orgid' value='$q_org' /><input type='text' name='ip_exclusion' size='40' /></td>\n";
-                echo "<td><input type='submit' class='button' style='width: 100%;' value='Insert' /></td>\n";
+                echo "<td><input type='submit' class='button' style='width: 100%;' value='" .$l['g_insert']. "' /></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
             echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";

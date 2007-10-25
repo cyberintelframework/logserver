@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.09                  #
-# 11-10-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.09 Fixed bug with int_page
 # 2.00.08 Not showing admin tab when contents are empty
 # 2.00.07 Added contact mail
@@ -46,6 +47,9 @@ include '../include/variables.inc.php';
 
 # Starting the session
 session_start();
+
+# Including language file
+include "../lang/${c_language}.php";
 
 $absfile = $_SERVER['SCRIPT_NAME'];
 $file = basename($absfile);
@@ -118,6 +122,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery-1.1.4.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/jquery.selectboxes.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/surfnetids.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-en.js'></script>\n";
@@ -127,18 +132,18 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
   echo "<div id='page'>\n";
     echo "<div id='pageHeader'>\n";
       echo "<ul id='globalNav'>\n";
-        echo "<li><a href='mailto:$c_contact_mail'>Contact</a></li>\n";
-        echo "<li><a href='logout.php'>Logout</a></li>\n";
-        echo "<li><a href='http://ids.surfnet.nl/'>About SURFids</a></li>\n";
+        echo "<li><a href='mailto:$c_contact_mail'>" .$l['me_contact']. "</a></li>\n";
+        echo "<li><a href='logout.php'>" .$l['me_logout']. "</a></li>\n";
+        echo "<li><a href='http://ids.surfnet.nl/'>" .$l['me_about']. " SURFids</a></li>\n";
       echo "</ul>\n";
       echo "<h1><a href=''>SURFids</a></h1>\n";
       echo "<div class='infoBar'>\n";
-	if ($total_active != '') echo "<div id='headerSensors'>Active sensors $total_active of $total_sensors </div>";
+	if ($total_active != '') echo "<div id='headerSensors'>" .$l['me_active']. " $total_active " .$l['me_of']. " $total_sensors </div>";
         else echo "<div id='headerSensors'>&nbsp;</div>"; 
 	echo "<div id='headerTime'> <span id=\"tP\">&nbsp;</span></div>\n";
           echo "<div id='headerUser'>\n";
             if ($file != "login.php") {
-              echo "Logged in as: $s_user";
+              echo $l['me_logged']. ": $s_user";
             }
           echo "</div>\n";
         echo "</div>";
@@ -149,32 +154,32 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
               #################
               # HOME TAB
               ################
-              echo "<li class='home'><a href='index.php'>Home</a>\n";
+              echo "<li class='home'><a href='index.php'>" .$l['me_home']. "</a>\n";
                 echo "<div id='tab1' class='tab'><ul></ul></div>\n";
               echo "</li>\n";
 
               #################
               # REPORT TAB
               #################
-              echo printTabItem(2, "", "Report", $main_tab);
+              echo printTabItem(2, "", $l['me_report'], $main_tab);
               if ($main_tab == 2) {
                 echo "<div id='tab2' class='tab'>\n";
               } else {
                 echo "<div id='tab2' class='tab' style='display: none;'>\n";
               }            
                   echo"<ul>\n";
-                    echo printMenuitem(2.1, "rank.php", "Ranking", $tab);
-                    echo printMenuitem(2.2, "logcheck.php", "Cross Domain", $tab);
-                    echo printMenuitem(2.3, "googlemap.php", "Google Map", $tab);
-                    echo printMenuitem(2.4, "traffic.php", "Traffic", $tab);
+                    echo printMenuitem(2.1, "rank.php", $l['me_rank'], $tab);
+                    echo printMenuitem(2.2, "logcheck.php", $l['me_cross'], $tab);
+                    echo printMenuitem(2.3, "googlemap.php", $l['me_google'], $tab);
+                    echo printMenuitem(2.4, "traffic.php", $l['me_traffic'], $tab);
                     if ($s_admin == 1) { 
-                      echo printMenuitem(2.5, "serverstats.php", "Server Info", $tab);
+                      echo printMenuitem(2.5, "serverstats.php", $l['me_serverinfo'], $tab);
                     }
                     if ($c_enable_arp == 1 && $s_access_sensor > 1) {
-                      echo printMenuitem(2.7, "detectedproto.php", "Detected Protocols", $tab);
+                      echo printMenuitem(2.7, "detectedproto.php", $l['me_detprot'], $tab);
                     }
-                    echo printMenuitem(2.8, "plotter.php", "Graphs", $tab);
-                    echo printMenuitem(2.6, "myreports.php", "My Reports", $tab);
+                    echo printMenuitem(2.8, "plotter.php", $l['me_graphs'], $tab);
+                    echo printMenuitem(2.6, "myreports.php", $l['me_reports'], $tab);
                   echo "</ul>\n";
                 echo "</div>\n";
               echo "</li>\n";
@@ -182,21 +187,21 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
               #################
               # ANALYZE TAB
               #################
-              echo printTabItem(3, "", "Analyze", $main_tab);
+              echo printTabItem(3, "", $l['me_analyze'], $main_tab);
               if ($main_tab == 3) {
                 echo "<div id='tab3' class='tab'>\n";
               } else {
                 echo "<div id='tab3' class='tab' style='display: none;'>\n";
               }            
                   echo "<ul>\n";
-                    echo printMenuitem(3.1, "logindex.php", "Attacks", $tab);	
-                    echo printMenuitem(3.2, "exploits.php", "Exploits", $tab);	
-                    echo printMenuitem(3.3, "maloffered.php", "Malware Offered", $tab);	
-                    echo printMenuitem(3.4, "maldownloaded.php", "Malware Downloaded", $tab);
+                    echo printMenuitem(3.1, "logindex.php", $l['g_attacks'], $tab);	
+                    echo printMenuitem(3.2, "exploits.php", $l['g_exploits'], $tab);	
+                    echo printMenuitem(3.3, "maloffered.php", $l['me_maloff'], $tab);	
+                    echo printMenuitem(3.4, "maldownloaded.php", $l['me_maldown'], $tab);
                     if ($c_enable_arp == 1 && $s_access_sensor > 1) {
-                      echo printMenuitem(3.6, "arp_cache.php", "ARP Cache", $tab);
+                      echo printMenuitem(3.6, "arp_cache.php", $l['ah_arp_cache'], $tab);
                     }
-                    echo printMenuitem(3.5, "search.php", "Search", $tab);	
+                    echo printMenuitem(3.5, "search.php", $l['me_search'], $tab);
                   echo "</ul>\n";
                 echo "</div>\n";
               echo "</li>";
@@ -204,28 +209,28 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
               #################
               # MANAGEMENT TAB
               #################
-              echo printTabItem(4, "", "Configuration", $main_tab);
+              echo printTabItem(4, "", $l['me_config'], $main_tab);
               if ($main_tab == 4) {
                 echo "<div id='tab4' class='tab'>\n";
               } else {
                 echo "<div id='tab4' class='tab' style='display: none;'>\n";
               }            
                   echo "<ul>\n";
-                    echo printMenuitem(4.1, "sensorstatus.php", "Sensor Status", $tab);
+                    echo printMenuitem(4.1, "sensorstatus.php", $l['me_sensorstatus'], $tab);
                     if ($c_enable_arp == 1 && $s_access_sensor > 1) {
-                      echo printMenuitem(4.2, "arp_static.php", "ARP", $tab);
+                      echo printMenuitem(4.2, "arp_static.php", $l['m_arp'], $tab);
                     }
                     if ($s_access_user > 1) {
-                      echo printMenuitem(4.3, "orgipadmin.php", "IP exclusions", $tab);
+                      echo printMenuitem(4.3, "orgipadmin.php", $l['me_ipex'], $tab);
                     }
                     if ($c_enable_argos == 1 && $s_access_sensor > 1) {
-                      echo printMenuitem(4.4, "argosconfig.php", "Argos", $tab);
+                      echo printMenuitem(4.4, "argosconfig.php", $l['me_argos'], $tab);
                     }
                     if ($s_admin == 1) {
                       if ($c_enable_argos == 1) {
-                        echo printMenuitem(4.5, "argosadmin.php", "Argos Templates", $tab);
+                        echo printMenuitem(4.5, "argosadmin.php", $l['me_argostemp'], $tab);
                       }
-                      echo printMenuitem(4.6, "serverconfig.php", "Config info", $tab);
+                      echo printMenuitem(4.6, "serverconfig.php", $l['me_configinfo'], $tab);
                     }
                   echo "</ul>\n";
                 echo "</div>\n";
@@ -234,7 +239,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                 #################
                 # ADMINISTRATION TAB
                 #################
-                echo printTabItem(5, "", "Administration", $main_tab);
+                echo printTabItem(5, "", $l['me_admin'], $main_tab);
                 if ($main_tab == 5) {
                   echo "<div id='tab5' class='tab'>\n";
                 } else {
@@ -242,13 +247,13 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                 }            
                     echo "<ul>\n";
                       if ($s_access_user != 0) {
-                        echo printMenuitem(5.1, "myaccount.php", "My Account", $tab);
+                        echo printMenuitem(5.1, "myaccount.php", $l['me_myaccount'], $tab);
                       }
                       if ($s_access_user > 1) {
-                        echo printMenuitem(5.2, "useradmin.php", "Users", $tab);
+                        echo printMenuitem(5.2, "useradmin.php", $l['me_users'], $tab);
                       }
                       if ($s_admin == 1) {
-	                echo printMenuitem(5.3, "orgadmin.php", "Domains", $tab);
+	                echo printMenuitem(5.3, "orgadmin.php", $l['me_domains'], $tab);
                       }
                     echo "</ul>\n";
                   echo "</div>\n";
@@ -267,7 +272,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
           echo "<div id='popupheaderleft'></div>\n";
           echo "<div id='popupheaderright'><a onclick='popout();'><img src='images/close.gif' /></a></div>\n";
         echo "</div>\n";
-        echo "<div id='popupcontent'>Loading page...</div>\n";
+        echo "<div id='popupcontent'>" .$l['me_loading']. "</div>\n";
       echo "</div>\n";
       echo "<div id='overlay' onclick='popout();'></div>\n";
 
@@ -390,7 +395,7 @@ function insert_selector($m_show = 1) {
 
       echo "<div id='timesel'>\n";
         echo "<div id='timesel_top'>\n";
-          echo "<font class='btext'>Period:</font>\n";
+          echo "<font class='btext'>" .$l['me_period']. ":</font>\n";
           echo "<select name='int_selperiod' id='selperiod' class='smallselect' onchange='setperiod(\"$c_startdayofweek\");'>\n";
             if ($selperiod == -1) {
               $per = $to - $from;
@@ -418,12 +423,12 @@ function insert_selector($m_show = 1) {
         echo "</div>\n";
         echo "<div id='timesel_bottom'>\n";
           echo "<div id='showstart'>\n";
-            echo "<div class='showtext btext'>From:</div>\n";
+            echo "<div class='showtext btext'>" .$l['me_from']. ":</div>\n";
             echo "<div id='showdate_start'>$from_date</div>\n";
             echo "<div id='fromcal' style='display: none;'></div>\n";
           echo "</div>\n";
           echo "<div id='showend'>\n";
-            echo "<div class='showtext btext'>Until:</div>\n";
+            echo "<div class='showtext btext'>" .$l['me_until']. ":</div>\n";
             echo "<div id='showdate_end'>$to_date</div>\n";
             echo "<div id='tocal' style='display: none;'></div>\n";
           echo "</div>\n";

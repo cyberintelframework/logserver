@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Added support for search templates
 # 2.00.01 Initial release (used to be mailadmin.php)
 ####################################
@@ -82,12 +83,12 @@ if ($s_access_user > 0) {
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>Actions</div>\n";
+        echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
-          echo "<a href='report_new.php?int_userid=$user_id'>Add Report</a><br />";
-          echo "<a href='report_mod.php?int_userid=$user_id&a=d&md5_hash=$s_hash'>Disable all reports</a><br />";
-          echo "<a href='report_mod.php?int_userid=$user_id&a=e&md5_hash=$s_hash'>Enable all reports</a><br />";
-          echo "<a href='report_mod.php?int_userid=$user_id&a=r&md5_hash=$s_hash'>Reset all timestamps</a>";
+          echo "<a href='report_new.php?int_userid=$user_id'>" .$l['mr_addreport']. "</a><br />";
+          echo "<a href='report_mod.php?int_userid=$user_id&a=d&md5_hash=$s_hash'>" .$l['mr_disableall']. "</a><br />";
+          echo "<a href='report_mod.php?int_userid=$user_id&a=e&md5_hash=$s_hash'>" .$l['mr_enableall']. "</a><br />";
+          echo "<a href='report_mod.php?int_userid=$user_id&a=r&md5_hash=$s_hash'>" .$l['mr_resetall']. "</a>";
         echo "</div>\n";
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</blockContent>
@@ -99,7 +100,7 @@ if ($s_access_user > 0) {
       echo "<div class='dataBlock'>\n";
         if ($s_access_user > 1) {
           echo "<div class='blockHeader'>";
-            echo "<div class='blockHeaderLeft'>Reports of $username</div>\n";
+            echo "<div class='blockHeaderLeft'>" .$l['mr_reportsof']. " $username</div>\n";
             echo "<div class='blockHeaderRight'>\n";
               echo "<form name='viewform' action='$url' method='GET'>\n";
                 $sql_users = "SELECT login.id, username, organisations.organisation FROM login, organisations ";
@@ -127,19 +128,19 @@ if ($s_access_user > 0) {
             echo "</div>\n";
           echo "</div>\n";
         } else {
-          echo "<div class='blockHeader'>Reports of $username</div>\n";
+          echo "<div class='blockHeader'>" .$l['mr_reportsof']. " $username</div>\n";
         }
         echo "<div class='blockContent'>";
           echo "<table border=0 cellspacing=2 cellpadding=2 class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='250'>" .printsort("Title", "subject"). "</th>\n";
-              echo "<th width='120'>" .printsort("Last sent", "last_sent"). "</th>\n";
-              echo "<th width='100'>" .printsort("Template", "template"). "</th>\n";
-              echo "<th width='200'>Time options</th>\n";
-              echo "<th width='140' class='norightb'>" .printsort("Type", "type"). "</th>\n";
+              echo "<th width='250'>" .printsort($l['mr_title'], "subject"). "</th>\n";
+              echo "<th width='120'>" .printsort($l['mr_lastsent'], "last_sent"). "</th>\n";
+              echo "<th width='100'>" .printsort($l['mr_temp'], "template"). "</th>\n";
+              echo "<th width='200'>" .$l['mr_timeopts']. "</th>\n";
+              echo "<th width='140' class='norightb'>" .printsort($l['g_type'], "type"). "</th>\n";
               echo "<th width='16' class='noleftb'></th>\n";
-              echo "<th width='60'>" .printsort("Status", "status"). "</th>\n";
-              echo "<th>Delete</th>\n";
+              echo "<th width='60'>" .printsort($l['g_status'], "status"). "</th>\n";
+              echo "<th>" .$l['g_delete']. "</th>\n";
             echo "</tr>\n";
 
             # Get reports
@@ -197,12 +198,12 @@ if ($s_access_user > 0) {
               }              
               $detail = $report_content['detail'];
               if ($active == "t") {
-                $status = "<font style='color:green;'>Active</font";
+                $status = "<font style='color:green;'>" .$l['mr_active']. "</font";
               } else {
-                $status = "<font style='color:red;'>Inactive</font>";
+                $status = "<font style='color:red;'>" .$l['mr_inactive']. "</font>";
               }
               if ($last_sent == null) {
-                $last_sent = "<i>never</i>";
+                $last_sent = "<i>" .$l['mr_never']. "</i>";
               } else {
                 $last_sent = date("d-m-Y H:i", $last_sent);
               }
@@ -230,7 +231,7 @@ if ($s_access_user > 0) {
                 echo "<td>" . $v_mail_template_ar[$template] . "</td>\n";
                 echo "<td>$freqstring</td>\n";
                 if ($template == 6) {
-                  echo "<td class='norightb'>Search result</td>\n";
+                  echo "<td class='norightb'>" .$l['mr_result']. "</td>\n";
                 } else {
                   echo "<td class='norightb'>" . $v_mail_detail_ar[$detail] . "</td>\n";
                 }
@@ -251,7 +252,7 @@ if ($s_access_user > 0) {
                   echo "<td class='noleftb'></td>\n";
                 }
                 echo "<td>" . $status . "</td>\n";
-                echo "<td><a href='report_del.php?int_userid=$user_id&int_rcid=$rcid' onclick=\"javascript: return confirm('Are you sure you want to delete this report?');\">[Delete]</a></td>\n";
+                echo "<td><a href='report_del.php?int_userid=$user_id&int_rcid=$rcid' onclick=\"javascript: return confirm('" .$l['mr_confirmdel']. "?');\">[" .$l['g_delete']. "]</a></td>\n";
               echo "</tr>\n";
             }
           echo "</table>\n";

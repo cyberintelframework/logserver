@@ -23,14 +23,11 @@ $s_access_search = intval($s_access{1});
 
 $xmlquery="?int_from=$from&int_to=$to&int_org=$q_org";
 
-### BROWSE MENU
-
-echo "<div id=\"search_wait\"><center>Your request is being processed...<br /><br />Please be patient.<br /></center></div>\n";
-#echo "<div id='content'>\n";
+echo "<div id='search_wait'><center>" .$l['gm_process']. "<br /><br />" .$l['gm_patient']. ".<br /></center></div>\n";
 echo "<div class='center'>\n";
 echo "<div class='block'>\n";
 echo "<div class='dataBlock'>\n";
-echo "<div class='blockHeader'>Google Map</div>\n";
+echo "<div class='blockHeader'>" .$l['gm_gmap']. "</div>\n";
 echo "<div class='blockContent'>\n";
 echo "<div id='map' style='width: 800px; height: 400px'></div>\n";
 echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=$c_googlemap_key' type='text/javascript'></script>";
@@ -139,20 +136,20 @@ echo "</div>\n"; #</center>
 
 echo "<div class='center'>\n";
   echo "<div class='legend'>\n";
-    echo "<div class='legendHeader'>Legend</div>\n";
+    echo "<div class='legendHeader'>" .$l['g_legend']. "</div>\n";
     echo "<div class='legendContent'>\n";
       echo "<div class='legendContentLeft'>\n";
         echo "<div class='legendItem'>\n";
-          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_yellow.png'> &lt;= 5 Attacks<br />\n";
+          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_yellow.png'> &lt;= 5 " .$l['g_attacks']. "<br />\n";
         echo "</div>\n";
         echo "<div class='legendItem'>\n";
-          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_orange.png'> &lt;= 25  Attacks<br />\n";
+          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_orange.png'> &lt;= 25 " .$l['g_attacks']. "<br />\n";
         echo "</div>\n";
         echo "<div class='legendItem'>\n";
-          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_red.png'> &lt;= 250  Attacks<br />\n";
+          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_red.png'> &lt;= 250 " .$l['g_attacks']. "<br />\n";
         echo "</div>\n";
         echo "<div class='legendItem'>\n";
-          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_black.png'> &gt; 250 Attacks<br />\n";
+          echo "<img src='http://labs.google.com/ridefinder/images/mm_20_black.png'> &gt; 250 " .$l['g_attacks']. "<br />\n";
         echo "</div>\n";
       echo "</div>\n";
     echo "</div>\n";

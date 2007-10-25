@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.06 Changed printhelp stuff
 # 1.04.05 Added hash check stuff
@@ -67,9 +68,9 @@ if ($err != 1) {
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>Actions</div>\n";
+        echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
-          echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>Generate Random Identifier String</a>";
+          echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>" .$l['oe_generate']. "</a>";
           echo printhelp("ris") ."<br />\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
@@ -81,19 +82,19 @@ if ($err != 1) {
     echo "<form action='orgsave.php?savetype=ident' method='POST'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>Edit domain & domain identifiers</div>\n";
+          echo "<div class='blockHeader'>" .$l['oe_editdomain']. " & " .$l['oe_idents']. "</div>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<td width='100'>ID</td>\n";
+                echo "<td width='100'>" .$l['g_id']. "</td>\n";
                 echo "<td width='300'>$orgid<input type='hidden' name='int_orgid' value='$orgid' /></td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td>Domain</td>\n";
+                echo "<td>" .$l['g_domain']. "</td>\n";
                 echo "<td><input type='text' name='strip_html_escape_orgname' value='$orgname' /></td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td valign='top'>Ranges" .printhelp("ranges"). "</td>\n";
+                echo "<td valign='top'>". $l['oe_ranges'] . printhelp("ranges"). "</td>\n";
                 echo "<td><textarea name='strip_html_escape_ranges' cols='40' rows='10'>$ranges</textarea></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
@@ -112,10 +113,10 @@ if ($err != 1) {
 */          echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<th width='100'>ID</th>\n";
-                echo "<th width='250'>Identifier</th>\n";
-                echo "<th width='150'>Type</th>\n";
-                echo "<th width='50'>Action</th>\n";
+                echo "<th width='100'>" .$l['g_id']. "</th>\n";
+                echo "<th width='250'>" .$l['oe_ident']. "</th>\n";
+                echo "<th width='150'>" .$l['g_type']. "</th>\n";
+                echo "<th width='50'>" .$l['g_action']. "</th>\n";
               echo "</tr>\n";
 
               while ($row = pg_fetch_assoc($result_orgids)) {
@@ -129,7 +130,7 @@ if ($err != 1) {
                   echo "<td>$v_org_ident_type_ar[$type]</td>\n";
                   echo "<td>";
                     echo "<a href='orgdel.php?int_orgid=$orgid&int_ident=$id&md5_hash=$s_hash' ";
-                    echo " onclick=\"javascript: return confirm('Are you sure you want to delete this identifier?');\">Delete</a>";
+                    echo " onclick=\"javascript: return confirm('" .$l['oe_confirmdel']. "?');\">" .$l['g_delete']. "</a>";
                   echo "</td>\n";
                 echo "</tr>\n";
               }
@@ -151,7 +152,7 @@ if ($err != 1) {
               echo "</tr>\n";
               echo "<tr>\n";
                 echo "<td colspan='4' align='right'>";
-                  echo "<input type='submit' name='submit' value='Save' class='button' />";
+                  echo "<input type='submit' name='submit' value='" .$l['g_save']. "' class='button' />";
                 echo "</td>\n";
               echo "</tr>\n";
             echo "</table>\n";

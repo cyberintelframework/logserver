@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 08-10-2007                       #
+# Version 2.10.01                  #
+# 23-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.03 Fixed a bug with clearing and missing sensor ID's
 # 2.00.02 Added access check
 # 2.00.01 New release 
@@ -63,11 +64,10 @@ if ($err == 0) {
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>Actions</div>\n";
+        echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
-          $confirm = "Are you sure you want to clear the Detected Protocols";
-          echo "<a href='detectedproto_clr.php?int_org=$q_org&md5_hash=$s_hash&int_sid=$sid' onclick=\"javascript: return confirm('" .$confirm. "');\">";
-          echo "Clear Detected Protocols</a>\n";
+          echo "<a href='detectedproto_clr.php?int_org=$q_org&md5_hash=$s_hash&int_sid=$sid' onclick=\"javascript: return confirm('" .$l['dp_confirm_del']. "');\">";
+          echo $l['dp_clear_det_prot']. "</a>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</actionBlock>
@@ -80,7 +80,7 @@ echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
-        echo "<div class='blockHeaderLeft'>Detected protocols</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['dp_detected']. "</div>\n";
         echo "<div class='blockHeaderRight'>";
           echo "<form method='get'>\n";
             if ($q_org == 0) {
@@ -116,9 +116,9 @@ echo "<div class='left'>\n";
         if ($err == 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='150'>Parent Protocol</th>\n";
-              echo "<th width='150'>Type Number</th>\n";
-              echo "<th width='300'>Type</th>\n";
+              echo "<th width='150'>" .$l['dp_parent']. "</th>\n";
+              echo "<th width='150'>" .$l['dp_type_number']. "</th>\n";
+              echo "<th width='300'>" .$l['dp_type']. "</th>\n";
             echo "</tr>\n";
 
             $sql_protos = "SELECT parent, number, protocol FROM sniff_protos WHERE sensorid = '$sid' ORDER BY parent, number";
@@ -141,7 +141,7 @@ echo "<div class='left'>\n";
           echo "<form method='get'>\n";
           echo "<table>";
             echo "<tr>";
-              echo "<td><span class='warning'>Select a sensor</span></td>\n";
+              echo "<td><span class='warning'>" .$l['g_select_sensor']. "</span></td>\n";
               echo "<td>\n";
                 $select_size = 8;
                 if ($q_org == 0) {

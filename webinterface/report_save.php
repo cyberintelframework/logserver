@@ -62,6 +62,7 @@ $allowed_post = array(
 		"int_sevsensor",
 		"int_detail",
 		"int_sdetail",
+		"int_filter",
 		"bool_active",
 		"md5_hash"
 );
@@ -101,6 +102,14 @@ if (isset($clean['userid'])) {
   $user_id = $s_userid;
 }
 
+if (!isset($clean['detail']) || !isset($clean['sdetail'])) {
+  $detail = 0;
+} elseif ($template == 4) {
+  $detail = $clean['sdetail'];
+} else {
+  $detail = $clean['detail'];
+}
+
 # Checking if the logged in user actually requested this action.
 if ($clean['hash'] != $s_hash) {
   $err = 1;
@@ -136,7 +145,11 @@ if (!isset($clean['sevattack']) || !isset($clean['sevsensor'])) {
   if ($template == 4) {
     $sev = $clean['sevsensor'];
   } elseif ($template == 1 || $template == 2) {
-    $sev = $clean['sevattack'];
+    if ($detail == 4) {
+      $sev = $clean['filter'];
+    } else {
+      $sev = $clean['sevattack'];
+    }
   }
 }
 
@@ -187,14 +200,6 @@ if (!isset($clean['active'])) {
   $m = 136;
 } else {
   $active = $clean['active'];
-}
-
-if (!isset($clean['detail']) || !isset($clean['sdetail'])) {
-  $detail = 0;
-} elseif ($template == 4) {
-  $detail = $clean['sdetail'];
-} else {
-  $detail = $clean['detail'];
 }
 
 if (!isset($clean['rcid'])) {

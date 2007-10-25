@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.06 Added more report detail options. Some cosmetic changes.
 # 1.04.05 Added hash check
@@ -68,15 +69,15 @@ echo "<div class='leftmed'>\n";
   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Mail options</div>\n";
+      echo "<div class='blockHeader'>" .$l['re_mailopts']. "</div>\n";
       echo "<div class='blockContent'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
-            echo "<td width='100'>Subject</td>\n";
+            echo "<td width='100'>" .$l['re_subject']. "</td>\n";
             echo "<td width='200'><input type='text' name='strip_html_escape_subject' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>Priority</td>\n";
+            echo "<td>" .$l['re_mailprio']. "</td>\n";
             echo "<td>";
               echo "<select name='int_priority'>\n";
                 foreach ($v_mail_priority_ar as $key => $val) {
@@ -93,14 +94,14 @@ echo "<div class='leftmed'>\n";
 
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Report options</div>\n";
+      echo "<div class='blockHeader'>" .$l['re_reportopts']. "</div>\n";
       echo "<div class='blockContent'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
             echo "<td width='100'>Sensor: </td>\n";
             echo "<td width='200'>\n";
               echo "<select name='int_sensorid'>\n";
-                echo printOption(-1, "All sensors", $sensor_id);
+                echo printOption(-1, $l['re_allsensors'], $sensor_id);
                 if ($s_admin == 1) {
                   $sql = "SELECT * FROM sensors WHERE NOT status = 3 ORDER BY keyname ASC, vlanid ASC";
                 } else {
@@ -122,9 +123,9 @@ echo "<div class='leftmed'>\n";
             echo "</td>\n";
           echo "</tr>\n";
           echo "<tr>";
-            echo "<td width='100'>Report template:</td>\n";
+            echo "<td width='100'>" .$l['re_reptemp']. ":</td>\n";
             echo "<td width='200'>";
-              echo "<select name='int_template' onchange='javascript: sh_mailtemp(this.value);'>\n";
+              echo "<select id='int_template' name='int_template' onchange='javascript: sh_mailtemp(this.value);'>\n";
                 foreach ($v_mail_template_ar as $key=>$val) {
                   if ($key != 6) {
                     echo printOption($key, $val, -1);
@@ -134,19 +135,28 @@ echo "<div class='leftmed'>\n";
             echo "</td>\n";
           echo "</tr>\n";
           echo "<tr style='display:;' id='repdetail' name='repdetail'>";
-            echo "<td width='100'>Report type:</td>\n";
+            echo "<td width='100'>" .$l['re_reptype']. ":</td>\n";
             echo "<td width='200'>";
-              echo "<select name='int_detail' onchange='javascript: sh_mailreptype(this.value);'>\n";
+              echo "<select name='int_detail' id='int_detail' onchange='javascript: sh_mailreptype(this.value);'>\n";
                 foreach ($v_mail_detail_ar as $key=>$val) {
                   echo printOption($key, $val, -1);
                 }
               echo "</select>\n";
             echo "</td>\n";
           echo "</tr>\n";
-          echo "<tr style='display:none;' id='srepdetail' name='srepdetail'>";
-            echo "<td width='100'>Report type:</td>\n";
+          echo "<tr style='display: none;' id='filter' name='filter'>";
+            echo "<td width='100'>" .$l['re_filter']. ":</td>\n";
             echo "<td width='200'>";
-              echo "<select name='int_sdetail'>\n";
+              echo "<select name='int_filter' id='int_filter'>\n";
+                echo printOption(0, $l['re_exown'], -1);
+                echo printOption(1, $l['re_incown'], -1);
+              echo "</select>\n";
+            echo "</td>\n";
+          echo "</tr>\n";
+          echo "<tr style='display:none;' id='srepdetail' name='srepdetail'>";
+            echo "<td width='100'>" .$l['re_reptype']. ":</td>\n";
+            echo "<td width='200'>";
+              echo "<select name='int_sdetail' id='int_sdetail'>\n";
                 foreach ($v_mail_sdetail_ar as $key=>$val) {
                   echo printOption($key, $val, -1);
                 }
@@ -154,10 +164,10 @@ echo "<div class='leftmed'>\n";
             echo "</td>\n";
           echo "</tr>\n";
           echo "<tr style='display:;' id='attack_sev' name='attack_sev'>";
-            echo "<td width='100'>Severity:</td>\n";
+            echo "<td width='100'>" .$l['ls_sev']. ":</td>\n";
             echo "<td width='200'>";
               echo "<select name='int_sevattack'>\n";
-                echo printOption(-1, "All severities", -1);
+                echo printOption(-1, $l['re_allsev'], -1);
                 foreach ($v_severity_ar as $key=>$val) {
                   echo printOption($key, $val, -1);
                 }
@@ -165,10 +175,10 @@ echo "<div class='leftmed'>\n";
             echo "</td>\n";
           echo "</tr>\n";
           echo "<tr style='display: none;' id='sensor_sev' name='sensor_sev'>";
-            echo "<td width='100'>Severity:</td>\n";
+            echo "<td width='100'>" .$l['ls_sev']. ":</td>\n";
             echo "<td width='200'>";
               echo "<select name='int_sevsensor'>\n";
-                echo printOption(-1, "All severities", -1);
+                echo printOption(-1, $l['re_allsev'], -1);
                 foreach ($v_sensor_sev_ar as $key=>$val) {
                   echo printOption($key, $val, -1);
                 }
@@ -185,11 +195,11 @@ echo "<div class='leftmed'>\n";
     echo "<div id='timeoptions' name='timeoptions' style='display: ;'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>Time options</div>\n";
+          echo "<div class='blockHeader'>" .$l['re_timeopts']. "</div>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr id='attack_time' name='attack_time' style='display: ;'>";
-                echo "<td width='100'>Frequency:</td>\n";
+                echo "<td width='100'>" .$l['re_freq']. ":</td>\n";
                 echo "<td width='200'>";
                   echo "<select name='int_freqattack' onchange='javascript: sh_mailfreq(this.value);'>\n";
                     foreach ($v_mail_frequency_attacks_ar as $key=>$val) {
@@ -199,7 +209,7 @@ echo "<div class='leftmed'>\n";
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr id='sensor_time' name='sensor_time' style='display: none;'>";
-                echo "<td width='100'>Frequency:</td>\n";
+                echo "<td width='100'>" .$l['re_freq']. ":</td>\n";
                 echo "<td width='200'>";
                   echo "<select name='int_freqsensor' onchange='javascript: sh_mailfreq(this.value);'>\n";
                     foreach ($v_mail_frequency_sensors_ar as $key=>$val) {
@@ -209,11 +219,11 @@ echo "<div class='leftmed'>\n";
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr id='daily_freq' name='daily_freq' style='display: none;'>\n";
-                echo "<td>Time:</td>\n";
+                echo "<td>" .$l['re_time']. ":</td>\n";
                 echo "<td>";
                   echo "<select name='int_intervalday'>\n";
                     for ($i = 0; $i < 24; $i++) {
-                      $time = "$i:00 hour";
+                      $time = "$i:00 " .$l['g_hour'];
                       if ($i < 10) {
                         $time = "0" . $time;
                       }
@@ -223,7 +233,7 @@ echo "<div class='leftmed'>\n";
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr id='weekly_freq' name='weekly_freq' style='display: none;'>";
-                echo "<td>Day:</td>\n";
+                echo "<td>" .$l['re_day']. ":</td>\n";
                 echo "<td>";
                   echo "<select name='int_intervalweek'>\n";
                     $j = (4 * 86400); // monday
@@ -245,11 +255,11 @@ echo "<div class='leftmed'>\n";
     echo "<div id='thresh_freq' name='thresh_freq' style='display: none;'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>Threshold options</div>\n";
+          echo "<div class='blockHeader'>" .$l['re_threshopts']. "</div>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<td width='100'>Operator:</td>\n";
+                echo "<td width='100'>" .$l['re_op']. ":</td>\n";
                 echo "<td width='200'>";
                   echo "<select name='int_operator'>\n";
                     foreach ($v_mail_operator_ar as $key => $val) {
@@ -259,11 +269,11 @@ echo "<div class='leftmed'>\n";
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td width='100'>Threshold amount:</td>\n";
+                echo "<td width='100'>" .$l['re_thresh_amount']. ":</td>\n";
                 echo "<td width='200'><input type='text' name='int_threshold' /></td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td width='100'>Timespan:</td>\n";
+                echo "<td width='100'>" .$l['re_timespan']. ":</td>\n";
                 echo "<td width='200'>";
                   echo "<select name='int_intervalthresh'>\n";
                     foreach ($v_mail_timespan_ar as $key => $val) {
@@ -287,7 +297,7 @@ echo "<div class='leftmed'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
             echo "<td>";
-              echo "<input type='submit' name='submit' value='Add' class='button' />";
+              echo "<input type='submit' name='submit' value='" .$l['g_add']. "' class='button' />";
             echo "</td>\n";
           echo "</tr>\n";
         echo "</table>\n";

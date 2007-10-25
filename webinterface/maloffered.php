@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.03 Code cleanup
 # 2.00.02 Fixed query
 # 2.00.01 Initial release
@@ -33,20 +34,20 @@ if (isset($tainted['show'])) {
 } else {
   $show = "top";
 }
-if ($show == 'all') $showtext = "All";
-if ($show == 'top') $showtext = "Top 10";
+if ($show == 'all') $showtext = $l['g_all'];
+if ($show == 'top') $showtext = $l['mo_top10'];
 
 echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>\n";
-        echo "<div class='blockHeaderLeft'>Malware offered - $showtext</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['mo_offered']. " - $showtext</div>\n";
         echo "<div class='blockHeaderRight'>\n";
           echo "<div class='searchnav'>\n";
             if ($show != "all") {
-              echo "<a href='maloffered.php?show=all'>&nbsp;ALL&nbsp;</a>\n";
+              echo "<a href='maloffered.php?show=all'>&nbsp;" .$l['ls_all']. "&nbsp;</a>\n";
             } else {
-              echo "<a href='maloffered.php?show=top'>&nbsp;Top 10&nbsp;</a>\n";
+              echo "<a href='maloffered.php?show=top'>&nbsp;" .$l['mo_top10']. "&nbsp;</a>\n";
             }
           echo "</div>\n"; 
         echo "</div>\n"; 
@@ -78,8 +79,8 @@ echo "<div class='left'>\n";
           if ($numrows_count > 0) {
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<th width='80%'>Filename</th>\n";
-                echo "<th width='20%'>Statistics</th>\n";
+                echo "<th width='80%'>" .$l['ls_filename']. "</th>\n";
+                echo "<th width='20%'>" .$l['g_stats']. "</th>\n";
               echo "</tr>\n";
 
               $total = 0;
@@ -98,7 +99,7 @@ echo "<div class='left'>\n";
               echo "</tr>\n";
             echo "</table>\n";
           } else {
-            echo "<span class='warning'>No records found!</span>\n";
+            echo "<span class='warning'>" .$l['g_nofound']. "</span>\n";
           }
         }
       echo "</div>\n"; #</blockContent>

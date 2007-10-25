@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.04                  #
-# 24-09-2007                       #
+# Version 2.10.01                  #
+# 23-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.04 Added hash check
 # 2.00.03 Added access check
 # 2.00.02 Removed obsolete session variable declarations
@@ -27,7 +28,7 @@ if ($s_access_sensor < 2) {
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_m",
+                "int_m"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -84,11 +85,11 @@ if ($s_access_sensor > 1) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='15%'>Sensor " .printhelp("sensor"). "</th>\n";
-              echo "<th width='15%'>Device IP " .printhelp("deviceip"). "</th>\n";
-              echo "<th width='30%'>Imagename " .printhelp("imagename"). "</th>\n";
-              echo "<th width='20%'>Template " .printhelp("template"). "</th>\n";
-              echo "<th width='10%'>Timespan " .printhelp("timespan"). "</th>\n";
+              echo "<th width='15%'>" .$l['ac_sensor']. " " .printhelp("sensor"). "</th>\n";
+              echo "<th width='15%'>" .$l['ac_deviceip']. " " .printhelp("deviceip"). "</th>\n";
+              echo "<th width='30%'>" .$l['ac_imagename']. " " .printhelp("imagename"). "</th>\n";
+              echo "<th width='20%'>" .$l['ac_template']. " " .printhelp("template"). "</th>\n";
+              echo "<th width='10%'>" .$l['ac_timespan']. " " .printhelp("timespan"). "</th>\n";
               echo "<th width='5%'></th>\n";
               echo "<th width='5%'></th>\n";
             echo "</tr>\n";
@@ -137,22 +138,22 @@ if ($s_access_sensor > 1) {
                       $query_timespan = pg_query($sql_timespan);
                       $rowtimespan = pg_fetch_assoc($query_timespan);
                       $timespan = $rowtimespan["timespan"];
-                      echo printOption('D', 'Last 24 hour' , $timespan); 
-                      echo printOption('W', 'Last week' , $timespan); 
-                      echo printOption('M', 'Last month' , $timespan); 
-                      echo printOption('Y', 'Last year' , $timespan); 
-                      echo printOption('N', 'No timespan' , $timespan); 
+                      echo printOption('D', $l['ac_last24'], $timespan); 
+                      echo printOption('W', $l['ac_lastweek'], $timespan); 
+                      echo printOption('M', $l['ac_lastmonth'], $timespan); 
+                      echo printOption('Y', $l['ac_lastyear'], $timespan); 
+                      echo printOption('N', $l['ac_notime'], $timespan); 
                     echo "</select>\n";
                   echo "</td>\n";
                   echo "<input type='hidden' name='int_argosid' value='$id' />\n";
                   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
-                  echo "<td><input type='submit' class='button' value='Update' /></td>\n";
+                  echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' /></td>\n";
                 echo "</form>\n";
                 echo "<form name='argosadmin_del' action='argosdel.php' method='post'>\n";
                   echo "<input type='hidden' name='int_argosid' value='$id' />\n";
                   echo "<input type='hidden' name='int_sensorid' value='$sensorid' />\n";
                   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
-                  echo "<td><input type='submit' class='button' value=\"Delete\" onclick=\"return confirm('This will also delete your range redirections.\\nAre you sure?');\" /></td>\n";
+                  echo "<td><input type='submit' class='button' value='" .$l['g_delete']. "' onclick=\"return confirm('" .$l['ac_confirm']. "');\" /></td>\n";
                 echo "</form>\n";
               echo "</tr>\n";
             }
@@ -169,31 +170,29 @@ if ($s_access_sensor > 1) {
                     $sql .= "WHERE organisations.id = sensors.organisation AND $where ORDER BY sensors.keyname";
                     $debuginfo[] = $sql;
                     $query = pg_query($sql);
-        	    while ($sensor_data = pg_fetch_assoc($query)) {
-                	$sid = $sensor_data['id'];
-	                $keyname = $sensor_data["keyname"];
-        	        $vlanid = $sensor_data["vlanid"];
-               		$label = $sensor_data["label"];
-             	  	$org = $sensor_data["organisation"];
-           	        $tapip = $sensor_data["tapip"];
-              	 	if ($label != "") { 
-                 	 $name = $label;
-             		} else {  
-                 	  if ($vlanid != 0 ) {
-                	    $name = sensorname($keyname, $vlanid);
-			  } else {
-			    $name = $keyname;
-			  }
-			}
-			if ($q_org == 0) {
-               		    $name .= " (" .$org. ") (" .$tapip. ")";
-                 	} else {
-               		    $name .= " (" .$tapip. ")";
+                    while ($sensor_data = pg_fetch_assoc($query)) {
+                      $sid = $sensor_data['id'];
+                      $keyname = $sensor_data["keyname"];
+                      $vlanid = $sensor_data["vlanid"];
+                      $label = $sensor_data["label"];
+                      $org = $sensor_data["organisation"];
+                      $tapip = $sensor_data["tapip"];
+                      if ($label != "") { 
+                        $name = $label;
+                      } else {  
+                        if ($vlanid != 0 ) {
+                          $name = sensorname($keyname, $vlanid);
+                        } else {
+                          $name = $keyname;
                         }
-	  	        echo printOption($sid, $name, $sensorid);
-        	 }
-
-
+                      }
+                      if ($q_org == 0) {
+                        $name .= " (" .$org. ") (" .$tapip. ")";
+                      } else {
+                        $name .= " (" .$tapip. ")";
+                      }
+                      echo printOption($sid, $name, $sensorid);
+                    }
                   echo "</select>\n";
                 echo "</td>\n";
                 echo "<td class='bottom'>";
@@ -221,14 +220,14 @@ if ($s_access_sensor > 1) {
                 echo "</td>\n";
                 echo "<td class='bottom'>\n";
                   echo "<select name='strip_html_escape_timespan'>\n";
-                    echo printOption('D', 'Last 24 hour' , ""); 
-                    echo printOption('W', 'Last week' , ""); 
-                    echo printOption('M', 'Last month' , ""); 
-                    echo printOption('Y', 'Last year' , ""); 
-                    echo printOption('N', 'No timespan' , ""); 
+                    echo printOption('D', $l['ac_last24'], $timespan); 
+                    echo printOption('W', $l['ac_lastweek'], $timespan); 
+                    echo printOption('M', $l['ac_lastmonth'], $timespan); 
+                    echo printOption('Y', $l['ac_lastyear'], $timespan); 
+                    echo printOption('N', $l['ac_notime'], $timespan); 
                   echo "</select>\n";
                 echo "</td>\n";
-                echo "<td class='bottom' colspan=2><input type='submit' class='button' value='Add' /></td>\n";
+                echo "<td class='bottom' colspan=2><input type='submit' class='button' value='" .$l['g_add']. "' /></td>\n";
               echo "</tr>\n";
               echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
             echo "</form>\n";
@@ -242,12 +241,12 @@ if ($s_access_sensor > 1) {
   echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Redirect to ranges</div>\n";
+        echo "<div class='blockHeader'>" .$l['ac_redirectto']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='60%'>Sensor</th>\n";
-              echo "<th width='30%'>Range or IP</th>\n";
+              echo "<th width='60%'>" .$l['g_sensor']. "</th>\n";
+              echo "<th width='30%'>" .$l['ac_range_or_ip']. "</th>\n";
               echo "<th width='5%'></th>\n";
               echo "<th width='5%'></th>\n";
             echo "</tr>\n";
@@ -272,13 +271,13 @@ if ($s_access_sensor > 1) {
                 echo "<form name='argosadmin_updaterange' action='argosupdaterange.php' method='post'>\n";
                   echo "<td>$sensor</td>";
                   echo "<td><input type='text' name='inet_range' size='18' value='$range' /></td>";
-                  echo "<td><input type='submit' class='button' value='Update' /></td>\n";
+                  echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' /></td>\n";
                   echo "<input type='hidden' name='int_rangeid' value='$rangeid'>\n";
                   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                 echo "</form>\n";
                 echo "<form name='argosadmin_delrange' action='argosdelrange.php' method='post'>\n";
                   echo "<input type='hidden' name='int_rangeid' value='$rangeid'>\n";
-                  echo "<td><input type='submit' class='button' value='Delete' /></td>\n";
+                  echo "<td><input type='submit' class='button' value='" .$l['g_delete']. "' /></td>\n";
                   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                 echo "</form>\n";
               echo "</tr>\n";
@@ -298,33 +297,33 @@ if ($s_access_sensor > 1) {
 	           $query = pg_query($sql);
 		  
 		  echo "<select name='int_sensorid'>\n";
-        	    while ($sensor_data = pg_fetch_assoc($query)) {
-                	$sid = $sensor_data['sensorid'];
-	                $keyname = $sensor_data["keyname"];
-        	        $vlanid = $sensor_data["vlanid"];
-               		$label = $sensor_data["label"];
-             	  	$org = $sensor_data["organisation"];
-           	        $tapip = $sensor_data["tapip"];
-              	 	if ($label != "") { 
-                 	 $name = $label;
-             		} else {  
-                 	  if ($vlanid != 0 ) {
-                	    $name = sensorname($keyname, $vlanid);
-			  } else {
-			    $name = $keyname;
-			  }
-			}
-			if ($q_org == 0) {
-               		    $name .= " (" .$org. ") (" .$tapip. ")";
-                 	} else {
-               		    $name .= " (" .$tapip. ")";
+                    while ($sensor_data = pg_fetch_assoc($query)) {
+                      $sid = $sensor_data['id'];
+                      $keyname = $sensor_data["keyname"];
+                      $vlanid = $sensor_data["vlanid"];
+                      $label = $sensor_data["label"];
+                      $org = $sensor_data["organisation"];
+                      $tapip = $sensor_data["tapip"];
+                      if ($label != "") { 
+                        $name = $label;
+                      } else {  
+                        if ($vlanid != 0 ) {
+                          $name = sensorname($keyname, $vlanid);
+                        } else {
+                          $name = $keyname;
                         }
-	  	        echo printOption($sid, $name, $sensorid);
-        	 }
+                      }
+                      if ($q_org == 0) {
+                        $name .= " (" .$org. ") (" .$tapip. ")";
+                      } else {
+                        $name .= " (" .$tapip. ")";
+                      }
+                      echo printOption($sid, $name, $sensorid);
+                    }
                   echo "</select>\n";
                 echo "</td>\n";
                 echo "<td class='bottom'><input type='text' name='inet_range' size='18' /></td>";
-                echo "<td class='bottom' colspan='2'><input type='submit' class='button' value='Add' /></td>\n";
+                echo "<td class='bottom' colspan='2'><input type='submit' class='button' value='" .$l['g_add']. "' /></td>\n";
                 echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
               echo "</form>\n";
             echo "</tr>\n";

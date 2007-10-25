@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 10-09-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 Changed the location of the md5 lib
 # 1.04.02 Changed data input handling
 # 1.04.01 Rereleased as 1.04.01
@@ -19,6 +20,10 @@
 # 1.02.02 Added url querystring support
 # 1.02.01 Initial release
 #############################################
+
+# Including language file
+include "../lang/${c_language}.php";
+
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
@@ -72,15 +77,15 @@ if ($c_login_method == 2) {
       $execute = pg_query($pgconn, $sql);
       $serverhash = md5($serverhash);
     } else {
-      echo "<p><font color='red'>Username or password was incorrect!</font></p>\n";
+      echo "<p><font color='red'>" .$l['lo_error']. "</font></p>\n";
       echo "<form name='login' action='login.php' method='post'>\n";
         echo "<table class='datatable' border='1'>\n";
           echo "<tr>\n";
-            echo "<td>Username:</td>\n";
+            echo "<td>" .$l['lo_username']. ":</td>\n";
             echo "<td><input type='text' name='strip_html_user' class='loginput' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td colspan='2' class='acenter'><input type='submit' value='Login' class='button' /></td>\n";
+            echo "<td colspan='2' class='acenter'><input type='submit' value='" .$l['lo_login']. "' class='button' /></td>\n";
           echo "</tr>\n";
         echo "</table>\n";
       echo "</form>\n";
@@ -90,7 +95,7 @@ if ($c_login_method == 2) {
     echo "<form name='login' action='checklogin.php$url' method='post' onsubmit='javascript:generatep();'>\n";
       echo "<table class='datatable' border='1'>\n";
         echo "<tr>\n";
-          echo "<td>Password:</td>\n";
+          echo "<td>" .$l['lo_pass']. ":</td>\n";
           echo "<td>\n";
             echo "<input type='password' class='loginput' />\n";
             echo "<input type='hidden' value='$serverhash' size='50' />\n";
@@ -102,12 +107,12 @@ if ($c_login_method == 2) {
     echo "<form name='login' action='login.php' method='post'>\n";
       echo "<table class='datatable' border='1'>\n";
         echo "<tr>\n";
-          echo "<td>Username:</td>\n";
+          echo "<td>" .$l['lo_username']. ":</td>\n";
           echo "<td><input type='text' name='strip_html_escape_user' class='loginput' /></td>\n";
         echo "</tr>\n";
   }
       echo "<tr>\n";
-        echo "<td colspan='2' class='acenter'><input type='submit' value='Login' class='button' /></td>\n";
+        echo "<td colspan='2' class='acenter'><input type='submit' value='" .$l['lo_login']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -118,18 +123,18 @@ if ($c_login_method == 2) {
   echo "<form name='login' action='checklogin.php$url' method='post' onsubmit='javascript:md5_pass.value=hex_md5(login.elements[1].value);'>\n";
     echo "<table class='datatable'>\n";
       echo "<tr>\n";
-        echo "<td>Username:</td>\n";
+        echo "<td>" .$l['lo_username']. ":</td>\n";
         echo "<td><input type='text' name='strip_html_escape_user' class='loginput' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Password:</td>\n";
+        echo "<td>" .$l['lo_pass']. ":</td>\n";
         echo "<td>\n";
           echo "<input type='password' class='loginput' />\n";
           echo "<input type='hidden' name='md5_pass' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td class='acenter' colspan='2'><input type='submit' value='Login' class='button' /></td>\n";
+        echo "<td class='acenter' colspan='2'><input type='submit' value='" .$l['lo_login']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";

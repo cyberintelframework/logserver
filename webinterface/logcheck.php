@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.10 Added yearly option 
 # 1.04.09 Added IP exclusions stuff
@@ -49,6 +50,7 @@ $check = extractvars($_GET, $allowed_get);
 debug_input();
 
 # Setting up sorting stuff
+# FIXME
 if (isset($clean['sort'])) {
   $sort = $clean['sort'];
 } else {
@@ -58,23 +60,23 @@ if (isset($clean['sort'])) {
 echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Cross Domain</div>\n";
+      echo "<div class='blockHeader'>" .$l['lc_cross']. "</div>\n";
       echo "<div class='blockContent'>\n";
         if ($row['ranges'] == "") {
-          echo "<h3>No ranges present for this organisation.</h3>\n";
+          echo "<h3>" .$l['lc_noranges']. "</h3>\n";
           $err = 1;
         } else {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
               if ($sort == 0) {
-                echo "<th width='300'><a href='logcheck.php?int_sort=1'>Range</a>&nbsp;<img src='images/up.gif' /></th>\n";
+                echo "<th width='300'><a href='logcheck.php?int_sort=1'>" .$l['lc_range']. "</a>&nbsp;<img src='images/up.gif' /></th>\n";
               } else {
-                echo "<th width='300'><a href='logcheck.php?int_sort=0'>Range</a>&nbsp;<img src='images/down.gif' /></th>\n";
+                echo "<th width='300'><a href='logcheck.php?int_sort=0'>" .$l['lc_range']. "</a>&nbsp;<img src='images/down.gif' /></th>\n";
               }
-              echo "<th width='150'>Malicious Attacks</th>\n";
-              echo "<th width='150'>Unique Source Addresses</th>\n";
-              echo "<th width='150'>Possible Malicious Attacks</th>\n";
-              echo "<th width='150'>Unique Source Addresses</th>\n";
+              echo "<th width='150'>" .$l['g_mal']. "</th>\n";
+              echo "<th width='150'>" .$l['lc_uniqsource']. "</th>\n";
+              echo "<th width='150'>" .$l['g_pos']. "</th>\n";
+              echo "<th width='150'>" .$l['lc_uniqsource']. "</th>\n";
             echo "</tr>\n";
 
             ### Looping through organisation info retrieved by soap connection.

@@ -207,6 +207,7 @@ $v_mail_detail_ar = array(
 		1 => "Mail - Detail", 
 		2 => "Mail - Summary + Detail",
 		3 => "Mail - IDMEF Detail",
+		4 => "Mail - Cymru markup",			# <ASN>  | <IP>  | <time> <info> | <ASN description>
 		10 => "RSS - Summary",
 		11 => "RSS - Summary + Detail"
 );
@@ -531,5 +532,10 @@ $v_sensor_purge_ar = array(
 );
 
 $v_weekdays = array("", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+
+$v_os_languages = array(
+	'nl' => "Dutch",
+	'en' => "English"
+);
 
 ?>

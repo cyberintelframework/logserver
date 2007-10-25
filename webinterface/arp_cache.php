@@ -3,13 +3,14 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 2.00.02                 #
-# 24-09-2007                      #
+# Version 2.10.01                 #
+# 23-10-2007                      #
 # Jan van Lith & Kees Trippelvitz #
 ###################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.03 Fixed a bug with clear and missing sensor ID's
 # 2.00.02 Added access check
 # 2.00.01 Initial release
@@ -61,9 +62,8 @@ if ($err == 0) {
       echo "<div class='actionBlock'>\n";
         echo "<div class='blockHeader'>Actions</div>\n";
         echo "<div class='blockContent'>\n";
-          $confirm = "Are you sure you want to clear the ARP cache?";
-          echo "<a href='arp_cache_clr.php?int_org=$q_org&md5_hash=$s_hash&int_sid=$sid' onclick=\"javascript: return confirm('" .$confirm. "');\">";
-          echo "Clear ARP cache</a>\n";
+          echo "<a href='arp_cache_clr.php?int_org=$q_org&md5_hash=$s_hash&int_sid=$sid' onclick=\"javascript: return confirm('" .$l['ah_confirm']. "');\">";
+          echo $l['ah_clear_arp']. "</a>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</actionBlock>
@@ -75,7 +75,7 @@ echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
-        echo "<div class='blockHeaderLeft'>ARP Cache</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['ah_arp_cache']. "</div>\n";
         echo "<div class='blockHeaderRight'>";
           echo "<form method='get'>\n";
             if ($q_org == 0 || $s_access_search == 9) {
@@ -112,13 +112,13 @@ echo "<div class='centerbig'>\n";
         if ($err == 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='120'>" .printsort("MAC address", "mac"). "</th>\n";
-              echo "<th width='100'>" .printsort("IP address", "ip"). "</th>\n";
-              echo "<th width='50'>" .printsort("Type", "flags"). "</th>\n";
-              echo "<th width='200'>" .printsort("NIC Manufacturer", "manufacturer"). "</th>\n";
-              echo "<th width='100'>Sensor</th>\n";
-              echo "<th width='140'>" .printsort("Last changed", "last_seen"). "</th>\n";
-              echo "<th width='70'>Status</th>\n";
+              echo "<th width='120'>" .printsort($l['g_mac'], "mac"). "</th>\n";
+              echo "<th width='100'>" .printsort($l['g_ip'], "ip"). "</th>\n";
+              echo "<th width='50'>" .printsort($l['g_type'], "flags"). "</th>\n";
+              echo "<th width='200'>" .printsort($l['ah_nic_man', "manufacturer"). "</th>\n";
+              echo "<th width='100'>" .$l['g_sensor']. "</th>\n";
+              echo "<th width='140'>" .printsort($l['ah_last_changed'], "last_seen"). "</th>\n";
+              echo "<th width='70'>" .$l['ah_status']. "</th>\n";
               echo "<th width='60'></th>\n";
             echo "</tr>\n";
 
@@ -196,11 +196,11 @@ echo "<div class='centerbig'>\n";
                   echo "<td>$sensor<input type='hidden' name='int_sensor' value='$sensorid' /></td>\n";
                   echo "<td>$lastseen</td>\n";
                   if ($poisoned == 0) {
-                    echo "<td><font class='bok'>OK</font></td>\n";
-                    echo "<td><input type='submit' value='Add to static list' class='button' /></td>\n";
+                    echo "<td><font class='bok'>". $l['ah_ok']. "</font></td>\n";
+                    echo "<td><input type='submit' value='" .$l['ah_add_to_static']. "' class='button' /></td>\n";
                   } else {
-                    echo "<td><font class='bwarning'>Poisoned</font></td>\n";
-                    echo "<td><input type='submit' value='Add to static list' class='button' disabled /></td>\n";
+                    echo "<td><font class='bwarning'>". $l['ah_poisoned']. "</font></td>\n";
+                    echo "<td><input type='submit' value='" .$l['ah_add_to_static']. "' class='button' disabled /></td>\n";
                   }
                 echo "</tr>\n";
                 echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
@@ -212,7 +212,7 @@ echo "<div class='centerbig'>\n";
           echo "<form method='get'>\n";
           echo "<table>";
             echo "<tr>";
-              echo "<td><span class='warning'>Select a sensor</span></td>\n";
+              echo "<td><span class='warning'>" .$l['g_select_sensor']. "</span></td>\n";
                echo "<td>\n";
                  $select_size = 8;
                  if ($q_org == 0) {

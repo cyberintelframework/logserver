@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 11-10-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Fixed bug with attacks.dport=0
 # 2.00.01 version 2.00
 # 1.04.07 Fixed a port link when today was selected
@@ -58,13 +59,13 @@ echo "<div class='all'>\n";
 echo "<div class='leftmed'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Attacks</div>\n";
+      echo "<div class='blockHeader'>" .$l['g_attacks']. "</div>\n";
       echo "<div class='blockContent'>\n";
         if ($num > 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='80%'>Detected connections</td>\n";
-              echo "<th width='20%'>Statistics</td>\n";
+              echo "<th width='80%'>" .$l['g_detconn']. "</td>\n";
+              echo "<th width='20%'>" .$l['g_stats']. "</td>\n";
             echo "</tr>\n";
 
             $sql_type = "SELECT DISTINCT attacks.atype, COUNT(attacks.atype) as total ";
@@ -114,7 +115,7 @@ echo "<div class='leftmed'>\n";
             }
           echo "</table>\n";
         } else {
-          echo "<font class='warning'>No records found!</font>\n";
+          echo "<font class='warning'>" .$l['g_nofound']. "</font>\n";
         }
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";
@@ -139,27 +140,23 @@ add_to_sql("attacks.timestamp <= $to", "where");
 echo "<div class='rightmed'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Exploits</div>\n";
+      echo "<div class='blockHeader'>" .$l['g_exploits']. "</div>\n";
       echo "<div class='blockContent'>\n";
         if ($err != 1) {
           ######### Table for Malicious attacks (SEV: 1) #############
           add_to_sql("attacks.id = details.attackid", "where");
           add_to_sql("attacks.severity = 1", "where");
           add_to_sql("details.type = 1", "where");
-#          add_to_sql("details.text = stats_dialogue.name", "where");
           if ($q_org != 0) {
             add_to_sql(gen_org_sql(), "where");
             add_to_sql("sensors", "table");
             add_to_sql("attacks.sensorid = sensors.id", "where");
           }
-#          add_to_sql("stats_dialogue", "table");
           add_to_sql("details", "table");
           add_to_sql("attacks", "table");
           add_to_sql("COUNT(DISTINCT details.attackid) as total", "select");
           add_to_sql("details.text", "select");
-#          add_to_sql("stats_dialogue.id", "select");
           add_to_sql("details.text", "group");
-#          add_to_sql("stats_dialogue.id", "group");
           add_to_sql("total", "order");
 
           # IP Exclusion stuff
@@ -184,8 +181,8 @@ echo "<div class='rightmed'>\n";
           if ($numrows_count > 0) {
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<th width='80%'>Malicious attacks</th>\n";
-                echo "<th width='20%'>Statistics</th>\n";
+                echo "<th width='80%'>" .$l['g_mal']. "</th>\n";
+                echo "<th width='20%'>" .$l['g_stats']. "</th>\n";
               echo "</tr>\n";
 
               $total = 0;
@@ -211,7 +208,7 @@ echo "<div class='rightmed'>\n";
               echo "</tr>\n";
             echo "</table>\n";
           } else {
-            echo "<font class='warning'>No records found!</font>\n";
+            echo "<font class='warning'>" .$l['g_nofound']. "</font>\n";
           }
         }
       echo "</div>\n"; #</blockContent>
@@ -225,13 +222,13 @@ echo "<div class='all'>\n";
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Attackers</div>\n";
+        echo "<div class='blockHeader'>" .$l['in_attackers']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable' width='100%'>\n";
             echo "<tr>\n";
-              echo "<th class='dataheader' width='50%'>IP Address</th>\n";
-              echo "<th class='dataheader' width='35%'>Last Seen</th>";
-              echo "<th class='dataheader' width='15%'>Total Hits</th>\n";
+              echo "<th class='dataheader' width='50%'>" .$l['g_ip']. "</th>\n";
+              echo "<th class='dataheader' width='35%'>" .$l['in_lastseen']. "</th>";
+              echo "<th class='dataheader' width='15%'>" .$l['in_totalhits']. "</th>\n";
             echo "</tr>\n";
     
             #### Get the data for todays attackers and display it.
@@ -314,14 +311,14 @@ echo "<div class='all'>\n";
           echo "<table>\n";
             echo "<tr>\n";
               echo "<td>Last Seen: </td>\n";
-              echo "<td style='background-color: $v_indexcolors[0]; text-align: center;' width='80'>Today</td>\n";
+              echo "<td style='background-color: $v_indexcolors[0]; text-align: center;' width='80'>" .$l['in_today']. "</td>\n";
               $count = count($v_indexcolors) - 1;
               foreach ($v_indexcolors as $key => $value) {
                 if ($key != 0 && $key != $count) {
                   echo "<td style='background-color: $value; width: 10px;'>&nbsp;</td>\n";
                 }
               }
-              echo "<td style='background-color: $v_indexcolors[$count]; text-align: center;' width='80'>7 days ago</td>\n";
+              echo "<td style='background-color: $v_indexcolors[$count]; text-align: center;' width='80'>" .$l['in_7']. "</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</div>\n"; #</blockContent>
@@ -333,13 +330,13 @@ echo "<div class='all'>\n";
   echo "<div class='rightmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Ports</div>\n";
+        echo "<div class='blockHeader'>" .$l['in_ports']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable' width='100%'>\n";
             echo "<tr>\n";
-              echo "<th width='40%'>Destination Ports</th>\n";
-              echo "<th width='45%'>Description</th>\n";
-              echo "<th width='100%'>Total Hits</th>\n";
+              echo "<th width='40%'>" .$l['in_destports']. "</th>\n";
+              echo "<th width='45%'>" .$l['in_desc']. "</th>\n";
+              echo "<th width='100%'>" .$l['in_totalhits']. "</th>\n";
             echo "</tr>\n";
 
             $queryport = "attacks.sensorid = sensors.id ";

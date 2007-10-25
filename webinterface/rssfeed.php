@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 22-10-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Fixed pubDate to display attack timestamp
 # 2.00.01 Initial release
 #############################################
@@ -21,6 +22,9 @@ include_once '../include/rss_generator.inc.php';
 
 # Starting the session
 session_start();
+
+# Including language file
+include "../lang/${c_language}.php";
 
 $allowed_get = array(
 	"int_rcid"
@@ -100,7 +104,7 @@ if ($err == 0) {
   $rss_channel->link = "$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid";
   $rss_channel->description = "$subject";
   $rss_channel->language = "EN-en";
-  $rss_channel->generator = "SURF IDS RSS Feed Generator";
+  $rss_channel->generator = "SURF IDS RSS Feed ". $l['rf_generator'];
   $rss_channel->webMaster = 'ids-beheer@surfnet.nl';
 
   ################################
@@ -244,7 +248,7 @@ if ($err == 0) {
         $ts = $row['timestamp'];
 
         $att = strtolower($v_severity_ar[$sev]);
-        $title = "New $att detected (attack ID: $attackid)!";
+        $title = $l['rf_new']. " $att " .$l['rf_detected']. ": $attackid)!";
         if ($text != "") {
           $description = "$source -> $keyname ($dest) - $text";
         } else {
@@ -265,7 +269,7 @@ if ($err == 0) {
       }
     } else {
       $item = new rssGenerator_item();
-      $item->title = "Error: No ranges present for this organisation!";
+      $item->title = $l['rf_noranges'];
       $item->pubDate = "$ts";
       $rss_channel->items[] = $item;
     }
@@ -299,7 +303,7 @@ if ($err == 0) {
   $rss_channel->link = "$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid";
   $rss_channel->description = "Error: $info";
   $rss_channel->language = "EN-en";
-  $rss_channel->generator = "SURF IDS RSS Feed Generator";
+  $rss_channel->generator = "SURF IDS RSS Feed " .$l['rf_generator'];
   $rss_channel->webMaster = 'ids-beheer@surfnet.nl';
 
   # Creating and showing the result

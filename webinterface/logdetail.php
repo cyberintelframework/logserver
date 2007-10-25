@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.04 Fixed binname variable name
 # 1.04.03 Changed data input handling
@@ -28,6 +29,9 @@ include '../include/variables.inc.php';
 # Starting the session
 session_start();
 header("Cache-control: private");
+
+# Including language file
+include "../lang/${c_language}.php";
 
 # Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
@@ -78,11 +82,11 @@ if ($err != 1) {
 #        echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<td colspan='2' class='title'>Details of attack ID: $id</td>\n";
+              echo "<td colspan='2' class='title'>" .$l['ld_aid_details']. ": $id</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<th width='30%'>Type</th>\n";
-              echo "<th width='70%'>Info</th>\n";
+              echo "<th width='30%'>" .$l['g_type']. "</th>\n";
+              echo "<th width='70%'>" .$l['g_info']. "</th>\n";
             echo "</tr>\n";
 
             while ($row = pg_fetch_assoc($result_details)) {
@@ -120,7 +124,7 @@ echo "</div>\n";
 
 echo "<div class='leftsmall'>\n";
   echo "<div class='block'>\n";
-    echo "<input type='button' onclick='popout();' class='button' value='Close this popup' />\n";
+    echo "<input type='button' onclick='popout();' class='button' value='" .$l['ld_popout']. "' />\n";
   echo "</div>\n";
 echo "</div>\n";
 

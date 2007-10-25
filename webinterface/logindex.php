@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 06-09-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.12 Added yearly option 
 # 1.04.11 Added IP exclusion stuff
@@ -72,13 +73,13 @@ $num = pg_num_rows($result_severity);
 echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Attacks</div>\n";
+      echo "<div class='blockHeader'>" .$l['g_attacks']. "</div>\n";
       echo "<div class='blockContent'>\n";
         if ($num > 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='80%'>Detected connections</td>\n";
-              echo "<th width='20%'>Statistics</td>\n";
+              echo "<th width='80%'>" .$l['g_detconn']. "</td>\n";
+              echo "<th width='20%'>" .$l['g_stats']. "</td>\n";
             echo "</tr>\n";
 
             $sql_type = "SELECT DISTINCT attacks.atype, COUNT(attacks.atype) as total ";
@@ -127,7 +128,7 @@ echo "<div class='left'>\n";
             }
           echo "</table>\n";
         } else {
-          echo "<font class='warning'>No records found!</font>\n";
+          echo "<font class='warning'>" .$l['g_nofound']. "</font>\n";
         }
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";

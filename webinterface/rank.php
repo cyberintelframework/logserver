@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 25-09-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -15,6 +15,7 @@
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Fixed a bug with tops source addresses.
 # 2.00.01 version 2.00
 # 1.04.14 Fixed links to logsearch + added vlan support for top 10 sensors
@@ -464,7 +465,7 @@ echo "<div class='all'>\n";
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Total</div>\n";
+        echo "<div class='blockHeader'>" .$l['pl_total']. "</div>\n";
         echo "<div class='blockContent'>\n";
           $result_attacks = pg_query($pgconn, $sql_attacks);
           $row = pg_fetch_assoc($result_attacks);
@@ -480,9 +481,9 @@ echo "<div class='all'>\n";
             $avg_perc = 0;
           }
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='2'>Totals</td></tr>\n";
+            echo "<tr><td class='title' colspan='2'>" .$l['ra_totals']. "</td></tr>\n";
             echo "<tr>\n";
-              echo "<th width='80%'>Total malicious attacks of all sensors</th>\n";
+              echo "<th width='80%'>" .$l['ra_totalmal_all']. "</th>\n";
               if ($s_access_search == 9) {
                 echo "<th width='20%'>" .downlink("logsearch.php?int_sev=1&int_org=0", nf($total_attacks)). "</th>\n";
               } else {
@@ -494,7 +495,7 @@ echo "<div class='all'>\n";
               echo "<td></td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<th>Total downloaded malware of all sensors</th>\n";
+              echo "<th>" .$l['ra_totaldown_all']. "</th>\n";
               if ($s_access_search == 9) {
                 echo "<th>" .downlink("logsearch.php?int_sev=32&int_org=0", nf($total_downloads)). "</th>\n";
               } else {
@@ -516,7 +517,7 @@ echo "<div class='all'>\n";
     echo "<div class='rightmed'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>Own domain</div>\n";
+          echo "<div class='blockHeader'>" .$l['ra_owndomain']. "</div>\n";
           echo "<div class='blockContent'>\n";
             $result_attacks = pg_query($pgconn, $sql_attacks_org);
             $row = pg_fetch_assoc($result_attacks);
@@ -537,21 +538,21 @@ echo "<div class='all'>\n";
             }
 
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='2'>Totals</td></tr>\n";
+              echo "<tr><td class='title' colspan='2'>" .$l['ra_totals']. "</td></tr>\n";
               echo "<tr>\n";
-                echo "<th width='80%'>Total malicious attacks for $orgname</th>\n";
+                echo "<th width='80%'>" .$l['ra_totalmal_org']. " $orgname</th>\n";
                 echo "<th width='20%'>" .downlink("logsearch.php?int_sev=1", nf($org_attacks)). "</th>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td class='indented'>% of total malicious attacks</td>\n";
+                echo "<td class='indented'>% " .$l['ra_totalmal_perc']. "</td>\n";
                 echo "<td>$org_attacks_perc%</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<th>Total downloaded malware by $orgname</th>\n";
+                echo "<th>" .$l['ra_totaldown_org']. " $orgname</th>\n";
                 echo "<th>" .downlink("logsearch.php?int_sev=32", nf($org_downloads)). "</th>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td class='indented'>% of total collected malware</td>\n";
+                echo "<td class='indented'>% " .$l['ra_totaldown_perc']. "</td>\n";
                 echo "<td>$org_downloads_perc%</td>\n";
               echo "</tr>\n";
             echo "</table>\n";
@@ -571,11 +572,11 @@ echo "<div class='all'>\n";
         echo "<div class='blockContent'>\n";
           $result_topexp = pg_query($pgconn, $sql_topexp);
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_topexploits exploits of all sensors</td></tr>\n";
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topexploits " .$l['ra_exploits_all']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>Exploit</th>\n";
-              echo "<th width='20%'>Total</th>\n";
+              echo "<th width='75%'>" .$l['ra_expl']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
             echo "</tr>\n";
             $i=1;
             $grandtotal = 0;
@@ -619,11 +620,11 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='3'>Top $c_topexploits exploits of your sensors</td></tr>\n";
+              echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topexploits " .$l['ra_exploits_org']. "</td></tr>\n";
               echo "<tr class='dataheader'>\n";
                 echo "<th width='5%'>#</td>\n";
-                echo "<th width='75%'>Exploit</td>\n";
-                echo "<th width='20%'>Total</td>\n";
+                echo "<th width='75%'>" .$l['ra_expl']. "</td>\n";
+                echo "<th width='20%'>" .$l['ra_total']. "</td>\n";
               echo "</tr>\n";
               $i = 1;
               $grandtotal = 0;
@@ -670,11 +671,11 @@ echo "<div class='all'>\n";
           $result_top = pg_query($pgconn, $sql_top);
 
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_topsensors sensors</td></tr>\n";
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topsensors " .$l['ra_sensors']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>Sensor</th>\n";
-              echo "<th width='20%'>Total exploits</th>\n";
+              echo "<th width='75%'>" .$l['g_sensor']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_totalexpl']. "</th>\n";
             echo "</tr>\n";
             $i=1;
             $rank_ar = array();
@@ -731,12 +732,12 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='4'>Top $c_topsensors sensors of $orgname</td></tr>\n";
+              echo "<tr><td class='title' colspan='4'>" .$l['ra_top']. " $c_topsensors " .$l['ra_sensorsof']. " $orgname</td></tr>\n";
               echo "<tr>\n";
                 echo "<th width='5%'>#</th>\n";
-                echo "<th width='25%'>Overall Rank</th>\n";
-                echo "<th width='50%'>Sensor</th>\n";
-                echo "<th width='20%'>Total exploits</th>\n";
+                echo "<th width='25%'>" .$l['ra_overallrank']. "</th>\n";
+                echo "<th width='50%'>" .$l['g_sensor']. "</th>\n";
+                echo "<th width='20%'>" .$l['ra_totalexpl']. "</th>\n";
               echo "</tr>\n";
               $i = 1;
               $result_top_org = pg_query($pgconn, $sql_top_org);
@@ -780,12 +781,12 @@ echo "<div class='all'>\n";
           $result_topports = pg_query($pgconn, $sql_topports);
 
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='4'>Top $c_topports ports of all sensors</td></tr>\n"; // change this into variable to be read from conf
+            echo "<tr><td class='title' colspan='4'>" .$l['ra_top']. " $c_topports " .$l['ra_ports_all']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='15%'>Port</th>\n";
-              echo "<th width='60%'>Port Description</th>\n";
-              echo "<th width='20%'>Total</th>\n";
+              echo "<th width='15%'>" .$l['ra_port']. "</th>\n";
+              echo "<th width='60%'>" .$l['ra_portdesc']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
             echo "</tr>\n";
             $i=1;
             $grandtotal = 0;
@@ -824,12 +825,12 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='4'>Top $c_topports ports of your sensors</td></tr>\n";
+              echo "<tr><td class='title' colspan='4'>" .$l['ra_top']. " $c_topports " .$l['ra_ports_org']. "</td></tr>\n";
               echo "<tr>\n";
                 echo "<th width='5%'>#</th>\n";
-                echo "<th width='15%'>Port</th>\n";
-                echo "<th width='60%'>Port Description</th>\n";
-                echo "<th width='20%'>Total</th>\n";
+                echo "<th width='15%'>" .$l['ra_port']. "</th>\n";
+                echo "<th width='60%'>" .$l['ra_portdesc']. "</th>\n";
+                echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
               echo "</tr>\n";
               $i = 1;
               $grandtotal = 0;
@@ -871,11 +872,11 @@ echo "<div class='all'>\n";
           $result_topsource = pg_query($pgconn, $sql_topsource);
 
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_topsourceips source addresses of all sensors</span>\n";// change this into variable to be read from conf
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topsourceips " .$l['ra_source_all']. "</span>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>Address</th>\n";
-              echo "<th width='20%'>Total</th>\n";
+              echo "<th width='75%'>" .$l['ra_address']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
             echo "</tr>\n";
             $i = 1;
             $grandtotal = 0;
@@ -904,7 +905,7 @@ echo "<div class='all'>\n";
                     if ($numrows_finger != 0) {
                       echo printosimg($os, $fingerprint);
                     } else {
-                      echo printosimg("Blank", "No info");
+                      echo printosimg("Blank", $l['ls_noinfo']);
                     }
                     if ($c_geoip_enable == 1) {
                       $record = geoip_record_by_addr($gi, $key);
@@ -924,7 +925,7 @@ echo "<div class='all'>\n";
                     $ranges_ar = explode(";", $rowrange['ranges']);
                     if (matchCIDR($key, $ranges_ar)) {
                       echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$key". "', 500, 500);\" class='warning' />$key</a>&nbsp;&nbsp;";
-                      echo "<img src='images/ownranges.jpg' ".printover("IP from your own ranges!") ."></td>\n";
+                      echo "<img src='images/ownranges.jpg' ".printover($l['ra_ipownranges']) ."></td>\n";
                     } else {
                       echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$key". "', 500, 500);\" />$key</a>";
                     }
@@ -952,11 +953,11 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='3'>Top $c_topsourceips source addresses of your sensors</td></tr>\n";  // change this into variable to be read from conf
+              echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topsourceips " .$l['ra_source_org']. "</td></tr>\n";
               echo "<tr>\n";
                 echo "<th width='5%'>#</th>\n";
-                echo "<th width='75%'>Address</th>\n";
-                echo "<th width='20%'>Total</th>\n";
+                echo "<th width='75%'>" .$l['ra_address']. "</th>\n";
+                echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
               echo "</tr>\n";
               $i = 1;
               $grandtotal = 0;
@@ -987,7 +988,7 @@ echo "<div class='all'>\n";
                       if ($numrows_finger != 0) {
                         echo printosimg($os, $fingerprint);
                       } else {
-                        echo printosimg("Blank", "No info");
+                        echo printosimg("Blank", $l['ls_noinfo']);
                       }
                       if ($c_geoip_enable == 1) {
                         $record = geoip_record_by_addr($gi, $key);
@@ -1002,7 +1003,7 @@ echo "<div class='all'>\n";
                       }
                       if (matchCIDR($key, $ranges_ar)) {
                         echo "<a onclick=\"popit('" ."whois.php?ip_ip=$key". "', 500, 500);\" class='warning'>$key</a>&nbsp;&nbsp;";
-                        echo "<img src='images/ownranges.jpg' ".printover("IP from your own ranges!") ."></td>\n";
+                        echo "<img src='images/ownranges.jpg' ".printover($l['ra_ipownranges']) ."></td>\n";
                       } else {
                         echo "<a onclick=\"popit('" ."whois.php?ip_ip=$key". "', 500, 500);\">$key </a></td>\n";
                       }
@@ -1031,11 +1032,11 @@ echo "<div class='all'>\n";
           $result_topfiles = pg_query($pgconn, $sql_topfiles);
         
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_topfilenames filenames of all sensors</td></tr>\n"; // change this into variable to be read from conf
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topfilenames " .$l['ra_files_all']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>Filename</th>\n";
-              echo "<th width='20%'>Total</th>\n";
+              echo "<th width='75%'>" .$l['ra_filename']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
             echo "</tr>\n";
             $i = 0;
             $grandtotal = 0;
@@ -1078,11 +1079,11 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='3'>Top $c_topfilenames filenames of your sensors</td><tr>\n";// change this into variable to be read from conf
+              echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topfilenames " .$l['ra_files_org']. "</td><tr>\n";
               echo "<tr>\n";
                 echo "<th width='5%'>#</th>\n";
-                echo "<th width='75%'>Filename</th>\n";
-                echo "<th width='20%'>Total</th>\n";
+                echo "<th width='75%'>" .$l['ra_filename']. "</th>\n";
+                echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
               echo "</tr>\n";
               $filenameArray = array();
               $i = 0;
@@ -1129,11 +1130,11 @@ echo "<div class='all'>\n";
           $result_topproto = pg_query($pgconn, $sql_topproto);
         
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_topprotocols download protocols of all sensors</td></tr>\n";
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topprotocols " .$l['ra_proto_all']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>Protocol</th>\n";
-              echo "<th width='20%'>Total</th>\n";
+              echo "<th width='75%'>" .$l['ra_proto']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
             echo "</tr>\n";
             $i = 0;
             $grandtotal = 0;
@@ -1171,11 +1172,11 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='3'>Top $c_topprotocols download protocols of your sensors</td></tr>\n";
+              echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topprotocols " .$l['ra_proto_org']. "</td></tr>\n";
               echo "<tr>\n";
                 echo "<th width='5%'>#</th>\n";
-                echo "<th width='75%'>Protocol</th>\n";
-                echo "<th width='20%'>Total</th>\n";
+                echo "<th width='75%'>" .$l['ra_proto']. "</th>\n";
+                echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
               echo "</tr>\n";
               $i = 0;
               $grandtotal = 0;
@@ -1220,11 +1221,11 @@ echo "<div class='all'>\n";
           $result_topos = pg_query($pgconn, $sql_topos);
         
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_topos attacker OS's of all sensors</td></tr>\n";
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topos " .$l['ra_os_all']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>OS</th>\n";
-              echo "<th width='20%'>Total</th>\n";
+              echo "<th width='75%'>" .$l['ra_os']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
             echo "</tr>\n";
             $i = 0;
             $grandtotal = 0;
@@ -1261,11 +1262,11 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='3'>Top $c_topos attacker OS's of your sensors</td></tr>\n";
+              echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_topos " .$l['ra_os_org']. "</td></tr>\n";
               echo "<tr>\n";
                 echo "<th width='5%'>#</th>\n";
-                echo "<th width='75%'>OS</th>\n";
-                echo "<th width='20%'>Total</th>\n";
+                echo "<th width='75%'>" .$l['ra_os']. "</th>\n";
+                echo "<th width='20%'>" .$l['ra_total']. "</th>\n";
               echo "</tr>\n";
               $i = 0;
               $grandtotal = 0;
@@ -1309,11 +1310,11 @@ echo "<div class='all'>\n";
           $result_organisation = pg_query($pgconn, $sql_organisation);
 
           echo "<table class='datatable' width='45%'>\n";
-            echo "<tr><td class='title' colspan='3'>Top $c_toporgs domains</td></tr>\n";
+            echo "<tr><td class='title' colspan='3'>" .$l['ra_top']. " $c_toporgs " .$l['ra_domains']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='5%'>#</th>\n";
-              echo "<th width='75%'>Domain</th>\n";
-              echo "<th width='20%'>Total exploits</th>\n";
+              echo "<th width='75%'>" .$l['g_domain']. "</th>\n";
+              echo "<th width='20%'>" .$l['ra_totalexpl']. "</th>\n";
             echo "</tr>\n";
             $i = 0;
             while ($row = pg_fetch_assoc($result_organisation)) {

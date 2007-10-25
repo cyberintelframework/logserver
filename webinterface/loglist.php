@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 11-10-2007                       #
+# Version 2.10.01                  #
+# 24-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Removed text on block header 
 # 2.00.01 Added support for possible attacks
 # 1.04.06 Added IP exclusion stuff
@@ -28,6 +29,9 @@
 # 1.02.02 Added debug option
 # 1.02.01 Added number formatting
 #############################################
+
+# Including language file
+include "../lang/${c_language}.php";
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
@@ -84,15 +88,15 @@ if ($err != 1) {
   echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Unique source addresses</div>\n";
+        echo "<div class='blockHeader'>" .$l['lc_uniqsource']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
               echo "<th>Source IP Address</th>\n";
               if ($sev == 1) {
-                echo "<th width='200'>Malicious attacks</th>\n";
+                echo "<th width='200'>" .$l['g_mal']. "</th>\n";
               } else {
-                echo "<th width='200'>Possible malicious attacks</th>\n";
+                echo "<th width='200'>" .$l['g_pos']. "</th>\n";
               }
             echo "</tr>\n";
             while ($row = pg_fetch_assoc($result_uniq)) {

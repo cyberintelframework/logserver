@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 10-10-2007                       #
+# Version 2.10.01                  #
+# 23-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.03 Added error message for unauthorized access
 # 2.00.02 Added hash check stuff
 # 2.00.01 Initial release
@@ -17,7 +18,7 @@
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_m",
+                "int_m"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -38,17 +39,17 @@ if ($s_admin == 1) {
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Argos Images</div>\n";
+        echo "<div class='blockHeader'>" .$l['aa_argosimages']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th>Name</th>\n";
-              echo "<th>Server IP</th>\n";
-              echo "<th>Imagename on Server</th>\n";
-              echo "<th>OS</th>\n";
-              echo "<th>OS Language</th>\n";
-              echo "<th>Mac address</th>\n";
-              echo "<th>Organisation</th>\n";
+              echo "<th>" .$l['aa_name']. "</th>\n";
+              echo "<th>" .$l['aa_serverip']. "</th>\n";
+              echo "<th>" .$l['aa_imagename']. "</th>\n";
+              echo "<th>" .$l['aa_os']. "</th>\n";
+              echo "<th>" .$l['aa_oslang']. "</th>\n";
+              echo "<th>" .$l['aa_mac']. "</th>\n";
+              echo "<th>" .$l['aa_org']. "</th>\n";
               echo "<th></th>\n";
               echo "<th></th>\n";
             echo "</tr>\n";
@@ -78,8 +79,9 @@ if ($s_admin == 1) {
                   echo "</td>\n";
                   echo "<td>\n";
                     echo "<select name='strip_html_escape_oslang'>\n";
-                      echo printOption('nl', 'Dutch' , $oslang);
-                      echo printOption('en', 'English' , $oslang);
+                      foreach ($v_os_languages as $key=>$val) {
+                        echo printOption($key, $val, $oslang);
+                      }
                     echo "</select>\n";
                   echo "</td>\n";
                   echo "<td><input type='text' name='mac_macaddr' size='15' value='$macaddr' /></td>";
@@ -98,13 +100,13 @@ if ($s_admin == 1) {
                       }
                     echo "</select>\n";
                   echo "</td>\n";
-                  echo "<td><input type='submit' class='button' value='Update' /></td>\n";
+                  echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' /></td>\n";
                   echo "<input type='hidden' name='int_imageid' value='$imageid'>\n";
                   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                 echo "</form>\n";
                 echo "<form name='argosadmin_delimage' action='argosdelimage.php' method='post'>\n";
                   echo "<input type='hidden' name='int_imageid' value='$imageid'>\n";
-                  echo "<td><input type='submit' class='button' value='Delete' /></td>\n";
+                  echo "<td><input type='submit' class='button' value='" .$l['g_delete']. "' /></td>\n";
                   echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                 echo "</form>\n";
               echo "</tr>\n";
@@ -123,8 +125,9 @@ if ($s_admin == 1) {
                 echo "</td>\n";
                 echo "<td>\n";
                   echo "<select name='strip_html_escape_oslang'>\n";
-                    echo printOption('nl', 'Dutch' , "");
-                    echo printOption('en', 'English' , "");
+                    foreach ($v_os_languages as $key=>$val) {
+                      echo printOption($key, $val, $oslang);
+                    }
                   echo "</select>\n";
                 echo "</td>\n";
                 echo "<td><input type='text' name='mac_macaddr' size='15' /></td>";
@@ -143,7 +146,7 @@ if ($s_admin == 1) {
                     }
                   echo "</select>\n";
                 echo "</td>\n";
-                echo "<td colspan=2><input type='submit' class='button' value='Add' /></td>\n";
+                echo "<td colspan=2><input type='submit' class='button' value='" .$l['g_add']. "' /></td>\n";
               echo "</tr>\n";
               echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
             echo "</form>\n";

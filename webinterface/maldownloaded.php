@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 25-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 Initial release
 #############################################
 
@@ -28,7 +29,7 @@ add_to_sql("attacks.timestamp <= $to", "where");
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Malware Downloaded</div>\n";
+      echo "<div class='blockHeader'>" .$l['md_title']. "</div>\n";
       echo "<div class='blockContent'>\n";
         add_to_sql("details.text", "select");
         add_to_sql("COUNT(details.id) as total", "select");
@@ -70,13 +71,13 @@ echo "<div class='centerbig'>\n";
           $virus_count_ar = array();
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='5%'>Malware</th>\n";
+              echo "<th width='5%'>" .$l['md_malware']. "</th>\n";
               while ($scanners = pg_fetch_assoc($result_scanners)) {
                 $name = $scanners['name'];
                 echo "<th width='15%'>$name</th>\n";
               }
               pg_result_seek($result_scanners, 0);
-              echo "<th width='5%'>Stats</th>\n";
+              echo "<th width='5%'>" .$l['md_stats']. "</th>\n";
             echo "</tr>\n";
 
             while ($row = pg_fetch_assoc($result_down)) {
@@ -97,7 +98,7 @@ echo "<div class='centerbig'>\n";
                   $numrows_virus = pg_num_rows($result_virus);
 
                   if ($numrows_virus == 0) {
-                    $virus = "Not scanned";
+                    $virus = $l['md_notscanned'];
                   } else {
                     $virus = pg_result($result_virus, "virusname");
                   }
@@ -105,7 +106,7 @@ echo "<div class='centerbig'>\n";
                   # Starting the count for the viri.
                   $virus_count_ar[$virus] = $virus_count_ar[$virus] + $count;
 
-                  if ($virus == "Not scanned") {
+                  if ($virus == $l['md_notscanned']) {
                     $ignore[$scanner_id]++;
                     $virustext = "$virus";
                   } elseif ($virus == "Suspicious") {
@@ -135,7 +136,7 @@ echo "<div class='centerbig'>\n";
                 $name = $scanners['name'];
 
                 if ($total[$id] == 0) {
-                  echo "<th class='bottom'>0 scanned</th>\n";
+                  echo "<th class='bottom'>0 " .$l['md_scanned']. "</th>\n";
                 } else {
                   if (!$found[$id]) {
                     $found[$id] = 0;
@@ -148,7 +149,7 @@ echo "<div class='centerbig'>\n";
             echo "</tr>\n";        
           echo "</table>\n";
         } else {
-          echo "<span class='warning'>No records found!</span>\n";
+          echo "<span class='warning'>" .$l['g_nofound']. "</span>\n";
         }
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";

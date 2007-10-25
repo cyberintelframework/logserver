@@ -28,7 +28,7 @@ use Encode;
 ####################
 # Variables used
 ####################
-do '/etc/surfnetids/surfnetids-log.conf';
+do '/etc/surfnetids/2.10-log.conf';
 
 ####################
 # Main script

@@ -3,8 +3,8 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 2.00.01                 #
-# 05-09-2007                      #
+# Version 2.10.01                 #
+# 23-10-2007                      #
 # Jan van Lith & Kees Trippelvitz #
 ###################################
 # Contributors:                   #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 New Release 
 # 1.04.07 Added CWS support 
 # 1.04.06 Added check for binary history info
@@ -29,11 +30,7 @@
 # 1.02.03 Initial release
 #############################################
 
-# Retrieving some session variables
-$s_org = intval($_SESSION['s_org']);
-$s_admin = intval($_SESSION['s_admin']);
 $err = 0;
-
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_binid",
@@ -133,29 +130,29 @@ if ($err == 0) {
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Binary info</div>\n";
+        echo "<div class='blockHeader'>" .$l['bh_binary_info']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<td><b>Binary</b></td>";
+              echo "<td><b>" .$l['bh_binary']. "</b></td>";
               echo "<td>";
                 echo "$bin_name";
                 if (file_exists("$c_surfidsdir/binaries/$bin_name") && $s_admin == 1 && $c_download_binaries == 1) {
-                  echo "[<a href='download.php?md5_binname=$bin_name'>download</a>]\n";
+                  echo "[<a href='download.php?md5_binname=$bin_name'>". $l['bh_download']. "</a>]\n";
                 }
               echo "</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>Size</b></td><td>$filesize</td>\n";
+              echo "<td><b>" .$l['bh_size']. "</b></td><td>$filesize</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>Info</b></td><td>$fileinfo</td>\n";
+              echo "<td><b>" .$l['g_info']. "</b></td><td>$fileinfo</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>First Seen</b></td><td>$first_seen</td>\n";
+              echo "<td><b>" .$l['bh_first_seen']. "</b></td><td>$first_seen</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>Last Seen</b></td><td>$last_seen</td>\n";
+              echo "<td><b>" .$l['bh_last_seen']. "</b></td><td>$last_seen</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</div>\n"; #</blockContent>
@@ -175,7 +172,7 @@ if ($err == 0) {
     echo "<div class='centerbig'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>Norman Result</div>\n";
+          echo "<div class='blockHeader'>" .$l['bh_norman']. "</div>\n";
           echo "<div class='blockContent'>\n";
               echo "<pre>$normanresult</pre>";
           echo "</div>\n"; #</blockContent>
@@ -197,7 +194,7 @@ if ($err == 0) {
       echo "<div class='centerbig'>\n";
         echo "<div class='block'>\n";
           echo "<div class='dataBlock'>\n";
-            echo "<div class='blockHeader'>CWSandbox Result</div>\n";
+            echo "<div class='blockHeader'>" $l['bh_cws']. "</div>\n";
             echo "<div class='blockContent'>\n";
               echo "<div id='cwsandbox'>";
                 echo "$cwsandboxresult";
@@ -213,7 +210,7 @@ if ($err == 0) {
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Binary History</div>\n";
+        echo "<div class='blockHeader'>" .$l['bh_binaryhist']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
@@ -292,7 +289,7 @@ if ($err == 0) {
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Filenames Used</div>\n";
+        echo "<div class='blockHeader'>" .$l['bh_filenames']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             $filename_ar = array();
@@ -310,11 +307,11 @@ if ($err == 0) {
             if ($i >= 10) {
               if ($show != "all") {
                 echo "<tr>\n";
-                  echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=all'>Show full list</a></td>\n";
+                  echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=all'>" .$l['bh_full']. "</a></td>\n";
                 echo "</tr>\n";
               } else {
                 echo "<tr>\n";
-                  echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=top'>Show top 10</a></td>\n";
+                  echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=top'>" .$l['bh_top10']. "</a></td>\n";
                 echo "</tr>\n";
               }
             }
