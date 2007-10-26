@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Fixed bugs: display criterea, source address  
 # 2.00.01 Initial release (split from logsearch.php)
 #############################################
@@ -25,6 +26,9 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
+
+# Including language file
+include "../lang/${c_language}.php";
 
 # Setting headers
 #header("Content-type: text/pdf");
@@ -347,41 +351,42 @@ $pdf->ezText("Period: $txt_from - $txt_to ", 10);
 $pdf->ezText("Destination: ", 10);
 
 if (isset($sensorid)) {
-   if ($sensorid == 0) {} 
-   elseif ($sensorid > 0) echo "$sensorid";
-     else {
-       foreach ($ar_sensorid as $key=>$sid) {
-                     if ($q_org == 0) {
-                        $sensor_where = " ";
-                      } else {
-                        $sensor_where = " AND sensors.organisation = '$q_org'";
-                      }
-                      $sql = "SELECT sensors.keyname, sensors.vlanid, sensors.label, organisations.organisation FROM sensors, organisations ";
-                      $sql .= "WHERE organisations.id = sensors.organisation AND sensors.id = $sid $sensor_where ORDER BY sensors.keyname";
-                      $debuginfo[] = $sql;
-                      $query = pg_query($sql);
-                      while ($sensor_data = pg_fetch_assoc($query)) {
-                        $keyname = $sensor_data["keyname"];
-                        $vlanid = $sensor_data["vlanid"];
-                        $label = $sensor_data["label"];
-                        $org = $sensor_data["organisation"];
-                        if ($label != "") { 
-                          $name = $label;
-                        } else {  
-                          $name = sensorname($keyname, $vlanid);
-                        }
-                       $out .= "$name, ";  
-                      }
-       }
-  	$dst_txt = "Sensor(s): $out";
+  if ($sensorid == 0) {} 
+  elseif ($sensorid > 0) {
+    echo "$sensorid";
+  } else {
+    foreach ($ar_sensorid as $key=>$sid) {
+      if ($q_org == 0) {
+        $sensor_where = " ";
+      } else {
+       $sensor_where = " AND sensors.organisation = '$q_org'";
+      }
+      $sql = "SELECT sensors.keyname, sensors.vlanid, sensors.label, organisations.organisation FROM sensors, organisations ";
+      $sql .= "WHERE organisations.id = sensors.organisation AND sensors.id = $sid $sensor_where ORDER BY sensors.keyname";
+      $debuginfo[] = $sql;
+      $query = pg_query($sql);
+      while ($sensor_data = pg_fetch_assoc($query)) {
+        $keyname = $sensor_data["keyname"];
+        $vlanid = $sensor_data["vlanid"];
+        $label = $sensor_data["label"];
+        $org = $sensor_data["organisation"];
+        if ($label != "") { 
+          $name = $label;
+        } else {  
+          $name = sensorname($keyname, $vlanid);
+        }
+        $out .= "$name, ";  
+      }
+    }
+    $dst_txt = $l['g_sensor']. ": $out";
   }
 }
 
 
 if (isset($destination_ip)) {
-  $dst_txt = "IP address: $destination_ip";
+  $dst_txt = $l['ls_destip']. ": $destination_ip";
 } elseif (isset($dest_mac)) {
-  $dst_txt = "MAC address: $dest_mac";
+  $dst_txt = $ls['ls_destmac']. ": $dest_mac";
 }
 if (isset($dport)) {
   $dst_txt .= ":$dport";
@@ -393,12 +398,12 @@ if ($dst_txt != "") {
 #### SOURCE
 $pdf->ezText("Source:", 10);
 if ($f_sourcechoice == 3 && !isset($source_ip)) {
-  $pdf->ezText("Own Ranges", 10);
+  $pdf->ezText($l['ls_own'], 10);
 }
 if (isset($source_ip)) {
-  $src_txt = "IP address: $source_ip";
+  $src_txt = $l['ls_sourceip']. ": $source_ip";
 } elseif (isset($source_mac)) {
-  $src_txt = "MAC address: $source_mac";
+  $src_txt = $l['ls_sourcemac']. ": $source_mac";
 }
 if (isset($sport)) {
   $src_txt .= ":$sport";
@@ -414,18 +419,18 @@ $debuginfo[] = $sql_exclusion;
 $nr_exclusionrows = intval(@pg_result($query, 0));
 
 if ($nr_exclusionrows > 1) {
-  $pdf->ezText("$smaspace(IP Exclusion ON)", 10);
+  $pdf->ezText("$smaspace(" .$l['ls_ipex_on']. ")", 10);
 } else {
-  $pdf->ezText("$smaspace(IP Exclusion OFF)", 10);
+  $pdf->ezText("$smaspace(" .$l['ls_ipex_off']. ")", 10);
 }
 
-$pdf->ezText("Characteristics:", 10);
+$pdf->ezText($l['ls_chars']. ":", 10);
 
 if (isset($f_sev)) {
-  $pdf->ezText("${smaspace}Severity: $v_severity_ar[$f_sev]", 10);
+  $pdf->ezText("${smaspace}" .$l['ls_sev']. ": $v_severity_ar[$f_sev]", 10);
 }
 if (isset($f_sevtype)) {
-  $pdf->ezText("${smaspace}Severity Type: $v_severity_atype_ar[$f_sevtype]", 10);
+  $pdf->ezText("${smaspace}" .$l['ls_sevtype']. ": $v_severity_atype_ar[$f_sevtype]", 10);
 }
 if (isset($f_attack)) {
   $sql_g = "SELECT name FROM stats_dialogue WHERE id = '$f_attack'";
@@ -434,17 +439,17 @@ if (isset($f_attack)) {
   $expl = $row_g['name'];
   $expl = str_replace("Dialogue", "", $expl);
   if ($expl != "") {
-    $pdf->ezText("${smaspace}Exploit: $expl", 10);
+    $pdf->ezText("${smaspace}" .$l['ls_exp']. ": $expl", 10);
   }
 }
 if (isset($f_binname)) {
-  $pdf->ezText("${smaspace}Binary Name: $f_binname", 10);
+  $pdf->ezText("${smaspace}" .$l['ls_binname']. ": $f_binname", 10);
 }
 if (isset($f_virus_txt)) {
-  $pdf->ezText("${smaspace}Virus: $f_virus_txt", 10);
+  $pdf->ezText("${smaspace}" .$l['ls_virus']. ": $f_virus_txt", 10);
 }
 if (isset($f_filename)) {
-  $pdf->ezText("${smaspace}Filename: $f_filename", 10);
+  $pdf->ezText("${smaspace}" .$l['ls_filename']. ": $f_filename", 10);
 }
 
 #####################

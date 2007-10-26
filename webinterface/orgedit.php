@@ -152,7 +152,7 @@ if ($err != 1) {
               echo "</tr>\n";
               echo "<tr>\n";
                 echo "<td colspan='4' align='right'>";
-                  echo "<input type='submit' name='submit' value='" .$l['g_save']. "' class='button' />";
+                  echo "<input type='submit' name='submit' value='" .$l['g_add']. "' class='button' />";
                 echo "</td>\n";
               echo "</tr>\n";
             echo "</table>\n";

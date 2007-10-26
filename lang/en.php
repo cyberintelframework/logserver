@@ -29,10 +29,12 @@ $l['g_all']			= "All";
 $l['g_id']			= "ID";
 $l['g_domain']			= "Domain";
 $l['g_hour']			= "hour";
+$l['g_status']			= "Status";
 
 ##########################
 # argosadmin.php
 ##########################
+$l['aa_allorg']			= "All domains";
 $l['aa_argosimages'] 		= "Argos Images";
 $l['aa_name'] 			= "Name";
 $l['aa_serverip'] 		= "Server IP";
@@ -40,7 +42,7 @@ $l['aa_imagename'] 		= "Image name on server";
 $l['aa_os'] 			= "OS";
 $l['aa_oslang']			= "OS language";
 $l['aa_mac'] 			= "MAC address";
-$l['aa_org'] 			= "Organisation";
+$l['aa_org'] 			= "Domain";
 
 ##########################
 # argosconfig.php
@@ -136,7 +138,7 @@ $l['in_destports']		= "Destination ports";
 # logcheck.php
 ##########################
 $l['lc_cross']			= "Cross domain";
-$l['lc_noranges']		= "No ranges present for this organisation.";
+$l['lc_noranges']		= "No ranges present for this domain.";
 $l['lc_range']			= "Range";
 $l['lc_uniqsource']		= "Unique source addresses";
 
@@ -201,6 +203,8 @@ $l['ls_additional']		= "Additional info";
 $l['ls_noinfo']			= "No Info";
 $l['ls_rendered']		= "Page rendered in";
 $l['ls_search_crit']		= "Search Criteria";
+$l['ls_fo']			= "file-offered";
+$l['ls_at']			= "attack-type";
 
 ##########################
 # maldownloaded.php
@@ -268,7 +272,7 @@ $l['ma_enable_gpg']		= "Enable GPG signing";
 $l['ma_disable_gpg']		= "Disable GPG signing";
 $l['ma_asensor']		= "Access: Sensor";
 $l['ma_asearch']		= "Access: Search";
-$l['ma_useradmin']		= "Access: User Admin";
+$l['ma_auseradmin']		= "Access: User Admin";
 $l['ma_arpac']			= "ARP access";
 $l['ma_argosac']		= "ARGOS access";
 
@@ -334,8 +338,8 @@ $l['pl_all']			= "all";
 $l['pl_ostype']			= "OS type";
 $l['pl_plottype']		= "Plot type";
 $l['pl_virusinfo']		= "Virus info";
-$l['pl_allvirii']		= "All virii";
-$l['pl_top10virii']		= "Top 10 virii";
+$l['pl_allvirii']		= "All viruses";
+$l['pl_top10virii']		= "Top 10 viruses";
 $l['pl_scanner']		= "Scanner";
 $l['pl_allattacks']		= "All attacks";
 
@@ -407,23 +411,132 @@ $l['re_timespan']		= "Timespan";
 $l['rf_generator']		= "Generator";
 $l['rf_new']			= "New";
 $l['rf_detected']		= "detected (attack ID";
-$l['rf_noranges']		= "Error: No ranges present for this organisation!";
+$l['rf_noranges']		= "Error: No ranges present for this domain!";
 
 ##########################
 # sensordetails.php
 ##########################
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
-$l['']			= "";
+$l['sd_purge']			= "Purge all events older than";
+$l['sd_name']			= "Name";
+$l['sd_sensorname']		= "Sensor name";
+$l['sd_label']			= "Sensor label";
+$l['sd_clear']			= "Clear";
+$l['sd_sensorside']		= "Sensor side";
+$l['sd_rip']			= "Remote IP";
+$l['sd_lip']			= "Local IP";
+$l['sd_serverside']		= "Server side";
+$l['sd_device']			= "Device";
+$l['sd_devmac']			= "Device MAC";
+$l['sd_devip']			= "Device IP";
+$l['sd_status']			= "Status";
+$l['sd_started']		= "Last started";
+$l['sd_stopped']		= "Last stopped";
+$l['sd_updated']		= "Last updated";
+$l['sd_sensorlog']		= "Sensor log";
+$l['sd_uptime']			= "Uptime";
+$l['sd_since']			= "Logging since";
+$l['sd_total']			= "Total log time";
+$l['sd_events']			= "Events";
+$l['sd_totalevents']		= "Total number of events";
 
+##########################
+# sensorstatus.php
+##########################
+$l['ss_label']			= "Label";
+$l['ss_config']			= "Config method";
+$l['ss_none']			= "None";
+$l['ss_reboot']			= "Reboot";
+$l['ss_sshoff']			= "SSH off";
+$l['ss_sshon']			= "SSH on";
+$l['ss_stop']			= "Stop";
+$l['ss_start']			= "Start";
+$l['ss_disable']		= "Disable";
+$l['ss_enable']			= "Enable";
+$l['ss_ignore']			= "Ignore";
+$l['ss_unignore']		= "Unignore";
+$l['ss_disable_arp']		= "Disable ARP";
+$l['ss_enable_arp']		= "Enable ARP";
+$l['ss_legend']			= "Legend";
+
+##########################
+# serverconfig.php
+##########################
+$l['sc_config']			= "Logging server config";
+$l['sc_global']			= "Global config options";
+$l['sc_webconfig']		= "Webinterface config options";
+$l['sc_session']		= "Login and session options";
+$l['sc_debug']			= "Debug options";
+$l['sc_search']			= "Search page options";
+$l['sc_perl']			= "Perl script options";
+$l['sc_finger']			= "Fingerprinting options";
+$l['sc_geoip']			= "GeoIP options";
+$l['sc_rank']			= "Ranking page options";
+$l['sc_maillog']		= "Maillogging script options";
+$l['sc_sandbox']		= "Sandbox script options";
+$l['sc_module']			= "Module options";
+$l['sc_virus']			= "Virus scanner info";
+
+##########################
+# serverstats.php
+##########################
+$l['ss_info']			= "Server Info";
+$l['ss_daily']			= "Daily Graph (5 minute averages)";
+$l['ss_day']			= "Daily";
+
+##########################
+# serverstatsview.php
+##########################
+$l['sv_dg']			= "Daily Graph (5 minute averages)";
+$l['sv_wg']			= "Weekly Graph (30 minute averages)";
+$l['sv_mg']			= "Monthly Graph (2 hour averages)";
+$l['sv_yg']			= "Yearly Graph (12 hour averages)";
+$l['sv_daily']			= "Daily";
+$l['sv_weekly']			= "Weekly";
+$l['sv_monthly']		= "Monthly";
+$l['sv_yearly']			= "Yearly";
+
+##########################
+# traffic.php
+##########################
+$l['tr_traffic']		= "Traffic";
+$l['tr_allsensors']		= "All sensors";
+
+##########################
+# trafficview.php
+##########################
+$l['tv_header']			= "Traffic analysis for";
+
+##########################
+# useradmin.php
+##########################
+$l['ua_adduser']		= "Add User";
+$l['ua_users']			= "Users";
+$l['ua_user']			= "User";
+$l['ua_lastlogin']		= "Last login";
+$l['ua_access']			= "Access";
+$l['ua_reports']		= "Reports";
+$l['ua_confirmdel']		= "Are you sure you want to delete this user";
+$l['ua_er']			= "Edit reports";
+
+##########################
+# usernew.php
+##########################
+$l['un_new']			= "New User";
+
+##########################
+# whois.php
+##########################
+$l['wh_select']			= "Select server";
+$l['wh_query']			= "Whois query";
+$l['wh_enterip']		= "Enter whois IP";
+$l['wh_q']			= "Query";
+$l['wh_wquery']			= "WHOIS Query at";
+$l['wh_for']			= "for";
+$l['wh_connect']		= "Connecting to";
+$l['wh_connto']			= "Connection to";
+$l['wh_connected']		= "Connected to";
+$l['wh_sending']		= "sending request...";
+$l['wh_couldnot']		= "coult not be made";
+$l['wh_connclosed']		= "Connection closed";
 
 ?>

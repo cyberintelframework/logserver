@@ -218,7 +218,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                   echo "<ul>\n";
                     echo printMenuitem(4.1, "sensorstatus.php", $l['me_sensorstatus'], $tab);
                     if ($c_enable_arp == 1 && $s_access_sensor > 1) {
-                      echo printMenuitem(4.2, "arp_static.php", $l['m_arp'], $tab);
+                      echo printMenuitem(4.2, "arp_static.php", $l['me_arp'], $tab);
                     }
                     if ($s_access_user > 1) {
                       echo printMenuitem(4.3, "orgipadmin.php", $l['me_ipex'], $tab);
@@ -279,7 +279,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
 
 function insert_selector($m_show = 1) {
   global $s_org, $pgconn, $s_access_search, $s_access_sensor, $s_access_user, $v_selector_period, $c_startdayofweek, $_GET, $_POST;
-  global $clean, $tainted, $to, $from, $to_date, $from_date, $q_org, $q_org_name, $c_debug_sql, $c_debug_input, $c_allow_global_debug;
+  global $clean, $tainted, $to, $from, $to_date, $from_date, $q_org, $q_org_name, $c_debug_sql, $c_debug_input, $c_allow_global_debug, $l;
   # Retrieving URL
   $url = $_SERVER['PHP_SELF'];
   $qs = $_SERVER['QUERY_STRING'];

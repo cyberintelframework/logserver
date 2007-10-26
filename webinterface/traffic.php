@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.10 Removed offline choice 
 # 1.04.09 Fixed a bug with displaying organisation and the all sensors image 
@@ -66,14 +67,13 @@ echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
     echo "<div class='blockHeader'>";
-      echo "<div class='blockHeaderLeft'>Traffic</div>\n";
+      echo "<div class='blockHeaderLeft'>" .$l['tr_traffic']. "</div>\n";
       echo "<div class='blockHeaderRight'>\n";
           echo "<form name='viewform' action='$url' method='GET'>\n";
             echo "<select name='int_selview' class='smallselect' onChange='javascript: this.form.submit();'>\n";
-              echo printOption(0, "View all sensors", $selview) . "<br />\n";
-              echo printOption(1, "View offline sensors", $selview) . "<br />\n";
-              echo printOption(2, "View online sensors", $selview) . "<br />\n";
-              echo printOption(3, "View outdated sensors", $selview) . "<br />\n";
+              foreach ($v_selview_ar as $key => $val) {
+                echo printOption($key, $val, $selview) . "\n";
+              }
             echo "</select>\n";
           echo "</form>\n";
       echo "</div>\n";
@@ -104,7 +104,7 @@ echo "<div class='left'>\n";
         if ($allid != "") {
           echo "<table>\n";
             echo "<tr>\n";
-              echo "<td><a href='trafficview.php?int_imgid=$allid'><img src='showtraffic.php?int_imgid=$allid' alt='All sensors' border='1' /></a></td>\n";
+              echo "<td><a href='trafficview.php?int_imgid=$allid'><img src='showtraffic.php?int_imgid=$allid' alt='" .$l['tr_allsensors']. "' border='1' /></a></td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         }

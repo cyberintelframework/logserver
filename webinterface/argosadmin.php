@@ -87,7 +87,7 @@ if ($s_admin == 1) {
                   echo "<td><input type='text' name='mac_macaddr' size='15' value='$macaddr' /></td>";
                   echo "<td>\n";
                     echo "<select name='int_orgid'>\n";
-                      echo printOption("0", "All Organisations" , "$organisationid");
+                      echo printOption("0", $l['aa_allorg'], "$organisationid");
                       $sql_org = "SELECT id, organisation FROM organisations ORDER BY id";
                       $debuginfo[] = $sql_org;
                       $query_org = pg_query($sql_org);
@@ -133,7 +133,7 @@ if ($s_admin == 1) {
                 echo "<td><input type='text' name='mac_macaddr' size='15' /></td>";
                 echo "<td>\n";
                   echo "<select name='int_orgid'>\n";
-                    echo printOption("0", "All Organisations" , "0");
+                    echo printOption("0", $l['aa_allorg'], "0");
                     $sql_org = "SELECT id, organisation FROM organisations ORDER BY id";
                     $debuginfo[] = $sql_org;
                     $query_org = pg_query($sql_org);

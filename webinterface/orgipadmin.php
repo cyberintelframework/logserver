@@ -80,8 +80,8 @@ if ($err == 0) {
           echo "<form name='orgadmin' action='orgipadd.php' method='post'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<th width='80%'>" .$l[oi_excl']. "</th>\n";
-                echo "<th width='20%'>" .$l[oi_actions']. "</th>\n";
+                echo "<th width='80%'>" .$l['oi_excl']. "</th>\n";
+                echo "<th width='20%'>" .$l['oi_actions']. "</th>\n";
               echo "</tr>\n";
               while ($row = pg_fetch_assoc($result_ex)) {
                 $id = $row['id'];
@@ -93,7 +93,7 @@ if ($err == 0) {
               }
               echo "<tr>\n";
                 echo "<td><input type='hidden' name='int_orgid' value='$q_org' /><input type='text' name='ip_exclusion' size='40' /></td>\n";
-                echo "<td><input type='submit' class='button' style='width: 100%;' value='" .$l['g_insert']. "' /></td>\n";
+                echo "<td><input type='submit' class='button' style='width: 100%;' value='" .$l['g_add']. "' /></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
             echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";

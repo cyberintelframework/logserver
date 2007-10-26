@@ -25,11 +25,11 @@ if ($s_admin != 1) {
 echo "<div class='leftmed'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Logging server config</div>\n";
+      echo "<div class='blockHeader'>" .$l['sc_config']. "</div>\n";
       echo "<div class='blockContent'>\n";
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Global config options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_global']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_surfidsdir</td>\n";
@@ -39,7 +39,7 @@ echo "<div class='leftmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Webinterface config options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_webconfig']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_web_port</td>\n";
@@ -73,7 +73,7 @@ echo "<div class='leftmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Login and session options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_session']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_login_method</td>\n";
@@ -95,7 +95,7 @@ echo "<div class='leftmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Debug options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_debug']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_debug_sql</td>\n";
@@ -113,7 +113,7 @@ echo "<div class='leftmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Search page options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_search']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_censor_ip</td>\n";
@@ -139,7 +139,7 @@ echo "<div class='leftmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Perl script options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_perl']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_logfile</td>\n";
@@ -161,12 +161,12 @@ echo "</div>\n"; #</leftmed>
 echo "<div class='rightmed'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Logging server config</div>\n";
+      echo "<div class='blockHeader'>" .$l['sc_config']. "</div>\n";
       echo "<div class='blockContent'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Fingerprinting options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_finger']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_enable_pof</td>\n";
@@ -180,7 +180,7 @@ echo "<div class='rightmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>GeoIP options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_geoip']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_geoip_enable</td>\n";
@@ -198,7 +198,7 @@ echo "<div class='rightmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Ranking page options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_rank']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_topexploits</td>\n";
@@ -236,7 +236,7 @@ echo "<div class='rightmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Maillogging script options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_maillog']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_from_address</td>\n";
@@ -254,7 +254,7 @@ echo "<div class='rightmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Sandbox script options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_sandbox']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_mail_mailhost</td>\n";
@@ -288,7 +288,7 @@ echo "<div class='rightmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>Module options</th>\n";
+            echo "<th colspan='2'>" .$l['sc_module']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_enable_arp</td>\n";
@@ -310,7 +310,7 @@ echo "<div class='all'>\n";
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Virus scanner info</div>\n";
+        echo "<div class='blockHeader'>" .$l['sc_virus']. "</div>\n";
         echo "<div class='blockContent'>\n";
           $sql = "SELECT name, version FROM scanners";
           $result = pg_query($pgconn, $sql);
@@ -327,8 +327,8 @@ echo "<div class='all'>\n";
           echo "</table>\n";
         echo "</div>\n";
         echo "<div class='blockFooter'></div>\n";
-      echo "</div>\n";
-    echo "</div>\n";
+      echo "</div>\n"; #</dataBlock>
+    echo "</div>\n"; #</block>
   echo "</div>\n"; #</centerbig>
 echo "</div>\n"; #</all>
 

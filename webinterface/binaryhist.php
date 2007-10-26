@@ -194,7 +194,7 @@ if ($err == 0) {
       echo "<div class='centerbig'>\n";
         echo "<div class='block'>\n";
           echo "<div class='dataBlock'>\n";
-            echo "<div class='blockHeader'>" $l['bh_cws']. "</div>\n";
+            echo "<div class='blockHeader'>" .$l['bh_cws']. "</div>\n";
             echo "<div class='blockContent'>\n";
               echo "<div id='cwsandbox'>";
                 echo "$cwsandboxresult";

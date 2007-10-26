@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 09-10-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Removed check on SSH, action always available now
 # 2.00.01 version 2.00
 # 1.04.12 Added ignore/unignore actions
@@ -107,10 +108,9 @@ echo "<div class='centerbig'>\n";
         echo "<div class='blockHeaderRight'>\n";
           echo "<form name='viewform' action='$url' method='GET'>\n";
             echo "<select name='int_selview' class='smallselect' onChange='javascript: this.form.submit();'>\n";
-              echo printOption(0, "View all sensors", $selview) . "<br />\n";
-              echo printOption(1, "View offline sensors", $selview) . "<br />\n";
-              echo printOption(2, "View online sensors", $selview) . "<br />\n";
-              echo printOption(3, "View outdated sensors", $selview) . "<br />\n";
+              foreach ($v_selview_ar as $key => $val) {
+                echo printOption($key, $val, $selview) . "\n";
+              }
             echo "</select>\n";
           echo "</form>\n";
         echo "</div>\n";
@@ -118,17 +118,17 @@ echo "<div class='centerbig'>\n";
       echo "<div class='blockContent'>\n";
         echo "<table class='datatable' width='100%'>\n";
           echo "<tr>\n";
-            echo "<th>" .printsort("Sensor", "keyname"). "</th>\n";
-            echo "<th>" .printsort("Label", "label"). "</th>\n";
-            echo "<th>" .printsort("Config method", "netconf"). "</th>\n";
-            echo "<th>" .printsort("Device IP", "tapip"). "</th>\n";
-            echo "<th>" .printsort("Uptime", "uptime"). "</th>\n";
-            echo "<th>Status</th>\n";
+            echo "<th>" .printsort($l['g_sensor'], "keyname"). "</th>\n";
+            echo "<th>" .printsort($l['ss_label'], "label"). "</th>\n";
+            echo "<th>" .printsort($l['ss_config'], "netconf"). "</th>\n";
+            echo "<th>" .printsort($l['sd_devip'], "tapip"). "</th>\n";
+            echo "<th>" .printsort($l['sd_uptime'], "uptime"). "</th>\n";
+            echo "<th>" .$l['g_status']. "</th>\n";
             if ($s_access_sensor == 9) {
-              echo "<th>" .printsort("Organisation", "org"). "</th>\n";
+              echo "<th>" .printsort($l['g_domain'], "org"). "</th>\n";
             }
             if ($s_access_sensor > 0) {
-              echo "<th>Action</th>\n";
+              echo "<th>" .$l['g_action']. "</th>\n";
             }
             echo "<th></th>\n";
           echo "</tr>\n";
@@ -237,24 +237,24 @@ echo "<div class='centerbig'>\n";
                     echo "<input type='hidden' name='int_vlanid' value='$vlanid' />\n";
                     echo "<input type='hidden' name='int_sid' value='$sid' />\n";
                     echo "<select name='action'>\n";
-                      echo "" . printOption("NONE", "None", $action) . "\n";
-                      echo "" . printOption("REBOOT", "Reboot", $action) . "\n";
-                      echo "" . printOption("SSHOFF", "SSH off", $action) . "\n";
-                      echo "" . printOption("SSHON", "SSH on", $action) . "\n";
-                      echo "" . printOption("STOP", "Stop", $action) . "\n";
-                      echo "" . printOption("START", "Start", $action) . "\n";
-                      echo "" . printOption("DISABLE", "Disable", $action) . "\n";
-                      echo "" . printOption("ENABLE", "Enable", $action) . "\n";
-                      echo "" . printOption("IGNORE", "Ignore", $action) . "\n";
-                      echo "" . printOption("UNIGNORE", "Unignore", $action) . "\n";
+                      echo "" . printOption("NONE", $l['ss_none'], $action) . "\n";
+                      echo "" . printOption("REBOOT", $l['ss_reboot'], $action) . "\n";
+                      echo "" . printOption("SSHOFF", $l['ss_sshoff'], $action) . "\n";
+                      echo "" . printOption("SSHON", $l['ss_sshon'], $action) . "\n";
+                      echo "" . printOption("STOP", $l['ss_stop'], $action) . "\n";
+                      echo "" . printOption("START", $l['ss_start'], $action) . "\n";
+                      echo "" . printOption("DISABLE", $l['ss_disable'], $action) . "\n";
+                      echo "" . printOption("ENABLE", $l['ss_enable'], $action) . "\n";
+                      echo "" . printOption("IGNORE", $l['ss_ignore'], $action) . "\n";
+                      echo "" . printOption("UNIGNORE", $l['ss_unignore'], $action) . "\n";
                       if ($arp == 1) {
-                        echo "" . printOption("DISABLEARP", "Disable ARP", $action) . "\n";
+                        echo "" . printOption("DISABLEARP", $l['ss_disable_arp'], $action) . "\n";
                       } else {
-                        echo "" . printOption("ENABLEARP", "Enable ARP", $action) . "\n";
+                        echo "" . printOption("ENABLEARP", $l['ss_enable_arp'], $action) . "\n";
                       }
                     echo "</select>\n";
                     echo "<td colspan='12' align='right'>\n";
-                      echo "<input type='submit' name='submit' value='Update' class='button' />";
+                      echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
                     echo "</td>\n";
                   echo "</td>\n";
                 }
@@ -270,7 +270,7 @@ echo "</div>\n"; #</center>
 
 echo "<div class='centerbig'>\n";
   echo "<div class='legend'>\n";
-    echo "<div class='legendHeader'>Legend</div>\n";
+    echo "<div class='legendHeader'>" .$l['ss_legend']. "</div>\n";
     echo "<div class='legendContent'>\n";
       echo "<div class='legendContentLeft'>\n";
         echo "<div class='legendItem'>\n";

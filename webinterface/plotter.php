@@ -185,7 +185,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Plot type</td>\n";
+        echo "<td>" .$l['pl_plottype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
@@ -209,7 +209,7 @@ if ($_GET['int_type']) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>Sensors:</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -251,7 +251,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>" .$l['pl_int']. </td>\n";
+        echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
             echo printOption(3600, $l['pl_hour'], 3600);
@@ -261,7 +261,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Plot type</td>\n";
+        echo "<td>" .$l['pl_plottype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
@@ -338,7 +338,7 @@ if ($_GET['int_type']) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Plot type</td>\n";
+        echo "<td>" .$l['pl_plottype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {

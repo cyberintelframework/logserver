@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2006                       #
+# Version 2.10.01                  #
+# 26-10-2006                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.03 Changed data input handling
 # 1.04.02 Added debug info
@@ -44,7 +45,7 @@ if (isset($clean['imgid'])) {
   echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Traffic analysis for: $label</div>\n";
+        echo "<div class='blockHeader'>" .$l['tv_header']. ": $label</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table>\n";
             echo "<tr>\n";
@@ -54,17 +55,17 @@ if (isset($clean['imgid'])) {
                   $type = $row['type'];
 
                   if ($type == "day") {
-                    echo "Daily Graph (5 minute averages)<br />\n";
-                    echo "<img alt='$sensor Daily' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
+                    echo $l['sv_dg']. "<br />\n";
+                    echo "<img alt='$sensor " .$l['sv_daily']. "' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
                   } elseif ($type == "week") {
-                    echo "Weekly Graph (30 minute averages)<br />\n";
-                    echo "<img alt='$sensor Weekly' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
+                    echo $l['sv_wg']. "<br />\n";
+                    echo "<img alt='$sensor " .$l['sv_weekly']. "' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
                   } elseif ($type == "month") {
-                    echo "Monthly Graph (2 hour averages)<br />\n";
-                    echo "<img alt='$sensor Monthly' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
+                    echo $l['sv_mg']. "<br />\n";
+                    echo "<img alt='$sensor " .$l['sv_monthly']. "' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
                   } elseif ($type == "year") {
-                    echo "Yearly Graph (12 hour averages)<br />\n";
-                    echo "<img alt='$sensor Yearly' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
+                    echo $l['sv_yg']. "<br />\n";
+                    echo "<img alt='$sensor " .$l['sv_yearly']. "' src='showtraffic.php?int_imgid=$imgid' /><br />\n";
                   }
                 }
               echo "</td>\n";

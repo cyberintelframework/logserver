@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.03 Added KRNIC and flush()
 # 1.04.02 Changed data input handling
@@ -22,6 +23,9 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
+
+# Including language file
+include "../lang/${c_language}.php";
 
 echo "<head>\n";
   echo "<link rel='stylesheet' href='${address}include/layout.css' />\n";
@@ -61,12 +65,12 @@ if (isset($clean['ip'])) {
 echo "<div class='leftsmall'>\n";
   echo "<div class='block'>\n";
     echo "<div class='actionBlock'>\n";
-      echo "<div class='blockHeader'>Select server</div>\n";
+      echo "<div class='blockHeader'>" .$l['wh_select']. "</div>\n";
       echo "<div class='blockContent'>\n";
         echo "<form name='whois' method='get'>\n";
           echo "<table class='actiontable'>\n";
             echo "<tr>\n";
-              echo "<td>Whois query:</td>\n";
+              echo "<td>" .$l['wh_query']. ":</td>\n";
               echo "<td>\n";
                 echo "<select name='strip_html_s'>\n";
                   foreach ($v_whois_servers as $key => $val) {
@@ -76,8 +80,8 @@ echo "<div class='leftsmall'>\n";
               echo "</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Enter whois IP:</td>\n";
-              echo "<td><input type='text' size='12' name='ip_ip' value='$ip' /><input type='submit' class='pbutton' value='Query' /></td>\n";
+              echo "<td>" .$l['wh_enterip']. ":</td>\n";
+              echo "<td><input type='text' size='12' name='ip_ip' value='$ip' /><input type='submit' class='pbutton' value='" .$l['wh_q']. "' /></td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</form>\n";
@@ -91,24 +95,24 @@ if ($err == 0) {
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>WHOIS Query at $server for $ip</div>\n";
+        echo "<div class='blockHeader'>" .$l['wh_wquery']. " $server " .$l['wh_for']. " $ip</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<pre id='whois'>\n";
             flush();
-            echo "Connecting to $server:43...<br>\n";
+            echo $l['wh_connect']. " $server:43...<br>\n";
             $fp = @fsockopen($server,43,&$errno,&$errstr,15);
             if(!$fp || $err != 0) {
-              echo "Connection to $server:43 could not be made.<br>\n";
+              echo $l['wh_connto']. " $server:43 " .$l['wh_couldnot']. ".<br>\n";
               return false;
             } else {
-              echo "Connected to $server:43, sending request...<br>\n";
+              echo $l['wh_connected']. " $server:43, " .$l['wh_sending']. "<br>\n";
               fputs($fp, "$ip\r\n");
               while(!feof($fp)) {
                 echo fgets($fp, 256);
                 flush();
               }
               fclose($fp);
-              echo "Connection closed.<br>\n";
+              echo $l['wh_connclosed']. ".<br>\n";
             }
           echo "</pre>\n";
         echo "</div>\n"; #</blockContent>

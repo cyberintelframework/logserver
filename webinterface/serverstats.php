@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Hiroshi Suzuki of NTT-CERT       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.04 Added support for multiple servers 
 # 1.04.04 Changed debug stuff
@@ -49,7 +50,7 @@ echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
-        echo "<div class='blockHeaderLeft'>Server Info</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['ss_info']. "</div>\n";
         echo "<div class='blockHeaderRight'>\n";
           echo "<form name='selectserver' method='get' action='serverstats.php'>\n";
             echo "<select name='strip_html_escape_server' onChange='javascript: this.form.submit();' class='smallselect'>\n";
@@ -86,8 +87,8 @@ echo "<div class='left'>\n";
           echo "<table>\n";
             echo "<tr>\n";
               echo "<td>\n";
-                echo "Daily Graph (5 minute averages)<br />\n";
-                echo "<a href='serverstatsview.php?int_imgid=$imgid'><img alt='$label Daily' src='showserver.php?int_imgid=$imgid' border='1' /></a>\n";
+                echo $l['ss_daily']. "<br />\n";
+                echo "<a href='serverstatsview.php?int_imgid=$imgid'><img alt='$label " .$l['ss_day']. "' src='showserver.php?int_imgid=$imgid' border='1' /></a>\n";
               echo "</td>\n";
             echo "</tr>\n";
           echo "</table>\n";

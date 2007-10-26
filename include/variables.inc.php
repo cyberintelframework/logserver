@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 20-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added selview array
 # 2.00.03 Added extra detail type
 # 2.00.02 Removed unused arrays
 # 2.00.01 added v_weekdays
@@ -536,6 +537,13 @@ $v_weekdays = array("", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 $v_os_languages = array(
 	'nl' => "Dutch",
 	'en' => "English"
+);
+
+$v_selview_ar = array(
+	0 => "View all sensors",
+	1 => "View offline sensors",
+	2 => "View online sensors",
+	3 => "View outdated sensors"
 );
 
 ?>

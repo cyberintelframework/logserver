@@ -85,7 +85,7 @@ if ($s_access_sensor > 1) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='15%'>" .$l['ac_sensor']. " " .printhelp("sensor"). "</th>\n";
+              echo "<th width='15%'>" .$l['g_sensor']. " " .printhelp("sensor"). "</th>\n";
               echo "<th width='15%'>" .$l['ac_deviceip']. " " .printhelp("deviceip"). "</th>\n";
               echo "<th width='30%'>" .$l['ac_imagename']. " " .printhelp("imagename"). "</th>\n";
               echo "<th width='20%'>" .$l['ac_template']. " " .printhelp("template"). "</th>\n";
@@ -318,7 +318,7 @@ if ($s_access_sensor > 1) {
                       } else {
                         $name .= " (" .$tapip. ")";
                       }
-                      echo printOption($sid, $name, $sensorid);
+                      echo printOption($sensorid, $name, $sid);
                     }
                   echo "</select>\n";
                 echo "</td>\n";

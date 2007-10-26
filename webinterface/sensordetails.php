@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 08-10-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01
 # 2.00.02 Added hash check
 # 2.00.01 Initial release
 #############################################
@@ -156,10 +157,10 @@ if ($err != 1) {
     echo "<div class='leftsmall'>\n";
       echo "<div class='block'>\n";
         echo "<div class='actionBlock'>\n";
-          echo "<div class='blockHeader'>Actions</div>\n";
+          echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
           echo "<div class='blockContent'>\n";
             echo "<form name='sensoractions' method='get' action='purge.php'>\n";
-              echo "Purge all events older than ";
+              echo $l['sd_purge']. " ";
               echo "<select name='int_time' onchange='this.form.submit();'>\n";
                 echo printOption(0, "", 0);
                 foreach ($v_sensor_purge_ar as $key => $val) {
@@ -181,17 +182,17 @@ if ($err != 1) {
         echo "<div class='blockHeader'>$header</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
-            echo "<tr><th colspan='2'>Name</th></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_name']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td width='150'>ID:</td>\n";
+              echo "<td width='150'>" .$l['g_id']. ":</td>\n";
               echo "<td width='300'>$sid</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Sensor name:</td>\n";
+              echo "<td>" ,$l['sd_sensorname']. ":</td>\n";
               echo "<td>$sensor</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Sensor label:</td>\n";
+              echo "<td>" .$l['sd_label']. ":</td>\n";
               echo "<td>";
                 if ($s_access_sensor > 0) {
                   echo "<form name='chg_label' method='get'>\n";
@@ -200,8 +201,8 @@ if ($err != 1) {
                       echo "<input type='text' name='strip_escape_html_label' value='$label' />";
                     echo "</div>\n";
                     echo "<div class='aright'>\n";
-                      echo "<input type='button' onclick=\"window.location='sensordetails.php?int_sid=$sid&int_dellabel=1&md5_hash=$s_hash';\" class='button' value='Clear' />\n";
-                      echo "<input type='submit' value='Save' class='button' />\n";
+                      echo "<input type='button' onclick=\"window.location='sensordetails.php?int_sid=$sid&int_dellabel=1&md5_hash=$s_hash';\" class='button' value='" .$l['sd_clear']. "' />\n";
+                      echo "<input type='submit' value='" .$l['g_update']. "' class='button' />\n";
                     echo "</div>\n";
                     echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                   echo "</form>\n";
@@ -211,49 +212,49 @@ if ($err != 1) {
               echo "</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Domain:</td>\n";
+              echo "<td>" .$l['g_domain']. ":</td>\n";
               echo "<td>$org</td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>Sensor side</th></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_sensorside']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td>Remote IP:</td>\n";
+              echo "<td>" .$l['sd_rip']. ":</td>\n";
               echo "<td>$remote</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Local IP:</td>\n";
+              echo "<td>" .$l['sd_lip']. ":</td>\n";
               echo "<td>$local</td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>Server side</th></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_serverside']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td>Device:</td>\n";
+              echo "<td>" .$l['sd_device']. ":</td>\n";
               echo "<td>$tap</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Device MAC:</td>\n";
+              echo "<td>" .$l['sd_devmac']. ":</td>\n";
               echo "<td>$mac</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Device IP:</td>\n";
+              echo "<td>" .$l['sd_devip']. ":</td>\n";
               echo "<td>$tapip</td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>Status</th></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_status']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td>Last started:</td>\n";
+              echo "<td>" .$l['sd_started']. ":</td>\n";
               echo "<td>$start_text</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Last stopped:</td>\n";
+              echo "<td>" .$l['sd_stopped']. ":</td>\n";
               echo "<td>$stop_text</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Last updated:</td>\n";
+              echo "<td>" .$l['sd_updated']. ":</td>\n";
               echo "<td>$update_text</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Status:</td>\n";
+              echo "<td>" .$l['sd_status']. ":</td>\n";
               echo "<td>";
                 echo "<div class='sensorstatus'>";
                   echo "<div class='" .$v_sensorstatus_ar[$status]["class"]. "'>";
@@ -287,35 +288,35 @@ if ($err != 1) {
   echo "<div class='rightmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Sensor log</div>\n";
+        echo "<div class='blockHeader'>" .$l['sd_sensorlog']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<form name='sensorlog'>\n"; 
           echo "<input type='hidden' name='int_sid' value='$sid' />\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th colspan='2'>Uptime</th>\n";
+              echo "<th colspan='2'>" .$l['sd_uptime']. "</th>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td width='150'>Logging since:</td>\n";
+              echo "<td width='150'>" .$l['sd_since']. ":</td>\n";
               echo "<td width='320'>$first_attack</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Total log time:</td>\n";
+              echo "<td>" .$l['sd_total']. ":</td>\n";
               echo "<td><span id='js_total'>$totaltime_text</span></td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Uptime:</td>\n";
+              echo "<td>" .$l['sd_uptime']. ":</td>\n";
               echo "<td><span id='js_uptime'>$uptime_text</span></td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>Events</th></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_events']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td>Total number of events:</td>\n";
+              echo "<td>" .$l['sd_totalevents']. ":</td>\n";
               echo "<td>";
                 echo "<div class='aleft'><div class='text'>$num_events</div></div>\n";
                 echo "<div class='aright'>";
                   echo "<select name='int_logfilter' class='smallselect' onchange='document.sensorlog.submit();'>";
-                    echo printOption(-1, "All", $logfilter);
+                    echo printOption(-1, $l['g_all'], $logfilter);
                     foreach ($v_logmessages_type_ar as $key => $val) {
                       echo printOption($key, "$val", $logfilter);
                     }

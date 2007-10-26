@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.02 Fixed bugs for ARP poisoning
 # 2.00.01 Initial release (split from logsearch.php)
 #############################################
@@ -24,6 +25,9 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
+
+# Including language file
+include "../lang/${c_language}.php";
 
 # Setting headers
 header("Content-type: text/xml");
@@ -391,11 +395,11 @@ while ($row = pg_fetch_assoc($result)) {
   echo "  </idmef:Target>\n";
 
   if ($sev == 1 && $attack != "") {
-    echo "  <idmef:AdditionalData type=\"string\" meaning=\"attack-type\">\n";
+    echo "  <idmef:AdditionalData type=\"string\" meaning=\"" .$l['ls_at']. "\">\n";
     echo "    <idmef:string>$attack</idmef:string>\n";
     echo "  </idmef:AdditionalData>\n";
   } elseif ($sev == 16 && $malware != "") {
-    echo "  <idmef:AdditionalData type=\"string\" meaning=\"file-offered\">\n";
+    echo "  <idmef:AdditionalData type=\"string\" meaning=\"" .$l['ls_fo']. "\">\n";
     echo "    <idmef:string>$malware</idmef:string>\n";
     echo "  </idmef:AdditionalData>\n";
   }

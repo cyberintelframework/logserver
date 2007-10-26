@@ -802,7 +802,7 @@ echo "<div class='leftmed'>";
             } else {
               echo "<tr id='virus' style='display:none;'>\n";
             }
-              echo "<td>" .$l['ls_virus']. :</td>";
+              echo "<td>" .$l['ls_virus']. ":</td>";
               echo "<td>\n";
                 if ($c_autocomplete == 1) { 
                   echo "<input type='text' id='strip_html_escape_virustxt' name='strip_html_escape_virustxt' onkeyup='searchSuggest(5);' autocomplete='off' value='$f_virus_txt' />" .$l['ls_wildcard']. " %";

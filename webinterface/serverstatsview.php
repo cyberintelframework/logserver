@@ -3,14 +3,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 26-10-2007                       #
 # Hiroshi Suzuki of NTT-CERT       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.05 Added support for multiple servers 
 # 1.04.04 Changed data input handling
@@ -73,17 +74,17 @@ if ($err == 0) {
             echo "<tr>\n";
               echo "<td>\n";
                 if ($interval == "day") {
-                  echo "Daily Graph (5 minute averages)<br />\n";
-                  echo "<img alt='$label Daily' src='showserver.php?int_imgid=$imgid' /><br />\n";
+                  echo $l['sv_dg']. "<br />\n";
+                  echo "<img alt='$label " .$l['sv_daily']. "' src='showserver.php?int_imgid=$imgid' /><br />\n";
                 } elseif ($interval == "week") {
-                  echo "Weekly Graph (30 minute averages)<br />\n";
-                  echo "<img alt='$label Weekly' src='showserver.php?int_imgid=$imgid' /><br />\n";
+                  echo $l['sv_wg']. "<br />\n";
+                  echo "<img alt='$label " .$l['sv_weekly']. "' src='showserver.php?int_imgid=$imgid' /><br />\n";
                 } elseif ($interval == "month") {
-                  echo "Monthly Graph (2 hour averages)<br />\n";
-                  echo "<img alt='label Monthly' src='showserver.php?int_imgid=$imgid' /><br />\n";
+                  echo $l['sv_mg']. "<br />\n";
+                  echo "<img alt='label " .$l['sv_monthly']. "' src='showserver.php?int_imgid=$imgid' /><br />\n";
                 } elseif ($interval == "year") {
-                  echo "Yearly Graph (12 hour averages)<br />\n";
-                  echo "<img alt='$label Yearly' src='showserver.php?int_imgid=$imgid' /><br />\n";
+                  echo $l['sv_yg']. "<br />\n";
+                  echo "<img alt='$label " .$l['sv_yearly']. "' src='showserver.php?int_imgid=$imgid' /><br />\n";
                   $labelcheck = 0;
                 }
               echo "</td>\n";
