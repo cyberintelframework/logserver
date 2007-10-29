@@ -1,4 +1,4 @@
-<?php $tab="5.1"; $pagetitle="Domain Admin - Edit"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="5.3"; $pagetitle="Domain Admin - Edit"; include("menu.php"); contentHeader(0); ?>
 <?php
 
 ####################################
@@ -11,6 +11,7 @@
 ####################################
 # Changelog:
 # 2.10.01 Added language support
+# 2.00.02 Fixed a typo in the tab number
 # 2.00.01 version 2.00
 # 1.04.06 Changed printhelp stuff
 # 1.04.05 Added hash check stuff

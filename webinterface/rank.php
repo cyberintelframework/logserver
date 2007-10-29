@@ -16,6 +16,7 @@
 ####################################
 # Changelog:
 # 2.10.01 Added language support
+# 2.00.03 Fixed a bug where it would not show own organisation in top orgs list
 # 2.00.02 Fixed a bug with tops source addresses.
 # 2.00.01 version 2.00
 # 1.04.14 Fixed links to logsearch + added vlan support for top 10 sensors
@@ -1326,7 +1327,7 @@ echo "<div class='all'>\n";
                 echo "<td>$i</td>\n";
                 if ($s_access_search == 9) {
                   echo "<td>$db_org_name</td>\n";
-                } elseif ($q_org == $db_org) {
+                } elseif ($q_org == $id) {
                   echo "<td>$db_org_name</td>\n";
                 } else {
                   echo "<td></td>\n";

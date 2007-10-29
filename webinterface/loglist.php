@@ -14,6 +14,7 @@
 #############################################
 # Changelog:
 # 2.10.01 Added language support
+# 2.00.03 Added missing timestamp stuff for the sql query
 # 2.00.02 Removed text on block header 
 # 2.00.01 Added support for possible attacks
 # 1.04.06 Added IP exclusion stuff
@@ -58,6 +59,7 @@ if (isset($clean['sev'])) {
 
 ### Checking for errors.
 if ($err != 1) {
+  $tsquery = "timestamp >= $from AND timestamp <= $to";
   ### retrieving organisation ranges.
 
   add_to_sql("attacks", "table");
