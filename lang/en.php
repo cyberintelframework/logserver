@@ -387,7 +387,7 @@ $l['ra_domains']		= "domains";
 ##########################
 $l['re_mailopts']		= "Mail options";
 $l['re_subject']		= "Subject";
-$l['re_mailprio']		= "Mail Priority";
+$l['re_mailprio']		= "Mail priority";
 $l['re_reportpopts']		= "Report options";
 $l['re_allsensors']		= "All sensors";
 $l['re_reptemp']		= "Report template";
