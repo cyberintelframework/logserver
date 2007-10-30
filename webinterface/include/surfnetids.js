@@ -1,13 +1,15 @@
 /*
  * ####################################
  * # SURFnet IDS                      #
- * # Version 2.00.01                  #
- * # 10-09-2007                       #
+ * # Version 2.10.02                  #
+ * # 30-10-2007                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 2.10.02 Fixed bug with Critera field in logsearch
+ * # 2.10.01 version 2.10
  * # 2.00.01 version 2.00
  * # 1.04.06 Added selector functions
  * # 1.04.05 Added sh_mailreptype()
@@ -367,12 +369,12 @@ function sh_search_dest(si) {
     $('#sensor').hide(0);
     $('#dest').show();
     $('#mac_destmac').val('');
-    $('#sensorid').selectedIndex = 0;
+    $('#sensorid')[0].selectedIndex = 0;
   } else if (si == 2) {
     $('#sensor').hide(0);
     $('#dest').hide(0);
     $('#destmac').show();
-    $('#sensorid').selectedIndex = 0;
+    $('#sensorid')[0].selectedIndex = 0;
     $('#inet_dest').val('');
   } else if (si == 3) {
     $('#destmac').hide(0);
@@ -404,6 +406,11 @@ function sh_search_src(si) {
 }
 
 function sh_search_charac(si) {
+    $('#int_sevtype')[0].selectedIndex = 0;
+    $('#int_attack')[0].selectedIndex = 0;
+    $('#strip_html_escape_virustxt').val('');
+    $('#strip_html_escape_filename').val('');
+    $('#strip_html_escape_binname').val('');
   if (si == 0) {
     $('#sevtype').hide(0);
     $('#attacktype').hide(0);
@@ -411,11 +418,6 @@ function sh_search_charac(si) {
     $('#filename').hide(0);
     $('#binary').hide(0);
     $('#charac_details').hide(0);
-    $('#int_sevtype').selectedIndex = 0;
-    $('#int_attack').selectedIndex = 0;
-    $('#strip_html_escape_virustxt').val('');
-    $('#strip_html_escape_filename').val('');
-    $('#strip_html_escape_binname').val('');
   } else if (si == 1) {
     $('#attacktype').hide(0);
     $('#virus').hide(0);
@@ -423,10 +425,6 @@ function sh_search_charac(si) {
     $('#binary').hide(0);
     $('#charac_details').show();
     $('#sevtype').show();
-    $('#int_attack').selectedIndex = 0;
-    $('#strip_html_escape_virustxt').val('');
-    $('#strip_html_escape_filename').val('');
-    $('#strip_html_escape_binname').val('');
   } else if (si == 16) {
     $('#sevtype').hide(0);
     $('#attacktype').hide(0);
@@ -435,10 +433,6 @@ function sh_search_charac(si) {
     $('#filename').hide(0);
     $('#charac_details').show();
     $('#filename').show();
-    $('#int_sevtype').selectedIndex = 0;
-    $('#int_attack').selectedIndex = 0;
-    $('#strip_html_escape_virustxt').val('');
-    $('#strip_html_escape_binname').val('');
   } else if (si == 32) {
     $('#sevtype').hide(0);
     $('#attacktype').hide(0);
@@ -446,8 +440,6 @@ function sh_search_charac(si) {
     $('#virus').show();
     $('#filename').show();
     $('#binary').show();
-    $('#int_sevtype').selectedIndex = 0;
-    $('#int_attack').selectedIndex = 0;
   }
 }
 
@@ -456,7 +448,7 @@ function sh_search_charac_sevtype(si) {
     $('#attacktype').show();
   } else {
     $('#attacktype').hide();
-    $('#int_attack').selectedIndex = 0;
+    $('#int_attack')[0].selectedIndex = 0;
   }
 }
 

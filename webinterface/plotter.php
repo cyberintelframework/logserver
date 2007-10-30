@@ -3,13 +3,14 @@
 ####################################
 # SURFnet IDS                      #
 # Version 2.10.01                  #
-# 25-10-2007                       #
+# 30-10-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
 # 2.10.01 Added language support
+# 2.00.04 Fixed bug with the popups
 # 2.00.03 Fixed some layout issues
 # 2.00.02 Graphs now shown in popups
 # 2.00.01 2.00 version
@@ -50,6 +51,7 @@ function buildqs() {
   $("form:eq("+sw+") input").each(function(item){
     var name = $("form:eq("+sw+") input:eq("+item+")").attr("name");
     var val = $("form:eq("+sw+") input:eq("+item+")").val();
+    $("form:eq("+sw+") input:eq("+item+")").blur();
     str = str+"&"+name+"="+val;
   })
   $("form:eq("+sw+") select").each(function(item){
@@ -58,6 +60,7 @@ function buildqs() {
     str = str+"&"+name+"="+val;
   })
   popimg("showplot.php"+str, 600, 1000, "11%");
+  return false;
 }
 
 function popimg(url,h,w,x,y) {
@@ -86,20 +89,6 @@ function popimg(url,h,w,x,y) {
 
 <?php
 
-if ($_GET['int_type']) {
-  $qs = $_SERVER['QUERY_STRING'];
-  echo "<div class='centerbig'>\n";
-    echo "<div class='block'>\n";
-      echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Graph</div>\n";
-        echo "<div class='blockContent'>\n";
-        echo "<img id='plot' src='showplot.php?$qs'>\n";
-	echo "</div>\n";
-        echo "<div class='blockFooter'></div>\n";
-      echo "</div>\n";
-    echo "</div>\n";
-  echo "</div>\n";
-} else {
   if ($s_admin == 1) {
     $where = "";
   } else {
@@ -137,7 +126,7 @@ if ($_GET['int_type']) {
   # SEVERITY
   ################
   echo "<div class='tabcontent' id='severity' style='z-index: 9; display: block;'>\n";
-  echo "<form method='get' action=\"showplot.php\" name='sevform' id='sevform'>\n";
+  echo "<form method='get' name='sevform' id='sevform' onsubmit='return buildqs();'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
@@ -205,7 +194,7 @@ if ($_GET['int_type']) {
   # ATTACKS
   ################
   echo "<div class='tabcontent' id='attacks' style='z-index: 9; display: none;'>\n";
-  echo "<form method='get' action='$_SELF' name='attackform' id='attackform'>\n";
+  echo "<form method='get' name='attackform' id='attackform' onsubmit='return buildqs();'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
@@ -281,7 +270,7 @@ if ($_GET['int_type']) {
   # PORTS
   ################
   echo "<div class='tabcontent' id='ports' style='z-index: 9; display: none;'>\n";
-  echo "<form method='get' action='$_SELF' name='portform' id='portform'>\n";
+  echo "<form method='get' name='portform' id='portform' onsubmit='return buildqs();'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
@@ -358,7 +347,7 @@ if ($_GET['int_type']) {
   # OS
   ################
   echo "<div class='tabcontent' id='os' style='z-index: 9; display: none;'>\n";
-  echo "<form method='get' action='$_SELF' name='osorm' id='osform'>\n";
+  echo "<form method='get' name='osorm' id='osform' onsubmit='return buildqs();'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
@@ -447,7 +436,7 @@ if ($_GET['int_type']) {
   # VIRUS
   ################
   echo "<div class='tabcontent' id='virus' style='z-index: 9; display: none;'>\n";
-  echo "<form method='get' action='$_SELF' name='virusform' id='virusform'>\n";
+  echo "<form method='get' name='virusform' id='virusform' onsubmit='return buildqs();'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
@@ -537,6 +526,5 @@ if ($_GET['int_type']) {
 
   echo "<input type='hidden' value='1' id='switch' />\n";
   debug_sql();
-}
 ?>
 <?php footer(); ?>

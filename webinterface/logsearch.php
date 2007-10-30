@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# Version 2.10.02                  #
+# 30-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 2.10.02 Fixed bug with Criterea 
 # 2.10.01 Added language support
 # 2.00.04 No additional info for ARP attacks
 # 2.00.03 Fixed a bug in the navigation
@@ -732,8 +733,8 @@ echo "<div class='leftmed'>";
             echo "<td width='18%'></td>";
             echo "<td width='80%'>";
               if (isset($f_sev)) echo $l['ls_sev']. ": <font class='btext'>$v_severity_ar[$f_sev]</font><br />";
-              if (isset($f_sevtype)) echo $l['ls_sevtype']. ": <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
-              if (isset($f_attack)) {
+              if (isset($f_sevtype) && $f_sev == 1) echo $l['ls_sevtype']. ": <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
+              if (isset($f_attack) && $f_sev == 1) {
                 $sql_g = "SELECT name FROM stats_dialogue WHERE id = '$f_attack'";
                 $result_g = pg_query($pgconn, $sql_g);
                 $row_g = pg_fetch_assoc($result_g);
@@ -741,9 +742,9 @@ echo "<div class='leftmed'>";
                 $expl = str_replace("Dialogue", "", $expl);
                 if ($expl != "") echo $l['ls_exp']. ": <font class='btext'>$expl</font><br />";
               }
-              if (isset($f_binname)) echo $l['ls_binname']. ": <font class='btext'>$f_binname</font><br />";
-              if (isset($f_virus_txt)) echo $l['ls_virus']. ": <font class='btext'>$f_virus_txt</font><br />";
-              if (isset($f_filename)) echo $l['ls_filename']. ": <font class='btext'>$f_filename</font><br />";
+              if (isset($f_binname) && $f_sev == 32) echo $l['ls_binname']. ": <font class='btext'>$f_binname</font><br />";
+              if (isset($f_virus_txt) && $f_sev == 32) echo $l['ls_virus']. ": <font class='btext'>$f_virus_txt</font><br />";
+              if (isset($f_filename) && ($f_sev == 16 || $f_sev == 16)) echo $l['ls_filename']. ": <font class='btext'>$f_filename</font><br />";
             echo "</td>\n";
             echo "<td width='2%'></td>\n";
           echo "</tr>\n";
@@ -754,7 +755,7 @@ echo "<div class='leftmed'>";
             echo "<td>\n";
               echo "<select id='int_sev' name='int_sev' onchange='javascript: sh_search_charac(this.value);'>\n";
                 if(!isset($f_sev)) $f_sev=-1;
-                  echo printOption(-1, "", -1);
+                  echo printOption(-1, "", $f_sev);
                   foreach ($v_severity_ar as $index=>$severity) {
                     echo printOption($index, $severity, $f_sev);
                   }
@@ -771,7 +772,8 @@ echo "<div class='leftmed'>";
               echo "<td>";
                 echo "<select id='int_sevtype' name='int_sevtype' onchange='javascript: sh_search_charac_sevtype(this.value);'>\n";
                   if(!isset($f_sevtype)) $f_sevtype=-1;
-                  echo printOption(-1, $l['g_all'], -1);
+		  if ($f_sev != 1) $f_sevtype=-1;
+                  echo printOption(-1, $l['g_all'], $f_sevtype);
                   foreach ($v_severity_atype_ar as $index=>$sevtype) {
                     echo printOption($index, $sevtype, $f_sevtype);
                   }
@@ -786,7 +788,8 @@ echo "<div class='leftmed'>";
               echo "<td>" .$l['ls_exp']. ":</td>";
               echo "<td>";
                 echo "<select name='int_attack' id='int_attack'>";
-                  echo printOption(-1, "All exploits", $f_attack);
+                  if ($f_sevtype != 0) $f_attack=-1;
+		  echo printOption(-1, "All exploits", $f_attack);
                   $sql = "SELECT * FROM stats_dialogue ORDER BY name";
                   $debuginfo[] = $sql;
                   $query = pg_query($sql);
@@ -807,7 +810,7 @@ echo "<div class='leftmed'>";
                 if ($c_autocomplete == 1) { 
                   echo "<input type='text' id='strip_html_escape_virustxt' name='strip_html_escape_virustxt' onkeyup='searchSuggest(5);' autocomplete='off' value='$f_virus_txt' />" .$l['ls_wildcard']. " %";
                   echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_5\"></div>\n";
+                    echo "<div id='search_suggest_5'></div>\n";
                   echo "</div>\n"; 
                 } else {
                   echo "<input type='text' name='strip_html_escape_virustxt' id='strip_html_escape_virustxt' value='$f_virus_txt' />" .$l['ls_wildcard']. " %\n";

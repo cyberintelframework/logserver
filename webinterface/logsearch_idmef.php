@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
+# Version 2.10.02                  #
 # 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 IE bug "could not download" fixed 
 # 2.10.01 Added language support
 # 2.00.02 Fixed bugs for ARP poisoning
 # 2.00.01 Initial release (split from logsearch.php)
@@ -30,8 +31,9 @@ include '../include/variables.inc.php';
 include "../lang/${c_language}.php";
 
 # Setting headers
-header("Content-type: text/xml");
-header("Cache-control: private");
+header("Pragma: public");
+header("Cache-Control: max-age=0");
+header("Content-type: application/xml");
 $fn = "SURFnet_IDMEF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".xml";
 header("Content-disposition: attachment; filename=$fn");
 
@@ -325,7 +327,7 @@ $sql .= " $sql_group ";
 $result = pg_query($sql);
 
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-echo "<!DOCTYPE IDMEF-Message PUBLIC \"-//IETF//DTD RFC XXXX IDMEF v1.0//EN\" \"idmef-message.dtd\">\n";
+#echo "<!DOCTYPE IDMEF-Message PUBLIC \"-//IETF//DTD RFC XXXX IDMEF v1.0//EN\" \"idmef-message.dtd\">\n";
 echo "<idmef:IDMEF-Message version=\"1.0\" xmlns:idmef=\"http://iana.org/idmef\">\n";
 flush();
 while ($row = pg_fetch_assoc($result)) {
