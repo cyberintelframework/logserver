@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+# detectarp.pl init script required for a single sensor setup
+# Ignore this file if also installed the tunnel server package
+# of the SURFids
+
+##################
+# Modules used
+##################
+use DBI;
+use Time::localtime qw(localtime);
+
+do '/etc/surfnetids/surfnetids-tn.conf';
+require "$c_surfidsdir/scripts/tnfunctions.inc.pl";
+
+##################
+# Main script
+##################
+
+$chk = connectdb();
+
+# Get the IP address configuration for the tap device from the database.
+$sql = "SELECT tap, arp FROM sensors WHERE keyname = 'nepenthes'";
+$sth = $dbh->prepare($sql);
+$er = $sth->execute();
+
+@row = $sth->fetchrow_array;
+$if = $row[0];
+$arp = $row[1];
+
+if (!$if) {
+  $if = "";
+}
+
+if ("$if" eq "") {
+  exit 1;
+}
+
+if ($arp == 1) {
+  system("$c_surfidsdir/scripts/detectarp.pl $if &");
+}
