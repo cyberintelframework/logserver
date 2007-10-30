@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 
 # detectarp.pl init script required for a single sensor setup
-# Ignore this file if also installed the tunnel server package
+# Ignore this file if you also installed the tunnel server package
 # of the SURFids
+
+# NOTICE: Single sensor setup only
 
 ##################
 # Modules used
