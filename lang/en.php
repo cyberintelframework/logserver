@@ -101,6 +101,7 @@ $l['bh_binaryhist']		= "Binary history";
 $l['bh_filenames']		= "Filenames used";
 $l['bh_full']			= "Show full list";
 $l['bh_top10']			= "Show top 10";
+$l['bh_last_scanned']		= "Last scanned";
 
 ##########################
 # detectedproto.php

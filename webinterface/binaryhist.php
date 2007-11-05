@@ -3,8 +3,8 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 2.10.01                 #
-# 23-10-2007                      #
+# Version 2.10.02                 #
+# 05-11-2007                      #
 # Jan van Lith & Kees Trippelvitz #
 ###################################
 # Contributors:                   #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.02 Added last scanned timestamp
 # 2.10.01 Added language support
 # 2.00.01 New Release 
 # 1.04.07 Added CWS support 
@@ -98,12 +99,13 @@ if ($err == 0) {
 }
 
 if ($err == 0) {
-  $sql_bindetail = "SELECT fileinfo, filesize FROM binaries_detail WHERE bin = $bin_id";
+  $sql_bindetail = "SELECT fileinfo, filesize, last_scanned FROM binaries_detail WHERE bin = $bin_id";
   $result_bindetail = pg_query($pgconn, $sql_bindetail);
   $row_bindetail = pg_fetch_assoc($result_bindetail);
   $filesize = $row_bindetail['filesize'];
   $filesize = size_hum_read($filesize);
   $fileinfo = $row_bindetail['fileinfo'];
+  $last_scanned = $row_bindetail['last_scanned'];
 
   $sql_firstseen = "SELECT attacks.timestamp, details.* ";
   $sql_firstseen .= "FROM attacks, details ";
@@ -153,6 +155,9 @@ if ($err == 0) {
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td><b>" .$l['bh_last_seen']. "</b></td><td>$last_seen</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td><b>" .$l['bh_last_scanned']. "</b></td><td>$last_scanned</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</div>\n"; #</blockContent>

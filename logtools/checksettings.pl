@@ -8,13 +8,6 @@
 # Jan van Lith & Kees Trippelvitz #
 ###################################
 
-# settings to check for changes in the ARP settings for a local sensor
-# and to update the lastupdate timestamp for a local sensor
-# Ignore this file if you also installed the tunnel server package
-# of the SURFids
-
-# NOTICE: Single sensor setup only
-
 #####################
 # Changelog:
 # 2.10.01 Initial version
@@ -49,6 +42,12 @@ if (!$tap) {
 }
 
 if ("$tap" ne "") {
+  $ifip = `ifconfig $tap | grep "inet addr:" | awk '{print \$2}' | awk -F":" '{print \$2}'`;
+  chomp($ifip);
+  $sql = "UPDATE sensors SET tapip = '$ifip', remoteip = '$ifip', localip = '$ifip' WHERE keyname = 'nepenthes'";
+  $sth = $dbh->prepare($sql);
+  $er = $sth->execute();
+
   if ("$arp" ne "") {
     if ("$arp" eq "0") {
       $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | awk '{print \$2}'`;
