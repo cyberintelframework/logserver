@@ -15,6 +15,8 @@
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
+include '../include/variables.inc.php';
+include '../lang/${c_language}.php';
 
 # Starting the session
 session_start();
@@ -57,7 +59,7 @@ if (isset($clean['id'])) {
 }
 
 if (isset($clean['app'])) {
-  $app = $clean['app'];
+  $status = $clean['app'];
 } else {
   $m = 149;
   $err = 1;
@@ -75,14 +77,19 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
-  $sql = "UPDATE groups SET approved = '$app' WHERE id = '$id'";
+  $sql = "UPDATE groups SET approved = '$status' WHERE id = '$id'";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 3;
+
+  if ($status == 0) { $message = "warning"; }
+  elseif ($status == 1) { $message = "ok"; }
+  elseif ($status == 2) { $message = "notice"; }
+  echo "<div id='status$id' class='$message'>" .$v_group_status_ar[$status]. "</div>\n";
 }
 
 # Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
-header("location: groupadmin.php?int_m=$m");
+#header("location: groupadmin.php?int_m=$m");
 ?>

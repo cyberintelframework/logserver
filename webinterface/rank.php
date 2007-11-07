@@ -191,9 +191,11 @@ add_to_sql("details.type = 1", "where");
 add_to_sql("details.attackid = attacks.id", "where");
 add_to_sql("details.text = stats_dialogue.name", "where");
 add_to_sql("$tsquery", "where");
-add_to_sql("DISTINCT stats_dialogue.id", "select");
+add_to_sql("DISTINCT details.text", "select");
+add_to_sql("stats_dialogue.id", "select");
 add_to_sql("COUNT(details.id) as total", "select");
 add_to_sql("stats_dialogue.id", "group");
+add_to_sql("details.text", "group");
 add_to_sql("total DESC LIMIT $c_topexploits OFFSET 0", "order");
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
@@ -584,7 +586,8 @@ echo "<div class='all'>\n";
             $i=1;
             $grandtotal = 0;
             while ($row = pg_fetch_assoc($result_topexp)) {
-              $exploit = $row['id'];
+              $exploit = $row['text'];
+              $exploitid = $row['id'];
               $total = $row['total'];
               $exploit_ar[$exploit] = $total;
               $grandtotal = $grandtotal + $total;
@@ -602,7 +605,7 @@ echo "<div class='all'>\n";
                   }
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?int_attack=$exploit", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   }
@@ -634,7 +637,8 @@ echo "<div class='all'>\n";
               $exploit_ar = "";
               $result_topexp_org = pg_query($pgconn, $sql_topexp_org);
               while ($row = pg_fetch_assoc($result_topexp_org)) {
-                $exploit = $row['id'];
+                $exploit = $row['text'];
+                $exploitid = $row['id'];
                 $total = $row['total'];
                 $exploit_ar[$exploit] = $total;
                 $grandtotal = $grandtotal + $total;
@@ -651,7 +655,7 @@ echo "<div class='all'>\n";
                       echo "<td>$attack</td>\n";
                     }
                     $perc = round($val / $grandtotal * 100);
-                    echo "<td>" . downlink("logsearch.php?int_attack=$exploit", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }

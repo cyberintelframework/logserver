@@ -41,7 +41,7 @@ echo "<div class='leftbig'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>Edit Group</div>\n";
       echo "<div class='blockContent'>\n";
-        echo "<form name='groupadmin' method='get' onsubmit=\"return popit('groupsave.php');\">\n";
+        echo "<form id='groupedit' name='groupedit'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
             echo "<th width='100'>Name</th>\n";
@@ -67,7 +67,7 @@ echo "<div class='leftbig'>\n";
           elseif ($status == 1) { $message = "ok"; }
           elseif ($status == 2) { $message = "notice"; }
 
-          echo "<tr>\n";
+          echo "<tr id='groupedit'>\n";
             echo "<td><input type='text' name='strip_html_escape_name' value='$name' /></td>\n";
             if ($status == 0 || ($type == 1 && $status != 0)) {
               echo "<td>";
@@ -90,7 +90,7 @@ echo "<div class='leftbig'>\n";
             }
             echo "<td>$owner</td>\n";
             echo "<td><div class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
-            echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' /></td>\n";
+            echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' onclick=\"submitform('groupedit', 'groupsave.php', 'u', 'groupedit';\" /></td>\n";
           echo "</tr>\n";
         echo "</table>\n";
         echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";

@@ -16,6 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
+include '../lang/${c_language}.php';
 
 # Starting the session
 session_start();
@@ -81,12 +82,47 @@ if ($err != 1) {
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
+
+  $sql = "SELECT name, type, detail, approved, organisation ";
+  $sql .= " FROM groups, organisations WHERE groups.owner = organisations.id AND groups.id = '$id'";
+  $debuginfo[] = $sql;
+  $result = pg_query($pgconn, $sql);
+  $row = pg_fetch_assoc($result);
+  $name = $row['name'];
+  $type = $row['type'];
+  $detail = $row['detail'];
+  $status = $row['approved'];
+  $owner = $row['organisation'];
+
+  echo "<tr>\n";
+    echo "<td><input type='text' name='strip_html_escape_name' value='$name' /></td>\n";
+    if ($status == 0 || ($type == 1 && $status != 0)) {
+      echo "<td>";
+        echo "<select name='int_type'>\n";
+          foreach ($v_group_type_ar as $key=>$val) {
+            echo printOption($key, $val, $type);
+          }
+        echo "</select>\n";
+      echo "</td>\n";
+      echo "<td>";
+        echo "<select name='int_detail'>\n";
+          foreach ($v_group_detail_ar as $key=>$val) {
+            echo printOption($key, $val, $detail);
+          }
+        echo "</select>\n";
+      echo "</td>\n";
+    } else {
+      echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
+      echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
+    }
+    echo "<td>$owner</td>\n";
+    echo "<td><div class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
+    echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' onclick=\"submitform('groupedit', 'groupsave.php', 'u', 'groupedit';\" /></td>\n";
+  echo "</tr>\n";
 }
 
 # Close connection and redirect
 pg_close($pgconn);
-
-geterror($m);
 
 #debug_sql();
 #header("location: groupedit.php?int_m=$m&int_id=$id");

@@ -16,7 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
-include '../lang/en.php';
+include '../lang/${c_language}.php';
 
 # Starting the session
 session_start();
@@ -85,20 +85,18 @@ if ($err != 1) {
 
 if ($err != 1) {
   if ($type == 1) {
-    $app = 0;
+    $status = 0;
   } else {
-    $app = 1;
+    $status = 1;
   }
 
   $sql = "INSERT INTO groups (name, type, detail, owner, approved) ";
-  $sql .= "VALUES ('$name', '$type', '$detail', '$s_org', '$app')";
+  $sql .= "VALUES ('$name', '$type', '$detail', '$s_org', '$status')";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
 
   if ($ann == 1 || $s_access_user == 9) {
-    $status = $app;
-
     $sql_owner = "SELECT organisation FROM organisations WHERE id = '$s_org'";
     $result_owner = pg_query($pgconn, $sql_owner);
     $row = pg_fetch_assoc($result_owner);
@@ -120,7 +118,16 @@ if ($err != 1) {
       echo "<td><div id='status$id' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
       echo "<td>[<a href='groupedit.php?int_id=$id'>edit</a>]</td>\n";
       echo "<td>[<a onclick=\"javascript: submitform('', 'groupdel.php?int_id=$id', 'd', '$id', '" .$l['ga_confirmdel']. "');\">delete</a>]</td>\n";
-      echo "<td>[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1', 'u', 'status$id', '');\">approve</a>]</td>\n";
+      echo "<td>";
+#        if ($status == 0) {
+          echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1', 'u', 'status$id', '');\">approve</a>]";
+#        } elseif ($status == 1) {
+          echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=0', 'u', 'status$id', '');\">disapprove</a>]";
+#        }
+#        if ($status != 2) {
+          echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=2', 'u', 'status$id', '');\">deny</a>]";
+#        }
+      echo "</td>\n";
     echo "</tr>\n";
   }
 }

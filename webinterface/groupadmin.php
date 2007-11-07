@@ -30,23 +30,23 @@ if (isset($clean['m'])) {
 
 echo "<div id='err'></div>\n";
 
-echo "<div class='leftbig'>\n";
+echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>Groups</div>\n";
       echo "<div class='blockContent'>\n";
-        echo "<form id='groupadmin'>\n";
+        echo "<form id='groupadmin' name='groupadmin'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
             echo "<th width='100'>Name</th>\n";
             echo "<th width='50'>Type</th>\n";
             echo "<th width='80'>Detail</th>\n";
-            echo "<th width='50'>Owner</th>\n";
-            echo "<th width='150'>Status</th>\n";
-            echo "<th width='100'>Edit</th>\n";
-            echo "<th width='100'>Delete</th>\n";
+            echo "<th width='80'>Owner</th>\n";
+            echo "<th width='130'>Status</th>\n";
+            echo "<th width='60'>Edit</th>\n";
+            echo "<th width='60'>Delete</th>\n";
             if ($s_access_user == 9) {
-              echo "<th width='100'>Approve</th>\n";
+              echo "<th width='150'>Actions</th>\n";
             }
           echo "</tr>\n";
           $sql = "SELECT groups.id, name, type, detail, approved, organisation FROM groups, organisations WHERE groups.owner = organisations.id";
@@ -74,17 +74,19 @@ echo "<div class='leftbig'>\n";
                 echo "<td>[<a href='groupedit.php?int_id=$id'>edit</a>]</td>\n";
                 echo "<td>[<a onclick=\"javascript: submitform('', 'groupdel.php?int_id=$id', 'd', '$id', '" .$l['ga_confirmdel']. "');\">delete</a>]</td>\n";
                 echo "<td>";
-                  if ($status == 0) {
+#                  if ($status == 0) {
                     echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1', 'u', 'status$id', '');\">approve</a>]";
-                  } elseif ($status == 1) {
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1', 'u', 'status$id', '');\">disapprove</a>]";
-                  }
-                  echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=2', 'u', 'status$id', '');\">deny</a>]";
+#                  } elseif ($status == 1) {
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=0', 'u', 'status$id', '');\">disapprove</a>]";
+#                  }
+#                  if ($status != 2) {
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=2', 'u', 'status$id', '');\">deny</a>]";
+#                  }
                 echo "</td>\n";
               echo "</tr>\n";
             }
           }
-          echo "<tr>\n";
+          echo "<tr id='inputrow'>\n";
             echo "<td><input type='text' name='strip_html_escape_name'></td>\n";
             echo "<td>";
               echo "<select name='int_type'>\n";
@@ -106,7 +108,7 @@ echo "<div class='leftbig'>\n";
               $cs = 4;
             }
 #            echo "<td colspan='$cs'><input type='submit' class='button aright' value='" .$l['g_insert']. "' /></td>\n";
-            echo "<td colspan='$cs'><input type='button' class='button aright' value='" .$l['g_insert']. "' onclick=\"submitform('groupadmin', 'groupadd.php', 'a', '$id');\" /></td>\n";
+            echo "<td colspan='$cs'><input type='button' class='button aright' value='" .$l['g_insert']. "' onclick=\"submitform('groupadmin', 'groupadd.php', 'a', 'inputrow');\" /></td>\n";
             echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
           echo "</tr>\n";
         echo "</table>\n";

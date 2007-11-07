@@ -552,6 +552,22 @@ function sec_to_string(sec) {
  * Test AJAX functions
  ***********************************/
 
+$.fn.clearForm = function() {
+  // iterate each matching form
+  return this.each(function() {
+	// iterate the elements within the form
+	$(':input', this).each(function() {
+	  var type = this.type, tag = this.tagName.toLowerCase();
+	  if (type == 'text' || type == 'password' || tag == 'textarea')
+		this.value = '';
+	  else if (type == 'checkbox' || type == 'radio')
+		this.checked = false;
+	  else if (tag == 'select')
+		this.selectedIndex = 0;
+	});
+  });
+};
+
 function submitform(formid, url, action, loc, str) {
   if (formid != '') {
     var qs = $('#'+formid).serialize();
@@ -559,6 +575,8 @@ function submitform(formid, url, action, loc, str) {
   }
   if (action == 'd') {
     var chk = confirm(str);
+  } else {
+    chk = true;
   }
   if (chk) {
     $.ajax({
@@ -570,7 +588,8 @@ function submitform(formid, url, action, loc, str) {
       },
       success: function(data){
         if (action == 'a') {
-          $('#'+loc).after(data);
+          $('#'+loc).before(data);
+          $('#'+formid).clearForm();
         } else if (action == 'u') {
           $('#'+loc).replaceWith(data);
         } else if (action == 'd') {
