@@ -26,7 +26,6 @@ use POSIX;
 ##################
 do '/etc/surfnetids/surfnetids-log.conf';
 
-$c_surfidsdir = "/home/kees/tem";
 # Color codes
 $n = "\033[0;39m";
 $y = "\033[1;33m";
