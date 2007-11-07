@@ -650,6 +650,38 @@ option.starting {
 
 /*
  ********************
+ * Colored messages
+ ********************
+*/
+.warning {
+  color:		red;
+}
+
+.bwarning {
+  color:		red;
+  font-weight:		bold;
+}
+
+.ok {
+  color:		green;
+}
+
+.bok {
+  color:		green;
+  font-weight:		bold;
+}
+
+.notice {
+  color:		orange;
+}
+
+.bnotice {
+  color:		orange;
+  font-weight:		bold;
+}
+
+/*
+ ********************
  * Miscellaneous
  ********************
 */
@@ -689,24 +721,6 @@ option.starting {
 
 .smallinput {
   font-size:            8pt;
-}
-
-.warning {
-  color:		red;
-}
-
-.bwarning {
-  color:		red;
-  font-weight:		bold;
-}
-
-.ok {
-  color:		green;
-}
-
-.bok {
-  color:		green;
-  font-weight:		bold;
 }
 
 .suggest_link {

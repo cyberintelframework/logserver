@@ -600,7 +600,7 @@ echo "<div class='all'>\n";
                   }
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?int_attack=$key&int_org=0", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_attack=$key&int_org=0&int_sev=1", nf($val)). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   }
@@ -649,7 +649,7 @@ echo "<div class='all'>\n";
                       echo "<td>$attack</td>\n";
                     }
                     $perc = round($val / $grandtotal * 100);
-                    echo "<td>" . downlink("logsearch.php?int_attack=$key", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_attack=$key&int_sev=1", nf($val)). " (${perc}%)</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }
@@ -750,7 +750,7 @@ echo "<div class='all'>\n";
                   $vlanid = $row_top_org['vlanid'];
                   $sensor = sensorname($keyname, $vlanid);
                   $total = $row_top_org['total'];
-                  $label = $row['label'];
+                  $label = $row_top_org['label'];
                   if ($label != "") {
                     $str = $label;
                   } else {

@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.02                  #
-# 30-10-2007                       #
+# Version 2.10.03                  #
+# 05-11-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,8 @@
 
 #########################################################################
 # Changelog:
+# 2.10.04 Fixed BUGS #42 + #43 
+# 2.10.03 Fixed a typo
 # 2.10.02 Fixed bug with Criterea 
 # 2.10.01 Added language support
 # 2.00.04 No additional info for ARP attacks
@@ -363,7 +365,7 @@ if (!empty($f_virus_txt)) {
 ####################
 # Filename
 ####################
-if (!empty($f_filename)) {
+if ("$f_filename" != "") {
   add_to_sql("details", "table");
   add_to_sql("attacks.id = details.attackid", "where");
   add_to_sql("details.type = 4", "where");
@@ -545,7 +547,7 @@ echo "<div class='leftmed'>";
                 if ($c_autocomplete == 1) { 
                   echo "<input type='text' id='inet_dest' name='inet_dest' alt='" .$l['ls_destip']. "' onkeyup='searchSuggest(1);' autocomplete='off' value='$destination_ip' />";
                   echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_1'></div>\n";
+                    echo "<div id='search_suggest_1' class='search_suggest'></div>\n";
                   echo "</div>\n";
                 } else {
                   echo "<input type='text' id='inet_dest' name='inet_dest' alt='" .$l['ls_destip']. "' maxlenght=18  value='$destination_ip'/>";
@@ -603,7 +605,7 @@ echo "<div class='leftmed'>";
               if ($c_autocomplete == 1) {
                 echo "<input type='text' id='mac_destmac' name='mac_destmac' alt='" .$l['ls_destmac']. "' onkeyup='searchSuggest(2);' autocomplete='off' value='$dest_mac' />";
                 echo "<div id='search_suggest'>\n";
-                  echo "<div id='search_suggest_2'></div>\n";
+                  echo "<div id='search_suggest_2' class='search_suggest'></div>\n";
                 echo "</div>\n"; 
               } else {
                 echo "<input type='text' id='mac_destmac' name='mac_destmac' alt='" .$l['ls_destmac']. "' value='$dest_mac' />";
@@ -663,7 +665,7 @@ echo "<div class='leftmed'>";
               if ($c_autocomplete == 1) { 
                 echo "<input type='text' id='inet_source' name='inet_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' value='$source_ip' />";
                 echo "<div id='search_suggest'>\n";
-                  echo "<div id='search_suggest_3'></div>\n";
+                  echo "<div id='search_suggest_3' class='search_suggest'></div>\n";
                 echo "</div>\n"; 
                } else { 
                 echo "<input type='text' id='inet_source' name='inet_source' alt='" .$l['ls_sourceip']. "' maxlenght='18' value='$source_ip' />";
@@ -677,7 +679,7 @@ echo "<div class='leftmed'>";
               if ($c_autocomplete == 1) {
                 echo "<input type='text' id='mac_sourcemac' name='mac_sourcemac' alt='" .$l['ls_sourcemac']. "' onkeyup='searchSuggest(4);' autocomplete='off' value='$source_mac' />";
                 echo "<div id='search_suggest'>\n";
-                  echo "<div id='search_suggest_4'></div>\n";
+                  echo "<div id='search_suggest_4' class='search_suggest'></div>\n";
                 echo "</div>\n"; 
               } else { 
                 echo "<input type='text' id='mac_sourcemac' name='mac_sourcemac' alt='" .$l['ls_sourcemac']. "' value='$source_mac' />";
@@ -810,7 +812,7 @@ echo "<div class='leftmed'>";
                 if ($c_autocomplete == 1) { 
                   echo "<input type='text' id='strip_html_escape_virustxt' name='strip_html_escape_virustxt' onkeyup='searchSuggest(5);' autocomplete='off' value='$f_virus_txt' />" .$l['ls_wildcard']. " %";
                   echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_5'></div>\n";
+                    echo "<div id='search_suggest_5' class='search_suggest'></div>\n";
                   echo "</div>\n"; 
                 } else {
                   echo "<input type='text' name='strip_html_escape_virustxt' id='strip_html_escape_virustxt' value='$f_virus_txt' />" .$l['ls_wildcard']. " %\n";
@@ -827,7 +829,7 @@ echo "<div class='leftmed'>";
                 if ($c_autocomplete == 1) { 
                   echo "<input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' onkeyup='searchSuggest(6);' autocomplete='off' value='$f_filename' />" .$l['ls_wildcard']. " %";
                   echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_6'></div>\n";
+                    echo "<div id='search_suggest_6' class='search_suggest'></div>\n";
                   echo "</div>\n"; 
                 } else {
                   echo "<input type='text' id='strip_html_escape_filename' name='strip_html_escape_filename' value='$f_filename' />" .$l['ls_wildcard']. " %\n";
@@ -895,7 +897,7 @@ echo "<div class='leftmed'>\n";
               echo "</tr>\n";
               echo "<tr>\n";
                 echo "<td></td>\n";
-                echo "<td><input type='submit' value='" .$l['g_save']. "' class='sbutton' /></td>\n";
+                echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
             echo "<input type='hidden' value='$s_hash' name='md5_hash' />\n";

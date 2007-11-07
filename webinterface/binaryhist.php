@@ -3,7 +3,7 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 2.10.02                 #
+# Version 2.10.03                 #
 # 05-11-2007                      #
 # Jan van Lith & Kees Trippelvitz #
 ###################################
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 2.10.03 Fixed a bug with long virusnames
 # 2.10.02 Added last scanned timestamp
 # 2.10.01 Added language support
 # 2.00.01 New Release 
@@ -106,6 +107,9 @@ if ($err == 0) {
   $filesize = size_hum_read($filesize);
   $fileinfo = $row_bindetail['fileinfo'];
   $last_scanned = $row_bindetail['last_scanned'];
+  if ("$last_scanned" == "") {
+    $last_scanned = $l['mr_never'];
+  }
 
   $sql_firstseen = "SELECT attacks.timestamp, details.* ";
   $sql_firstseen .= "FROM attacks, details ";
@@ -261,7 +265,7 @@ if ($err == 0) {
                     $virus_html = $virus;
                   } else {
                     if (strlen($virus) > 23) {
-                      $virus_html = substr($virus, 0, 20) ."...";
+                      $virustext = substr($virus, 0, 20) ."...";
                       $virus_html = "<font class='warning' " .printover($virus). ">$virustext</font>";
                     } else {
                       $virus_html = "<font class='warning'>$virus</font>";

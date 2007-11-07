@@ -217,6 +217,7 @@ function popit(url,h,w) {
   $("#overlay").show();
 
   $("#overlay").height(wh);
+  return false;
 }
 
 function popout() {
@@ -544,4 +545,38 @@ function sec_to_string(sec) {
   seconds = sec % 60;
   sec = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
   return sec;
+}
+
+
+/***********************************
+ * Test AJAX functions
+ ***********************************/
+
+function submitform(formid, url, action, loc, str) {
+  if (formid != '') {
+    var qs = $('#'+formid).serialize();
+    var url = url+'?'+qs;
+  }
+  if (action == 'd') {
+    var chk = confirm(str);
+  }
+  if (chk) {
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'html',
+      error: function(){
+        alert('Error processing your request!');
+      },
+      success: function(data){
+        if (action == 'a') {
+          $('#'+loc).after(data);
+        } else if (action == 'u') {
+          $('#'+loc).replaceWith(data);
+        } else if (action == 'd') {
+          $('#'+loc).remove();
+        }
+      }
+    });
+  }
 }

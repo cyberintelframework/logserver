@@ -120,7 +120,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<style type='text/css'>@import url('${address}include/calendar.css');</style>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
-    echo "<script type='text/javascript' src='${address}include/jquery-1.1.4.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/jquery-1.2.1.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.selectboxes.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/surfnetids.js'></script>\n";
@@ -255,6 +255,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                       if ($s_admin == 1) {
 	                echo printMenuitem(5.3, "orgadmin.php", $l['me_domains'], $tab);
                       }
+                      if ($s_access_user > 1) {
+                        echo printMenuitem(5.4, "groupadmin.php", $l['me_groups'], $tab);
+                      }
                     echo "</ul>\n";
                   echo "</div>\n";
                 echo "</li>";
@@ -274,6 +277,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         echo "</div>\n";
         echo "<div id='popupcontent'>" .$l['me_loading']. "</div>\n";
       echo "</div>\n";
+      echo "<div id='error'></div>\n";
       echo "<div id='overlay' onclick='popout();'></div>\n";
 
 

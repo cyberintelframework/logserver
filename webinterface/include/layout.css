@@ -34,6 +34,11 @@
   margin:		0;
 }
 
+#page #pageBody .leftbig {
+  width:		800px;
+  float:		left;
+  margin-left:		8px;
+}
 #page #pageBody .left {
   width:		630px;
   float:		left;
