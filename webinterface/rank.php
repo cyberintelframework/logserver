@@ -600,7 +600,7 @@ echo "<div class='all'>\n";
                   }
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?int_attack=$key&int_org=0&int_sev=1", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_attack=$key&int_org=0", nf($val)). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   }
@@ -649,7 +649,7 @@ echo "<div class='all'>\n";
                       echo "<td>$attack</td>\n";
                     }
                     $perc = round($val / $grandtotal * 100);
-                    echo "<td>" . downlink("logsearch.php?int_attack=$key&int_sev=1", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_attack=$key", nf($val)). " (${perc}%)</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }
@@ -712,7 +712,7 @@ echo "<div class='all'>\n";
                     echo "<td></td>\n";
                   }
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?sensorid[]=$id&int_org=0", nf($total)). "</td>\n";
+                    echo "<td>" . downlink("logsearch.php?sensorid[]=$id&int_org=0&int_sev=1", nf($total)). "</td>\n";
                   } else {
                     echo "<td>" . nf($total) . "</td>\n";
                   }
@@ -760,7 +760,7 @@ echo "<div class='all'>\n";
 
                   echo "<td># $rank_all</td>\n";
                   echo "<td>$str</td>\n";
-                  echo "<td>" .downlink("logsearch.php?sensorid[]=$id", nf($total)). "</td>\n";
+                  echo "<td>" .downlink("logsearch.php?sensorid[]=$id&int_sev=1", nf($total)). "</td>\n";
                 echo "</tr>\n";
                 $i++;
               }
