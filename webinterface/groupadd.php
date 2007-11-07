@@ -117,15 +117,13 @@ if ($err != 1) {
       echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
       echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
       echo "<td>$owner</td>\n";
-      echo "<td><div class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
+      echo "<td><div id='status$id' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
       echo "<td>[<a href='groupedit.php?int_id=$id'>edit</a>]</td>\n";
-      echo "<td>[<a href='groupdel.php?int_id=$id&md5_hash=$s_hash' onclick=\"javascript: return confirm('" .$l['ga_confirmdel']. "?');\">delete</a>]</td>\n";
-      echo "<td>[<a href='groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1'>approve</a>]</td>\n";
+      echo "<td>[<a onclick=\"javascript: submitform('', 'groupdel.php?int_id=$id', 'd', '$id', '" .$l['ga_confirmdel']. "');\">delete</a>]</td>\n";
+      echo "<td>[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1', 'u', 'status$id', '');\">approve</a>]</td>\n";
     echo "</tr>\n";
   }
 }
-
-#echo "M: $m<br />\n";
 
 # Close connection and redirect
 pg_close($pgconn);
