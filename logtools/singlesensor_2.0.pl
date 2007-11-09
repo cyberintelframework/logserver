@@ -77,23 +77,23 @@ sub printmsg {
 printmsg("Downloading required tools:", "info");
 
 if (! -e "/etc/surfnetids/surfnetids-tn.conf") {
-  `svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/surfnetids-tn.conf /etc/surfnetids/surfnetids-tn.conf`;
+  `svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/surfnetids-tn.conf /etc/surfnetids/surfnetids-tn.conf`;
   printmsg("Downloading surfnetids-tn.conf:", $?);
 }
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/scripts/rrd_traffic.pl $c_surfidsdir/scripts/rrd_traffic.pl`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/scripts/rrd_traffic.pl $c_surfidsdir/scripts/rrd_traffic.pl`;
 printmsg("Downloading rrd_traffic.pl:", $?);
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/scripts/rrd_serverinfo.pl $c_surfidsdir/scripts/rrd_serverinfo.pl`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/scripts/rrd_serverinfo.pl $c_surfidsdir/scripts/rrd_serverinfo.pl`;
 printmsg("Downloading rrd_serverinfo.pl:", $?);
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/scripts/detectarp.pl $c_surfidsdir/scripts/detectarp.pl`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/scripts/detectarp.pl $c_surfidsdir/scripts/detectarp.pl`;
 printmsg("Downloading detectarp.pl:", $?);
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/scripts/scanbinaries.pl $c_surfidsdir/scripts/scanbinaries.pl`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/scripts/scanbinaries.pl $c_surfidsdir/scripts/scanbinaries.pl`;
 printmsg("Downloading scanbinaries.pl:", $?);
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/scripts/types_data.pl $c_surfidsdir/scripts/types_data.pl`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/scripts/types_data.pl $c_surfidsdir/scripts/types_data.pl`;
 printmsg("Downloading types_data.pl:", $?);
 
 `svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/tntools/update_oui.pl $c_surfidsdir/logtools/update_oui.pl`;
@@ -102,10 +102,10 @@ printmsg("Downloading update_oui.pl:", $?);
 `svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/tntools/localsensor.pl $c_surfidsdir/logtools/localsensor.pl`;
 printmsg("Downloading localsensor.pl:", $?);
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/scripts/tnfunctions.inc.pl $c_surfidsdir/scripts/tnfunctions.inc.pl`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/scripts/tnfunctions.inc.pl $c_surfidsdir/scripts/tnfunctions.inc.pl`;
 printmsg("Downloading tnfunctions.inc.pl:", $?);
 
-`svn export https://svn.ids.surfnet.nl/surfids/2.10/tunnel/branches/crontab.tn $c_surfidsdir/crontab.tn`;
+`svn export https://svn.ids.surfnet.nl/surfids/2.0/tunnel/branches/crontab.tn $c_surfidsdir/crontab.tn`;
 printmsg("Downloading crontab.tn:", $?);
 
 printmsg("Setting up the crontab:", "info");
