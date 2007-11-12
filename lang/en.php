@@ -1,5 +1,22 @@
 <?php
 
+####################################
+# SURFnet IDS                      #
+# Version 2.10.03                  #
+# 06-11-2007                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
+# Contributors:                    #
+# Peter Arts                       #
+####################################
+
+#############################################
+# Changelog:
+# 2.10.03 Added group pages
+# 2.10.02 Added missing timestamp text for search page
+# 2.10.01 Initial release
+#############################################
+
 ##########################
 # Global
 ##########################
@@ -30,6 +47,8 @@ $l['g_id']			= "ID";
 $l['g_domain']			= "Domain";
 $l['g_hour']			= "hour";
 $l['g_status']			= "Status";
+$l['g_remove']			= "remove";
+$l['g_approve']			= "approve";
 
 ##########################
 # argosadmin.php
@@ -117,6 +136,12 @@ $l['dp_type_number']		= "Type number";
 ##########################
 
 ##########################
+# groupadmin.php
+##########################
+$l['ga_confirmdel']		= "Are you sure you want to delete this group?";
+$l['ga_group']			= "Group";
+
+##########################
 # googlemap.php
 ##########################
 $l['gm_process']		= "Your request is being processed...";
@@ -194,7 +219,7 @@ $l['ls_saveas']			= "Save as";
 $l['ls_stemp']			= "searchtemplate";
 $l['ls_temp_title']		= "Template title";
 $l['ls_time_options']		= "Timespan options";
-$l['ls_dontsave']		= "Don\'t save timespan info";
+$l['ls_dontsave']		= "Don't save timespan info";
 $l['ls_noresults']		= "No matching results found!";
 $l['ls_multi']			= "Multi";
 $l['ls_pages']			= "pages";
@@ -206,6 +231,7 @@ $l['ls_rendered']		= "Page rendered in";
 $l['ls_search_crit']		= "Search Criteria";
 $l['ls_fo']			= "file-offered";
 $l['ls_at']			= "attack-type";
+$l['ls_timestamp']		= "Timestamp";
 
 ##########################
 # maldownloaded.php
@@ -260,6 +286,7 @@ $l['me_loading']		= "Loading page...";
 $l['me_period']			= "Period";
 $l['me_from']			= "From";
 $l['me_until']			= "Until";
+$l['me_groups']			= "Groups";
 
 ##########################
 # myaccount.php
@@ -276,6 +303,7 @@ $l['ma_asearch']		= "Access: Search";
 $l['ma_auseradmin']		= "Access: User Admin";
 $l['ma_arpac']			= "ARP access";
 $l['ma_argosac']		= "ARGOS access";
+$l['ma_modules']		= "Modules";
 
 ##########################
 # myreports.php
@@ -439,6 +467,7 @@ $l['sd_since']			= "Logging since";
 $l['sd_total']			= "Total log time";
 $l['sd_events']			= "Events";
 $l['sd_totalevents']		= "Total number of events";
+$l['sd_members']		= "Member of groups";
 
 ##########################
 # sensorstatus.php
@@ -540,4 +569,10 @@ $l['wh_sending']		= "sending request...";
 $l['wh_couldnot']		= "coult not be made";
 $l['wh_connclosed']		= "Connection closed";
 
+##########################
+# mods 
+##########################
+$l['mod_virusscanners']			= "Virus Scanners";
+$l['mod_virusscan']			= "Virus scanner";
+$l['mod_version']			= "Version";
 ?>

@@ -16,7 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
-include '../lang/${c_language}.php';
+include "../lang/${c_language}.php";
 
 # Starting the session
 session_start();
@@ -38,7 +38,7 @@ $s_hash = md5($_SESSION['s_hash']);
 
 # Retrieving posted variables from $_POST
 $allowed_get = array(
-                "int_id",
+                "int_gid",
 		"md5_hash",
 		"int_app"
 );
@@ -51,8 +51,8 @@ if ($clean['hash'] != $s_hash) {
   $m = 116;
 }
 
-if (isset($clean['id'])) {
-  $id = $clean['id'];
+if (isset($clean['gid'])) {
+  $gid = $clean['gid'];
 } else {
   $m = 117;
   $err = 1;
@@ -65,8 +65,13 @@ if (isset($clean['app'])) {
   $err = 1;
 }
 
+if ($s_access_user < 9) {
+  $m = 101;
+  $err = 1;
+}
+
 if ($err != 1) {
-  $sql = "SELECT id FROM groups WHERE id = '$id'";
+  $sql = "SELECT id FROM groups WHERE id = '$gid'";
   $debuginfo[] = $sql;
   $result_user = pg_query($pgconn, $sql);
   $rows = pg_num_rows($result_user);
@@ -77,15 +82,15 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
-  $sql = "UPDATE groups SET approved = '$status' WHERE id = '$id'";
+  $sql = "UPDATE groups SET approved = '$status' WHERE id = '$gid'";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 3;
 
-  if ($status == 0) { $message = "warning"; }
+  if ($status == 0) { $message = "notice"; }
   elseif ($status == 1) { $message = "ok"; }
-  elseif ($status == 2) { $message = "notice"; }
-  echo "<div id='status$id' class='$message'>" .$v_group_status_ar[$status]. "</div>\n";
+  elseif ($status == 2) { $message = "warning"; }
+  echo "<div id='status$gid' class='$message'>" .$v_group_status_ar[$status]. "</div>\n";
 }
 
 # Close connection and redirect

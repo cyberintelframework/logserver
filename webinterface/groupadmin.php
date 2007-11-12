@@ -43,46 +43,52 @@ echo "<div class='centerbig'>\n";
             echo "<th width='80'>Detail</th>\n";
             echo "<th width='80'>Owner</th>\n";
             echo "<th width='130'>Status</th>\n";
-            echo "<th width='60'>Edit</th>\n";
-            echo "<th width='60'>Delete</th>\n";
+            echo "<th width='50'>Members</th>\n";
+            echo "<th width='70'>Modify</th>\n";
             if ($s_access_user == 9) {
               echo "<th width='150'>Actions</th>\n";
             }
           echo "</tr>\n";
-          $sql = "SELECT groups.id, name, type, detail, approved, organisation FROM groups, organisations WHERE groups.owner = organisations.id";
+          $sql = "SELECT groups.id, name, type, detail, approved, owner, organisation FROM groups, organisations WHERE groups.owner = organisations.id";
           $debuginfo[] = $sql;
           $result = pg_query($pgconn, $sql);
 
           while ($row = pg_fetch_assoc($result)) {
-            $id = $row['id'];
+            $gid = $row['id'];
             $name = $row['name'];
             $type = $row['type'];
             $detail = $row['detail'];
             $status = $row['approved'];
-            $owner = $row['organisation'];
+            $owner = $row['owner'];
+            $org = $row['organisation'];
 
-            if ($ann == 1 || $s_access_user == 9) {
-              if ($status == 0) { $message = "warning"; }
+            $sql_count = "SELECT id FROM groupmembers WHERE groupid = '$gid'";
+            $debuginfo[] = $sql_count;
+            $result_count = pg_query($pgconn, $sql_count);
+            $membercount = pg_num_rows($result_count);
+
+            if ($type == 1 || $s_access_user == 9 || $owner == $s_org) {
+              if ($status == 0) { $message = "notice"; }
               elseif ($status == 1) { $message = "ok"; }
-              elseif ($status == 2) { $message = "notice"; }
-              echo "<tr id='$id'>\n";
+              elseif ($status == 2) { $message = "warning"; }
+              echo "<tr id='$gid'>\n";
                 echo "<td>$name</td>\n";
                 echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
                 echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
-                echo "<td>$owner</td>\n";
+                echo "<td>$org</td>\n";
                 echo "<td><div id='status$id' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
-                echo "<td>[<a href='groupedit.php?int_id=$id'>edit</a>]</td>\n";
-                echo "<td>[<a onclick=\"javascript: submitform('', 'groupdel.php?int_id=$id', 'd', '$id', '" .$l['ga_confirmdel']. "');\">delete</a>]</td>\n";
+                echo "<td>$membercount</td>\n";
                 echo "<td>";
-#                  if ($status == 0) {
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=1', 'u', 'status$id', '');\">approve</a>]";
-#                  } elseif ($status == 1) {
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=0', 'u', 'status$id', '');\">disapprove</a>]";
-#                  }
-#                  if ($status != 2) {
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_id=$id&md5_hash=$s_hash&int_app=2', 'u', 'status$id', '');\">deny</a>]";
-#                  }
+                  echo "[<a href='groupedit.php?int_gid=$gid'>edit</a>]\n";
+                  echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">delete</a>]";
                 echo "</td>\n";
+                if ($s_access_user == 9) {
+                  echo "<td>";
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=1', 'u', 'status$gid', '');\">approve</a>]";
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=0', 'u', 'status$gid', '');\">disapprove</a>]";
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=2', 'u', 'status$gid', '');\">deny</a>]";
+                  echo "</td>\n";
+                }
               echo "</tr>\n";
             }
           }

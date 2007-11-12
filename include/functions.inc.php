@@ -1,14 +1,15 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.03                  #
-# 13-09-2007                       #
+# Version 2.10.01                  #
+# 08-11-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Modified by Peter Arts           #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Changed sensorname function to take $label as 3rd arg
 # 2.00.03 Rearranged functions and index
 # 2.00.02 Modified sec_to_string for specifying a type
 # 2.00.01 Added array support for printoption
@@ -356,7 +357,7 @@ function extractvars($source, $allowed) {
 
 # 3.02 geterror
 # Function to retrieve the error message given the error number
-function geterror($m) {
+function geterror($m, $popup = 0) {
   global $v_errors;
   $e = $v_errors[$m];
 
@@ -370,9 +371,15 @@ function geterror($m) {
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='${type}Block'>\n";
-        echo "<div class='blockHeader'>" .ucfirst($type). "</div>\n";
+        if ($popup == 1) {
+          echo "<div class='blockHeader'>\n";
+            echo "<div class='blockHeaderLeft'>" .ucfirst($type). "</div>\n";
+            echo "<div class='blockHeaderRight'><a onclick='popout();'><img src='images/close.gif' /></a></div>\n";
+          echo "</div>\n";
+        } else {
+          echo "<div class='blockHeader'>" .ucfirst($type). "</div>\n";
+        }
         echo "<div class='blockContent'>\n";
-          echo "<form name='whois' method='get'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
                 echo "<td width='100'>" .ucfirst($type). " code:</td>\n";
@@ -383,7 +390,6 @@ function geterror($m) {
                 echo "<td>$e</td>\n";
               echo "</tr>\n";
             echo "</table>\n";
-          echo "</form>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</errorBlock>
@@ -664,11 +670,15 @@ function sec_to_string($sec, $type = 4) {
 # 3.16 sensorname
 # Function to return the correct sensorname
 # Input: keyname + vlanid
-function sensorname($keyname, $vlanid) {
-  if ($vlanid == 0) {
-    $s = $keyname;
+function sensorname($keyname, $vlanid, $label = "") {
+  if ($label == "") {
+    if ($vlanid == 0) {
+      $s = $keyname;
+    } else {
+      $s = "$keyname-$vlanid";
+    }
   } else {
-    $s = "$keyname-$vlanid";
+    $s = $label;
   }
   return $s;
 }
@@ -995,6 +1005,24 @@ function printOption($value, $text, $val, $status = "") {
   return $return;
 }
 
-
+function show_log_message($ts, $log, $args) {
+  if ("$ts" == "") {
+    $ts = "00-00-0000 00:00:00";
+  }
+  if ("$log" == "") {
+    $log = "Could not retrieve log message!";
+  }
+  if ($args != "") {
+    $args_ar = explode(",", $args);
+    foreach ($args_ar as $keyval) {
+      $keyval_ar = explode(" = ", $keyval);
+      $key = $keyval_ar[0];
+      $val = $keyval_ar[1];
+      $log = str_replace($key, $val, $log);
+    }
+  }
+  $s = "[$ts] $log\n";
+  return $s;
+}
 
 ?>

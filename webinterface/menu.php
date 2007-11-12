@@ -277,7 +277,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         echo "</div>\n";
         echo "<div id='popupcontent'>" .$l['me_loading']. "</div>\n";
       echo "</div>\n";
-      echo "<div id='error'></div>\n";
+      echo "<center><div id='error'></div></center>\n";
       echo "<div id='overlay' onclick='popout();'></div>\n";
 
 
@@ -286,7 +286,7 @@ function insert_selector($m_show = 1) {
   global $clean, $tainted, $to, $from, $to_date, $from_date, $q_org, $q_org_name, $c_debug_sql, $c_debug_input, $c_allow_global_debug, $l;
   # Retrieving URL
   $url = $_SERVER['PHP_SELF'];
-  $qs = $_SERVER['QUERY_STRING'];
+  $qs = urldecode($_SERVER['QUERY_STRING']);
 
   # Retrieving posted variables from $_GET
   $allowed_get = array(

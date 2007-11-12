@@ -43,6 +43,7 @@ $allowed_get = array(
 		"sensorid",
 		"mac_sourcemac",
 		"inet_source",
+		"inet_ownsource",
 		"int_sport",
 		"mac_destmac",
 		"inet_dest",
@@ -182,6 +183,11 @@ if (isset($clean['source'])) {
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source <<= '$source_ip'", "where");
 }
+if (isset($clean['ownsource'])) {
+  $ownsource = $clean['ownsource'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.source <<= '$ownsource'", "where");
+}
 if (isset($clean['sport'])) {
   $sport = $clean['sport'];
   if ($sport != 0) {
@@ -304,7 +310,7 @@ if (!empty($f_binid)) {
 ####################
 # Ranges
 ####################
-if ($f_sourcechoice == 3 && $source_ip == "") {
+if ($f_sourcechoice == 3 && $ownsource == "") {
   add_to_sql(gen_org_sql(1), "where");
 } else {
   add_to_sql(gen_org_sql(), "where");
@@ -318,7 +324,7 @@ add_to_sql("attacks", "table");
 add_to_sql("sensors.id = attacks.sensorid", "where");
 
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 
 prepare_sql();
 
@@ -397,11 +403,13 @@ if ($dst_txt != "") {
 
 #### SOURCE
 $pdf->ezText("Source:", 10);
-if ($f_sourcechoice == 3 && !isset($source_ip)) {
-  $pdf->ezText($l['ls_own'], 10);
+if ($f_sourcechoice == 3 && !isset($ownsource)) {
+  $pdf->ezText($smaspace $l['ls_own'], 10);
 }
 if (isset($source_ip)) {
   $src_txt = $l['ls_sourceip']. ": $source_ip";
+} elseif (isset($ownsource)) {
+  $src_txt = $l['ls_own']. ": $ownsource";
 } elseif (isset($source_mac)) {
   $src_txt = $l['ls_sourcemac']. ": $source_mac";
 }

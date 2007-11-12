@@ -113,6 +113,7 @@ $allowed_get = array(
 		"sensorid",
 		"mac_sourcemac",
 		"inet_source",
+		"inet_ownsource",
 		"int_sport",
 		"mac_destmac",
 		"inet_dest",
@@ -276,6 +277,11 @@ if (isset($clean['source'])) {
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source <<= '$source_ip'", "where");
 }
+if (isset($clean['ownsource'])) {
+  $ownsource = $clean['ownsource'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.source <<= '$ownsource'", "where");
+}
 if (isset($clean['sport'])) {
   $sport = $clean['sport'];
   if ($sport != 0) {
@@ -398,7 +404,7 @@ if (!empty($f_binid)) {
 ####################
 # Ranges
 ####################
-if ($f_sourcechoice == 3 && $source_ip == "") {
+if ($f_sourcechoice == 3 && $ownsource == "") {
   add_to_sql(gen_org_sql(1), "where");
 } else {
   add_to_sql(gen_org_sql(), "where");
@@ -635,9 +641,10 @@ echo "<div class='leftmed'>";
           echo "<tr>\n";
             echo "<td width='18%'>" .$l['ls_source']. ":</td>\n";
             echo "<th width='52%'>\n";
-              if (!isset($source_ip) && !isset($source_mac)) echo $l['ls_all']. " ";
-              if ($f_sourcechoice == 3 && !isset($source_ip)) echo $l['ls_own'];
+              if (!isset($source_ip) && !isset($source_mac) && !isset($ownsource)) echo $l['ls_all']. " ";
+              if ($f_sourcechoice == 3 && !isset($ownsource)) echo $l['ls_own'];
               if (isset($source_ip)) echo "$source_ip";
+              if (isset($ownsource)) echo "$ownsource";
               if (isset($source_mac)) echo "$source_mac";
               if (isset($sport)) echo ":$sport";
             echo "</th>\n";
@@ -697,13 +704,13 @@ echo "<div class='leftmed'>";
               if ($row['ranges'] == "") {
                 echo "<input type='text' value='" .$l['ls_noranges']. "' />";
               } else {
-                echo "<select name='inet_source' id='inet_source'>\n";
+                echo "<select name='inet_ownsource' id='inet_ownsource'>\n";
                   $ranges_ar = explode(";", $row['ranges']);
                   sort($ranges_ar);
                   echo printOption("", $l['ls_allranges'], "" );
                   foreach ($ranges_ar as $range) {
                     if (trim($range) != "") {
-                      echo printOption("$range", "$range", "$source_ip" );
+                      echo printOption("$range", "$range", "$ownsource" );
                     }
                   }
                 echo "</select>\n"; 
@@ -782,7 +789,7 @@ echo "<div class='leftmed'>";
                 echo "</select>\n";
               echo "</td>";
             echo "</tr>\n";
-            if ($f_sevtype == 0) {
+            if ($f_sevtype == 0 && $f_sev == 1) {
               echo "<tr id='attacktype' style=''>\n";
             } else {
               echo "<tr id='attacktype' style='display:none;'>\n";

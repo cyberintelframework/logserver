@@ -110,7 +110,7 @@ add_to_sql("attacks.severity = 1", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_attacks = "SELECT $sql_select ";
 $sql_attacks .= " FROM $sql_from ";
@@ -130,7 +130,7 @@ add_to_sql("attacks.severity = 32", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_downloads = "SELECT $sql_select ";
 $sql_downloads .= " FROM $sql_from ";
@@ -153,7 +153,6 @@ add_to_sql("sensors.id = attacks.sensorid", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 prepare_sql();
 $sql_attacks_org = "SELECT $sql_select ";
 $sql_attacks_org .= " FROM $sql_from ";
@@ -172,7 +171,6 @@ add_to_sql("sensors.id = attacks.sensorid", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 prepare_sql();
 $sql_downloads_org = "SELECT $sql_select ";
 $sql_downloads_org .= " FROM $sql_from ";
@@ -198,7 +196,7 @@ add_to_sql("stats_dialogue.id", "group");
 add_to_sql("details.text", "group");
 add_to_sql("total DESC LIMIT $c_topexploits OFFSET 0", "order");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_topexp = "SELECT $sql_select ";
 $sql_topexp .= " FROM $sql_from ";
@@ -245,7 +243,7 @@ add_to_sql("sensors.id", "group");
 add_to_sql("sensors.label", "group");
 add_to_sql("total DESC LIMIT $c_topsensors OFFSET 0", "order");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_top = "SELECT $sql_select";
 $sql_top .= " FROM $sql_from ";
@@ -278,7 +276,7 @@ add_to_sql("NOT attacks.dport = 0", "where");
 add_to_sql("attacks.dport", "group");
 add_to_sql("total DESC LIMIT $c_topports OFFSET 0", "order");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_topports = "SELECT $sql_select ";
 $sql_topports .= " FROM $sql_from ";
@@ -294,7 +292,6 @@ add_to_sql("sensors", "table");
 add_to_sql("sensors.id = attacks.sensorid", "where");
 add_to_sql(gen_org_sql(), "where");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where"); #CHECKME
 prepare_sql();
 $sql_topports_org = "SELECT $sql_select ";
 $sql_topports_org .= " FROM $sql_from ";
@@ -314,7 +311,7 @@ add_to_sql("$tsquery", "where");
 add_to_sql("attacks.source", "group");
 add_to_sql("total DESC LIMIT $c_topsourceips", "order");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_topsource = "SELECT $sql_select ";
 $sql_topsource .= " FROM $sql_from ";
@@ -330,7 +327,6 @@ add_to_sql("sensors", "table");
 add_to_sql("sensors.id = attacks.sensorid", "where");
 add_to_sql(gen_org_sql(), "where");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 prepare_sql();
 $sql_topsource_org = "SELECT $sql_select ";
 $sql_topsource_org .= " FROM $sql_from ";
@@ -350,7 +346,7 @@ $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles .= " AND $tsquery ";
   }
   $sql_topfiles .= "AND type = 4  AND details.attackid = attacks.id AND ";
-  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl)) as sub ";
+  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
 $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
 $debuginfo[] = $sql_topfiles;
 
@@ -382,7 +378,7 @@ $sql_topproto = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM ";
     $sql_topproto .= " AND $tsquery ";
   }
   $sql_topproto .= "AND type = 4  AND details.attackid = attacks.id AND ";
-  $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl)) as sub ";
+  $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
 $sql_topproto .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
 $debuginfo[] = $sql_topproto;
 
@@ -414,7 +410,7 @@ $sql_topos = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
     $sql_topos .= " AND $tsquery ";
   }
   $sql_topos .= " AND attacks.source = system.ip_addr AND ";
-  $sql_topos .= "NOT attacks.source IN (SELECT exclusion FROM org_excl)) as sub ";
+  $sql_topos .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
 $sql_topos .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
 $debuginfo[] = $sql_topos;
 
@@ -453,7 +449,7 @@ add_to_sql("organisations.organisation", "group");
 add_to_sql("sensors.organisation", "group");
 add_to_sql("total DESC LIMIT $c_toporgs OFFSET 0", "order");
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
 prepare_sql();
 $sql_organisation = "SELECT $sql_select ";
 $sql_organisation .= " FROM $sql_from ";
@@ -590,12 +586,14 @@ echo "<div class='all'>\n";
               $exploitid = $row['id'];
               $total = $row['total'];
               $exploit_ar[$exploit] = $total;
-              $grandtotal = $grandtotal + $total;
+              $exploitid_ar[$exploit] = $exploitid;
+	      $grandtotal = $grandtotal + $total;
             }
             if ($exploit_ar != "") {
               foreach ($exploit_ar as $key => $val) {
                 $attack = $v_attacks_ar[$key]["Attack"];
                 $attack_url = $v_attacks_ar[$key]["URL"];
+	        $exploitid  = $exploitid_ar[$key];
                 echo "<tr>\n";
                   echo "<td>$i.</td>\n";
                   if ($attack_url != "") {
@@ -605,7 +603,7 @@ echo "<div class='all'>\n";
                   }
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_org=0&int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   }
@@ -640,13 +638,15 @@ echo "<div class='all'>\n";
                 $exploit = $row['text'];
                 $exploitid = $row['id'];
                 $total = $row['total'];
-                $exploit_ar[$exploit] = $total;
+		$exploit_ar[$exploit] = $total;
+                $exploitid_ar[$exploit] = $exploitid;
                 $grandtotal = $grandtotal + $total;
               }
               if ($exploit_ar != "") {
                 foreach ($exploit_ar as $key => $val) {
                   $attack = $v_attacks_ar[$key]["Attack"];
                   $attack_url = $v_attacks_ar[$key]["URL"];
+		  $exploitid  = $exploitid_ar[$key];
                   echo "<tr>\n";
                     echo "<td>$i.</td>\n";
                     if ($attack_url != "") {
@@ -718,7 +718,7 @@ echo "<div class='all'>\n";
                     echo "<td></td>\n";
                   }
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?sensorid[]=$id&int_org=0&int_sev=1", nf($total)). "</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_org=0&int_sev=1&int_sevtype=0&sensorid[]=$id", nf($total)). "</td>\n";
                   } else {
                     echo "<td>" . nf($total) . "</td>\n";
                   }
@@ -766,7 +766,7 @@ echo "<div class='all'>\n";
 
                   echo "<td># $rank_all</td>\n";
                   echo "<td>$str</td>\n";
-                  echo "<td>" .downlink("logsearch.php?sensorid[]=$id&int_sev=1", nf($total)). "</td>\n";
+                  echo "<td>" .downlink("logsearch.php?&int_sev=1&int_sevtype=0&sensorid[]=$id", nf($total)). "</td>\n";
                 echo "</tr>\n";
                 $i++;
               }
@@ -939,7 +939,7 @@ echo "<div class='all'>\n";
                   echo "</td>\n";
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" .downlink("logsearch.php?inet_source=$key&int_sev=1&int_org=0", $val). " (${perc}%)</td>\n";
+                    echo "<td>" .downlink("logsearch.php?inet_source=$key&int_org=0", $val). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>$val (${perc}%)</td>\n";
                   }
@@ -1016,7 +1016,7 @@ echo "<div class='all'>\n";
                       }
                     echo "</td>\n";
                     $perc = round($val / $grandtotal * 100);
-                    echo "<td>" .downlink("logsearch.php?inet_source=$key&int_sev=1", $val). " (${perc}%)</td>\n";
+                    echo "<td>" .downlink("logsearch.php?inet_source=$key", $val). " (${perc}%)</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }
@@ -1066,7 +1066,7 @@ echo "<div class='all'>\n";
                   echo "<td>$key</td>\n";
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" .downlink("logsearch.php?strip_html_escape_filename=$key&int_org=0", $val). " (${perc}%)</td>\n";
+                    echo "<td>" .downlink("logsearch.php?int_sev=16&strip_html_escape_filename=$key&int_org=0", $val). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>$val (${perc}%)</td>\n";
                   }
@@ -1115,7 +1115,7 @@ echo "<div class='all'>\n";
                     echo "<td>$i</td>\n";
                     echo "<td>$key</td>\n";
                     $perc = round($val / $grandtotal * 100);
-                    echo "<td>" .downlink("logsearch.php?strip_html_escape_file=$key", $val). " (${perc}%)</td>\n";
+                    echo "<td>" .downlink("logsearch.php?int_sev=16&strip_html_escape_file=$key", $val). " (${perc}%)</td>\n";
                   echo "</tr>\n";
                 }
               }

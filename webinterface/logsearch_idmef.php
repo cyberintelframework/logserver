@@ -43,7 +43,8 @@ $allowed_get = array(
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
-		"ip_sourceip",
+		"inet_source",
+		"inet_sourceip",
 		"int_sport",
 		"mac_destmac",
 		"inet_dest",
@@ -178,6 +179,11 @@ if (isset($clean['source'])) {
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source <<= '$source_ip'", "where");
 }
+if (isset($clean['ownsource'])) {
+  $ownsource = $clean['ownsource'];
+  add_to_sql("attacks", "table");
+  add_to_sql("attacks.source <<= '$ownsource'", "where");
+}
 if (isset($clean['sport'])) {
   $sport = $clean['sport'];
   if ($sport != 0) {
@@ -300,7 +306,7 @@ if (!empty($f_binid)) {
 ####################
 # Ranges
 ####################
-if ($f_sourcechoice == 3 && $source_ip == "") {
+if ($f_sourcechoice == 3 && $ownsource == "") {
   add_to_sql(gen_org_sql(1), "where");
 } else {
   add_to_sql(gen_org_sql(), "where");
@@ -308,13 +314,14 @@ if ($f_sourcechoice == 3 && $source_ip == "") {
 
 add_to_sql("sensors.keyname", "select");
 add_to_sql("sensors.vlanid", "select");
+add_to_sql("sensors.label", "select");
 add_to_sql("attacks.*", "select");
 add_to_sql("sensors", "table");
 add_to_sql("attacks", "table");
 add_to_sql("sensors.id = attacks.sensorid", "where");
 
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 
 prepare_sql();
 
@@ -335,7 +342,9 @@ while ($row = pg_fetch_assoc($result)) {
   $id = intval($row['id']);
   $keyname = $row['keyname'];
   $vlanid = $row['vlanid'];
+  $label = $row['label'];
   $keyname = sensorname($keyname, $vlanid);
+  if ($label != "") $keyname = $label;
   $timestamp = $row['timestamp'];
   $source = $row['source'];
   $srcmac = $row['src_mac'];

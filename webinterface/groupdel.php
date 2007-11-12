@@ -37,7 +37,7 @@ $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_id",
+                "int_gid",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -50,11 +50,11 @@ if ($clean['hash'] != $s_hash) {
 }
 
 # Checking $_GET'ed variables
-if (!isset($clean['id']) ) {
+if (!isset($clean['gid']) ) {
   $m = 117;
   $err = 1;
 } else {
-  $id = $clean['id'];
+  $gid = $clean['gid'];
 }
 
 # Checking access
@@ -62,7 +62,7 @@ if ($s_access_user < 2) {
   $m = 101;
   $err = 1;
 } elseif ($s_access_user < 9) {
-  $sql_check = "SELECT owner FROM groups WHERE id = $id AND owner = '$s_org'";
+  $sql_check = "SELECT owner FROM groups WHERE id = $gid AND owner = '$s_org'";
   $debuginfo[] = $sql_check;
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
@@ -73,13 +73,11 @@ if ($s_access_user < 2) {
 }
 
 if ($err == 0) {
-  # Deleting all mailreports from the user
-  $sql = "DELETE FROM groupmembers WHERE groupid = '$id'";
+  $sql = "DELETE FROM groupmembers WHERE groupid = '$gid'";
   $debuginfo[] = $sql;
   $query = pg_query($pgconn, $sql);
 
-  # Deleting the actual user records
-  $sql = "DELETE FROM groups WHERE id = $id";
+  $sql = "DELETE FROM groups WHERE id = $gid";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   

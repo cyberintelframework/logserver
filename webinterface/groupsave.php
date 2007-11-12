@@ -16,7 +16,7 @@ include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
-include '../lang/${c_language}.php';
+include "../lang/${c_language}.php";
 
 # Starting the session
 session_start();
@@ -36,10 +36,12 @@ $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 
-# Retrieving posted variables from $_POST
+# Retrieving posted variables from $_GET
 $allowed_get = array(
-		"int_id",
+		"int_gid",
                 "strip_html_escape_name",
+		"int_type",
+		"int_detail",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -51,8 +53,8 @@ if ($clean['hash'] != $s_hash) {
   $m = 116;
 }
 
-if (isset($clean['id'])) {
-  $id = $clean['id'];
+if (isset($clean['gid'])) {
+  $gid = $clean['gid'];
 } else {
   $m = 117;
   $err = 1;
@@ -66,8 +68,13 @@ if (isset($clean['name'])) {
   $err = 1;
 }
 
+if ($s_access_user < 2) {
+  $m = 101;
+  $err = 1;
+}
+
 if ($err != 1) {
-  $sql = "SELECT name FROM groups WHERE name = '$name'";
+  $sql = "SELECT name FROM groups WHERE name = '$name' AND NOT id = '$gid'";
   $debuginfo[] = $sql;
   $result_user = pg_query($pgconn, $sql);
   $rows = pg_num_rows($result_user);
@@ -78,23 +85,37 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
-  $sql = "UPDATE groups SET name = '$name' WHERE id = '$id'";
+  $sql = "SELECT type, detail, approved, organisation ";
+  $sql .= " FROM groups, organisations WHERE groups.owner = organisations.id AND groups.id = '$gid'";
+  $debuginfo[] = $sql;
+  $result = pg_query($pgconn, $sql);
+  $row = pg_fetch_assoc($result);
+  $status = $row['approved'];
+  $owner = $row['organisation'];
+
+  if ($status == 0 || ($type == 1 && $status != 0)) {
+    if (isset($clean['type'])) {
+      $type = $clean['type'];
+    } else {
+      $type = $row['type'];
+    }
+    if (isset($clean['detail'])) {
+      $detail = $clean['detail'];
+    } else {
+      $detail = $row['detail'];
+    }
+  }
+
+  $sql = "UPDATE groups SET name = '$name', type = '$type', detail = '$detail' WHERE id = '$gid'";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
 
-  $sql = "SELECT name, type, detail, approved, organisation ";
-  $sql .= " FROM groups, organisations WHERE groups.owner = organisations.id AND groups.id = '$id'";
-  $debuginfo[] = $sql;
-  $result = pg_query($pgconn, $sql);
-  $row = pg_fetch_assoc($result);
-  $name = $row['name'];
-  $type = $row['type'];
-  $detail = $row['detail'];
-  $status = $row['approved'];
-  $owner = $row['organisation'];
+  if ($status == 0) { $message = "notice"; }
+  elseif ($status == 1) { $message = "ok"; }
+  elseif ($status == 2) { $message = "warning"; }
 
-  echo "<tr>\n";
+  echo "<tr id='grouprow'>\n";
     echo "<td><input type='text' name='strip_html_escape_name' value='$name' /></td>\n";
     if ($status == 0 || ($type == 1 && $status != 0)) {
       echo "<td>";
@@ -117,13 +138,16 @@ if ($err != 1) {
     }
     echo "<td>$owner</td>\n";
     echo "<td><div class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
-    echo "<td><input type='submit' class='button' value='" .$l['g_update']. "' onclick=\"submitform('groupedit', 'groupsave.php', 'u', 'groupedit';\" /></td>\n";
+    echo "<td><input type='button' onclick=\"submitform('groupedit', 'groupsave.php', 'u', 'grouprow');\" class='button' value='" .$l['g_update']. "' /></td>\n";
   echo "</tr>\n";
+} else {
+  echo "ERROR\n";
+  geterror($m, 1);
 }
 
 # Close connection and redirect
 pg_close($pgconn);
 
 #debug_sql();
-#header("location: groupedit.php?int_m=$m&int_id=$id");
+#header("location: groupedit.php?int_m=$m&int_gid=$gid");
 ?>

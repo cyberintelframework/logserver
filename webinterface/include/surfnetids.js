@@ -222,8 +222,24 @@ function popit(url,h,w) {
 
 function popout() {
   $("#popup").hide();
+  $("#error").hide();
   $("#overlay").hide();
   $("#popupcontent").html('Loading...');
+}
+
+function poperr(str,h,w) {
+  var wh = getScrollSize();
+  $("#error").html(str);
+
+  if (h !== null && w !== null) {
+    $("#error").height(h);
+    $("#error").width(w);
+  }
+  $("#error").show();
+  $("#overlay").show();
+
+  $("#overlay").height(wh);
+  return false;
 }
 
 /***********************************
@@ -392,11 +408,13 @@ function sh_search_src(si) {
     $('#sourcemac').hide();
     $('#mac_sourcemac').val('');
     $('#ownrange').hide();
+    $('#inet_ownsource').val('');
   } else if (si == 2) {
     $('#source').hide();
     $('#inet_source').val('');
     $('#sourcemac').show();
     $('#ownrange').hide();
+    $('#inet_ownsource').val('');
   } else if (si == 3) {
     $('#source').hide();
     $('#inet_source').val('');
@@ -587,13 +605,18 @@ function submitform(formid, url, action, loc, str) {
         alert('Error processing your request!');
       },
       success: function(data){
-        if (action == 'a') {
-          $('#'+loc).before(data);
-          $('#'+formid).clearForm();
-        } else if (action == 'u') {
-          $('#'+loc).replaceWith(data);
-        } else if (action == 'd') {
-          $('#'+loc).remove();
+        var str = data;
+        if (data.match(/ERROR.*/)) {
+          poperr(str);
+        } else {
+          if (action == 'a') {
+            $('#'+loc).before(data);
+            $('#'+formid).clearForm();
+          } else if (action == 'u') {
+            $('#'+loc).replaceWith(data);
+          } else if (action == 'd') {
+            $('#'+loc).remove();
+          }
         }
       }
     });

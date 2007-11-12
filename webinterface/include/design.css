@@ -532,8 +532,8 @@ PRE {
 
 #error {
   position:		absolute;
-  left:			30%;
-  top:			15%;
+  left:			40%;
+  top:			45%;
   width:		500px;
   height:		300px;
   z-index:		5001;

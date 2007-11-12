@@ -268,6 +268,36 @@ if ($err != 1) {
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
+#  echo "</div>\n"; #</leftmed>
+
+#  echo "<div class='leftmed'>\n";
+    echo "<div class='block'>\n";
+      echo "<div class='dataBlock'>\n";
+        echo "<div class='blockHeader'>" .$l['sd_members']. "</div>\n";
+        echo "<div class='blockContent'>\n";
+          echo "<table class='datatable'>\n";
+            echo "<tr>\n";
+              echo "<th width='150'>" .$l['ga_group']. "</th>\n";
+              echo "<th width='300'>" .$l['g_actions']. "</th>\n";
+            echo "</tr>\n";
+
+            $sql = "SELECT groups.id, groups.name FROM groupmembers, groups WHERE groups.id = groupmembers.groupid AND groupmembers.sensorid = '$sid'";
+            $debuginfo[] = $sql;
+            $result = pg_query($pgconn, $sql);
+
+            while ($row = pg_fetch_assoc($result)) {
+              $name = $row['name'];
+              $gid = $row['id'];
+              echo "<tr>\n";
+                echo "<td>$name</td>\n";
+                echo "<td>[<a href='groupedit.php?int_gid=$gid'>" .$l['g_edit']. "</a>]</td>\n";
+              echo "</tr>\n";
+            }
+          echo "</table>\n";
+        echo "</div>\n"; #</blockContent>
+        echo "<div class='blockFooter'></div>\n";
+      echo "</div>\n"; #</dataBlock>
+    echo "</div>\n"; #</block>
   echo "</div>\n"; #</leftmed>
 
   $sql_count = "SELECT COUNT(id) as total FROM sensors_log WHERE sensorid = '$sid'";
@@ -276,7 +306,7 @@ if ($err != 1) {
   $rowcount = pg_fetch_assoc($result_count);
   $num_events = $rowcount['total'];
 
-  $sql_events = "SELECT logmessages.log, sensors_log.timestamp FROM sensors_log, logmessages WHERE sensors_log.sensorid = '$sid' ";
+  $sql_events = "SELECT logmessages.log, sensors_log.timestamp, sensors_log.args FROM sensors_log, logmessages WHERE sensors_log.sensorid = '$sid' ";
   $sql_events .= " AND sensors_log.logid = logmessages.id ";
   if ($logfilter != -1) {
     $sql_events .= " AND logmessages.type >= $logfilter ";
@@ -329,7 +359,9 @@ if ($err != 1) {
                     $ev_timestamp = $row_events['timestamp'];
                     $ev_timestamp = date("d-m-Y H:i:s", $ev_timestamp);
                     $ev_log = $row_events['log'];
-                    echo "[$ev_timestamp] $ev_log\n";
+                    $ev_args = $row_events['args'];
+                    echo show_log_message($ev_timestamp, $ev_log, $ev_args);
+#                    echo "[$ev_timestamp] $ev_log\n";
                   }
                 echo "</textarea>\n";
               echo "</td>\n";

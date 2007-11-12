@@ -336,7 +336,15 @@ $v_errors = array(
 		141 => "Invalid or missing range ID!",
 		142 => "Invalid or missing query string!",
 		143 => "Invalid or missing feed ID!",
-		144 => "Invalid or missing username!"
+		144 => "Invalid or missing username!",
+		145 => "Invalid or missing group name!",
+		146 => "A public group needs to be approved by an admin. The admin has been notified!",
+		147 => "Invalid or missing group type!",
+		148 => "Invalid or missing group detail!",
+		149 => "Invalid or missing status!",
+		150 => "Invalid or missing group ID!",
+		151 => "Sensor already a member of this group!",
+		152 => "The group needs to be approved by an admin first!"
 );
 
 # Array for the different types of plots available.
@@ -544,6 +552,27 @@ $v_selview_ar = array(
 	1 => "View offline sensors",
 	2 => "View online sensors",
 	3 => "View outdated sensors"
+);
+
+$v_group_type_ar = array(
+	0 => "Private",
+	1 => "Public"
+);
+
+$v_group_detail_ar = array(
+	0 => "Anonymize data",
+	1 => "Show all data"
+);
+
+$v_group_status_ar = array(
+	0 => "Pending admin approval",
+	1 => "Active",
+	2 => "Denied by admin"
+);
+
+$v_groupmember_status_ar = array(
+	0 => "Waiting for approval",
+	1 => "Member"
 );
 
 ?>

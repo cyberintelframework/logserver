@@ -157,7 +157,7 @@ echo "<div class='left'>\n";
                 if ($row['ranges'] == "") {
                   echo "<input type='text' value='" .$l['ls_noranges']. "' />";
                 } else {
-                  echo "<select name='inet_source' id='inet_source'>\n";
+                  echo "<select name='inet_ownsource' id='inet_ownsource'>\n";
                     $ranges_ar = explode(";", $row['ranges']);
                     sort($ranges_ar);
                     echo printOption("", $l['ls_allranges'], "" );
