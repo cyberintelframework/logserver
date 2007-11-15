@@ -180,6 +180,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                     }
                     echo printMenuitem(2.8, "plotter.php", $l['me_graphs'], $tab);
                     echo printMenuitem(2.6, "myreports.php", $l['me_reports'], $tab);
+                    echo printMenuitem(2.9, "grouping.php", $l['me_grouping'], $tab);
                   echo "</ul>\n";
                 echo "</div>\n";
               echo "</li>\n";

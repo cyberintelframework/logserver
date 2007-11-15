@@ -38,10 +38,10 @@ $debuginfo[] = $sql_topproto;
                 break;
               }
               $tempproto = $row['proto'];
-              $total = $row['total'];
+              $prottotal = $row['total'];
               $proto = str_replace(":", "", $tempproto);
-              $grandtotal = $grandtotal + $total;
-              $proto_ar[$proto] = $total;
+              $grandprottotal = $grandprottotal + $prottotal;
+              $proto_ar[$proto] = $prottotal;
             }
             if ($proto_ar != "") {
               foreach ($proto_ar as $key => $val) {
@@ -49,8 +49,8 @@ $debuginfo[] = $sql_topproto;
                 echo "<tr>\n";
                   echo "<td>$i</td>\n";
                   echo "<td>$key</td>\n";
-                  $perc = round($val / $grandtotal * 100);
-                  echo "<td>$val (${perc}%)</td>\n";
+                  $protperc = round($val / $grandprottotal * 100);
+                  echo "<td>$val (${protperc}%)</td>\n";
                 echo "</tr>\n";
               }
             }
@@ -58,6 +58,7 @@ $debuginfo[] = $sql_topproto;
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
+     echo "</div>\n"; #</block>
 
 reset_sql();
 ?>

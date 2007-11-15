@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# Version 2.10.02                  #
+# 13-11-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -15,6 +15,7 @@
 
 ####################################
 # Changelog:
+# 2.10.02 Removed unneeded extractvars
 # 2.10.01 Added language support
 # 2.00.03 Fixed a bug where it would not show own organisation in top orgs list
 # 2.00.02 Fixed a bug with tops source addresses.
@@ -48,15 +49,6 @@ if ($c_geoip_enable == 1) {
   include '../include/' .$c_geoip_module;
   $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
-
-# Retrieving posted variables from $_GET
-$allowed_get = array(
-                "int_org",
-		"b",
-		"i"
-);
-$check = extractvars($_GET, $allowed_get);
-debug_input();
 
 $tsquery = " timestamp >= $from AND timestamp <= $to";
 
@@ -466,7 +458,7 @@ echo "<div class='all'>\n";
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['pl_total']. "</div>\n";
+        echo "<div class='blockHeader'>" .$l['ra_total']. "</div>\n";
         echo "<div class='blockContent'>\n";
           $result_attacks = pg_query($pgconn, $sql_attacks);
           $row = pg_fetch_assoc($result_attacks);

@@ -1,5 +1,11 @@
  <?php
-    echo "<div class='block'>\n";
+ 
+if ($c_geoip_enable == 1) {
+  include '../include/' .$c_geoip_module;
+  $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
+}
+ 
+     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>" .$l['in_attackers']. "</div>\n";
         echo "<div class='blockContent'>\n";

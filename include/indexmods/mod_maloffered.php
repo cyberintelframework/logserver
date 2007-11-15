@@ -8,7 +8,6 @@
         echo "</div>\n"; 
       echo "</div>\n"; #</blockHeader>
       echo "<div class='blockContent'>\n";
-        if ($err != 1) {
           $sql_count = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
           $sql_count .= " (SELECT split_part(details.text, '/', 4) as file ";
           $sql_count .= " FROM details, attacks";
@@ -54,7 +53,6 @@
           } else {
             echo "<span class='warning'>" .$l['g_nofound']. "</span>\n";
           }
-        }
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";
     echo "</div>\n"; #</dataBlock>

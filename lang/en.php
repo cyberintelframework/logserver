@@ -18,7 +18,7 @@
 #############################################
 
 ##########################
-# Global
+# Global (Uppercase first letter)
 ##########################
 $l['g_add'] 			= "Add";
 $l['g_update'] 			= "Update";
@@ -45,10 +45,23 @@ $l['g_submit']			= "Submit";
 $l['g_all']			= "All";
 $l['g_id']			= "ID";
 $l['g_domain']			= "Domain";
-$l['g_hour']			= "hour";
 $l['g_status']			= "Status";
-$l['g_remove']			= "remove";
-$l['g_approve']			= "approve";
+$l['g_modify']			= "Modify";
+$l['g_total']			= "Total";
+
+##########################
+# Global (Lowercase first letter)
+##########################
+$l['g_hour_l']			= "hour";
+$l['g_remove_l']		= "remove";
+$l['g_approve_l']		= "approve";
+$l['g_disapprove_l']		= "disapprove";
+$l['g_deny_l']			= "deny";
+$l['g_delete_l']		= "delete";
+$l['g_edit_l']			= "edit";
+$l['g_exploits_l']		= "exploits";
+$l['g_ports_l']			= "ports";
+$l['g_files_l']			= "files";
 
 ##########################
 # argosadmin.php
@@ -140,6 +153,25 @@ $l['dp_type_number']		= "Type number";
 ##########################
 $l['ga_confirmdel']		= "Are you sure you want to delete this group?";
 $l['ga_group']			= "Group";
+$l['ga_groups']			= "Groups";
+$l['ga_name']			= "Name";
+$l['ga_type']			= "Type";
+$l['ga_detail']			= "Detail";
+$l['ga_owner']			= "Owner";
+$l['ga_status']			= "Status";
+$l['ga_pending']		= "Pending";
+$l['ga_active']			= "Active";
+
+##########################
+# groupedit.php
+##########################
+$l['ge_edit']			= "Edit Group";
+$l['ge_members']		= "Group members";
+
+##########################
+# grouping.php
+##########################
+$l['gr_select']			= "Select group";
 
 ##########################
 # googlemap.php
@@ -287,6 +319,7 @@ $l['me_period']			= "Period";
 $l['me_from']			= "From";
 $l['me_until']			= "Until";
 $l['me_groups']			= "Groups";
+$l['me_grouping']		= "Group compare";
 
 ##########################
 # myaccount.php

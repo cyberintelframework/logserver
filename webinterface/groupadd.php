@@ -121,16 +121,16 @@ if ($err != 1) {
     echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
     echo "<td>$owner</td>\n";
     echo "<td><div id='status$gid' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
-    echo "<td>0</td>\n";
+    echo "<td><span class='notice'>0</span> / <span class='ok'>0</span></td>\n";
     echo "<td>";
-      echo "[<a href='groupedit.php?int_gid=$gid'>edit</a>]
-      echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">delete</a>]";
+      echo "[<a href='groupedit.php?int_gid=$gid'>" .$l['g_edit']. "</a>]\n";
+      echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">" .$l['g_delete']. "</a>]";
     echo "</td>\n";
     if ($s_access_user == 9) {
       echo "<td>";
-        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=1', 'u', 'status$gid', '');\">approve</a>]";
-        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=0', 'u', 'status$gid', '');\">disapprove</a>]";
-        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=2', 'u', 'status$gid', '');\">deny</a>]";
+        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=1', 'u', 'status$gid', '');\">" .$l['g_approve_l']. "</a>]";
+        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=0', 'u', 'status$gid', '');\">" .$l['g_disapprove_l']. "</a>]";
+        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=2', 'u', 'status$gid', '');\">" .$l['g_deny_l']. "</a>]";
       echo "</td>\n";
     }
   echo "</tr>\n";

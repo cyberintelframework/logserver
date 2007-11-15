@@ -33,20 +33,20 @@ echo "<div id='err'></div>\n";
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>Groups</div>\n";
+      echo "<div class='blockHeader'>" .$l['ga_groups']. "</div>\n";
       echo "<div class='blockContent'>\n";
         echo "<form id='groupadmin' name='groupadmin'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
-            echo "<th width='100'>Name</th>\n";
-            echo "<th width='50'>Type</th>\n";
-            echo "<th width='80'>Detail</th>\n";
-            echo "<th width='80'>Owner</th>\n";
-            echo "<th width='130'>Status</th>\n";
-            echo "<th width='50'>Members</th>\n";
-            echo "<th width='70'>Modify</th>\n";
+            echo "<th width='100'>" .$l['ga_name']. "</th>\n";
+            echo "<th width='20'>" .$l['ga_type']. "</th>\n";
+            echo "<th width='50'>" .$l['ga_detail']. "</th>\n";
+            echo "<th width='80'>" .$l['ga_owner']. "</th>\n";
+            echo "<th width='130'>" .$l['ga_status']. "</th>\n";
+            echo "<th width='100'>" .$l['ga_pending']. " / " .$l['ga_active']. "</th>\n";
+            echo "<th width='73'>" .$l['g_modify']. "</th>\n";
             if ($s_access_user == 9) {
-              echo "<th width='150'>Actions</th>\n";
+              echo "<th width='150'>" .$l['g_actions']. "</th>\n";
             }
           echo "</tr>\n";
           $sql = "SELECT groups.id, name, type, detail, approved, owner, organisation FROM groups, organisations WHERE groups.owner = organisations.id";
@@ -62,10 +62,19 @@ echo "<div class='centerbig'>\n";
             $owner = $row['owner'];
             $org = $row['organisation'];
 
-            $sql_count = "SELECT id FROM groupmembers WHERE groupid = '$gid'";
+            $sql_count = "SELECT COUNT(id) as total, status FROM groupmembers WHERE groupid = '$gid' GROUP BY status";
             $debuginfo[] = $sql_count;
             $result_count = pg_query($pgconn, $sql_count);
-            $membercount = pg_num_rows($result_count);
+            $m_pending = 0;
+            $m_active = 0;
+            while ($rowmembers = pg_fetch_assoc($result_count)) {
+              $m_status = $rowmembers['status'];
+              if ($m_status == 0) {
+                $m_pending = $rowmembers['total'];
+              } elseif ($status == 1) {
+                $m_active = $rowmembers['total'];
+              }
+            }
 
             if ($type == 1 || $s_access_user == 9 || $owner == $s_org) {
               if ($status == 0) { $message = "notice"; }
@@ -76,17 +85,17 @@ echo "<div class='centerbig'>\n";
                 echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
                 echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
                 echo "<td>$org</td>\n";
-                echo "<td><div id='status$id' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
-                echo "<td>$membercount</td>\n";
+                echo "<td><div id='status$gid' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
+                echo "<td><span class='notice'>$m_pending</span> / <span class='ok'>$m_active</span></td>\n";
                 echo "<td>";
-                  echo "[<a href='groupedit.php?int_gid=$gid'>edit</a>]\n";
-                  echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">delete</a>]";
+                  echo "[<a href='groupedit.php?int_gid=$gid'>". $l['g_edit_l']. "</a>]\n";
+                  echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">" .$l['g_delete_l']. "</a>]";
                 echo "</td>\n";
                 if ($s_access_user == 9) {
                   echo "<td>";
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=1', 'u', 'status$gid', '');\">approve</a>]";
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=0', 'u', 'status$gid', '');\">disapprove</a>]";
-                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=2', 'u', 'status$gid', '');\">deny</a>]";
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=1', 'u', 'status$gid', '');\">" .$l['g_approve_l']. "</a>]";
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=0', 'u', 'status$gid', '');\">" .$l['g_disapprove_l']. "</a>]";
+                    echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=2', 'u', 'status$gid', '');\">" .$l['g_deny_l']. "</a>]";
                   echo "</td>\n";
                 }
               echo "</tr>\n";

@@ -302,7 +302,7 @@ if ($numrows > 0) {
                   echo "<td>";
                     echo "<select name='int_intervalday'>\n";
                       for ($i = 0; $i < 24; $i++) {
-                        $time = "$i:00 " .$l['g_hour'];
+                        $time = "$i:00 " .$l['g_hour_l'];
                         if ($i < 10) {
                           $time = "0" . $time;
                         }
