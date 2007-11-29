@@ -127,6 +127,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<script type='text/javascript' src='${address}include/calendar.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-en.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-setup.js'></script>\n";
+#    echo "<script type='text/javascript' src='${address}js/swfobject.js'></script>\n";
   echo "</head>\n";
   echo "<body>\n";
   echo "<div id='page'>\n";

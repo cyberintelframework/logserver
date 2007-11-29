@@ -43,7 +43,13 @@ $check = extractvars($_POST, $allowed_post);
 #debug_input();
 $err = 0;
 
-$userid = $clean['userid'];
+if (isset($clean['userid'])){
+	$userid = $clean['userid'];
+	$redirectpage=1;
+} else {
+	$userid = $s_userid;
+	$redirectpage=0;
+}
 
 # Checking if the logged in user actually requested this action.
 if ($clean['hash'] != $s_hash) {
@@ -124,5 +130,10 @@ if ($err == 0) {
 # Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
-header("location: myaccount.php?int_m=$m");
+
+if ($redirectpage == 1) {
+	header("location: useredit.php?int_userid=$userid&int_m=$m");
+} else {
+	header("location: myaccount.php?int_m=$m");
+}
 ?>

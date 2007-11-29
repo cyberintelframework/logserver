@@ -348,6 +348,7 @@ $v_errors = array(
 );
 
 # Array for the different types of plots available.
+/*
 $v_plottertypes = array(
 				1 => "bars",
 				2 => "lines",
@@ -357,6 +358,14 @@ $v_plottertypes = array(
 				6 => "pie",
 				7 => "thinbarline",
 				8 => "squared"
+);
+*/
+
+$v_plottertypes = array(
+				1 => "bars",
+				2 => "lines",
+				4 => "area",
+				6 => "pie"
 );
 
 # Array with the colors used in the index page.
@@ -542,6 +551,8 @@ $v_sensor_purge_ar = array(
 
 $v_weekdays = array("", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
 
+$v_openflash_colors_ar = array("0x009900", "0xFF6600", "0xFFCC33", "0x0000FF", "0x66CCFF", "0xCC3399", "0x00FF00");
+
 $v_os_languages = array(
 	'nl' => "Dutch",
 	'en' => "English"
@@ -555,8 +566,8 @@ $v_selview_ar = array(
 );
 
 $v_group_type_ar = array(
-	0 => "Private",
-	1 => "Public"
+	0 => "Sub-Domain",
+	1 => "Global"
 );
 
 $v_group_detail_ar = array(

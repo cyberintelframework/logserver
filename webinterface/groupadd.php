@@ -39,8 +39,7 @@ $c_debug_input = 1;
 # Retrieving posted variables from $_POST
 $allowed_get = array(
                 "strip_html_escape_name",
-                "int_type",
-                "int_detail",
+		"int_type",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -62,14 +61,11 @@ if (isset($clean['name'])) {
 if (isset($clean['type'])) {
   $type = $clean['type'];
 } else {
-  $m = 147;
-  $err = 1;
-}
-if (isset($clean['detail'])) {
-  $detail = $clean['detail'];
-} else {
-  $m = 148;
-  $err = 1;
+  if ($s_access_user == 9) {
+    $type = 1;
+  } else {
+    $type = 0;
+  }
 }
 
 if ($s_access_user < 2) {
@@ -89,14 +85,8 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
-  if ($type == 1) {
-    $status = 0;
-  } else {
-    $status = 1;
-  }
-
-  $sql = "INSERT INTO groups (name, type, detail, owner, approved) ";
-  $sql .= "VALUES ('$name', '$type', '$detail', '$s_org', '$status')";
+  $sql = "INSERT INTO groups (name, type, owner) ";
+  $sql .= "VALUES ('$name', '$type', '$s_org')";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
@@ -111,28 +101,15 @@ if ($err != 1) {
   $row = pg_fetch_assoc($result_owner);
   $gid = $row['id'];
 
-  if ($status == 0) { $message = "notice"; }
-  elseif ($status == 1) { $message = "ok"; }
-  elseif ($status == 2) { $message = "warning"; }
-
   echo "<tr id='$gid'>\n";
     echo "<td>$name</td>\n";
     echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
-    echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
     echo "<td>$owner</td>\n";
-    echo "<td><div id='status$gid' class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
-    echo "<td><span class='notice'>0</span> / <span class='ok'>0</span></td>\n";
+    echo "<td>0</td>\n";
     echo "<td>";
-      echo "[<a href='groupedit.php?int_gid=$gid'>" .$l['g_edit']. "</a>]\n";
-      echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">" .$l['g_delete']. "</a>]";
+      echo "[<a href='groupedit.php?int_gid=$gid'>" .$l['g_edit_l']. "</a>]\n";
+      echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">" .$l['g_delete_l']. "</a>]";
     echo "</td>\n";
-    if ($s_access_user == 9) {
-      echo "<td>";
-        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=1', 'u', 'status$gid', '');\">" .$l['g_approve_l']. "</a>]";
-        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=0', 'u', 'status$gid', '');\">" .$l['g_disapprove_l']. "</a>]";
-        echo "[<a onclick=\"javascript: submitform('', 'groupstatus.php?int_gid=$gid&md5_hash=$s_hash&int_app=2', 'u', 'status$gid', '');\">" .$l['g_deny_l']. "</a>]";
-      echo "</td>\n";
-    }
   echo "</tr>\n";
 } else {
   echo "ERROR\n";

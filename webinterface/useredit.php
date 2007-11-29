@@ -54,7 +54,7 @@ if ($s_access_user < 2) {
 if ($s_access_user == 9) {
   $sql_user = "SELECT * FROM login WHERE id = $userid";
 } else {
-  $sql_user = "SELECT * FROM login WHERE id = $userid AND organisation = $s_org";
+  $sql_user = "SELECT * FROM login WHERE id = $userid AND organisation = $q_org";
 }
 $debuginfo[] = $sql_user;
 $result_user = pg_query($pgconn, $sql_user);

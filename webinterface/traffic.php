@@ -60,7 +60,7 @@ if ($s_admin == 1) {
     add_to_sql("organisation = $q_org", "where");
   }
 } else {
-  add_to_sql("organisation = $s_org", "where");
+  add_to_sql("organisation = $q_org", "where");
 }
 
 echo "<div class='left'>\n";
@@ -121,10 +121,10 @@ echo "<div class='left'>\n";
           $label = "$db_orgkeyname";
         }
 
-        if ($s_admin == 1) {
+        if ($q_org == 0) {
           $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE type = 'day' AND label = '$label'";
         } else {
-          $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE orgid = $s_org AND type = 'day' AND label = '$label'";
+          $sql_sensors = "SELECT id, label, orgid FROM rrd WHERE orgid = $q_org AND type = 'day' AND label = '$label'";
         }
         $debuginfo[] = $sql_sensors;
         $result_sensors = pg_query($pgconn, $sql_sensors);

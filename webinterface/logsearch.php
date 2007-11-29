@@ -132,7 +132,8 @@ $allowed_get = array(
 		"int_binid",
 		"int_sourcechoice",
 		"int_destchoice",
-		"int_interval"
+		"int_interval",
+		"int_gid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -258,6 +259,29 @@ if ($sensorid > 0) {
       $tmp_where .= "$ar_sensorid[$i], ";
     } else {
       $tmp_where .= "$ar_sensorid[$i]";
+    }
+  }
+  $tmp_where .= ")";
+  add_to_sql($tmp_where, "where");
+}
+
+####################
+# Group
+####################
+if (isset($clean['gid'])) {
+  $gid = $clean['gid'];
+  $sql_gid = "SELECT sensorid FROM groupmembers WHERE groupid = '$gid'";
+  $result_gid = pg_query($pgconn, $sql_gid);
+  $i = 0;
+  $tmp_where = "sensors.id IN (";
+  $num_gid = pg_num_rows($result_gid);
+  while ($row_gid = pg_fetch_assoc($result_gid)) {
+    $i++;
+    $group_sid = $row_gid['sensorid'];
+    if ($i != $num_gid) {
+      $tmp_where .= "$group_sid, ";
+    } else {
+      $tmp_where .= "$group_sid";
     }
   }
   $tmp_where .= ")";
@@ -404,10 +428,12 @@ if (!empty($f_binid)) {
 ####################
 # Ranges
 ####################
-if ($f_sourcechoice == 3 && $ownsource == "") {
-  add_to_sql(gen_org_sql(1), "where");
-} else {
-  add_to_sql(gen_org_sql(), "where");
+if (!isset($clean['gid'])) {
+  if ($f_sourcechoice == 3 && $ownsource == "") {
+    add_to_sql(gen_org_sql(1), "where");
+  } else {
+    add_to_sql(gen_org_sql(), "where");
+  }
 }
 
 add_to_sql("attacks", "table");

@@ -76,6 +76,7 @@
 # 3.17		sorter
 # 3.18		gen_org_sql
 # 3.19		cleanfooter
+# 3.20		roundup
 #
 # 4 Debug Functions
 # 4.01		printer
@@ -95,6 +96,10 @@
 # 5.10		printradio
 # 5.11		printcheckbox
 # 5.12		printoption
+# 5.13		show_log_message
+#
+# 6 Open Flash chart functions
+# 6.01		of_legend
 #############################################
 
 ###############################
@@ -752,6 +757,12 @@ function cleanfooter() {
   echo "</div>\n";
 }
 
+# 3.20 roundup
+# Function to round upwards
+function roundup($value, $dp) {
+  return ceil($value*pow(10, $dp))/pow(10, $dp);
+}
+
 ###############################
 # 4 Debug functions
 ###############################
@@ -1005,6 +1016,8 @@ function printOption($value, $text, $val, $status = "") {
   return $return;
 }
 
+# 5.13 show_log_message
+# Function to print out the sensor log message
 function show_log_message($ts, $log, $args) {
   if ("$ts" == "") {
     $ts = "00-00-0000 00:00:00";
@@ -1023,6 +1036,44 @@ function show_log_message($ts, $log, $args) {
   }
   $s = "[$ts] $log\n";
   return $s;
+}
+
+# 6.01 of_legend
+# Function to add legend items to the OF legend array
+function of_legend($add) {
+  global $of_legend_ar;
+  if (!in_array($add, $of_legend_ar)) {
+    $of_legend_ar[] = $add;
+  }
+}
+
+# 6.02 of_links
+# Function to add links to the OF links array
+function of_links($add, $r) {
+  global $of_links_ar, $of_link_colors_ar;
+
+  if (!in_array($add, $of_links_ar)) {
+    $of_links_ar[] = $add;
+    $num = mt_rand(0, 0xffffff);
+    $color = sprintf('%x', $num);
+    $of_link_colors_ar[] = $color;
+  }
+}
+
+# 6.03 of_set_legend
+# Function to create a legend item
+function of_set_legend() {
+  global $of_legend_ar;
+  $leg = "";
+  foreach ($of_legend_ar as $key => $val) {
+    $chk = $key + 1;
+    if ($chk == count($of_legend_ar)) {
+      $leg .= $val;
+    } else {
+      $leg .= "$val - ";
+    }
+  }
+  return $leg;
 }
 
 ?>

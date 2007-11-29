@@ -404,6 +404,7 @@ $l['pl_allvirii']		= "All viruses";
 $l['pl_top10virii']		= "Top 10 viruses";
 $l['pl_scanner']		= "Scanner";
 $l['pl_allattacks']		= "All attacks";
+$l['pl_graph']			= "Graph";
 
 ##########################
 # rank.php

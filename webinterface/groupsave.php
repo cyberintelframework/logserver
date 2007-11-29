@@ -40,8 +40,6 @@ $s_hash = md5($_SESSION['s_hash']);
 $allowed_get = array(
 		"int_gid",
                 "strip_html_escape_name",
-		"int_type",
-		"int_detail",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -85,59 +83,23 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
-  $sql = "SELECT type, detail, approved, organisation ";
+  $sql = "SELECT organisation, type ";
   $sql .= " FROM groups, organisations WHERE groups.owner = organisations.id AND groups.id = '$gid'";
   $debuginfo[] = $sql;
   $result = pg_query($pgconn, $sql);
   $row = pg_fetch_assoc($result);
-  $status = $row['approved'];
   $owner = $row['organisation'];
+  $type = $row['type'];
 
-  if ($status == 0 || ($type == 1 && $status != 0)) {
-    if (isset($clean['type'])) {
-      $type = $clean['type'];
-    } else {
-      $type = $row['type'];
-    }
-    if (isset($clean['detail'])) {
-      $detail = $clean['detail'];
-    } else {
-      $detail = $row['detail'];
-    }
-  }
-
-  $sql = "UPDATE groups SET name = '$name', type = '$type', detail = '$detail' WHERE id = '$gid'";
+  $sql = "UPDATE groups SET name = '$name' WHERE id = '$gid'";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
 
-  if ($status == 0) { $message = "notice"; }
-  elseif ($status == 1) { $message = "ok"; }
-  elseif ($status == 2) { $message = "warning"; }
-
   echo "<tr id='grouprow'>\n";
-    echo "<td><input type='text' name='strip_html_escape_name' value='$name' /></td>\n";
-    if ($status == 0 || ($type == 1 && $status != 0)) {
-      echo "<td>";
-        echo "<select name='int_type'>\n";
-          foreach ($v_group_type_ar as $key=>$val) {
-            echo printOption($key, $val, $type);
-          }
-        echo "</select>\n";
-      echo "</td>\n";
-      echo "<td>";
-        echo "<select name='int_detail'>\n";
-          foreach ($v_group_detail_ar as $key=>$val) {
-            echo printOption($key, $val, $detail);
-          }
-        echo "</select>\n";
-      echo "</td>\n";
-    } else {
-      echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
-      echo "<td>" .$v_group_detail_ar[$detail]. "</td>\n";
-    }
+    echo "<td><input type='text' name='strip_html_escape_name' value='$name' size='40' /></td>\n";
+    echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
     echo "<td>$owner</td>\n";
-    echo "<td><div class='$message'>" .$v_group_status_ar[$status]. "</div></td>\n";
     echo "<td><input type='button' onclick=\"submitform('groupedit', 'groupsave.php', 'u', 'grouprow');\" class='button' value='" .$l['g_update']. "' /></td>\n";
   echo "</tr>\n";
 } else {

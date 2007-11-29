@@ -375,7 +375,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
 
       # OS
-      $sql_os = "SELECT DISTINCT split_part(name, ' ', 1) as os FROM system ORDER BY os ASC";
+      $sql_os = "SELECT os FROM ostypes ORDER BY os ASC";
       $debuginfo[] = $sql_os;
       $result_os = pg_query($pgconn, $sql_os);
 
