@@ -15,7 +15,7 @@
 # 1.02.01 Initial release
 #############################################
 
-  $config_handle = @fopen("/etc/surfnetids/2.10-log.conf", "r");
+  $config_handle = @fopen("/etc/surfnetids/surfnetids-log.conf", "r");
   if ($config_handle) {
     while (!feof($config_handle)) {
       $buffer = fgets($config_handle);
