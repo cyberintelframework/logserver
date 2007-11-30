@@ -19,6 +19,7 @@
 # 1.04.02 Added destination port graphs
 # 1.04.01 Initial release
 #############################################
+
 ?>
 
 <script>
@@ -46,20 +47,38 @@ function shlinks(id) {
 }
 
 function buildqs() {
-  var str = "?";
+  var str = "";
   var sw = $('#switch').val();
   $("form:eq("+sw+") input").each(function(item){
     var name = $("form:eq("+sw+") input:eq("+item+")").attr("name");
     var val = $("form:eq("+sw+") input:eq("+item+")").val();
     $("form:eq("+sw+") input:eq("+item+")").blur();
-    str = str+"&"+name+"="+val;
+    if (str == "") {
+      str = str+"?"+name+"="+val;
+    } else {
+      str = str+"&"+name+"="+val;
+    }
   })
   $("form:eq("+sw+") select").each(function(item){
     var name = $("form:eq("+sw+") select:eq("+item+")").attr("name");
     var val = $("form:eq("+sw+") select:eq("+item+")").val();
-    str = str+"&"+name+"="+val;
+    if (str == "") {
+      str = str+"?"+name+"="+val;
+    } else {
+      str = str+"&"+name+"="+val;
+    }
   })
-  popimg("showplot.php"+str, 600, 1000, "11%");
+  method = $('#int_method').val();
+  if (str == "") {
+    str = "?int_method="+method;
+  } else {
+    str = str+"&int_method="+method;
+  }
+  if (method == 0) {
+    location.href="plotter.php"+str;
+  } else if (method == 1) {
+    popimg("showphplot.php"+str, 600, 1000, "11%");
+  }
   return false;
 }
 
@@ -88,6 +107,21 @@ function popimg(url,h,w,x,y) {
 </script>
 
 <?php
+  if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
+    $qs = $_SERVER['QUERY_STRING'];
+    include_once 'include/php-ofc-library/open_flash_chart_object.php';
+    echo "<div class='centerbig'>\n";
+      echo "<div class='block'>\n";
+        echo "<div class='dataBlock'>\n";
+          echo "<div class='blockHeader'>" .$l['pl_graph']. "</div>\n";
+          echo "<div class='blockContent'>\n";
+            open_flash_chart_object(960, 600, 'showopenflash.php?'.$qs);
+          echo "</div>\n"; #</blockContent>
+          echo "<div class='blockFooter'></div>\n";
+        echo "</div>\n"; #</dataBlock>
+      echo "</div>\n"; #</block>
+    echo "</div>\n"; #</centerbig>
+  } else {
 
   if ($s_admin == 1) {
     $where = "";
@@ -110,6 +144,10 @@ function popimg(url,h,w,x,y) {
             echo "<input class='tab' id='button_ports' type='button' name='button_ports' value='" .$l['pl_port']. "' onclick='javascript: shlinks(\"ports\");' />\n";
             echo "<input class='tab' id='button_os' type='button' name='button_os' value='" .$l['pl_os']. "' onclick='javascript: shlinks(\"os\");' />\n";
             echo "<input class='tab' id='button_virus' type='button' name='button_virus' value='" .$l['pl_virus']. "' onclick='javascript: shlinks(\"virus\");' />\n";
+            echo "<select id='int_method' name='int_method'>\n";
+              echo printOption(0, "Open Flash Chart", 0);
+              echo printOption(1, "PHPlot", 0);
+            echo "</select>\n";
           echo "</div>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
@@ -126,13 +164,14 @@ function popimg(url,h,w,x,y) {
   # SEVERITY
   ################
   echo "<div class='tabcontent' id='severity' style='z-index: 9; display: block;'>\n";
-  echo "<form method='get' name='sevform' id='sevform' onsubmit='return buildqs();'>\n";
+#  echo "<form method='get' name='sevform' id='sevform' onsubmit='return buildqs();'>\n";
+  echo "<form method='get' name='sevform' id='sevform'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
         echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
+          echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption("", "All sensors", $sid);
             while ($row = pg_fetch_assoc($result_getsensors)) {
                 $id = $row['id'];
@@ -155,10 +194,21 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>" .$l['pl_sev']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='severity[]' size='5' multiple='true'>\n";
-            echo printOption(99, $l['pl_allattacks'], 99);
+          echo "<select name='severity' size='5' multiple='true' onclick='sh_plotsevtype();' id='plotsev'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_ar as $key => $val) {
-              echo printOption($key, $val, 99);
+              echo printOption($key, $val, -1);
+            }
+           echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr id='plotsevtype' style='display:none;'>\n";
+        echo "<td>" .$l['pl_sevtype']. ":</td>\n";
+        echo "<td>\n";
+          echo "<select name='int_sevtype'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
+            foreach ($v_severity_atype_ar as $key => $val) {
+              echo printOption($key, $val, -1);
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -185,6 +235,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td colspan='2' align='right'><input type='button' name='submit' value='" .$l['pl_show']. "' class='button' onclick='buildqs();' /></td>\n";
+#        echo "<td colspan='2' align='right'><input type='submit' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -195,12 +246,13 @@ function popimg(url,h,w,x,y) {
   ################
   echo "<div class='tabcontent' id='attacks' style='z-index: 9; display: none;'>\n";
   echo "<form method='get' name='attackform' id='attackform' onsubmit='return buildqs();'>\n";
+#  echo "<form method='get' name='attackform' id='attackform'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
         echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
+          echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
@@ -228,13 +280,13 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>" .$l['pl_attack']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='attack[]' size='5' multiple='true'>\n";
-            echo printOption(99, $l['pl_allattacks'], 99);
+          echo "<select name='attack' size='5' multiple='true'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
             while ($attack_data = pg_fetch_assoc($result_getattacks)) {
               $id = $attack_data['id'];
               $name = $attack_data['name'];
               $name = str_replace("Dialogue", "", $name);
-              echo printOption($id, $name, 99); 
+              echo printOption($id, $name, -1); 
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -261,6 +313,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
+#        echo "<td colspan='2' align='right'><input type='submit' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -271,12 +324,13 @@ function popimg(url,h,w,x,y) {
   ################
   echo "<div class='tabcontent' id='ports' style='z-index: 9; display: none;'>\n";
   echo "<form method='get' name='portform' id='portform' onsubmit='return buildqs();'>\n";
+#  echo "<form method='get' name='portform' id='portform'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
         echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
+          echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
@@ -306,11 +360,11 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>" .$l['pl_sev']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='severity[]' size='3' multiple='true'>\n";
-            echo printOption(99, $l['pl_allattacks'], 99);
+          echo "<select name='severity' size='3' multiple='true'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
-                echo printOption($key, $val, 99);
+                echo printOption($key, $val, -1);
               }
             }
            echo "</select>\n";
@@ -338,6 +392,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
+#        echo "<td colspan='2' align='right'><input type='submit' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -348,12 +403,13 @@ function popimg(url,h,w,x,y) {
   ################
   echo "<div class='tabcontent' id='os' style='z-index: 9; display: none;'>\n";
   echo "<form method='get' name='osorm' id='osform' onsubmit='return buildqs();'>\n";
+#  echo "<form method='get' name='osorm' id='osform'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
         echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
+          echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
@@ -382,7 +438,7 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>" .$l['pl_ostype']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='os[]' size='4' multiple='true'>\n";
+          echo "<select name='os' size='4' multiple='true'>\n";
             echo printOption("all", "All OS types", "all");
             while ($os_data = pg_fetch_assoc($result_os)) {
               $os = $os_data['os'];
@@ -395,11 +451,11 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>Severity:</td>\n";
         echo "<td>\n";
-          echo "<select name='severity[]' size='3' multiple='true'>\n";
-            echo printOption(99, $l['pl_allattacks'], 99);
+          echo "<select name='severity' size='3' multiple='true'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
-                echo printOption($key, $val, 99);
+                echo printOption($key, $val, -1);
               }
             }
            echo "</select>\n";
@@ -427,6 +483,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td colspan='2' align='right'><input type='button' onclick='buildqs();' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
+#        echo "<td colspan='2' align='right'><input type='submit' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -437,12 +494,13 @@ function popimg(url,h,w,x,y) {
   ################
   echo "<div class='tabcontent' id='virus' style='z-index: 9; display: none;'>\n";
   echo "<form method='get' name='virusform' id='virusform' onsubmit='return buildqs();'>\n";
+#  echo "<form method='get' name='virusform' id='virusform'>\n";
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
         echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='sensorid[]' size='5' class='smallselect' multiple='true'>\n";
+          echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
@@ -467,9 +525,9 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>" .$l['pl_virusinfo']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='virus[]' size='2' multiple='true'>\n";
-            echo printOption("all", $l['pl_allvirii'], "all");
-            echo printOption("top10", $l['pl_top10virii'], "none");
+          echo "<select name='int_virus'>\n";
+            echo printOption(0, $l['pl_allvirii'], 0);
+            echo printOption(1, $l['pl_top10virii'], 0);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -513,6 +571,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td colspan='2' align='right'><input type='button' name='submit' value='" .$l['pl_show']. "' class='button' onclick='buildqs();' /></td>\n";
+#        echo "<td colspan='2' align='right'><input type='submit' name='submit' value='" .$l['pl_show']. "' class='button' /></td>\n";
       echo "</tr>\n";
     echo "</table>\n";
   echo "</form>\n";
@@ -525,6 +584,7 @@ function popimg(url,h,w,x,y) {
   echo "</div>\n"; #</left>
 
   echo "<input type='hidden' value='1' id='switch' />\n";
+} 
   debug_sql();
 ?>
 <?php footer(); ?>

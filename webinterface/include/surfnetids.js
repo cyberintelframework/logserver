@@ -565,6 +565,25 @@ function sec_to_string(sec) {
   return sec;
 }
 
+/***********************************
+ * Plotter functions
+ ***********************************/
+
+function sh_plotsevtype() {
+  status = $("#plotsev").val();
+  found = 0;
+  for (var i=0; i < status.length; i++) {
+    val = status[i];
+    if (val == 1) {
+      found = 1;
+    }
+  }
+  if (found == 1) {
+    $("#plotsevtype").show();
+  } else {
+    $("#plotsevtype").hide();
+  }
+}
 
 /***********************************
  * Test AJAX functions
