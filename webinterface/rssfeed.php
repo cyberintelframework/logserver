@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# Version 2.10.02                  #
+# 05-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added s_access_user check
 # 2.10.01 Added language support
 # 2.00.02 Fixed pubDate to display attack timestamp
 # 2.00.01 Initial release
@@ -22,6 +23,16 @@ include_once '../include/rss_generator.inc.php';
 
 # Starting the session
 session_start();
+
+$s_access = $_SESSION['s_access'];
+$s_access_user = intval($s_access{2});
+
+# Redirect user if he doesn't have the right access
+if ($s_access_user < 1) {
+  header("location: index.php");
+  pg_close($pgconn);
+  exit;
+}
 
 # Including language file
 include "../lang/${c_language}.php";

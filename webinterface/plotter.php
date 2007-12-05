@@ -77,6 +77,7 @@ function buildqs() {
   if (method == 0) {
     location.href="plotter.php"+str;
   } else if (method == 1) {
+    alert(str);
     popimg("showphplot.php"+str, 600, 1000, "11%");
   }
   return false;
@@ -121,6 +122,8 @@ function popimg(url,h,w,x,y) {
         echo "</div>\n"; #</dataBlock>
       echo "</div>\n"; #</block>
     echo "</div>\n"; #</centerbig>
+    footer();
+    exit;
   } else {
 
   if ($s_admin == 1) {
@@ -174,27 +177,27 @@ function popimg(url,h,w,x,y) {
           echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption("", "All sensors", $sid);
             while ($row = pg_fetch_assoc($result_getsensors)) {
-                $id = $row['id'];
-                $keyname = $row['keyname'];
-                $vlanid = $row['vlanid'];
-                $label = $row['label'];
-                $sensor = sensorname($keyname, $vlanid);
-                if ($label != "") $sensor = $label; 
-		$org = $row['organisation'];
-		if ($q_org == 0 ) {
-                  echo printOption($id, "$sensor - $org", $sid);
-                } else {
-                  echo printOption($id, $sensor, $sid);
-                }
+              $id = $row['id'];
+              $keyname = $row['keyname'];
+              $vlanid = $row['vlanid'];
+              $label = $row['label'];
+              $sensor = sensorname($keyname, $vlanid);
+              if ($label != "") $sensor = $label; 
+              $org = $row['organisation'];
+              if ($q_org == 0 ) {
+                echo printOption($id, "$sensor - $org", $sid);
+              } else {
+                echo printOption($id, $sensor, $sid);
               }
-           echo "</select>\n";
+            }
+          echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
       # SEVERITY
       echo "<tr>\n";
         echo "<td>" .$l['pl_sev']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='severity' size='5' multiple='true' onclick='sh_plotsevtype();' id='plotsev'>\n";
+          echo "<select name='severity' size='5' multiple='true' onclick='sh_plotsevtype(1);' id='plotsev_1'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_ar as $key => $val) {
               echo printOption($key, $val, -1);
@@ -202,10 +205,10 @@ function popimg(url,h,w,x,y) {
            echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
-      echo "<tr id='plotsevtype' style='display:none;'>\n";
+      echo "<tr id='plotsevtype_1' style='display:none;'>\n";
         echo "<td>" .$l['pl_sevtype']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='int_sevtype'>\n";
+          echo "<select name='sevtype' size='5' multiple='true'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_atype_ar as $key => $val) {
               echo printOption($key, $val, -1);
@@ -256,20 +259,20 @@ function popimg(url,h,w,x,y) {
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
-                $id = $sensord['id'];
-                $keyname = $sensord['keyname'];
-                $vlanid = $sensord['vlanid'];
-                $label = $sensord['label'];
-                $sensor = sensorname($keyname, $vlanid);
-                if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
-                if ($q_org == 0) {
-                  echo printOption($id, "$sensor - $org", $sid);
-                } else {
-                  echo printOption($id, $sensor, $sid);
-                }
+              $id = $sensord['id'];
+              $keyname = $sensord['keyname'];
+              $vlanid = $sensord['vlanid'];
+              $label = $sensord['label'];
+              $sensor = sensorname($keyname, $vlanid);
+              if ($label != "") $sensor = $label; 
+              $org = $sensord['organisation'];
+              if ($q_org == 0) {
+                echo printOption($id, "$sensor - $org", $sid);
+              } else {
+                echo printOption($id, $sensor, $sid);
               }
-           echo "</select>\n";
+            }
+          echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
       # ATTACKS
@@ -334,20 +337,20 @@ function popimg(url,h,w,x,y) {
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
-                $id = $sensord['id'];
-                $keyname = $sensord['keyname'];
-                $vlanid = $sensord['vlanid'];
-                $label = $sensord['label'];
-                $sensor = sensorname($keyname, $vlanid);
-                if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
-                if ($q_org == 0) {
-                  echo printOption($id, "$sensor - $org", $sid);
-                } else {
-                  echo printOption($id, $sensor, $sid);
-                }
+              $id = $sensord['id'];
+              $keyname = $sensord['keyname'];
+              $vlanid = $sensord['vlanid'];
+              $label = $sensord['label'];
+              $sensor = sensorname($keyname, $vlanid);
+              if ($label != "") $sensor = $label; 
+              $org = $sensord['organisation'];
+              if ($q_org == 0) {
+                echo printOption($id, "$sensor - $org", $sid);
+              } else {
+                echo printOption($id, $sensor, $sid);
               }
-           echo "</select>\n";
+            }
+          echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
@@ -360,12 +363,23 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>" .$l['pl_sev']. ":</td>\n";
         echo "<td>\n";
-          echo "<select name='severity' size='3' multiple='true'>\n";
+          echo "<select name='severity' size='3' multiple='true' id='plotsev_2' onclick='sh_plotsevtype(2);'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
                 echo printOption($key, $val, -1);
               }
+            }
+           echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr id='plotsevtype_2' style='display:none;'>\n";
+        echo "<td>" .$l['pl_sevtype']. ":</td>\n";
+        echo "<td>\n";
+          echo "<select name='sevtype' size='5' multiple='true'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
+            foreach ($v_severity_atype_ar as $key => $val) {
+              echo printOption($key, $val, -1);
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -413,20 +427,20 @@ function popimg(url,h,w,x,y) {
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
-                $id = $sensord['id'];
-                $keyname = $sensord['keyname'];
-                $vlanid = $sensord['vlanid'];
-                $label = $sensord['label'];
-                $sensor = sensorname($keyname, $vlanid);
-                if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
-                if ($q_org == 0) {
-                  echo printOption($id, "$sensor - $org", $sid);
-                } else {
-                  echo printOption($id, $sensor, $sid);
-                }
+              $id = $sensord['id'];
+              $keyname = $sensord['keyname'];
+              $vlanid = $sensord['vlanid'];
+              $label = $sensord['label'];
+              $sensor = sensorname($keyname, $vlanid);
+              if ($label != "") $sensor = $label; 
+              $org = $sensord['organisation'];
+              if ($q_org == 0) {
+                echo printOption($id, "$sensor - $org", $sid);
+              } else {
+                echo printOption($id, $sensor, $sid);
               }
-           echo "</select>\n";
+            }
+          echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
 
@@ -451,12 +465,23 @@ function popimg(url,h,w,x,y) {
       echo "<tr>\n";
         echo "<td>Severity:</td>\n";
         echo "<td>\n";
-          echo "<select name='severity' size='3' multiple='true'>\n";
+          echo "<select name='severity' size='3' multiple='true' id='plotsev_3' onclick='sh_plotsevtype(3);'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
             foreach ($v_severity_ar as $key => $val) {
               if ($key == 0 || $key == 1) {
                 echo printOption($key, $val, -1);
               }
+            }
+           echo "</select>\n";
+        echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr id='plotsevtype_3' style='display:none;'>\n";
+        echo "<td>" .$l['pl_sevtype']. ":</td>\n";
+        echo "<td>\n";
+          echo "<select name='sevtype' size='5' multiple='true'>\n";
+            echo printOption(-1, $l['pl_allattacks'], -1);
+            foreach ($v_severity_atype_ar as $key => $val) {
+              echo printOption($key, $val, -1);
             }
            echo "</select>\n";
         echo "</td>\n";
@@ -504,20 +529,20 @@ function popimg(url,h,w,x,y) {
             echo printOption(0, "All sensors", $sid);
             pg_result_seek($result_getsensors, 0);
             while ($sensord = pg_fetch_assoc($result_getsensors)) {
-                $id = $sensord['id'];
-                $keyname = $sensord['keyname'];
-                $vlanid = $sensord['vlanid'];
-                $label = $sensord['label'];
-                $sensor = sensorname($keyname, $vlanid);
-                if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
-                if ($q_org == 0) {
-                  echo printOption($id, "$sensor - $org", $sid);
-                } else {
-                  echo printOption($id, $sensor, $sid);
-                }
+              $id = $sensord['id'];
+              $keyname = $sensord['keyname'];
+              $vlanid = $sensord['vlanid'];
+              $label = $sensord['label'];
+              $sensor = sensorname($keyname, $vlanid);
+              if ($label != "") $sensor = $label; 
+              $org = $sensord['organisation'];
+              if ($q_org == 0) {
+                echo printOption($id, "$sensor - $org", $sid);
+              } else {
+                echo printOption($id, $sensor, $sid);
               }
-           echo "</select>\n";
+            }
+          echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
 

@@ -34,18 +34,19 @@ include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 
 # Starting the session
+###############################################
 session_start();
 
 # Retrieving some session variables
+###############################################
 $s_org = intval($_SESSION['s_org']);
 $q_org = $_SESSION['q_org'];
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
-$drawerr = 0;
-$limit = "";
 
 # Retrieving posted variables from $_GET
+###############################################
 $allowed_get = array(
                 "int_interval",
 		"int_type",
@@ -58,11 +59,16 @@ $allowed_get = array(
 		"int_heigth",
 		"int_org",
 		"int_scanner",
-		"int_virus"
+		"int_virus",
+		"sevtype"
 );
 $check = extractvars($_GET, $allowed_get);
-#$c_debug_input = 1;
 #debug_input();
+
+# Initialising some variables
+###############################################
+$of_title_ar = array();
+$limit = "";
 
 ########################
 #  Organisation 
@@ -117,29 +123,72 @@ if ($tainted['severity']) {
   $sev = $tainted['severity'];
   $sev_ar = explode(",", $sev);
 
+  $atype = $tainted['sevtype'];
+  $atype_ar = explode(",", $atype);
+
   if ($sev_ar[0] == -1) {
-    $title .= "All attacks";
+    if ($clean['virus']) {
+      of_title("Downloaded malware");
+    } else {
+      of_title("All attacks");
+    }
   } else {
-    $title .= $v_severity_ar[$sev];
-    $tempwhere .= "attacks.severity IN (";
+    $tempwhere .= "(attacks.severity IN (";
     $check = 0;
     foreach ($sev_ar as $sev) {
       $check++;
       $sev = intval($sev);
-      if ($check != count($sev_ar)) {
-        $tempwhere .= $sev .", ";
-        $title .= $v_severity_ar[$sev] . ", ";
+      if ($sev == 1) {
+        if (isset($tainted['sevtype'])) {
+          if ($tainted['sevtype'] == -1) {
+            $tempwhere .= $sev .", ";
+          }
+        }
       } else {
-        $tempwhere .= $sev;
-        $title .= $v_severity_ar[$sev];
+        $tempwhere .= $sev .", ";
       }
     }
-    $tempwhere .= ") ";
+    $tempwhere = trim($tempwhere, " ");
+    $tempwhere = trim($tempwhere, ",");
+    $tempwhere .= ")";
+    if ($tempwhere == "(attacks.severity IN ()") {
+      $tempwhere = "(";
+    }
+    if (isset($tainted['sevtype'])) {
+      if ($tainted['sevtype'] != -1) {
+        if ($tempwhere != "(") {
+          $tempwhere .= " OR";
+        }
+        $tempwhere .= " (atype IN (";
+        $check = 0;
+        foreach ($atype_ar as $atype) {
+          $check++;
+          $atype = intval($atype);
+          if ($check != count($atype_ar)) {
+            $tempwhere .= $atype .", ";
+          } else {
+            $tempwhere .= $atype;
+          }
+        }
+        $tempwhere .= " ) AND severity = 1))";
+      } else {
+        $tempwhere .= ")";
+      }
+    } else {
+      $tempwhere .= ")";
+    }
+    of_title("Attacks");
     add_to_sql("$tempwhere", "where");
   }
 } else {
-  $title .= "All attacks";
+  if (isset($clean['virus'])) {
+    of_title("Downloaded malware");
+  } else {
+    of_title("All attacks");
+  }
 }
+add_to_sql("atype", "select");
+add_to_sql("atype", "group");
 add_to_sql("attacks.severity", "group");
 $tempwhere = "";
 
@@ -183,6 +232,7 @@ if (isset($tainted['attack'])) {
     add_to_sql($tempwhere, "where");
     add_to_sql("details.text", "group");
     $title .= ") ";
+    of_title($title);
     add_to_sql("details.text", "select");
     add_to_sql("details.type = 1", "where");
   } else {
@@ -231,6 +281,7 @@ if ($tainted['os']) {
     }
     $tempwhere .= ") ";
     $title .= ") ";
+    of_title($title);
     add_to_sql($tempwhere, "where");
   }
 }
@@ -239,20 +290,9 @@ $tempwhere = "";
 ########################
 # Virus Types
 ########################
-if ($clean['virus']) {
+if (isset($clean['virus'])) {
   $virus = $clean['virus'];
 
-/*
-  add_to_sql("binaries.bin", "select");
-  add_to_sql("binaries", "table");
-  add_to_sql("uniq_binaries", "table");
-  add_to_sql("details", "table");
-  add_to_sql("attacks.id = details.attackid", "where");
-  add_to_sql("details.type = 8", "where");
-  add_to_sql("details.text = uniq_binaries.name", "where");
-  add_to_sql("uniq_binaries.id = binaries.bin", "where");
-  add_to_sql("binaries.bin", "group");
-*/
   add_to_sql("stats_virus.name", "select");
   add_to_sql("binaries", "table");
   add_to_sql("stats_virus", "table");
@@ -276,11 +316,11 @@ if ($clean['virus']) {
   }
   if ($virus == 1) {
     $limit = 10;
-    $title .= " (Top $limit virusses$scannername)";
+    of_title("(Top $limit virusses$scannername)");
     $sqllimit = " LIMIT $limit";
   } else {
     $sqllimit = "";
-    $title .= "$scannername";
+    of_title("$scannername");
   }
 }
 $tempwhere = "";
@@ -289,11 +329,11 @@ $tempwhere = "";
 # Interval & Timestamps
 ########################
 if ($interval == 3600) {
-  $title .= " per hour";
+  of_title("per hour");
 } elseif ($interval == 86400) {
-  $title .= " per day";
+  of_title("per day");
 } elseif ($interval == 604800) {
-  $title .= " per week";
+  of_title("per week");
 }
 
 $from = $_SESSION['s_from'];
@@ -313,7 +353,7 @@ if ($tainted['sensorid']) {
   $sensors_ar = explode(",", $sensors);
 
   if ($sensors_ar[0] == 0) {
-    $title .= " for all sensors";
+    of_title("for all sensors");
     $allsensors = 1;
   } else {
     add_to_sql("sensors.keyname", "group");
@@ -340,6 +380,7 @@ if ($tainted['sensorid']) {
         $title .= $keytitle;
       }
     }
+    of_title($title);
     $tempwhere .= ") ";
     add_to_sql("$tempwhere", "where");
   }
@@ -372,10 +413,10 @@ if (isset($clean['ports'])) {
           if ($port{0} == "!") {
             $port = substr($port, 1); 
             $portrange_ar = explode("-", $port);
-            $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) AND ";
+            $notsqlports .= "attacks.dport NOT BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) ";
           } else { 
             $portrange_ar = explode("-", $port);
-            $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) OR ";
+            $sqlports .= "attacks.dport BETWEEN ($portrange_ar[0]) AND ($portrange_ar[1]) ";
           }
         } else { 
           if ($port{0} == "!") {
@@ -387,26 +428,31 @@ if (isset($clean['ports'])) {
         }
       }
     }  
-    if ($portlist) { 
+    if ($portlist != "") {
       $portlist = trim($portlist, ",");
-      $sqlports .= "attacks.dport IN ($portlist)"; 
-      $sqlports = trim($sqlports);
+      $sqlports .= " OR attacks.dport IN ($portlist)";
+      $sqlports = trim($sqlports, " ");
       $sqlports = trim($sqlports, "OR");
+    }
+    if ($sqlports != "") {
       add_to_sql("($sqlports)", "where");
     }
-    if ($notportlist) { 
+    if ($notportlist != "") {
       $notportlist = trim($notportlist, ",");
-      $notsqlports .= "attacks.dport NOT IN ($notportlist)"; 
+      $notsqlports .= " AND attacks.dport NOT IN ($notportlist)";
       $notsqlports = trim($notsqlports);
       $notsqlports = trim($notsqlports, "AND");
+    }
+    if ($notsqlports != "") {
       add_to_sql("($notsqlports)", "where");
     }
     add_to_sql("attacks.dport", "select");
     add_to_sql("attacks.dport", "group");
-    $title .= " with attack port ($ports)  ";
+    of_title("with attack port ($ports)");
   }
 }
-$title .= "\n From $textstart to $textend";
+of_title("\n From $textstart to $textend");
+$title = of_set_title();
 
 ##############
 # PHPlot stuff
@@ -420,30 +466,60 @@ $plot->SetXTitle('Time');
 $plot->SetYTitle('Attacks');
 $plot->SetPlotType($type);
 
+# Initialising the used arrays and variables
+###############################################
 $data = array();
-$i = 0;
-
 $check_ar = array();
-$maxcount = 0;
-
-add_to_sql("severity", "order");
-add_to_sql("COUNT(attacks.severity) as total", "select");
-
-# IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
-
-prepare_sql();
-
-#print "tssteps: $tssteps\n";
-$stepcount = $tssteps / 30;
-$stepcount_org = round($stepcount);
-$stepcount = $stepcount_org;
-
 $point = array();
 $foundkeys_ar = array();
+$i = 0;
+$y_max = 0;
+$sevtotal = 0;
+
+# Preparing the final SQL stuff
+###############################################
+add_to_sql("severity", "order");
+add_to_sql("COUNT(attacks.severity) as total", "select");
+# IP Exclusion stuff
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+prepare_sql();
+
+if ($limit != "") {
+  # Setting up the top $limit query
+  ###############################################
+  $sql = "SELECT $sql_select ";
+  $sql .= "FROM $sql_from";
+  $sql .= "$sql_where";
+  if ($sql_where != "") {
+    $sql .= " AND ";
+  } else {
+    $sql .= " WHERE ";
+  }
+  $sql .= " attacks.timestamp >= $from ";
+  $sql .= " AND attacks.timestamp <= $to ";
+  $sql .= " GROUP BY $sql_group ";
+  $sql .= " ORDER BY total DESC";
+  $sql .= $sqllimit;
+  $debuginfo[] = $sql;
+  $result = pg_query($pgconn, $sql);
+  while ($row = pg_fetch_assoc($result)) {
+    $top_ar[] = $row['name'];
+  }
+}
+
+# Looping through the steps
+###############################################
 while ($i != $tssteps) {
+  # Setting the step variables
+  # a = from step
+  # i = to step
+  # Example: where timestamp from $a till $i
+  ###############################################
   $a = $i;
   $i++;
+
+  # Resetting the point array while keeping the keys
+  ###############################################
   foreach ($point as $key => $value) {
     if ("$key" != "0") {
       if (!in_array($key, $foundkeys_ar)) {
@@ -452,10 +528,9 @@ while ($i != $tssteps) {
     }
     $point[$key] = 0;
   }
-#  $sql = "SELECT DISTINCT $selectattacks $selectsensorid attacks.severity, COUNT(attacks.severity) as total FROM attacks, sensors, details ";
-#  $sql .= "WHERE details.attackid = attacks.id AND timestamp >= $tsstart + ($interval * $a) AND timestamp <= $tsstart + ($interval * $i) ";
-#  $sql .= "AND sensors.id = attacks.sensorid $where ";
-#  $sql .= "GROUP BY $groupbysensorid $groupbyattacks attacks.severity ORDER BY severity";
+
+  # Building the SQL query
+  ###############################################
   $sql = "SELECT $sql_select ";
   $sql .= "FROM $sql_from";
   $sql .= "$sql_where";
@@ -468,13 +543,12 @@ while ($i != $tssteps) {
   $sql .= " AND attacks.timestamp <= $tsstart + ($interval * $i) ";
   $sql .= " GROUP BY $sql_group ";
   $sql .= " ORDER BY $sql_order ";
-  if (isset($clean['virus'])) {
-    $sql .= $sqllimit;
-  }
   $debuginfo[] = $sql;
-
   $result = pg_query($pgconn, $sql);
   $numrows = pg_num_rows($result);
+
+  # Creating the date string for the x axis
+  ###############################################
   $date = $tsstart + ($interval * $a);
   if ($interval == 3600) {
     $datestring = date("d-m", $date) . "\n " . date("H", $date) . ":00";
@@ -483,68 +557,129 @@ while ($i != $tssteps) {
   } elseif ($interval == 604800) {
     $datestring = "Week\n" .date("W", $date);
   }
-  if ($stepcount == $i) {
-    $point[0] = $datestring;
-    $stepcount = $stepcount + $stepcount_org;
-  }
-  elseif ($i == 1 || $i == $tssteps) $point[0] = $datestring;
-  else  $point[0] = ''; 
+  $point[0] = $datestring;
 
+  # Retrieving point data if there are any rows
+  ###############################################
   if ($numrows != 0) {
     while($row = pg_fetch_assoc($result)) {
+      # Resetting legend array
+      ###############################################
+      $of_legend_ar = array();
+
+      # Fetching row data
+      ###############################################
       $count = $row['total'];
       $sev = $row['severity'];
+      $atype = $row['atype'];
+
+      # Keeping track of the cumulative malicious attacks
+      ###############################################
+      if (isset($tainted['severity'])) {
+        if ($sev == 1) {
+          $sevtotal += $count;
+        }
+      }
+
+      # Determining the maximum value of the y axis
+      ###############################################
+      if ($y_max < $count) {
+        $y_max = $count;
+      } elseif ($y_max < $sevtotal) {
+        $y_max = $sevtotal;
+      }
+
+      # Handling the row data
+      ###############################################
       if (isset($row['text'])) {
         $type = $row['text'];
       }
-      $legend = "";
-      if ($maxcount < $count) {
-        $maxcount = $count;
-      }
+
       if (isset($row['keyname'])) {
         $vlanid = $row['vlanid'];
         $keyname = $row['keyname'];
         $keytitle = sensorname($keyname, $vlanid);
-        $legend .= "$keytitle -";
+        of_legend("$keytitle");
       }
      
       if (isset($row['text'])) {
         $attack = str_replace("Dialogue", "", $row['text']);
-	if($legend == "") { $legend .= " ".$attack;}
-	else { $legend .= " - ".$attack; }
+        of_legend($attack);
       }
       if (isset($row['dport'])) {
         $port = $row['dport'];
-        $legend .= " $port";
+        of_legend("$port");
       }
       if (isset($row['os'])) {
         $os = $row['os'];
-        $legend .= " $os";
+        of_legend("$os");
       }
       if (isset($row['name'])) {
-        $name = $row['name'];
-        $legend .= " $name";
+        $vir = $row['name'];
+        if ($limit != "") {
+          if (in_array($vir, $top_ar)) {
+            of_legend($vir);
+          }
+        } else {
+          of_legend($vir);
+        }
       } else {
         if ($v_severity_ar[$sev] == "Possible malicious attack") { $v_severity_ar[$sev] = "PosA"; }
         if ($v_severity_ar[$sev] == "Malicious attack") { $v_severity_ar[$sev] = "MalA"; }
         if ($v_severity_ar[$sev] == "Malware offered") { $v_severity_ar[$sev] = "MalO"; }
         if ($v_severity_ar[$sev] == "Malware downloaded") { $v_severity_ar[$sev] = "MalD"; }
-        if ($legend == "") {$legend .= " ".$v_severity_ar[$sev];}
-        else {$legend .= " - ".$v_severity_ar[$sev];}
+
+        if ($sev == 1) {
+          if (isset($row['atype'])) {
+            $atype = $row['atype'];
+            of_legend($v_severity_ar[$sev] . " - " .$v_severity_atype_ar[$atype]);
+          } else {
+            of_legend($v_severity_ar[$sev]);
+          }
+        } else {
+          of_legend($v_severity_ar[$sev]);
+        }
       }
-      if (!in_array($legend, $check_ar)) {
-        if ($limit != "") {
-          if (count($check_ar) != $limit) {
+
+      # Setting up the legend and adding it (if needed)
+      ###############################################
+      $legend = of_set_legend();
+      if ($legend != "") {
+        if (!in_array($legend, $check_ar)) {
+          if ($limit != "") {
+            if (count($check_ar) != $limit) {
+              $check_ar[] = $legend;
+              $plot->SetLegend($legend);
+            }
+          } else {
             $check_ar[] = $legend;
             $plot->SetLegend($legend);
           }
-        } else {
-          $check_ar[] = $legend;
-          $plot->SetLegend($legend);
         }
       }
       if (in_array($legend, $check_ar)) {
         $point[$legend] = $count;
+      }
+    }
+
+    # If needed, adding cumulative malicous attacks
+    ###############################################
+    if (isset($tainted['sevtype'])) {
+      if ($limit == "") {
+        $legend = "All MalA";
+        if (!in_array($legend, $check_ar)) {
+          if ($limit != "") {
+            if (count($check_ar) != $limit) {
+              $check_ar[] = $legend;
+              $plot->SetLegend($legend);
+            }
+          } else {
+            $check_ar[] = $legend;
+            $plot->SetLegend($legend);
+          }
+        }
+        $point[$legend] = $sevtotal;
+        $sevtotal = 0;
       }
     }
 
@@ -554,6 +689,8 @@ while ($i != $tssteps) {
   }
 }
 
+# Setting up 0 values for missing points
+###############################################
 if (count($foundkeys_ar) != 0) {
   foreach ($data as $key => $val) {
     foreach ($foundkeys_ar as $fkey => $fval) {
@@ -568,13 +705,11 @@ if (count($foundkeys_ar) != 0) {
   }
 }
 
-#printer($data);
-#printer($sql);
-
 #debug_sql();
 
-#if (!empty($data)) {
 if (empty($data)) {
+  # Handling empty data sets
+  ###############################################
   $point = array();
   $point[] = " ";
   $point[] = " ";
@@ -582,8 +717,9 @@ if (empty($data)) {
   $data[] = $point;
   $ytick = 1;
 } else {
-#  printer($maxcount);
-  $pertick = intval($maxcount / 20);
+  # Calculating the step size of the y-axis
+  ###############################################
+  $pertick = intval($y_max / 20);
   if ($pertick > 50) {
     $ytick = $pertick - ($pertick % 50);
   } elseif ($pertick > 10) {
@@ -596,16 +732,18 @@ if (empty($data)) {
     $ytick = 1;
   }
 }
- # printer($pertick);
- # printer($ytick);
-  $plot->SetDataColors($v_phplot_data_colors);
-  $plot->SetBackgroundColor("#f0f0f0");
-  $plot->SetVertTickIncrement("$ytick");
-  $plot->SetDataValues($data);
-  $plot->SetLegendPixels(0, 0);
-  $plot->SetDefaultDashedStyle('4-3');
-  $plot->DrawGraph();
-#} else {
-#  readfile("images/nodata.gif");
-#}
+
+# Setting up some graphing options
+###############################################
+$plot->SetDataColors($v_phplot_data_colors);
+$plot->SetBackgroundColor("#f0f0f0");
+$plot->SetVertTickIncrement("$ytick");
+$plot->SetDataValues($data);
+$plot->SetLegendPixels(0, 0);
+$plot->SetDefaultDashedStyle('4-3');
+
+# Printing the graph
+###############################################
+$plot->DrawGraph();
+
 ?>

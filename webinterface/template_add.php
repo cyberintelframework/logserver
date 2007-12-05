@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 05-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added validation to the $qs variable
 # 2.00.01 Initial release
 #############################################
 
@@ -125,6 +126,9 @@ if (isset($_SERVER['QUERY_STRING'])) {
   # Removing trailing empty variable
   $pattern = '/&[a-zA-Z_]*=$/';
   $qs = preg_replace($pattern, "", $qs);
+
+  # Validating querystring input
+  $qs = pg_escape_string(strip_tags(htmlentities($qs)));
 } else {
   $err = 1;
   $m = 142;

@@ -569,8 +569,8 @@ function sec_to_string(sec) {
  * Plotter functions
  ***********************************/
 
-function sh_plotsevtype() {
-  status = $("#plotsev").val();
+function sh_plotsevtype(id) {
+  status = $("#plotsev_"+id).val();
   found = 0;
   for (var i=0; i < status.length; i++) {
     val = status[i];
@@ -579,9 +579,9 @@ function sh_plotsevtype() {
     }
   }
   if (found == 1) {
-    $("#plotsevtype").show();
+    $("#plotsevtype_"+id).show();
   } else {
-    $("#plotsevtype").hide();
+    $("#plotsevtype_"+id).hide();
   }
 }
 
