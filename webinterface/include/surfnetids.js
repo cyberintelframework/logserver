@@ -579,9 +579,9 @@ function sh_plotsevtype(id) {
     }
   }
   if (found == 1) {
-    $("#plotsevtype_"+id).show();
+    $(".plotsevtype_"+id).show();
   } else {
-    $("#plotsevtype_"+id).hide();
+    $(".plotsevtype_"+id).hide();
   }
 }
 

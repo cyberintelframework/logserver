@@ -53,9 +53,11 @@ $allowed_get = array(
 		"strip_html_escape_ports",
 		"int_org",
 		"int_scanner",
-		"int_method",
 		"int_virus",
-		"sevtype"
+		"sevtype",
+		"int_totalmal1",
+		"int_totalmal2",
+		"int_totalmal3"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -66,12 +68,17 @@ $of_title_ar = array();
 $limit = "";
 
 ########################
-#  Method
+#  Total Malicious attacks
 ########################
-if (isset($clean['method'])) {
-  $method = $clean['method'];
-} else {
-  $method = 0;
+$set_totalmal = 0;
+if (isset($clean['totalmal1'])) {
+  $set_totalmal = 1;
+}
+if (isset($clean['totalmal2'])) {
+  $set_totalmal = 1;
+}
+if (isset($clean['totalmal3'])) {
+  $set_totalmal = 1;
 }
 
 ########################
@@ -111,6 +118,10 @@ add_to_sql("$query_org", "where");
 if ($tainted['severity']) {
   $sev = $tainted['severity'];
   $sev_ar = explode(",", $sev);
+
+  if (!in_array(1, $sev_ar)) {
+    $set_totalmal = 0;
+  }
 
   $atype = $tainted['sevtype'];
   $atype_ar = explode(",", $atype);
@@ -530,7 +541,7 @@ while ($i != $tssteps) {
   } elseif ($interval == 86400) {
     $datestring = date("d-m", $date);
   } elseif ($interval == 604800) {
-    $datestring = "Week\n" .date("W", $date);
+    $datestring = "Week " .date("W", $date);
   }
 
   # Setting up the labels for the x axis
@@ -552,11 +563,14 @@ while ($i != $tssteps) {
       $sev = $row['severity'];
       $atype = $row['atype'];
 
-      # Keeping track of the cumulative malicious attacks
-      ###############################################
-      if (isset($tainted['severity'])) {
-        if ($sev == 1) {
-          $sevtotal += $count;
+      if ($set_totalmal == 1) {
+        # Keeping track of the cumulative malicious attacks
+        ###############################################
+        if (isset($tainted['severity'])) {
+          if ($sev == 1) {
+            $sevtotal += $count;
+            echo "SEVTOTAL: $sevtotal<br />\n";
+          }
         }
       }
 
@@ -647,26 +661,17 @@ while ($i != $tssteps) {
       }
       $of_temp_links_ar = array();
       $r++;
-
-#      if (isset($data[$legend])) {
-#        # Setting up 0 values for missing points
-#        ###############################################
-#        for ($tsc = 1; $tsc <= $tssteps; $tsc++) {
-#          if (!array_key_exists($tsc, $data[$legend])) {
-#            $data[$legend][$tsc] = 0;
-#          }
-#        }
-#        ksort($data[$legend]);
-#      }
     }
 
-    # If needed, adding cumulative malicous attacks
-    ###############################################
-    if (isset($tainted['sevtype'])) {
-      if ($limit == "") {
-        $legend = "All malicious attacks";
-        $datasev[$legend][$i] = $sevtotal;
-        $sevtotal = 0;
+    if ($set_totalmal == 1) {
+      # If needed, adding cumulative malicous attacks
+      ###############################################
+      if (isset($tainted['sevtype'])) {
+        if ($limit == "") {
+          $legend = "All malicious attacks";
+          $datasev[$legend][$i] = $sevtotal;
+          $sevtotal = 0;
+        }
       }
     }
   }
@@ -683,15 +688,17 @@ foreach ($data as $key => $val) {
   }
 }
 
-if (isset($datasev)) {
-  # Setting up 0 values for missing points (for total malicious attacks)
-  ###############################################
-  for ($tsc = 1; $tsc <= $tssteps; $tsc++) {
-    if (!array_key_exists($tsc, $datasev[$legend])) {
-      $datasev["All malicious attacks"][$tsc] = 0;
+if ($set_totalmal == 1) {
+  if (isset($datasev)) {
+    # Setting up 0 values for missing points (for total malicious attacks)
+    ###############################################
+    for ($tsc = 1; $tsc <= $tssteps; $tsc++) {
+      if (!array_key_exists($tsc, $datasev[$legend])) {
+        $datasev["All malicious attacks"][$tsc] = 0;
+      }
     }
+    ksort($datasev[$legend]);
   }
-  ksort($datasev[$legend]);
 }
 
 # Determining the step size of the x axis
@@ -726,11 +733,25 @@ $g->y_axis_colour( '#8499A4', '#E4F5FC' );
 # Determining the step size of the y axis
 ###############################################
 if ($y_max != 0) {
+  echo "Y_MAX1: $y_max<br />\n";
   $rp = -(strlen($y_max) - 1);
+  echo "RP: $rp<br />\n";
   $y_max = roundup($y_max, $rp);
+  echo "Y_MAX2: $y_max<br />\n";
   $rp = strlen($y_max) - 1;
-  $deler = substr($y_max, 0, $rp) / 2;
+  echo "RP: $rp<br />\n";
+  if ($rp == 0) {
+    $rp = 1;
+  }
+  echo "RP: $rp<br />\n";
+  $deler = substr($y_max, 0, $rp);
+  echo "DELER: $deler<br />\n";
   $y_steps = round($y_max / $deler);
+  echo "Y_STEPS1: $y_steps<br />\n";
+  if ($y_max < 20) {
+    $y_steps = $y_max;
+  }
+  echo "Y_STEPS2: $y_steps<br />\n";
 } else {
   $y_max = 10;
   $y_steps = 10;
@@ -797,11 +818,11 @@ if ($type != 6) {
 # Pie charts need totals as data, adding them here
 ###############################################
 if ($type == 6) {
-  $empty = array();
   $g->pie(60,'#505050','#000000');
   if (count($of_links_ar) != 0) {
     $g->pie_values($piepoints, $piekeys, $of_links_ar);
   } else {
+    $empty = array();
     $g->pie_values($piepoints, $piekeys, $empty);
   }
   $g->pie_slice_colours($of_link_colors_ar);

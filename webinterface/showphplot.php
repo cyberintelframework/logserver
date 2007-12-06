@@ -60,7 +60,10 @@ $allowed_get = array(
 		"int_org",
 		"int_scanner",
 		"int_virus",
-		"sevtype"
+		"sevtype",
+		"int_totalmal1",
+		"int_totalmal2",
+		"int_totalmal3"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -69,6 +72,20 @@ $check = extractvars($_GET, $allowed_get);
 ###############################################
 $of_title_ar = array();
 $limit = "";
+
+########################
+#  Total Malicious attacks
+########################
+$set_totalmal = 0;
+if (isset($clean['totalmal1'])) {
+  $set_totalmal = 1;
+}
+if (isset($clean['totalmal2'])) {
+  $set_totalmal = 1;
+}
+if (isset($clean['totalmal3'])) {
+  $set_totalmal = 1;
+}
 
 ########################
 #  Organisation 
@@ -573,11 +590,13 @@ while ($i != $tssteps) {
       $sev = $row['severity'];
       $atype = $row['atype'];
 
-      # Keeping track of the cumulative malicious attacks
-      ###############################################
-      if (isset($tainted['severity'])) {
-        if ($sev == 1) {
-          $sevtotal += $count;
+      if ($set_totalmal == 1) {
+        # Keeping track of the cumulative malicious attacks
+        ###############################################
+        if (isset($tainted['severity'])) {
+          if ($sev == 1) {
+            $sevtotal += $count;
+          }
         }
       }
 
@@ -662,24 +681,26 @@ while ($i != $tssteps) {
       }
     }
 
-    # If needed, adding cumulative malicous attacks
-    ###############################################
-    if (isset($tainted['sevtype'])) {
-      if ($limit == "") {
-        $legend = "All MalA";
-        if (!in_array($legend, $check_ar)) {
-          if ($limit != "") {
-            if (count($check_ar) != $limit) {
+    if ($set_totalmal == 1) {
+      # If needed, adding cumulative malicous attacks
+      ###############################################
+      if (isset($tainted['sevtype'])) {
+        if ($limit == "") {
+          $legend = "All MalA";
+          if (!in_array($legend, $check_ar)) {
+            if ($limit != "") {
+              if (count($check_ar) != $limit) {
+                $check_ar[] = $legend;
+                $plot->SetLegend($legend);
+              }
+            } else {
               $check_ar[] = $legend;
               $plot->SetLegend($legend);
             }
-          } else {
-            $check_ar[] = $legend;
-            $plot->SetLegend($legend);
           }
+          $point[$legend] = $sevtotal;
+          $sevtotal = 0;
         }
-        $point[$legend] = $sevtotal;
-        $sevtotal = 0;
       }
     }
 

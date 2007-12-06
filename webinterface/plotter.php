@@ -52,11 +52,23 @@ function buildqs() {
   $("form:eq("+sw+") input").each(function(item){
     var name = $("form:eq("+sw+") input:eq("+item+")").attr("name");
     var val = $("form:eq("+sw+") input:eq("+item+")").val();
+    var type = $("form:eq("+sw+") input:eq("+item+")").attr("type");
     $("form:eq("+sw+") input:eq("+item+")").blur();
-    if (str == "") {
-      str = str+"?"+name+"="+val;
+    if (type == "checkbox") {
+      var chk = $("form:eq("+sw+") input:eq("+item+")").attr("checked");
+      if (chk) {
+        if (str == "") {
+          str = str+"?"+name+"="+val;
+        } else {
+          str = str+"&"+name+"="+val;
+        }
+      }
     } else {
-      str = str+"&"+name+"="+val;
+      if (str == "") {
+        str = str+"?"+name+"="+val;
+      } else {
+        str = str+"&"+name+"="+val;
+      }
     }
   })
   $("form:eq("+sw+") select").each(function(item){
@@ -77,7 +89,6 @@ function buildqs() {
   if (method == 0) {
     location.href="plotter.php"+str;
   } else if (method == 1) {
-    alert(str);
     popimg("showphplot.php"+str, 600, 1000, "11%");
   }
   return false;
@@ -110,6 +121,7 @@ function popimg(url,h,w,x,y) {
 <?php
   if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
     $qs = $_SERVER['QUERY_STRING'];
+    $qs = strip_tags($qs);
     include_once 'include/php-ofc-library/open_flash_chart_object.php';
     echo "<div class='centerbig'>\n";
       echo "<div class='block'>\n";
@@ -172,7 +184,7 @@ function popimg(url,h,w,x,y) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption("", "All sensors", $sid);
@@ -195,7 +207,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       # SEVERITY
       echo "<tr>\n";
-        echo "<td>" .$l['pl_sev']. ":</td>\n";
+        echo "<td>" .$l['pl_sev']. "</td>\n";
         echo "<td>\n";
           echo "<select name='severity' size='5' multiple='true' onclick='sh_plotsevtype(1);' id='plotsev_1'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -205,8 +217,8 @@ function popimg(url,h,w,x,y) {
            echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
-      echo "<tr id='plotsevtype_1' style='display:none;'>\n";
-        echo "<td>" .$l['pl_sevtype']. ":</td>\n";
+      echo "<tr class='plotsevtype_1' style='display:none;'>\n";
+        echo "<td>" .$l['pl_sevtype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sevtype' size='5' multiple='true'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -215,6 +227,10 @@ function popimg(url,h,w,x,y) {
             }
            echo "</select>\n";
         echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr class='plotsevtype_1' style='display:none;'>\n";
+        echo "<td>" .$l['pl_options']. "</td>\n";
+        echo "<td>" .printCheckBox($l['pl_totalmal'], "int_totalmal1", 1, 1). "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td>" .$l['pl_int']. "</td>\n";
@@ -253,7 +269,7 @@ function popimg(url,h,w,x,y) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -281,7 +297,7 @@ function popimg(url,h,w,x,y) {
       $result_getattacks = pg_query($sql_getattacks);
 
       echo "<tr>\n";
-        echo "<td>" .$l['pl_attack']. ":</td>\n";
+        echo "<td>" .$l['pl_attack']. "</td>\n";
         echo "<td>\n";
           echo "<select name='attack' size='5' multiple='true'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -331,7 +347,7 @@ function popimg(url,h,w,x,y) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -354,14 +370,14 @@ function popimg(url,h,w,x,y) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>" .$l['pl_dports']. ":<br />" .$l['pl_example']. ":<br />80,100-1000,!445,!137-145 or " .$l['pl_all']. "</td>\n";
+        echo "<td>" .$l['pl_dports']. "<br />" .$l['pl_example']. ":<br />80,100-1000,!445,!137-145 or " .$l['pl_all']. "</td>\n";
         echo "<td>\n";
           echo "<input type='text' name='strip_html_escape_ports' size='20' />\n";
         echo "</td>\n";
       echo "</tr>\n";
       # SEVERITY
       echo "<tr>\n";
-        echo "<td>" .$l['pl_sev']. ":</td>\n";
+        echo "<td>" .$l['pl_sev']. "</td>\n";
         echo "<td>\n";
           echo "<select name='severity' size='3' multiple='true' id='plotsev_2' onclick='sh_plotsevtype(2);'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -373,8 +389,8 @@ function popimg(url,h,w,x,y) {
            echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
-      echo "<tr id='plotsevtype_2' style='display:none;'>\n";
-        echo "<td>" .$l['pl_sevtype']. ":</td>\n";
+      echo "<tr class='plotsevtype_2' style='display:none;'>\n";
+        echo "<td>" .$l['pl_sevtype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sevtype' size='5' multiple='true'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -383,6 +399,10 @@ function popimg(url,h,w,x,y) {
             }
            echo "</select>\n";
         echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr class='plotsevtype_2' style='display:none;'>\n";
+        echo "<td>" .$l['pl_options']. "</td>\n";
+        echo "<td>" .printCheckBox($l['pl_totalmal'], "int_totalmal2", 1, 1). "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td>Interval</td>\n";
@@ -421,7 +441,7 @@ function popimg(url,h,w,x,y) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -450,7 +470,7 @@ function popimg(url,h,w,x,y) {
       $result_os = pg_query($pgconn, $sql_os);
 
       echo "<tr>\n";
-        echo "<td>" .$l['pl_ostype']. ":</td>\n";
+        echo "<td>" .$l['pl_ostype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='os' size='4' multiple='true'>\n";
             echo printOption("all", "All OS types", "all");
@@ -463,7 +483,7 @@ function popimg(url,h,w,x,y) {
       echo "</tr>\n";
       # SEVERITY
       echo "<tr>\n";
-        echo "<td>Severity:</td>\n";
+        echo "<td>" .$l['pl_sev']. "</td>\n";
         echo "<td>\n";
           echo "<select name='severity' size='3' multiple='true' id='plotsev_3' onclick='sh_plotsevtype(3);'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -475,8 +495,8 @@ function popimg(url,h,w,x,y) {
            echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
-      echo "<tr id='plotsevtype_3' style='display:none;'>\n";
-        echo "<td>" .$l['pl_sevtype']. ":</td>\n";
+      echo "<tr class='plotsevtype_3' style='display:none;'>\n";
+        echo "<td>" .$l['pl_sevtype']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sevtype' size='5' multiple='true'>\n";
             echo printOption(-1, $l['pl_allattacks'], -1);
@@ -485,6 +505,10 @@ function popimg(url,h,w,x,y) {
             }
            echo "</select>\n";
         echo "</td>\n";
+      echo "</tr>\n";
+      echo "<tr class='plotsevtype_3' style='display:none;'>\n";
+        echo "<td>" .$l['pl_options']. "</td>\n";
+        echo "<td>" .printCheckBox($l['pl_totalmal'], "int_totalmal3", 1, 1). "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td>" .$l['pl_int']. "</td>\n";
@@ -523,7 +547,7 @@ function popimg(url,h,w,x,y) {
     echo "<table class='datatable'>\n";
       # SENSORS
       echo "<tr>\n";
-        echo "<td width='185'>" .$l['pl_sensors']. ":</td>\n";
+        echo "<td width='185'>" .$l['pl_sensors']. "</td>\n";
         echo "<td>\n";
           echo "<select name='sensorid' size='5' class='smallselect' multiple='true'>\n";
             echo printOption(0, "All sensors", $sid);
@@ -548,7 +572,7 @@ function popimg(url,h,w,x,y) {
 
       # VIRUS
       echo "<tr>\n";
-        echo "<td>" .$l['pl_virusinfo']. ":</td>\n";
+        echo "<td>" .$l['pl_virusinfo']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_virus'>\n";
             echo printOption(0, $l['pl_allvirii'], 0);
@@ -563,7 +587,7 @@ function popimg(url,h,w,x,y) {
 
       # SCANNERS
       echo "<tr>\n";
-        echo "<td>" .$l['pl_scanner']. ":</td>\n";
+        echo "<td>" .$l['pl_scanner']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_scanner' size='5'>\n";
             while ($scanner_data = pg_fetch_assoc($result_scanner)) {
