@@ -383,6 +383,7 @@ $l['oi_confirmdel']		= "Are you sure you want to delete this record";
 # plotter.php
 ##########################
 $l['pl_sev']			= "Severity";
+$l['pl_sevtype']		= "Attack type";
 $l['pl_attack']			= "Attack";
 $l['pl_port']			= "Port";
 $l['pl_os']			= "OS";
@@ -405,6 +406,8 @@ $l['pl_top10virii']		= "Top 10 viruses";
 $l['pl_scanner']		= "Scanner";
 $l['pl_allattacks']		= "All attacks";
 $l['pl_graph']			= "Graph";
+$l['pl_options']		= "Options";
+$l['pl_totalmal']		= "Show total malicious attacks";
 
 ##########################
 # rank.php

@@ -362,10 +362,10 @@ $v_plottertypes = array(
 */
 
 $v_plottertypes = array(
-				1 => "bars",
-				2 => "lines",
-				4 => "area",
-				6 => "pie"
+			1 => "bars",
+			2 => "lines",
+			4 => "area",
+			6 => "pie"
 );
 
 # Array with the colors used in the index page.

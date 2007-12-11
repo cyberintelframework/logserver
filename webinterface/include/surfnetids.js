@@ -78,7 +78,7 @@ function showtab(selected) {
       $("#sel" + i).removeClass("selected");
     }
     i++;
-  })
+  });
 }
 
 /***********************************

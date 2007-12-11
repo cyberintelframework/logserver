@@ -59,7 +59,6 @@ if ($qs == "") {
   $url = $file . "?";
 } else {
   $url = $file . "?" . $qs . "&";
-
 }
 
 if ($file != "login.php") {
@@ -111,6 +110,14 @@ $tabar = explode(".", $tab);
 $main_tab = $tabar[0];
 $sub_tab = $tabar[1];
 
+if ($c_minified_enable == 1) {
+  $mindir = "min/";
+  $min = "-min";
+} else {
+  $mindir = "";
+  $min = "";
+}
+
 echo "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>\n";
 echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
   echo "<head>\n";
@@ -120,14 +127,12 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<style type='text/css'>@import url('${address}include/calendar.css');</style>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
-    echo "<script type='text/javascript' src='${address}include/jquery-1.2.1.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/jquery.selectboxes.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/surfnetids.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/calendar.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/calendar-en.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/calendar-setup.js'></script>\n";
-#    echo "<script type='text/javascript' src='${address}js/swfobject.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/${mindir}jquery-1.2.1${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/${mindir}jquery.selectboxes${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/${mindir}surfnetids${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/${mindir}calendar${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/${mindir}calendar-en${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/${mindir}calendar-setup${min}.js'></script>\n";
   echo "</head>\n";
   echo "<body>\n";
   echo "<div id='page'>\n";

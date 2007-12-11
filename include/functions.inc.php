@@ -100,6 +100,11 @@
 #
 # 6 Open Flash chart functions
 # 6.01		of_legend
+# 6.02		of_link
+# 6.03		of_title
+# 6.04		of_set_legend
+# 6.05		of_set_links
+# 6.06		of_set_title
 #############################################
 
 ###############################
@@ -641,6 +646,7 @@ function footer() {
   echo "</div>\n";
   echo "<div class='clearer'></div>\n";
   echo "</div>\n";
+  echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
 }
 
 # 3.15 sec_to_string
@@ -1048,19 +1054,26 @@ function of_legend($add) {
 }
 
 # 6.02 of_links
-# Function to add links to the OF links array
-function of_links($add, $r) {
-  global $of_links_ar, $of_link_colors_ar;
+# Function to add links to the OF temp links array
+function of_links($add) {
+  global $of_temp_links_ar;
 
-  if (!in_array($add, $of_links_ar)) {
-    $of_links_ar[] = $add;
-    $num = mt_rand(0, 0xffffff);
-    $color = sprintf('%x', $num);
-    $of_link_colors_ar[] = $color;
+  if (!in_array($add, $of_temp_links_ar)) {
+    $of_temp_links_ar[] = $add;
   }
 }
 
-# 6.03 of_set_legend
+# 6.03 of_title
+# Function to add text to the OF title array
+function of_title($add) {
+  global $of_title_ar;
+
+  if (!in_array($add, $of_title_ar)) {
+    $of_title_ar[] = $add;
+  }
+}
+
+# 6.04 of_set_legend
 # Function to create a legend item
 function of_set_legend() {
   global $of_legend_ar;
@@ -1074,6 +1087,42 @@ function of_set_legend() {
     }
   }
   return $leg;
+}
+
+# 6.05 of_set_links
+# Function to create a link item
+function of_set_links() {
+  global $of_temp_links_ar, $of_links_ar, $of_link_colors_ar;
+  $leg = "";
+  $chk = 0;
+  foreach ($of_temp_links_ar as $key => $val) {
+    if ($chk == 0) {
+      $tmp = $val;
+    } else {
+      $tmp .= "&" .$val;
+    }
+    $chk++;
+  }
+
+  if (!in_array($tmp, $of_links_ar)) {
+    $of_links_ar[] = $tmp;
+  }
+
+  $num = mt_rand(0, 0xffffff);
+  $color = sprintf('%x', $num);
+  $of_link_colors_ar[] = $color;
+
+#  return $tmp;
+}
+
+# 6.06 of_set_title
+# Function to create the title from the of_title_ar
+function of_set_title() {
+  global $of_title_ar;
+  foreach ($of_title_ar as $item) {
+    $title .= "$item ";
+  }
+  return $title;
 }
 
 ?>
