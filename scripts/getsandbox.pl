@@ -24,11 +24,14 @@ use Mail::POP3Client;
 use IO::Socket::SSL;
 use MIME::Parser;
 use Encode;
+use MIME::QuotedPrint;
+use LWP::UserAgent;
+use HTML::Entities;
 
 ####################
 # Variables used
 ####################
-do '/etc/surfnetids/2.10-log.conf';
+do '/etc/surfnetids/surfnetids-log.conf';
 
 ####################
 # Main script
@@ -47,6 +50,9 @@ if (($pop->Count()) < 1) {
   print "No messages...\n";
   exit;
 }
+
+$dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
+       or die $DBI::errstr;
 
 # if msgs, tell how many
 print $pop->Count() . " messages found!\n";
@@ -97,8 +103,7 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
       print "md5: $md5\n";
     }
     
-    $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
-        or die $DBI::errstr;
+    $body = encode("utf8", $body);
     
     ## Get all binid that are already logged
     $sth_binid = $dbh->prepare("SELECT binid FROM norman");
@@ -137,39 +142,122 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     open(LOG, "> $mailfile");
     print LOG "$body";
     close(LOG);
-
+    
     # Rip the XML attachment out
     mimeextract($body);
 
-    $md5 = `cat $xml | grep -m 1 md5 | cut -d \" \" -f 6 | egrep '^md5' | awk -F \"=\" '{print \$2}'`;
-    $subject =~ s/^\s+//;
-    $md5 =~ s/\"//g;
-    chomp($md5);
-    
+    if (-e "$xml") {
+      $md5 = `cat $xml | grep -m 1 md5 | cut -d \" \" -f 6 | egrep '^md5' | awk -F \"=\" '{print \$2}'`;
+      $subject =~ s/^\s+//;
+      $md5 =~ s/\"//g;
+      chomp($md5);
+      $xmlattach = 1;
+    } else {
+      $md5 = `cat $mailfile |grep "Submitted file" |awk -F"nepenthes" '{print \$2}'`;
+      $md5 = substr($md5, 0,32);
+      chomp($md5);
+      $xmlattach = 0;
+    }
+   
     if ("$md5" eq "") {
       # Skip this one
       next;
     } else {
       print "md5: $md5\n";
     }
+    if ($xmlattach == 1) { 
+      $body = `$c_xalanbin -in $xml -xsl $c_surfidsdir/include/ViewAnalysis.xslt`;
+      $body =~ s/'/ /g;
+      $body =~ s/\\/\\\\/g;
+      $body =~ s/\n+/\n/g;
+      $xml2 = `cat $xml`;
+      $xml2 =~ s/'/ /g;
+      $xml2 =~ s/\\/\\\\/g;
     
-    $body = `$c_xalanbin -in $xml -xsl $c_surfidsdir/include/ViewAnalysis.xslt`;
-    $body =~ s/'/ /g;
-    $body =~ s/\\/\\\\/g;
-    $body =~ s/\n+/\n/g;
-    $xml2 = `cat $xml`;
-    $xml2 =~ s/'/ /g;
-    $xml2 =~ s/\\/\\\\/g;
+      open(LOG, "> $mailfile");
+      print LOG "$body";
+      close(LOG);
+    
+      # This helps remove non-UTF8 characters that make postgres unhappy
+      $body2 = encode("utf8", $body);
+      $logit = 1; 
+    } else {
+      $body = `cat $mailfile |tail -n10`; 
+      $body = decode_qp($body);
+      open(LOG, "> $mailfile");
+      print LOG "$body";
+      close(LOG);
+      $body = `cat $mailfile |grep "You can find the report at http:" | awk -F"report at " '{print \$2}' | awk -F"---" '{print \$1}'`;
+      if ("$body" ne "") {
+        $link = encode("utf8", $body);
+	chomp($link);
+        chop($link);
 
-    open(LOG, "> $mailfile");
-    print LOG "$body";
-    close(LOG);
+	$ua = LWP::UserAgent->new;
+	$ua->agent("MyApp/0.1 ");
 
-    # This helps remove non-UTF8 characters that make postgres unhappy
-    $body2 = encode("utf8", $body);
+	my $req = HTTP::Request->new(POST => "$link");
+	$req->content_type('application/x-www-form-urlencoded');
 
-    $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
-        or die $DBI::errstr;
+	#Pass request to the user agent and get a response back
+	my $res = $ua->request($req);
+	$found = 0;
+	#Ceck the outcome of the response
+	if ($res->is_success) {
+ 	 $page = $res->content;
+  	 @lines = split("\n", $page);
+  	 foreach $line (@lines) {
+    	    if ($line =~ /liverow/) {
+               $found = 1;
+            } 
+     	    if ($line =~ /CWSandbox/ && $found == 1) {
+               $found = 2;
+            }
+            if ($line =~ /a href=/ && $found == 2) {
+     	       chomp($line);
+	       @newlink = split('\"', $line);
+	       foreach $newlink (@newlink){
+	          if ($newlink =~ /id/){
+	      	     decode_entities($newlink);
+		     $link = $newlink;
+	          }
+	       }
+	       $found = 0;
+            }
+         }
+        }
+	else {
+ 	   $logit = 0;
+	}
+	$link =~ s/details/analysis&format=xml/;
+	$link = "http://cwsandbox.org/$link";
+        print "Getting xml results for binary ID: $bin_id at $link\n";
+	`wget -q -O $xml "$link" 2>/dev/null`;
+        if ($? == 0) {
+	 $body = `$c_xalanbin -in $xml -xsl $c_surfidsdir/include/ViewAnalysis.xslt`;
+         $body =~ s/'/ /g;
+         $body =~ s/\\/\\\\/g;
+         $body =~ s/\n+/\n/g;
+         $xml2 = `cat $xml`;
+         $xml2 =~ s/'/ /g;
+         $xml2 =~ s/\\/\\\\/g;
+    
+         open(LOG, "> $mailfile");
+         print LOG "$body";
+         close(LOG);
+    
+         # This helps remove non-UTF8 characters that make postgres unhappy
+         $body2 = encode("utf8", $body);
+         $logit = 1;
+	} else { 
+	   $logit = 0;
+	}
+      } else {
+        $logit = 0;	
+      }
+    }
+      
+   if ($logit == 1) { 
     
     ## Get all binid that are already logged
     $sth_binid = $dbh->prepare("SELECT binid FROM cwsandbox");
@@ -197,17 +285,17 @@ for ($i = 1; $i <= $pop->Count(); $i++) {
     } else {
       print "CWSandbox report of binary ID: $bin_id already logged\n";
     }
+   }
   }
   if ("$md5" ne "") {
     ##############
     # BINARIES_DETAIL
     ##############
     # Check if the binary was already in the binaries_detail table.
-    $sql_checkbin = "SELECT bin FROM binaries_detail WHERE bin = $bin_id";
-    $sth_checkbin = $dbh->prepare($sql_checkbin);
-    $result_checkbin = $sth_checkbin->execute();
-    $numrows_checkbin = $sth_checkbin->rows;
-    if ($numrows_checkbin == 0) {
+    $sth_checkmd5 = $dbh->prepare("SELECT id FROM uniq_binaries WHERE name = '$md5'");
+    $execute_result = $sth_checkmd5->execute();
+    $numrows_checkmd5 = $sth_checkmd5->rows;
+    if ($numrows_checkmd5 == 0) {
     
       # If not, we add the filesize and file info to the database. 
       # Getting the info from linux file command. 

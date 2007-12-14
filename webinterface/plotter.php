@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 30-10-2007                       #
+# Version 2.10.02                  #
+# 14-12-2007                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added default settings support, interval suggest
 # 2.10.01 Added language support
 # 2.00.04 Fixed bug with the popups
 # 2.00.03 Fixed some layout issues
@@ -20,123 +21,43 @@
 # 1.04.01 Initial release
 #############################################
 
-?>
+if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
+  $qs = $_SERVER['QUERY_STRING'];
+  $qs = strip_tags($qs);
+  include_once '../include/php-ofc-library/open_flash_chart_object.php';
+  echo "<div class='centerbig'>\n";
+    echo "<div class='block'>\n";
+      echo "<div class='dataBlock'>\n";
+        echo "<div class='blockHeader'>" .$l['pl_graph']. "</div>\n";
+        echo "<div class='blockContent'>\n";
+          open_flash_chart_object(960, 600, 'showopenflash.php?'.$qs, true, "include/");
+        echo "</div>\n"; #</blockContent>
+        echo "<div class='blockFooter'></div>\n";
+      echo "</div>\n"; #</dataBlock>
+    echo "</div>\n"; #</block>
+  echo "</div>\n"; #</centerbig>
+  footer();
+  exit;
+} else {
 
-<script>
-var myplots = new Array();
-myplots[1] = "severity";
-myplots[2] = "attacks";
-myplots[3] = "ports";
-myplots[4] = "os";
-myplots[5] = "virus";
+  $sql_getdef = "SELECT d_plotter, d_plottype FROM login ";
+  $sql_getdef .= "WHERE id = $s_userid";
+  $result_getdef = pg_query($sql_getdef);
+  $debuginfo[] = $sql_getdef;
+  $row_def = pg_fetch_assoc($result_getdef);
+  $d_plotter = $row_def['d_plotter'];
+  $d_plottype = $row_def['d_plottype'];
 
-function shlinks(id) {
-  for (i=1;i<myplots.length;i++) {
-    var tab = myplots[i];
-    var but = 'button_' + tab;
-    if (tab == id) {
-      $('#switch').val(i);
-      $('#'+but).addClass('tabsel');
-      $('#'+id).show();
-    } else {
-      $('#'+but).removeClass('tabsel');
-      $('#'+tab).hide();
-    }
-  }
-  $('#'+id).blur();
-}
-
-function buildqs() {
-  var str = "";
-  var sw = $('#switch').val();
-  $("form:eq("+sw+") input").each(function(item){
-    var name = $("form:eq("+sw+") input:eq("+item+")").attr("name");
-    var val = $("form:eq("+sw+") input:eq("+item+")").val();
-    var type = $("form:eq("+sw+") input:eq("+item+")").attr("type");
-    $("form:eq("+sw+") input:eq("+item+")").blur();
-    if (type == "checkbox") {
-      var chk = $("form:eq("+sw+") input:eq("+item+")").attr("checked");
-      if (chk) {
-        if (str == "") {
-          str = str+"?"+name+"="+val;
-        } else {
-          str = str+"&"+name+"="+val;
-        }
-      }
-    } else {
-      if (str == "") {
-        str = str+"?"+name+"="+val;
-      } else {
-        str = str+"&"+name+"="+val;
-      }
-    }
-  })
-  $("form:eq("+sw+") select").each(function(item){
-    var name = $("form:eq("+sw+") select:eq("+item+")").attr("name");
-    var val = $("form:eq("+sw+") select:eq("+item+")").val();
-    if (str == "") {
-      str = str+"?"+name+"="+val;
-    } else {
-      str = str+"&"+name+"="+val;
-    }
-  })
-  method = $('#int_method').val();
-  if (str == "") {
-    str = "?int_method="+method;
+  # Calculate the best interval time
+  ########################
+  $time = $to - $from;
+  if ($time < 72001) {
+    $int_suggest = 3600;
+  } elseif ($time < 1728001) {
+    $int_suggest = 86400;
   } else {
-    str = str+"&int_method="+method;
+    $int_suggest = 604800;
   }
-  if (method == 0) {
-    location.href="plotter.php"+str;
-  } else if (method == 1) {
-    popimg("showphplot.php"+str, 600, 1000, "11%");
-  }
-  return false;
-}
-
-function popimg(url,h,w,x,y) {
-  var wh = getScrollSize();
-  $("#popupcontent").html("<center><img src='"+url+"' /></center>\n");
-
-  if (h !== null) {
-    $("#popup").height(h);
-  }
-  if (w !== null) {
-    $("#popup").width(w);
-  }
-  if (x !== null) {
-    $("#popup").css("left", x);
-  }
-  if (y !== null) {
-    $("#popup").css("top", y);
-  }
-  $("#popup").show();
-  $("#overlay").show();
-
-  $("#overlay").height(wh);
-}
-
-</script>
-
-<?php
-  if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
-    $qs = $_SERVER['QUERY_STRING'];
-    $qs = strip_tags($qs);
-    include_once 'include/php-ofc-library/open_flash_chart_object.php';
-    echo "<div class='centerbig'>\n";
-      echo "<div class='block'>\n";
-        echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>" .$l['pl_graph']. "</div>\n";
-          echo "<div class='blockContent'>\n";
-            open_flash_chart_object(960, 600, 'showopenflash.php?'.$qs);
-          echo "</div>\n"; #</blockContent>
-          echo "<div class='blockFooter'></div>\n";
-        echo "</div>\n"; #</dataBlock>
-      echo "</div>\n"; #</block>
-    echo "</div>\n"; #</centerbig>
-    footer();
-    exit;
-  } else {
 
   if ($s_admin == 1) {
     $where = "";
@@ -160,8 +81,9 @@ function popimg(url,h,w,x,y) {
             echo "<input class='tab' id='button_os' type='button' name='button_os' value='" .$l['pl_os']. "' onclick='javascript: shlinks(\"os\");' />\n";
             echo "<input class='tab' id='button_virus' type='button' name='button_virus' value='" .$l['pl_virus']. "' onclick='javascript: shlinks(\"virus\");' />\n";
             echo "<select id='int_method' name='int_method'>\n";
-              echo printOption(0, "Open Flash Chart", 0);
-              echo printOption(1, "PHPlot", 0);
+              foreach ($v_plotters_ar as $key => $plotter) {
+                echo printOption($key, $plotter, $d_plotter);
+              }
             echo "</select>\n";
           echo "</div>\n";
         echo "</div>\n"; #</blockContent>
@@ -236,9 +158,9 @@ function popimg(url,h,w,x,y) {
         echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, $l['pl_hour'], 3600);
-            echo printOption(86400, $l['pl_day'], 0);
-            echo printOption(604800, $l['pl_week'], 0);
+            echo printOption(3600, $l['pl_hour'], $int_suggest);
+            echo printOption(86400, $l['pl_day'], $int_suggest);
+            echo printOption(604800, $l['pl_week'], $int_suggest);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -247,7 +169,7 @@ function popimg(url,h,w,x,y) {
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
-              echo printOption($key, $val, 1);
+              echo printOption($key, $val, $d_plottype);
             }
           echo "</select>\n";
         echo "</td>\n";
@@ -314,9 +236,9 @@ function popimg(url,h,w,x,y) {
         echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, $l['pl_hour'], 3600);
-            echo printOption(86400, $l['pl_day'], 0);
-            echo printOption(604800, $l['pl_week'], 0);
+            echo printOption(3600, $l['pl_hour'], $int_suggest);
+            echo printOption(86400, $l['pl_day'], $int_suggest);
+            echo printOption(604800, $l['pl_week'], $int_suggest);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -325,7 +247,7 @@ function popimg(url,h,w,x,y) {
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
-              echo printOption($key, $val, 1);
+              echo printOption($key, $val, $d_plotttype);
             }
           echo "</select>\n";
         echo "</td>\n";
@@ -408,9 +330,9 @@ function popimg(url,h,w,x,y) {
         echo "<td>Interval</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, $l['pl_hour'], 3600);
-            echo printOption(86400, $l['pl_day'], 0);
-            echo printOption(604800, $l['pl_week'], 0);
+            echo printOption(3600, $l['pl_hour'], $int_suggest);
+            echo printOption(86400, $l['pl_day'], $int_suggest);
+            echo printOption(604800, $l['pl_week'], $int_suggest);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -419,7 +341,7 @@ function popimg(url,h,w,x,y) {
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
-              echo printOption($key, $val, 1);
+              echo printOption($key, $val, $d_plottype);
             }
           echo "</select>\n";
         echo "</td>\n";
@@ -514,9 +436,9 @@ function popimg(url,h,w,x,y) {
         echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, $l['pl_hour'], 3600);
-            echo printOption(86400, $l['pl_day'], 0);
-            echo printOption(604800, $l['pl_week'], 0);
+            echo printOption(3600, $l['pl_hour'], $int_suggest);
+            echo printOption(86400, $l['pl_day'], $int_suggest);
+            echo printOption(604800, $l['pl_week'], $int_suggest);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -525,7 +447,7 @@ function popimg(url,h,w,x,y) {
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
-              echo printOption($key, $val, 1);
+              echo printOption($key, $val, $d_plottype);
             }
           echo "</select>\n";
         echo "</td>\n";
@@ -602,9 +524,9 @@ function popimg(url,h,w,x,y) {
         echo "<td>" .$l['pl_int']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
-            echo printOption(3600, $l['pl_hour'], 3600);
-            echo printOption(86400, $l['pl_day'], 0);
-            echo printOption(604800, $l['pl_week'], 0);
+            echo printOption(3600, $l['pl_hour'], $int_suggest);
+            echo printOption(86400, $l['pl_day'], $int_suggest);
+            echo printOption(604800, $l['pl_week'], $int_suggest);
           echo "</select>\n";
         echo "</td>\n";
       echo "</tr>\n";
@@ -613,7 +535,7 @@ function popimg(url,h,w,x,y) {
         echo "<td>\n";
           echo "<select name='int_type'>\n";
             foreach ($v_plottertypes as $key => $val) {
-              echo printOption($key, $val, 1);
+              echo printOption($key, $val, $d_plottype);
             }
           echo "</select>\n";
         echo "</td>\n";
@@ -634,6 +556,8 @@ function popimg(url,h,w,x,y) {
 
   echo "<input type='hidden' value='1' id='switch' />\n";
 } 
-  debug_sql();
+
+debug_sql();
+
 ?>
 <?php footer(); ?>

@@ -69,6 +69,14 @@ echo "<div class='leftmed'>\n";
             echo "<td>c_footer_address</td>\n";
             echo "<td>$c_footer_address</td>\n";
           echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_language</td>\n";
+            echo "<td>$c_language</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_minified_enable</td>\n";
+            echo "<td>" .printled($c_minified_enable). "</td>\n";
+          echo "</tr>\n";
         echo "</table>\n";
 
         echo "<table class='multipletable'>\n";

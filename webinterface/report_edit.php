@@ -384,7 +384,7 @@ if ($numrows > 0) {
 #          echo "<table class='datatable'>\n";
 #            echo "<tr>\n";
 #              echo "<td>";
-                echo "<input type='submit' name='submit' value='" .$l['g_save']. "' class='button' />";
+                echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
 #              echo "</td>\n";
 #            echo "</tr>\n";
 #          echo "</table>\n";

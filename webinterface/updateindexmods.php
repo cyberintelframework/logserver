@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 24-09-2007                       #
+# Version 2.10.01                  #
+# 13-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 version 2.10
 # 2.00.02 Added hash check
 # 2.00.01 Initial release
 #############################################
@@ -43,12 +44,12 @@ $check = extractvars($_POST, $allowed_post);
 #debug_input();
 $err = 0;
 
-if (isset($clean['userid'])){
-	$userid = $clean['userid'];
-	$redirectpage=1;
+if (isset($clean['userid'])) {
+  $userid = $clean['userid'];
+  $redirectpage = 1;
 } else {
-	$userid = $s_userid;
-	$redirectpage=0;
+  $userid = $s_userid;
+  $redirectpage = 0;
 }
 
 # Checking if the logged in user actually requested this action.
@@ -96,44 +97,43 @@ if ($s_access_user < $access_user) {
 }
 
 if ($err == 0) {
-	$sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
-	$debuginfo[] = $sql_mods;
-	$result_mods = pg_query($pgconn, $sql_mods);
-        while ($row_mods = pg_fetch_assoc($result_mods)) {
-		$dbmod_id = $row_mods['indexmod_id'];
-		$mods[$dbmod_id] = $dbmod_id;
-	}
- 	if (count($mods) == 0) {
-		$mods[0] = 0;
-	}
-	$delmods = array_diff($mods, $ar_modsid); 	
- 	$addmods = array_diff($ar_modsid, $mods); 	
-	$m = "";
-
-	if (!empty($delmods)) {
-		foreach ($delmods as $key=>$modid) {
-  			$sql = "DELETE FROM indexmods_selected WHERE login_id = $userid AND indexmod_id = $modid";
-    			$debuginfo[] = $sql;
-    			$query = pg_query($pgconn, $sql);
-		}
-		$m = 3;
-	}
-	if (!empty($addmods)) {
-		foreach ($addmods as $key=>$modid) {
-  			$sql = "INSERT INTO indexmods_selected (login_id, indexmod_id) VALUES ($userid, $modid)";
-    			$debuginfo[] = $sql;
-    			$query = pg_query($pgconn, $sql);
-		}
-		$m = 3;
-        }
+  $sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
+  $debuginfo[] = $sql_mods;
+  $result_mods = pg_query($pgconn, $sql_mods);
+  while ($row_mods = pg_fetch_assoc($result_mods)) {
+    $dbmod_id = $row_mods['indexmod_id'];
+    $mods[$dbmod_id] = $dbmod_id;
+  }
+  if (count($mods) == 0) {
+    $mods[0] = 0;
+  }
+  $delmods = array_diff($mods, $ar_modsid); 	
+  $addmods = array_diff($ar_modsid, $mods); 	
+  $m = "";
+  if (!empty($delmods)) {
+    foreach ($delmods as $key=>$modid) {
+      $sql = "DELETE FROM indexmods_selected WHERE login_id = $userid AND indexmod_id = $modid";
+      $debuginfo[] = $sql;
+      $query = pg_query($pgconn, $sql);
+    }
+    $m = 3;
+  }
+  if (!empty($addmods)) {
+    foreach ($addmods as $key=>$modid) {
+      $sql = "INSERT INTO indexmods_selected (login_id, indexmod_id) VALUES ($userid, $modid)";
+      $debuginfo[] = $sql;
+      $query = pg_query($pgconn, $sql);
+    }
+    $m = 3;
+  }
 }
 # Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
 
 if ($redirectpage == 1) {
-	header("location: useredit.php?int_userid=$userid&int_m=$m");
+  header("location: useredit.php?int_userid=$userid&int_m=$m");
 } else {
-	header("location: myaccount.php?int_m=$m");
+  header("location: myaccount.php?int_m=$m");
 }
 ?>

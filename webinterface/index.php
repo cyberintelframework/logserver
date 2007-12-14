@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# Version 2.10.02                  #
+# 13-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added some comments, split up sql for readability
 # 2.10.01 Added language support
 # 2.00.02 Fixed bug with attacks.dport=0
 # 2.00.01 version 2.00
@@ -24,36 +25,33 @@
 
 session_start();
 
-$sql_modssel = "SELECT phppage FROM indexmods_selected, indexmods WHERE indexmods_selected.login_id = $s_userid AND indexmods_selected.indexmod_id = indexmods.id";
+$sql_modssel = "SELECT phppage FROM indexmods_selected, indexmods ";
+$sql_modssel .= " WHERE indexmods_selected.login_id = $s_userid AND indexmods_selected.indexmod_id = indexmods.id";
 $debuginfo[] = $sql_modssel;
 $result_modssel = pg_query($pgconn, $sql_modssel);
 while ($row_modssel = pg_fetch_assoc($result_modssel)) {
-	$phppage = $row_modssel['phppage'];
- 	$ar_phppage[]=$phppage;
-
+  $phppage = $row_modssel['phppage'];
+  $ar_phppage[] = $phppage;
 }
 $countpages = count($ar_phppage)-1; 
 
 for ($oe = 0; $oe <= $countpages; $oe++) {
   if (($oe % 2) == 0) {
-	echo "<div class='all'>\n";
-   	 echo "<div class='leftmed'>\n";
-	  include "../include/indexmods/$ar_phppage[$oe]";
- 	 echo "</div>\n";
-	 if ($oe == $countpages) {
- 	 	echo "</div>\n";
-	 } 	
+    echo "<div class='all'>\n";
+    echo "<div class='leftmed'>\n";
+    include "../include/indexmods/$ar_phppage[$oe]";
+    echo "</div>\n"; #</leftmed>
+    if ($oe == $countpages) {
+      echo "</div>\n"; #</all>
+    } 	
   }
   if (($oe % 2) != 0) {
- 	 echo "<div class='rightmed'>\n";
-	  include "../include/indexmods/$ar_phppage[$oe]";
- 	 echo "</div>\n";
-        echo "</div>\n";
+    echo "<div class='rightmed'>\n";
+    include "../include/indexmods/$ar_phppage[$oe]";
+    echo "</div>\n"; #</rightmed>
+    echo "</div>\n"; #</all>
   }
 }
- 
-
-
 
 debug_sql();
 ?>

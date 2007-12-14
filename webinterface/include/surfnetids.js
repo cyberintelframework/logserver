@@ -1,13 +1,14 @@
 /*
  * ####################################
  * # SURFnet IDS                      #
- * # Version 2.10.02                  #
- * # 30-10-2007                       #
+ * # Version 2.10.03                  #
+ * # 14-12-2007                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 2.10.03 Added selector functions
  * # 2.10.02 Fixed bug with Critera field in logsearch
  * # 2.10.01 version 2.10
  * # 2.00.01 version 2.00
@@ -287,7 +288,7 @@ function generatep() {
 /***********************************
  * Selector functions
  ***********************************/
-/*
+
 function browse(dir) {
   $("#selector_dir").val(dir);
   document.fselector.submit();
@@ -375,7 +376,34 @@ function setperiod(startofweek) {
   $("#showdate_end").html(end.print("%d-%m-%Y %H:%M"));
   $('#fselector').submit();
 }
-*/
+
+function closecal(cal) {
+  if (cal.dateClicked) {
+    var date_to = cal.date;
+
+    var ts_from = $('#field_from').val();
+    var ts_to = date_to.print("%s");
+    if (ts_to < ts_from) {
+      newto = ts_from;
+      newfrom = ts_to;
+      $('#int_to').val(newto);
+      $('#int_from').val(newfrom);
+    } else {
+      $('#showdate_end').html(date_to.print("%d-%m-%Y %H:%M"));
+      $('#int_to').val(date_to.print("%s"));
+    }
+    $('#selperiod').selectedIndex = 0;
+    $('#fromcal').hide();
+    $('#tocal').hide();
+    $('#fselector').submit();
+  }
+}
+
+function shcals() {
+  $('#fromcal').toggle();
+  $('#tocal').toggle();
+}
+
 /***********************************
  * Search page functions
  ***********************************/
@@ -569,6 +597,29 @@ function sec_to_string(sec) {
  * Plotter functions
  ***********************************/
 
+var myplots = new Array();
+myplots[1] = "severity";
+myplots[2] = "attacks";
+myplots[3] = "ports";
+myplots[4] = "os";
+myplots[5] = "virus";
+
+function shlinks(id) {
+  for (i=1;i<myplots.length;i++) {
+    var tab = myplots[i];
+    var but = 'button_' + tab;
+    if (tab == id) {
+      $('#switch').val(i);
+      $('#'+but).addClass('tabsel');
+      $('#'+id).show();
+    } else {
+      $('#'+but).removeClass('tabsel');
+      $('#'+tab).hide();
+    }
+  }
+  $('#'+id).blur();
+}
+
 function sh_plotsevtype(id) {
   status = $("#plotsev_"+id).val();
   found = 0;
@@ -583,6 +634,76 @@ function sh_plotsevtype(id) {
   } else {
     $(".plotsevtype_"+id).hide();
   }
+}
+
+function popimg(url,h,w,x,y) {
+  var wh = getScrollSize();
+  $("#popupcontent").html("<center><img src='"+url+"' /></center>\n");
+
+  if (h !== null) {
+    $("#popup").height(h);
+  }
+  if (w !== null) {
+    $("#popup").width(w);
+  }
+  if (x !== null) {
+    $("#popup").css("left", x);
+  }
+  if (y !== null) {
+    $("#popup").css("top", y);
+  }
+  $("#popup").show();
+  $("#overlay").show();
+
+  $("#overlay").height(wh);
+}
+
+function buildqs() {
+  var str = "";
+  var sw = $('#switch').val();
+  $("form:eq("+sw+") input").each(function(item){
+    var name = $("form:eq("+sw+") input:eq("+item+")").attr("name");
+    var val = $("form:eq("+sw+") input:eq("+item+")").val();
+    var type = $("form:eq("+sw+") input:eq("+item+")").attr("type");
+    $("form:eq("+sw+") input:eq("+item+")").blur();
+    if (type == "checkbox") {
+      var chk = $("form:eq("+sw+") input:eq("+item+")").attr("checked");
+      if (chk) {
+        if (str == "") {
+          str = str+"?"+name+"="+val;
+        } else {
+          str = str+"&"+name+"="+val;
+        }
+      }
+    } else {
+      if (str == "") {
+        str = str+"?"+name+"="+val;
+      } else {
+        str = str+"&"+name+"="+val;
+      }
+    }
+  })
+  $("form:eq("+sw+") select").each(function(item){
+    var name = $("form:eq("+sw+") select:eq("+item+")").attr("name");
+    var val = $("form:eq("+sw+") select:eq("+item+")").val();
+    if (str == "") {
+      str = str+"?"+name+"="+val;
+    } else {
+      str = str+"&"+name+"="+val;
+    }
+  })
+  method = $('#int_method').val();
+  if (str == "") {
+    str = "?int_method="+method;
+  } else {
+    str = str+"&int_method="+method;
+  }
+  if (method == 0) {
+    location.href="plotter.php"+str;
+  } else if (method == 1) {
+    popimg("showphplot.php"+str, 600, 1000, "11%");
+  }
+  return false;
 }
 
 /***********************************

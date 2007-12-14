@@ -111,10 +111,8 @@ $main_tab = $tabar[0];
 $sub_tab = $tabar[1];
 
 if ($c_minified_enable == 1) {
-  $mindir = "min/";
   $min = "-min";
 } else {
-  $mindir = "";
   $min = "";
 }
 
@@ -126,13 +124,13 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<link rel='stylesheet' href='${address}include/design.css' />\n";
     echo "<style type='text/css'>@import url('${address}include/calendar.css');</style>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
-    echo "<script type='text/javascript' src='${address}include/overlib/overlib.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
-    echo "<script type='text/javascript' src='${address}include/${mindir}jquery-1.2.1${min}.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/${mindir}jquery.selectboxes${min}.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/${mindir}surfnetids${min}.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/${mindir}calendar${min}.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/${mindir}calendar-en${min}.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/${mindir}calendar-setup${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/overlib/overlib${min}.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
+    echo "<script type='text/javascript' src='${address}include/jquery-1.2.1${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/jquery.selectboxes${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/surfnetids${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/calendar${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/calendar-en${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/calendar-setup${min}.js'></script>\n";
   echo "</head>\n";
   echo "<body>\n";
   echo "<div id='page'>\n";
@@ -457,8 +455,8 @@ function insert_selector($m_show = 1) {
         $qs_ar = split("&", $qs);
         foreach ($qs_ar as $pair) {
           $pair_ar = split("=", $pair);
-          $key = $pair_ar[0];
-          $val = $pair_ar[1];
+          $key = strip_tags($pair_ar[0]);
+          $val = strip_tags($pair_ar[1]);
           if (!in_array($key, $check_ar)) {
             $val = str_replace("%3A", ":", "$val");
             $key = str_replace("%5B", "[", "$key");
@@ -482,125 +480,6 @@ function insert_selector($m_show = 1) {
       $('#showdate_start').html(date_from.print("%d-%m-%Y %H:%M"));
       $('#int_from').val(date_from.print("%s"));
     }
-
-    function closecal(cal) {
-      if (cal.dateClicked) {
-        var date_to = cal.date;
-
-        var ts_from = $('#field_from').val();
-        var ts_to = date_to.print("%s");
-        if (ts_to < ts_from) {
-          newto = ts_from;
-          newfrom = ts_to;
-          $('#int_to').val(newto);
-          $('#int_from').val(newfrom);
-        } else {
-          $('#showdate_end').html(date_to.print("%d-%m-%Y %H:%M"));
-          $('#int_to').val(date_to.print("%s"));
-        }
-        $('#selperiod').selectedIndex = 0;
-        $('#fromcal').hide();
-        $('#tocal').hide();
-        $('#fselector').submit();
-      }
-    }
-
-    function shcals() {
-      $('#fromcal').toggle();
-      $('#tocal').toggle();
-    }
-
-/***********************************
- * Selector functions
- ***********************************/
-
-function browse(dir) {
-  $("#selector_dir").val(dir);
-  document.fselector.submit();
-}
-
-function setperiod(startofweek) {
-  var period = $("#selperiod").val();
-  var start = new Date();
-  var end = new Date();
-
-  if (period == 1) {
-    start.setHours(start.getHours()-1);
-  } else if (period == 2) {
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    end.setHours(0);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    end.setDate(end.getDate()+1);
-  } else if (period == 3) {
-    start.setDate(start.getDate()-7);
-  } else if (period == 4) {
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    end.setHours(0);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    var d = start.getDay();
-    var d = d - startofweek;
-    var d = start.getDate() - d;
-    start.setDate(d);
-    end.setDate(d + 7);
-  } else if (period == 5) {
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    end.setHours(0);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    var d = start.getDay();
-    var d = d - startofweek;
-    var d = start.getDate() - d;
-    var d = d - 7;
-    start.setDate(d);
-    end.setDate(d + 7);
-  } else if (period == 6) {
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start.setDate(1);
-    end.setHours(0);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    end.setDate(1);
-    end.setMonth(end.getMonth()+1);
-  } else if (period == 7) {
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start.setMonth(start.getMonth()-1);
-    start.setDate(1);
-    end.setHours(0);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    end.setDate(1);
-  } else if (period == 8) {
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start.setDate(1);
-    start.setMonth(0);
-    end.setHours(0);
-    end.setMinutes(0);
-    end.setSeconds(0);
-    end.setDate(1);
-    end.setMonth(0);
-    end.setFullYear(end.getFullYear()+1);
-  }
-
-  $("#int_from").val(start.print("%s"));
-  $("#int_to").val(end.print("%s"));
-  $("#showdate_start").html(start.print("%d-%m-%Y %H:%M"));
-  $("#showdate_end").html(end.print("%d-%m-%Y %H:%M"));
-  $('#fselector').submit();
-}
 
     Calendar.setup(
       {

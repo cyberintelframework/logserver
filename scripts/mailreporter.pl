@@ -2,8 +2,8 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 23-10-2007                       #
+# Version 2.10.02                  #
+# 13-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 2.10.02 Normal text mails are now sent without attachment
 # 2.10.01 Added Cymru mail report
 # 2.00.01 version 2.00 - improved mailreporter
 # 1.04.10 Fixed a bug with the ARP template
@@ -77,7 +78,7 @@ use POSIX qw(ceil);
 ####################
 # Variables used
 ####################
-do '/etc/surfnetids/2.10-log.conf';
+do '/etc/surfnetids/surfnetids-log.conf';
 
 $logfile = $c_logfile;
 $logfile =~ s|.*/||;
@@ -311,7 +312,9 @@ while (@row = $email_query->fetchrow_array) {
 
       $totalcount = 0;
       if ($detail =~ /^(0|2)$/) {
-        ############# Summary
+
+        # Summary
+        ###############################################
         printmail("######### Summary #########");
         $sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total ";
         $sql .= " FROM attacks, sensors, severity WHERE attacks.severity = severity.val ";
@@ -336,7 +339,9 @@ while (@row = $email_query->fetchrow_array) {
 
       if ($detail =~ /^(1|2)$/) {
         $totalcount = 0;
-        ############# Detail overview
+
+        # Detailed overview
+        ###############################################
         printmail("######### Detail overview #########");
         $sql = "SELECT attacks.source, attacks.timestamp, details.text, sensors.keyname, sensors.vlanid ";
         $sql .= "FROM attacks ";
@@ -378,6 +383,8 @@ while (@row = $email_query->fetchrow_array) {
         ############# Detail overview
       }
       if ($detail == 3) {
+        # IDMEF
+        ###############################################
         $sql = "SELECT attacks.id, sensors.keyname, sensors.vlanid, attacks.timestamp, attacks.severity, severity.txt, attacks.source, ";
         $sql .= " attacks.sport, attacks.dest, attacks.dport, details.text ";
         $sql .= " FROM attacks ";
@@ -463,6 +470,8 @@ while (@row = $email_query->fetchrow_array) {
       }
 
       if ($detail == 4) {
+        # CYMRU format
+        ###############################################
         $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
         $sql .= "FROM attacks ";
         $sql .= " INNER JOIN sensors ";
@@ -518,6 +527,7 @@ while (@row = $email_query->fetchrow_array) {
       }
 
       # Checking for threshold stuff
+      ###############################################
       if ($threshold > -1) {
         $sendit = 0;
         $printcheck = "Measured attacks for the $tsstring ($totalcount) $oper Allowed attacks ($threshold)";
@@ -560,7 +570,9 @@ while (@row = $email_query->fetchrow_array) {
       if ($count > 0) {
         @rangerow = split(/;/, "@rangerow");
         if ($detail =~ /^(0|2)$/) {
-          ############# Summary
+
+          # Summary
+          ###############################################
           printmail("######### Summary #########");
 
           %sevhash = ();
@@ -595,6 +607,9 @@ while (@row = $email_query->fetchrow_array) {
         }
 
         if ($detail =~ /^(1|2)$/) {
+
+          # Detailed overview
+          ###############################################
           $totalcount = 0;
           printmail("######### Detail overview #########");
           printmail("Source IP\t\tTimestamp\t\tAdditional info");
@@ -638,6 +653,9 @@ while (@row = $email_query->fetchrow_array) {
         } #/detail
 
         if ($detail == 3) {
+
+          # IDMEF
+          ###############################################
           $totalcount = 0;
           printattach("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
           printattach("<!DOCTYPE IDMEF-Message PUBLIC \"-//IETF//DTD RFC XXXX IDMEF v1.0//EN\" \"idmef-message.dtd\">");
@@ -726,6 +744,7 @@ while (@row = $email_query->fetchrow_array) {
         }
 
         # Checking for threshold stuff
+        ###############################################
         if ($threshold > -1) {
           $sendit = 0;
           $printcheck = "Measured attacks for the $tsstring ($totalcount) $oper Allowed attacks ($threshold)";
@@ -782,13 +801,18 @@ while (@row = $email_query->fetchrow_array) {
 
         if ("$status" ne "") {
           if ("$severity" eq "-1") {
+
+            # Checking for offline sensors
+            ###############################################
             if ($status == 0) {
               $sendit = 1;
               printmail("$keyname is down!");
               printmail("");
             } elsif ($status == 1) {
               if ("$tap" eq "") {
-                # Sensor is starting up
+
+                # Checking for failed startups (of sensors)
+                ###############################################
                 $check = $laststart + (10 * $minute);
                 if ($ts_now > $check) {
                   # Sensor has been trying to start for 10 minutes now
@@ -801,7 +825,9 @@ while (@row = $email_query->fetchrow_array) {
           } elsif ($severity == 1) {
             if ($status == 1) {
               if ("$tap" eq "") {
-                # Sensor is starting up
+
+                # Checking for failed startups (of sensors)
+                ###############################################
                 $check = $laststart + (10 * $minute);
                 if ($ts_now > $check) {
                   # Sensor has been trying to start for 10 minutes now
@@ -812,6 +838,9 @@ while (@row = $email_query->fetchrow_array) {
               } #/$tap
             } #/$status
           } elsif ($severity == 2) {
+
+            # Checking for offline sensors
+            ###############################################
             if ("$status" eq "0") {
               $sendit = 1;
               printmail("$keyname is down!");
@@ -851,9 +880,11 @@ sub sendmail {
   
   print "Sending mailreport to $email\n";
   
-  $maildata = "/tmp/" .$id. ".mail";
-  $attachdata = "$maildata" . "attach";
-  $sigmaildata = "$maildata" . ".sig";
+  $mailfile = "/tmp/" .$id. ".mail";
+  $maildata = `cat $mailfile`;
+  chomp($maildata);
+  $attachfile = "$mailfile" . "attach";
+  $sigfile = "$mailfile" . ".sig";
   $mail_host = 'localhost';
   
   # Prepare subject
@@ -874,7 +905,9 @@ sub sendmail {
   if ($gpg_enabled == 1) {
     # Encrypt the mail with gnupg 
     $gpg = new GnuPG();
-    $gpg->clearsign(plaintext => "$maildata", output => "$sigmaildata", armor => 1, passphrase => $c_passphrase);
+    $gpg->clearsign(plaintext => "$mailfile", output => "$sigfile", armor => 1, passphrase => $c_passphrase);
+    $sigdata = `cat $sigfile`;
+    chomp($sigdata);
   }
   
   #### Create the multipart container
@@ -891,23 +924,24 @@ sub sendmail {
   else { $header_priority = "3 (Normal)"; }
   $msg->add('X-Priority' => $header_priority);
   
-  if ($gpg_enabled == 1) { $final_maildata  = $sigmaildata; }
-  else { $final_maildata = $maildata; }
+#  if ($gpg_enabled == 1) { $final_maildata  = $sigmaildata; }
+#  else { $final_maildata = $maildata; }
+  if ($gpg_enabled == 1) { $maildata  = $sigdata; }
   ### Add the (signed) file
   $msg->attach (
     Type => 'text/plain; charset=ISO-8859-1',
-    Path => $final_maildata,
-    Filename => $final_maildata,
-  ) or die "Error adding $final_maildata: $!\n";
+    Data => $maildata
+#    Filename => $final_maildata,
+  ) or die "Error adding $maildata: $!\n";
 
   if ($attach == 1) {
     ### Add binary file as attachement
     $msg->attach (
       Type => 'text/xml',
-      Path => $attachdata,
+      Path => $attachfile,
       Filename => "IDMEF-$id-$ts_now.xml",
       Disposition => 'attachment'
-    ) or die "Error adding $attachdata: $!\n";
+    ) or die "Error adding $attachfile: $!\n";
   }
 
   ### Send the Message
@@ -924,14 +958,14 @@ sub sendmail {
   printlog("Mailed stats for $sub_date to: $email with organisation $org");
   
   # Delete the mail and signed mail
-  if (-e "$maildata") {
-    system("rm $maildata");
+  if (-e "$mailfile") {
+    system("rm $mailfile");
   }
-  if (-e "$final_maildata") {
-    system("rm $final_maildata");
+  if (-e "$sigfile") {
+    system("rm $sigfile");
   }
-  if (-e "$attachdata") {
-    system("rm $attachdata");
+  if (-e "$attachfile") {
+    system("rm $attachfile");
   }
 }
 

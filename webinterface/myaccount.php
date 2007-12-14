@@ -70,15 +70,11 @@ if ($err == 0) {
   $maillog = $row['maillog'];
   $access = $row['access'];
   $gpg = $row['gpg'];
-  if ($s_admin == 1) {
-    $access_sensor = 9;
-    $access_search = 9;
-    $access_user = 9;
-  } else {
-    $access_sensor = $access{0};
-    $access_search = $access{1};
-    $access_user = $access{2};
-  }
+  $access_sensor = $access{0};
+  $access_search = $access{1};
+  $access_user = $access{2};
+  $d_plotter = $row['d_plotter'];
+  $d_plottype = $row['d_plottype'];
 
   echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
 ?>
@@ -221,41 +217,85 @@ if ($err == 0) {
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</left>
-  
+
   echo "<div class='rightmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['ma_edit']. " " .$l['ma_modules']. "</div>\n";
+        echo "<div class='blockHeader'>" .$l['ma_pref']. "</div>\n";
         echo "<div class='blockContent'>\n";
+          echo "<form name='preferences' action='updatepref.php' method='get'>\n";
+            echo "<table class='datatable'>\n";
+              echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_graph']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_plotter'>\n";
+                    foreach ($v_plotters_ar as $key => $plotter) {
+                      echo printOption($key, $plotter, $d_plotter);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_graph_type']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_plottype'>\n";
+                    foreach ($v_plottertypes as $key => $plottype) {
+                      echo printOption($key, $plottype, $d_plottype);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td colspan='2'><input class='button aright' type='submit' name='submit' value='" .$l['g_update']. "' /></td>\n";
+                echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+                echo "<input type='hidden' name='int_userid' value='$s_userid' />\n";
+                echo "<input type='hidden' name='int_my' value='1' />\n";
+              echo "</tr>\n";
+            echo "</table>\n";
+          echo "</form>\n";
+        echo "</div>\n"; #</blockContent>
+        echo "<div class='blockFooter'></div>\n";
+      echo "</div>\n"; #</dataBlock>
+    echo "</div>\n"; #</block>
+  echo "</div>\n"; #</rightmed>
 
-	$sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
-	$debuginfo[] = $sql_mods;
-	$result_mods = pg_query($pgconn, $sql_mods);
-        while ($row_mods = pg_fetch_assoc($result_mods)) {
-		$mod_id = $row_mods['indexmod_id'];
-		$mods[$mod_id] = $mod_id;
-	}
+  echo "<div class='rightmed'>\n";
+    echo "<div class='block'>\n";
+      echo "<div class='dataBlock'>\n";
+        echo "<div class='blockHeader'>" .$l['ma_modules']. "</div>\n";
+        echo "<div class='blockContent'>\n";
+          $sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
+          $debuginfo[] = $sql_mods;
+          $result_mods = pg_query($pgconn, $sql_mods);
+          while ($row_mods = pg_fetch_assoc($result_mods)) {
+            $mod_id = $row_mods['indexmod_id'];
+            $mods[$mod_id] = $mod_id;
+          }
           echo "<form name='indexmods' action='updateindexmods.php' method='post'>\n";
-                echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
-                echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
-                echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
-                echo printCheckBox("".$l['mo_top10']. " ".$l['in_attackers']."", "mods[]", 4, $mods[4]) . "<br />\n";
-                echo printCheckBox("".$l['mo_top10']." ".$l['ra_proto_org']."", "mods[]", 5, $mods[5]) . "<br />\n";
-                echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
-                echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
-                echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
-                echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
-                echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
-                echo printCheckBox("".$l['mo_top10']." ".$l['pl_sensors']."", "mods[]", 11, $mods[11]) . "<br />\n";
-             echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />\n";
-            echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+            echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
+            echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
+            echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
+            echo printCheckBox($l['mo_top10']." ".$l['in_attackers'], "mods[]", 4, $mods[4]) . "<br />\n";
+            echo printCheckBox($l['mo_top10']." ".$l['ra_proto_org'], "mods[]", 5, $mods[5]) . "<br />\n";
+            echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
+            echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
+            echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
+            echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
+            echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
+            echo printCheckBox($l['mo_top10']." ".$l['pl_sensors'], "mods[]", 11, $mods[11]) . "<br />\n";
+            echo "<table class='datatable'>\n";
+              echo "<tr><td>\n";
+                echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button aright' />\n";
+                echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+              echo "</td></tr>\n";
+            echo "</table>\n";
           echo "</form>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</right>
-  echo "</div>\n";
+  echo "</div>\n"; #</all>
 }
 
 pg_close($pgconn);

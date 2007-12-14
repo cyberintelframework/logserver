@@ -2,26 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 08-10-2007                       #
+# Version 2.10.02                  #
+# 14-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.02 Fixed a bug with empty data points
-# 2.00.01 version 2.00
-# 1.04.11 Fixed attack-dialogue graph
-# 1.04.10 Added IP exclusions stuff
-# 1.04.09 Shows empty graph when no data
-# 1.04.08 Added data colors array, background color
-# 1.04.07 Added virus graphs
-# 1.04.06 Fixed bug when not giving any port exclusions
-# 1.04.05 Added extra dport and timestamp functionality 
-# 1.04.04 Fixed bugs with organisation  
-# 1.04.03 Location of phplot.php is a config value now
-# 1.04.02 Fixed typo
-# 1.04.01 Initial release
+# 2.10.02 Fixed a bug with the severity
+# 2.10.01 Initial release
 #############################################
 
 include '../include/config.inc.php';
@@ -115,7 +104,7 @@ add_to_sql("$query_org", "where");
 ########################
 # Severity
 ########################
-if ($tainted['severity']) {
+if (isset($tainted['severity'])) {
   $sev = $tainted['severity'];
   $sev_ar = explode(",", $sev);
 
@@ -125,7 +114,6 @@ if ($tainted['severity']) {
 
   $atype = $tainted['sevtype'];
   $atype_ar = explode(",", $atype);
-
   if ($sev_ar[0] == -1) {
     if ($clean['virus']) {
       of_title("Downloaded malware");
@@ -710,7 +698,7 @@ if ($x_steps == 0) {
 
 # Including the php open flash library
 ###############################################
-include_once( 'include/php-ofc-library/open-flash-chart.php' );
+include_once('../include/php-ofc-library/open-flash-chart.php');
 
 # Initialising the new graph
 ###############################################
@@ -733,25 +721,17 @@ $g->y_axis_colour( '#8499A4', '#E4F5FC' );
 # Determining the step size of the y axis
 ###############################################
 if ($y_max != 0) {
-  echo "Y_MAX1: $y_max<br />\n";
   $rp = -(strlen($y_max) - 1);
-  echo "RP: $rp<br />\n";
   $y_max = roundup($y_max, $rp);
-  echo "Y_MAX2: $y_max<br />\n";
   $rp = strlen($y_max) - 1;
-  echo "RP: $rp<br />\n";
   if ($rp == 0) {
     $rp = 1;
   }
-  echo "RP: $rp<br />\n";
   $deler = substr($y_max, 0, $rp);
-  echo "DELER: $deler<br />\n";
   $y_steps = round($y_max / $deler);
-  echo "Y_STEPS1: $y_steps<br />\n";
   if ($y_max < 20) {
     $y_steps = $y_max;
   }
-  echo "Y_STEPS2: $y_steps<br />\n";
 } else {
   $y_max = 10;
   $y_steps = 10;

@@ -344,7 +344,9 @@ $v_errors = array(
 		149 => "Invalid or missing status!",
 		150 => "Invalid or missing group ID!",
 		151 => "Sensor already a member of this group!",
-		152 => "The group needs to be approved by an admin first!"
+		152 => "The group needs to be approved by an admin first!",
+		153 => "Invalid or missing default graph!",
+		154 => "Invalid or missing default graph type!"
 );
 
 # Array for the different types of plots available.
@@ -584,6 +586,11 @@ $v_group_status_ar = array(
 $v_groupmember_status_ar = array(
 	0 => "Waiting for approval",
 	1 => "Member"
+);
+
+$v_plotters_ar = array(
+	0 => "Open Flash Chart",
+	1 => "PHPlot"
 );
 
 ?>

@@ -264,6 +264,7 @@ $l['ls_search_crit']		= "Search Criteria";
 $l['ls_fo']			= "file-offered";
 $l['ls_at']			= "attack-type";
 $l['ls_timestamp']		= "Timestamp";
+$l['ls_graphit']		= "Graph it!";
 
 ##########################
 # maldownloaded.php
@@ -336,7 +337,10 @@ $l['ma_asearch']		= "Access: Search";
 $l['ma_auseradmin']		= "Access: User Admin";
 $l['ma_arpac']			= "ARP access";
 $l['ma_argosac']		= "ARGOS access";
-$l['ma_modules']		= "Modules";
+$l['ma_modules']		= "My Home";
+$l['ma_pref']			= "My preferences";
+$l['ma_def_graph']		= "Default graph";
+$l['ma_def_graph_type']		= "Default graph type";
 
 ##########################
 # myreports.php

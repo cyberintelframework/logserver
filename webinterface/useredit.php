@@ -90,15 +90,11 @@ if ($err == 0) {
   $maillog = $row['maillog'];
   $access = $row['access'];
   $gpg = $row['gpg'];
-  if ($s_admin == 1 && $s_userid == $id) {
-    $access_sensor = 9;
-    $access_search = 9;
-    $access_user = 9;
-  } else {
-    $access_sensor = $access{0};
-    $access_search = $access{1};
-    $access_user = $access{2};
-  }
+  $access_sensor = $access{0};
+  $access_search = $access{1};
+  $access_user = $access{2};
+  $d_plotter = $row['d_plotter'];
+  $d_plottype = $row['d_plottype'];
 
   echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
 ?>
@@ -241,6 +237,46 @@ if ($err == 0) {
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
    echo "</div>\n"; #</leftmed>
+
+  echo "<div class='rightmed'>\n";
+    echo "<div class='block'>\n";
+      echo "<div class='dataBlock'>\n";
+        echo "<div class='blockHeader'>" .$l['ma_pref']. "</div>\n";
+        echo "<div class='blockContent'>\n";
+          echo "<form name='preferences' action='updatepref.php' method='get'>\n";
+            echo "<table class='datatable'>\n";
+              echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_graph']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_plotter'>\n";
+                    foreach ($v_plotters_ar as $key => $plotter) {
+                      echo printOption($key, $plotter, $d_plotter);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_graph_type']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_plottype'>\n";
+                    foreach ($v_plottertypes as $key => $plottype) {
+                      echo printOption($key, $plottype, $d_plottype);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td colspan='2'><input class='button aright' type='submit' name='submit' value='" .$l['g_update']. "' /></td>\n";
+                echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+                echo "<input type='hidden' name='int_userid' value='$s_userid' />\n";
+              echo "</tr>\n";
+            echo "</table>\n";
+          echo "</form>\n";
+        echo "</div>\n"; #</blockContent>
+        echo "<div class='blockFooter'></div>\n";
+      echo "</div>\n"; #</dataBlock>
+    echo "</div>\n"; #</block>
+  echo "</div>\n"; #</rightmed>
 
   echo "<div class='rightmed'>\n";
     echo "<div class='block'>\n";

@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.03                  #
-# 05-11-2007                       #
+# Version 2.10.05                  #
+# 11-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 2.10.05 Fixed BUG #59
 # 2.10.04 Fixed BUGS #42 + #43 
 # 2.10.03 Fixed a typo
 # 2.10.02 Fixed bug with Criterea 
@@ -524,7 +525,10 @@ echo "<div class='leftmed'>";
                 if (!isset($destination_ip) && !isset($dest_mac) && $sensorid == 0) echo $l['ls_all'];
                 if (isset($sensorid)) {
                   if ($sensorid == 0) {} 
-                  elseif ($sensorid > 0) echo "$sensorid";
+                  elseif ($sensorid > 0) {
+                    echo "$sensorid";
+                    $graph[] = "sensorid=$sensorid";
+                  }
                   else {
                     foreach ($ar_sensorid as $key=>$sid) {
                       if ($q_org == 0) {
@@ -551,12 +555,18 @@ echo "<div class='leftmed'>";
                         }
                         echo "$name<br />\n";
                       }
+                      $sensorstring .= $sid . ",";
                     }
+                    $sensorstring = trim($sensorstring, ",");
+                    $graph[] = "sensorid=$sensorstring";
                   }
                 }
 	        if (isset($destination_ip)) echo "$destination_ip";
                 if (isset($dest_mac)) echo "$dest_mac";
-                if (isset($dport)) echo ":$dport";
+                if (isset($dport)) {
+                  echo ":$dport";
+                  $graph[] = "strip_html_escape_ports=$dport";
+                }
               echo "</th>\n";
               echo "<td width='17%' class='aright'><a onclick='\$(\"#search_dest\").toggle();'>" .$l['ls_change']. "</a></td>\n";
             echo "</tr>\n";
@@ -767,14 +777,33 @@ echo "<div class='leftmed'>";
           echo "<tr>";
             echo "<td width='18%'></td>";
             echo "<td width='80%'>";
-              if (isset($f_sev)) echo $l['ls_sev']. ": <font class='btext'>$v_severity_ar[$f_sev]</font><br />";
-              if (isset($f_sevtype) && $f_sev == 1) echo $l['ls_sevtype']. ": <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
+              if (isset($f_sev)) {
+                echo $l['ls_sev']. ": <font class='btext'>$v_severity_ar[$f_sev]</font><br />";
+                if (isset($f_sevtype)) {
+                  if ($f_sevtype != 0) {
+                    $graph[] = "severity=$f_sev";
+                  }
+                } else {
+                  $graph[] = "severity=$f_sev";
+                }
+              }
+              if (isset($f_sevtype) && $f_sev == 1) {
+                echo $l['ls_sevtype']. ": <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
+                if ($f_sevtype == 0) {
+                  $graph[] = "attack=-1";
+                } else {
+                  $graph[] = "sevtype=$f_sevtype";
+                }
+              } elseif ($f_sev == 1) {
+                $graph[] = "sevtype=-1&int_totalmal1=1";
+              }
               if (isset($f_attack) && $f_sev == 1) {
                 $sql_g = "SELECT name FROM stats_dialogue WHERE id = '$f_attack'";
                 $result_g = pg_query($pgconn, $sql_g);
                 $row_g = pg_fetch_assoc($result_g);
                 $expl = $row_g['name'];
                 $expl = str_replace("Dialogue", "", $expl);
+                $graph[] = "attack=$f_attack";
                 if ($expl != "") echo $l['ls_exp']. ": <font class='btext'>$expl</font><br />";
               }
               if (isset($f_binname) && $f_sev == 32) echo $l['ls_binname']. ": <font class='btext'>$f_binname</font><br />";
@@ -889,6 +918,27 @@ echo "<div class='leftmed'>";
   echo "</div>\n"; #</block>
 echo "</div>\n"; #</leftsmall>
 
+if (count($graph) != 0) {
+  foreach ($graph as $key=>$val) {
+    if ($key == 0) {
+      $g = "?$val";
+    } else {
+      $g .= "&$val";
+    }
+  }
+  if ($g != "") {
+    $g .= "&int_type=1";
+    $time = $to - $from;
+    if ($time < 72001) {
+      $g .= "&int_interval=3600";
+    } elseif ($time < 1728001) {
+      $g .= "&int_interval=86400";
+    } else {
+      $g .= "&int_interval=604800";
+    }
+  }
+}
+
 echo "<div class='leftmed'>\n";
   echo "<div class='block'>\n";
     echo "<div class='actionBlock'>\n";
@@ -897,6 +947,10 @@ echo "<div class='leftmed'>\n";
         $qs = $_SERVER['QUERY_STRING'];
         echo "<a href='logsearch_pdf.php?$qs'>" .$l['ls_saveas']. " PDF</a><br />";
         echo "<a href='logsearch_idmef.php?$qs'>" .$l['ls_saveas']. " IDMEF</a><br />";
+
+        echo "<a href='plotter.php$g'>" .$l['ls_graphit']. "</a><br />";
+
+
         echo "<a onclick='\$(\"#templates\").toggle();'>" .$l['ls_saveas']. " " .$l['ls_stemp']. "</a>";
         echo "<div id='templates' style='display: none;'>\n";
           echo "<form name='temp' action='template_add.php?$qs' method='post'>\n";
@@ -978,22 +1032,30 @@ if ($num_rows == 0) {
 $nav = "";
 $url = preg_replace('/&$/', '', $url);
 $url = str_replace("&int_page=" . $clean["page"], "", $url);
+$url = str_replace("?int_page=" . $clean["page"], "", $url);
+$url = trim($url, "?");
+$count = substr_count($url, "?");
+if ($count == 0) {
+  $oper = "?";
+} else {
+  $oper = "&";
+}
 if ($page_nr == 1) $nav .= "<img src='images/selector_arrow_left.gif'>\n";
-else $nav .= "<a href=\"$url&int_page=" . ($page_nr - 1) . "\"><img src='images/selector_arrow_left.gif'></a>&nbsp;<a href='$url&int_page=1'>1</a>&nbsp;..\n";
+else $nav .= "<a href=\"${url}${oper}int_page=" . ($page_nr - 1) . "\"><img src='images/selector_arrow_left.gif'></a>&nbsp;<a href='${url}${oper}int_page=1'>1</a>&nbsp;..\n";
 for ($i = ($page_nr - 2); $i <= ($page_nr + 2); $i++) {
   if (($i > 0) && ($i <= $last_page)) {
     if (($i == $page_nr) && ($i == ($last_page - 1)))  $nav .= "<font class='btext'><font size='3'>$i</font></font>\n"; 
     elseif ($i == $page_nr)  $nav .= "<font class='btext'><font size='3'>$i</font></font>&nbsp;"; 
     elseif ($i == 1) $nav .= "\n";
     elseif ($i == $last_page) $nav .= "\n";
-    elseif ($i == ($last_page - 1)) $nav .= "<a href=\"$url&int_page=$i\">$i</a>\n";
-    else  $nav .= "<a href=\"$url&int_page=$i\">$i</a>&nbsp;";
+    elseif ($i == ($last_page - 1)) $nav .= "<a href=\"${url}${oper}int_page=$i\">$i</a>\n";
+    else  $nav .= "<a href=\"${url}${oper}int_page=$i\">$i</a>&nbsp;";
   }
 }
-if ($page_nr < $last_page) $nav .= "..&nbsp;<a href='$url&int_page=$last_page'>$last_page</a>&nbsp;<a href=\"$url&int_page=" . ($page_nr + 1) . "\"><img src='images/selector_arrow_right.gif'></a>\n";
+if ($page_nr < $last_page) $nav .= "..&nbsp;<a href='${url}${oper}int_page=$last_page'>$last_page</a>&nbsp;<a href=\"${url}${oper}int_page=" . ($page_nr + 1) . "\"><img src='images/selector_arrow_right.gif'></a>\n";
 else $nav .= "<img src='images/selector_arrow_right.gif'>\n";
-if ($rapport == "single") $nav .= "&nbsp;<a href='$url&reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
-if ($rapport == "multi") $nav .= "&nbsp;<a href='$url&reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
+if ($rapport == "single") $nav .= "&nbsp;<a href='${url}${oper}reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
+if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
 
 ####################
 # BUILDING SEARCH QUERY

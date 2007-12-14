@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 13-12-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Replaced addslashes with pg_escape_string
 # 2.00.01 Initial release
 #############################################
 
@@ -43,42 +44,40 @@ $check = extractvars($_GET, $allowed_get);
 
 $type = $clean['type'];
 if (isset($tainted['search']) && $tainted['search'] != '') {
-$q = addslashes($tainted['search']);
-if ($c_autocomplete == 1) {
-  if ($s_access_search != 9) {
-    $sql_smac1 = "SELECT DISTINCT src_mac FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND src_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit ";
-    $sql_smac2 = "SELECT DISTINCT mac FROM sensors WHERE sensors.organisation = $s_org AND mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_dmac = "SELECT DISTINCT dst_mac FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND dst_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_dda = "SELECT DISTINCT dest FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND dest::char varying LIKE '$q%' LIMIT $c_suggest_limit ";
-    $sql_dsa = "SELECT DISTINCT source FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND source::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_vir = "SELECT name FROM stats_virus WHERE name LIKE '$q%' LIMIT $c_suggest_limit";
+  $q = pg_escape_string($tainted['search']);
+  if ($c_autocomplete == 1) {
+    if ($s_access_search != 9) {
+      $sql_smac1 = "SELECT DISTINCT src_mac FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND src_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit ";
+      $sql_smac2 = "SELECT DISTINCT mac FROM sensors WHERE sensors.organisation = $s_org AND mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_dmac = "SELECT DISTINCT dst_mac FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND dst_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_dda = "SELECT DISTINCT dest FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND dest::char varying LIKE '$q%' LIMIT $c_suggest_limit ";
+      $sql_dsa = "SELECT DISTINCT source FROM attacks, sensors WHERE attacks.sensorid = sensors.id AND sensors.organisation = $s_org AND source::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_vir = "SELECT name FROM stats_virus WHERE name LIKE '$q%' LIMIT $c_suggest_limit";
 
-    $sql_files = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
-      $sql_files .= "(SELECT split_part(details.text, '/', 4) as file FROM details, sensors ";
-      $sql_files .= "WHERE NOT split_part(details.text, '/', 4) = '' AND type = 4 AND split_part(details.text, '/', 4) LIKE '$q%' AND sensors.id = details.sensorid ";
-      $sql_files .= "AND sensors.organisation = $s_org) as sub ";
-    $sql_files .= "GROUP BY sub.file LIMIT $c_suggest_limit";
-  } else {
-    $sql_smac1 = "SELECT DISTINCT src_mac FROM attacks WHERE src_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_smac2 = "SELECT DISTINCT mac FROM sensors WHERE mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_dmac = "SELECT DISTINCT dst_mac FROM attacks WHERE dst_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_dda = "SELECT DISTINCT dest FROM attacks WHERE dest::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_dsa = "SELECT DISTINCT source FROM attacks WHERE source::char varying LIKE '$q%' LIMIT $c_suggest_limit";
-    $sql_vir = "SELECT name FROM stats_virus WHERE name LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_files = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
+        $sql_files .= "(SELECT split_part(details.text, '/', 4) as file FROM details, sensors ";
+        $sql_files .= "WHERE NOT split_part(details.text, '/', 4) = '' AND type = 4 AND split_part(details.text, '/', 4) LIKE '$q%' AND sensors.id = details.sensorid ";
+        $sql_files .= "AND sensors.organisation = $s_org) as sub ";
+      $sql_files .= "GROUP BY sub.file LIMIT $c_suggest_limit";
+    } else {
+      $sql_smac1 = "SELECT DISTINCT src_mac FROM attacks WHERE src_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_smac2 = "SELECT DISTINCT mac FROM sensors WHERE mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_dmac = "SELECT DISTINCT dst_mac FROM attacks WHERE dst_mac::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_dda = "SELECT DISTINCT dest FROM attacks WHERE dest::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_dsa = "SELECT DISTINCT source FROM attacks WHERE source::char varying LIKE '$q%' LIMIT $c_suggest_limit";
+      $sql_vir = "SELECT name FROM stats_virus WHERE name LIKE '$q%' LIMIT $c_suggest_limit";
 
-    $sql_files = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
-      $sql_files .= "(SELECT split_part(details.text, '/', 4) as file FROM details, sensors ";
-      $sql_files .= "WHERE NOT split_part(details.text, '/', 4) = '' AND type = 4 AND split_part(details.text, '/', 4) LIKE '$q%') as sub ";
-    $sql_files .= "GROUP BY sub.file LIMIT $c_suggest_limit";
-  }
-  $debuginfo[] = $sql_smac;
-  $debuginfo[] = $sql_dmac;
-  $debuginfo[] = $sql_vir;
-  $debuginfo[] = $sql_files;
-  $debuginfo[] = $sql_dsa;
-  $debuginfo[] = $sql_dda;
-
-
+      $sql_files = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
+        $sql_files .= "(SELECT split_part(details.text, '/', 4) as file FROM details, sensors ";
+        $sql_files .= "WHERE NOT split_part(details.text, '/', 4) = '' AND type = 4 AND split_part(details.text, '/', 4) LIKE '$q%') as sub ";
+      $sql_files .= "GROUP BY sub.file LIMIT $c_suggest_limit";
+    }
+    $debuginfo[] = $sql_smac;
+    $debuginfo[] = $sql_dmac;
+    $debuginfo[] = $sql_vir;
+    $debuginfo[] = $sql_files;
+    $debuginfo[] = $sql_dsa;
+    $debuginfo[] = $sql_dda;
 
     if ($type == "1") {
       $result = pg_query($pgconn, $sql_dda);
@@ -127,15 +126,14 @@ if ($c_autocomplete == 1) {
         echo "$file\n";
       }
     }
+  }
+}
 
-}
-}
 // Set output to "no suggestion" if no hint were found
 // or to the correct values
-if ($mac == "" && $file == "" && $name == "" && $source == "" && $dest == "")
- {
- $response="";
- }
+if ($mac == "" && $file == "" && $name == "" && $source == "" && $dest == "") {
+  $response="";
+}
 
 //output the response
 echo "$response\n";
