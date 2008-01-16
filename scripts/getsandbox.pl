@@ -10,6 +10,7 @@
 
 ###############################################
 # Changelog:
+# 2.10.01 version 2.10
 # 2.00.01 version 2.00 (Norman and CWSandbox supported)
 # 1.04.03 Added Norman sandbox support again
 # 1.04.02 Skipping messages without md5
