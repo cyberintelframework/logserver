@@ -177,6 +177,8 @@ $l['gr_select']			= "Select group";
 # googlemap.php
 ##########################
 $l['gm_process']		= "Your request is being processed...";
+$l['gm_setting']		= "Setting up google map...";
+$l['gm_loading']		= "Loading data points...";
 $l['gm_patient']		= "Please be patient";
 $l['gm_gmap']			= "Google Map";
 

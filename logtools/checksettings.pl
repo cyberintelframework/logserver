@@ -29,25 +29,20 @@ require "$c_surfidsdir/scripts/tnfunctions.inc.pl";
 # Main script
 ##################
 $chk = connectdb();
-$sql = "SELECT arp, tap FROM sensors WHERE keyname = 'nepenthes'";
+$sql = "SELECT id, arp, tap FROM sensors WHERE status = 1 AND NOT tap = ''";
 $sth = $dbh->prepare($sql);
 $er = $sth->execute();
 
-@row = $sth->fetchrow_array;
-$arp = $row[0];
-$tap = $row[1];
+while (@row = $sth->fetchrow_array) {
+$id = $row[0];
+$arp = $row[1];
+$tap = $row[2];
 
 if (!$tap) {
   $tap = "";
 }
 
 if ("$tap" ne "") {
-  $ifip = `ifconfig $tap | grep "inet addr:" | awk '{print \$2}' | awk -F":" '{print \$2}'`;
-  chomp($ifip);
-  $sql = "UPDATE sensors SET tapip = '$ifip', remoteip = '$ifip', localip = '$ifip' WHERE keyname = 'nepenthes'";
-  $sth = $dbh->prepare($sql);
-  $er = $sth->execute();
-
   if ("$arp" ne "") {
     if ("$arp" eq "0") {
       $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | awk '{print \$2}'`;
@@ -56,18 +51,17 @@ if ("$tap" ne "") {
         $pid = "";
       }
       if ("$pid" ne "") {
-        `kill -9 $pid`;
+        print "killing $pid from $tap\n";
+	`kill -9 $pid`;
       }
     } else {
       $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | wc -l`;
       chomp($pid);
       if ("$pid" eq "0") {
+        print "Starting detectarp $tap\n";
         system("$c_surfidsdir/scripts/detectarp.pl $tap &");
       }    
     }
   }
 }
-$ts = time;
-$sql = "UPDATE sensors SET lastupdate = '$ts' WHERE keyname = 'nepenthes'";
-$sth = $dbh->prepare($sql);
-$er = $sth->execute();
+}

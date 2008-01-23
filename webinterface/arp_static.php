@@ -68,12 +68,12 @@ if (isset($clean['sid'])) {
   $keyname = $row['keyname'];
   $vlanid = $row['vlanid'];
   $db_arp = $row['arp'];
-  $sensor = sensorname($keyname, $vlanid);
+  $selected = sensorname($keyname, $vlanid);
 
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['as_actions_for']. " $sensor</div>\n";
+        echo "<div class='blockHeader'>" .$l['as_actions_for']. " $selected</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<form name='arpform' method='get' action='arp_static.php'>\n";
             echo "<input type='hidden' name='int_sid' value='$sid' />\n";
@@ -204,7 +204,7 @@ echo "<div class='left'>\n";
                 echo "</td>\n";
 
                 pg_result_seek($result_sensors, 0);
-                echo "<td>$sensor</td>\n";
+                echo "<td>$selected</td>\n";
                 echo "<td align='right'>";
                 echo "<input type='hidden' name='int_sid' value='$sid' />\n";
                   echo "<input type='submit' class='button' name='submit' value='" .$l['g_add']. "' size='15' />";

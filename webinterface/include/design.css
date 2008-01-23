@@ -584,8 +584,9 @@ PRE {
 #search_wait {
   position:		absolute;
   left:			40%;
+  top:			400px;
   width:		250px;
-  height:		100px;
+  height:		50px;
   padding:		10px;
   z-index:		99;
 }

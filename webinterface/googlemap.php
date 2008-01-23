@@ -21,7 +21,7 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-$xmlquery="?int_from=$from&int_to=$to&int_org=$q_org";
+$xmlquery = "?int_from=$from&int_to=$to&int_org=$q_org";
 
 echo "<div id='search_wait'><center>" .$l['gm_process']. "<br /><br />" .$l['gm_patient']. ".<br /></center></div>\n";
 echo "<div class='center'>\n";
@@ -29,105 +29,62 @@ echo "<div class='block'>\n";
 echo "<div class='dataBlock'>\n";
 echo "<div class='blockHeader'>" .$l['gm_gmap']. "</div>\n";
 echo "<div class='blockContent'>\n";
-echo "<div id='map' style='width: 800px; height: 400px'></div>\n";
+echo "<div id='map' style='width: 890px; height: 400px'></div>\n";
+echo "<script src='include/jquery.jmap2.js' type='text/javascript'></script>";
 echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=$c_googlemap_key' type='text/javascript'></script>";
 ?>
 <script type="text/javascript">
-//<![CDATA[
- 
-var map = new GMap(document.getElementById("map"));
-map.addControl(new GMapTypeControl());
-map.addControl(new GLargeMapControl());
-map.centerAndZoom(new GPoint(12.0,25.0),15);
-//map.setMapType(G_SATELLITE_TYPE);
-//]]>
- 
-var yellowicon = new GIcon();
-yellowicon.image = "http://labs.google.com/ridefinder/images/mm_20_yellow.png";
-yellowicon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
-yellowicon.iconSize = new GSize(12, 20);
-yellowicon.shadowSize = new GSize(22, 20);
-yellowicon.iconAnchor = new GPoint(6, 20);
-yellowicon.infoWindowAnchor = new GPoint(5, 1);
- 
-var orangeicon = new GIcon();
-orangeicon.image = "http://labs.google.com/ridefinder/images/mm_20_orange.png";
-orangeicon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
-orangeicon.iconSize = new GSize(12, 20);
-orangeicon.shadowSize = new GSize(22, 20);
-orangeicon.iconAnchor = new GPoint(6, 20);
-orangeicon.infoWindowAnchor = new GPoint(5, 1);
- 
-var redicon = new GIcon();
-redicon.image = "http://labs.google.com/ridefinder/images/mm_20_red.png";
-redicon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
-redicon.iconSize = new GSize(12, 20);
-redicon.shadowSize = new GSize(22, 20);
-redicon.iconAnchor = new GPoint(6, 20);
-redicon.infoWindowAnchor = new GPoint(5, 1);
- 
-var blackicon = new GIcon();
-blackicon.image = "http://labs.google.com/ridefinder/images/mm_20_black.png";
-blackicon.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
-blackicon.iconSize = new GSize(12, 20);
-blackicon.shadowSize = new GSize(22, 20);
-blackicon.iconAnchor = new GPoint(6, 20);
-blackicon.infoWindowAnchor = new GPoint(5, 1);
- 
- 
-function createMarker(point,country,city,count)
-{
-  var marker;
-  if ( count <= 5){
-   marker = new GMarker(point,yellowicon);
-  }else
-  if ( count <= 25){
-   marker = new GMarker(point,orangeicon);
-  }else
-  if ( count <= 250){
-   marker = new GMarker(point,redicon);
-  }else
-  {
-   marker = new GMarker(point,blackicon);
-  }
- 
-  var msg = "<small><b>Country:</b> " + country +"<br/>";
-  msg = msg+"<b>City:</b> " + city +"<br/>";
-  msg = msg+"<b>Count:</b> " + count +"<br/>";
-  msg = msg+"</small>";
-  GEvent.addListener(marker, "click", function(){marker.openInfoWindowHtml(msg);});
-  return marker;
-}
- 
-var request = GXmlHttp.create();
-<?
-echo "request.open('GET', 'googlemapdata.xml.php$xmlquery', true);";
-?>
+$('#search_wait').html("<?php echo "<center>" .$l['gm_setting']. "<br /><br />" .$l['gm_patient']. ".<br /></center>" ?>");
+var yellowicon = $.jmap.createIcon({
+        image: "http://labs.google.com/ridefinder/images/mm_20_yellow.png",
+        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+        iconSize : new GSize(12, 20),
+        shadowSize : new GSize(22, 20),
+        iconAnchor : new GPoint(6, 20),
+        infoWindowAnchor : new GPoint(5, 1),
+        infoShadowAnchor : new GPoint(5, 1)
+});
 
-request.onreadystatechange = function() {
-  if (request.readyState == 4) {
-    if (request.status == 200) {
-      document.getElementById('search_wait').style.display='none';
-      var xmlDoc = request.responseXML;
-      var markers = xmlDoc.documentElement.getElementsByTagName("marker");
- 
-      for (var i = 0; i < markers.length; i++) {
-        var point = new GPoint(
-          parseFloat(markers[i].getAttribute("lng")),
-          parseFloat(markers[i].getAttribute("lat"))
-        );
-        var city = markers[i].getAttribute("city");
-        var country = markers[i].getAttribute("country");
-        var count = markers[i].getAttribute("count");
-        var marker = new createMarker(point,country,city,count);
-        map.addOverlay(marker);
-      }
-    }
-  }
-}
-request.send(null);
+var orangeicon = $.jmap.createIcon({
+        image: "http://labs.google.com/ridefinder/images/mm_20_orange.png",
+        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+        iconSize : new GSize(12, 20),
+        shadowSize : new GSize(22, 20),
+        iconAnchor : new GPoint(6, 20),
+        infoWindowAnchor : new GPoint(5, 1),
+        infoShadowAnchor : new GPoint(5, 1)
+});
+
+var redicon = $.jmap.createIcon({
+        image: "http://labs.google.com/ridefinder/images/mm_20_red.png",
+        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+        iconSize : new GSize(12, 20),
+        shadowSize : new GSize(22, 20),
+        iconAnchor : new GPoint(6, 20),
+        infoWindowAnchor : new GPoint(5, 1),
+        infoShadowAnchor : new GPoint(5, 1)
+});
+
+var blackicon = $.jmap.createIcon({
+        image: "http://labs.google.com/ridefinder/images/mm_20_black.png",
+        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+        iconSize : new GSize(12, 20),
+        shadowSize : new GSize(22, 20),
+        iconAnchor : new GPoint(6, 20),
+        infoWindowAnchor : new GPoint(5, 1),
+        infoShadowAnchor : new GPoint(5, 1)
+});
+
+$('#map').jmap({
+	mapZoom: 2,
+	mapShowOverview: false,
+	mapControlSize: "large",
+	mapDimensions: [900,400]
+});
+
 </script>
 <?php
+flush();
 echo "</div>\n";
 echo "<div class='blockFooter'></div>\n";
 echo "</div>\n"; #</dataBlock>
@@ -158,4 +115,50 @@ echo "<div class='center'>\n";
 echo "</div>\n";
 
 ?>
+<script>
+url = "googlemapdata.xml.php<?php echo $xmlquery ?>";
+$('#search_wait').html("<?php echo "<center>" .$l['gm_loading']. "<br /><br />" .$l['gm_patient']. ".<br /></center>" ?>");
+
+$.ajax({
+  url: url,
+  type: 'GET',
+  dataType: 'xml',
+  error: function(){
+    alert('Error processing your request!');
+  },
+  success: function(xml){
+    $("marker", xml).each(function() {
+      country = $(this).attr("country");
+      count = $(this).attr("count");
+      city = $(this).attr("city");
+      lat = $(this).attr("lat");
+      lng = $(this).attr("lng");
+
+      var msg = "<small><b>Country:</b> " + country +"<br/>";
+      msg = msg+"<b>City:</b> " + city +"<br/>";
+      msg = msg+"<b>Count:</b> " + count +"<br/>";
+      msg = msg+"</small>";
+
+      if (count <= 5) {
+        var icon = yellowicon;
+      } else if (count <= 25) {
+        var icon = orangeicon;
+      } else if (count <= 250) {
+        var icon = redicon;
+      } else {
+        var icon = blackicon;
+      }
+
+      $('#map').addMarker({
+        pointLat: lat,
+        pointLng: lng,
+        pointHTML: msg,
+        icon: icon
+      });
+    });
+    $('#search_wait').toggle();
+  }
+});
+</script>
+<?php flush(); ?>
 <?php footer(); ?>

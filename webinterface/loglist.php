@@ -94,7 +94,7 @@ if ($err != 1) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th>Source IP Address</th>\n";
+              echo "<th>" .$l['ls_sourceip']. " " .$l['ls_address']. "</th>\n";
               if ($sev == 1) {
                 echo "<th width='200'>" .$l['g_mal']. "</th>\n";
               } else {

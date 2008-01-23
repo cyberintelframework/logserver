@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# Version 2.10.03                  #
+# 10-01-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,8 @@
 
 #############################################
 # Changelog:
+# 2.10.03 Fixed #54 bug
+# 2.10.02 Fixed a CSRF vuln
 # 2.10.01 Added language support
 # 2.00.09 Fixed bug with int_page
 # 2.00.08 Not showing admin tab when contents are empty
@@ -240,7 +242,6 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                   echo "</ul>\n";
                 echo "</div>\n";
               echo "</li>";
-              if ($s_access_user > 1 || $s_admin == 1) {
                 #################
                 # ADMINISTRATION TAB
                 #################
@@ -250,23 +251,22 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                 } else {
                   echo "<div id='tab5' class='tab' style='display: none;'>\n";
                 }            
-                    echo "<ul>\n";
-                      if ($s_access_user != 0) {
-                        echo printMenuitem(5.1, "myaccount.php", $l['me_myaccount'], $tab);
-                      }
-                      if ($s_access_user > 1) {
-                        echo printMenuitem(5.2, "useradmin.php", $l['me_users'], $tab);
-                      }
-                      if ($s_admin == 1) {
-	                echo printMenuitem(5.3, "orgadmin.php", $l['me_domains'], $tab);
-                      }
-                      if ($s_access_user > 1) {
-                        echo printMenuitem(5.4, "groupadmin.php", $l['me_groups'], $tab);
-                      }
-                    echo "</ul>\n";
-                  echo "</div>\n";
-                echo "</li>";
-              }
+                  echo "<ul>\n";
+                    if ($s_access_user != 0) {
+                      echo printMenuitem(5.1, "myaccount.php", $l['me_myaccount'], $tab);
+                    }
+                    if ($s_access_user > 1) {
+                      echo printMenuitem(5.2, "useradmin.php", $l['me_users'], $tab);
+                    }
+                    if ($s_admin == 1) {
+                      echo printMenuitem(5.3, "orgadmin.php", $l['me_domains'], $tab);
+                    }
+                    if ($s_access_user > 1) {
+                      echo printMenuitem(5.4, "groupadmin.php", $l['me_groups'], $tab);
+                    }
+                  echo "</ul>\n";
+                echo "</div>\n";
+              echo "</li>";
             echo "</ul>\n";
           echo "</div>\n";
         } else {
@@ -379,7 +379,7 @@ function insert_selector($m_show = 1) {
           $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
           $debuginfo[] = $sql_orgs;
           $result_orgs = pg_query($pgconn, $sql_orgs);
-          echo "<select name='int_org' class='smallselect' onChange='javascript: this.form.submit();'>\n";
+          echo "<select name='int_org' class='smallwidthselect' onChange='javascript: this.form.submit();'>\n";
             echo printOption(0, "All", $q_org) . "\n";
             while ($row = pg_fetch_assoc($result_orgs)) {
               $org_id = $row['id'];
@@ -461,7 +461,9 @@ function insert_selector($m_show = 1) {
             $val = str_replace("%3A", ":", "$val");
             $key = str_replace("%5B", "[", "$key");
             $key = str_replace("%5D", "]", "$key");
-	    if ($key != "int_page") echo "<input type='hidden' name='$key' value='$val' />\n";
+            if ($key != "int_page" && $key != "" && $val != "") {
+              echo "<input type='hidden' name='$key' value='$val' />\n";
+            }
           }
         }
       }

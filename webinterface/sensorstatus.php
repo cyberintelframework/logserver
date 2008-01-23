@@ -194,7 +194,7 @@ echo "<div class='centerbig'>\n";
                     }
                   echo "</td>\n";
                 } else {
-                  echo "<td>static ";
+                  echo "<td>";
                     if ($s_access_sensor == 0) {
                       echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
                     } else {

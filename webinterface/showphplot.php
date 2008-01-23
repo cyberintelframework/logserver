@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 08-10-2007                       #
+# Version 2.10.01                  #
+# 10-01-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Fixed bug #55
 # 2.00.02 Fixed a bug with empty data points
 # 2.00.01 version 2.00
 # 1.04.11 Fixed attack-dialogue graph

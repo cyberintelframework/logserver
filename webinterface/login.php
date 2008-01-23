@@ -46,13 +46,16 @@ if (isset($clean['url'])) {
 
 if (isset($clean['m'])) {
   $m = $clean['m'];
-  $m = geterror($m);
-  echo $m;
+  geterror($m);
 }
 
 # Loading the md5.js script needed for logging in.
 echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
-
+echo "<noscript>\n";
+  echo "<div class='centersmall'>\n";
+    echo "<span class='warning'>Javascript needs to be enabled to login!</span>\n";
+  echo "</div>\n";
+echo "</noscript>\n";
 echo "<div class='centersmall'>\n";
 echo "<div class='block'>\n";
 echo "<div class='dataBlock'>\n";

@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# Version 2.10.02                  #
+# 09-01-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added JPNIC support and fixed KRNIC
 # 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.03 Added KRNIC and flush()
@@ -45,11 +46,17 @@ debug_input();
 # Setting the whois server
 if (isset($clean['s'])) {
   $serv = $clean['s'];
-  $pattern = '/^(arin|lacnic|apnic|ripe|afrinic|krnic)$/';
+  $pattern = '/^(arin|lacnic|apnic|ripe|afrinic|krnic|jpnic)$/';
   if (preg_match($pattern, $serv) != 1) {
     $server = "whois.ripe.net";
   } else {
-    $server = "whois." .$serv. ".net";
+    if ($serv == "jpnic") {
+      $server = "whois.nic.ad.jp";
+    } elseif ($serv == "krnic") {
+      $server = "whois.nida.or.kr";
+    } else {
+      $server = "whois." .$serv. ".net";
+    }
   }
 } else {
   $serv = "ripe";
@@ -106,7 +113,11 @@ if ($err == 0) {
               return false;
             } else {
               echo $l['wh_connected']. " $server:43, " .$l['wh_sending']. "<br>\n";
-              fputs($fp, "$ip\r\n");
+              if ($serv == "jpnic") {
+                fputs($fp, "$ip /e\r\n");
+              } else {
+                fputs($fp, "$ip\r\n");
+              }
               while(!feof($fp)) {
                 echo fgets($fp, 256);
                 flush();

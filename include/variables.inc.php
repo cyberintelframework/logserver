@@ -525,7 +525,8 @@ $v_whois_servers = array(
 	'apnic' => "APNIC",
 	'lacnic' => "LACNIC",
 	'afrinic' => "AFRINIC",
-	'krnic' => "KRNIC"
+	'krnic' => "KRNIC",
+	'jpnic' => "JPNIC"
 );
 
 # Array with the different destination search option

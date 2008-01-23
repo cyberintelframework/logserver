@@ -718,6 +718,10 @@ option.starting {
 .smallselect {
   font-size:            8pt;
 }
+.smallwidthselect {
+  font-size:            8pt;
+  width:                90px;
+}
 
 .smallinput {
   font-size:            8pt;

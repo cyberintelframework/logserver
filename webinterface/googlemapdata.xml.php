@@ -57,10 +57,10 @@ if (isset($clean['org'])) {
   $int_org = intval($s_org);
 }
 
-if ($int_org == 0 && $s_admin == 1) {$orgquery = "";}
-elseif ($int_org != 0 && $s_org == $int_org) {$orgquery = "sensors.organisation = '$int_org' AND";}
-elseif ($int_org != 0 && $s_admin == 1) {$orgquery = "sensors.organisation = '$int_org' AND";}
-else { $err=1; }
+if ($int_org == 0 && $s_admin == 1) { $orgquery = ""; }
+elseif ($int_org != 0 && $s_org == $int_org) { $orgquery = "sensors.organisation = '$int_org' AND"; }
+elseif ($int_org != 0 && $s_admin == 1) { $orgquery = "sensors.organisation = '$int_org' AND"; }
+else { $err = 1; }
 
 if (isset($clean['to']) && isset($clean['from'])) {
   $start = $clean['from'];
@@ -81,12 +81,13 @@ if ( $query == true && $err == 0) {
   $f = fopen("/tmp/data.cache.xml","w+");  // change this path
   $mytime = time(0) - 24 * 3600 * 9;
 
-  $query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1'  AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC"; 
+  $query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks ";
+  $query .= "WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1' ";
+  $query .= "AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC"; 
   $r_hit = pg_query($pgconn, $query);
   if (pg_num_rows($r_hit)) {
-    fwrite($f,'<?xml version="1.0" encoding="ISO-8859-1"?>');
-    fwrite($f,"\n");
-    fwrite($f,"<markers>\n");
+    echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
+    echo "<markers>";
     $ar_latlng = array();
     while ($hit = pg_fetch_assoc($r_hit)) {
       $source = $hit['source'];
@@ -117,23 +118,20 @@ if ( $query == true && $err == 0) {
       $count = $val["count"];
       $country = $val["country"];
       $city = $val["city"];
-      $line ='   <marker lat="'.$lat.'" lng="'.$lng.'" count="'.$count.'" country="'.$country.'" city="'.$city.'" />'."\n";
-      fwrite($f,$line);
+      $line = '<marker lat="' .$lat. '" lng="' .$lng. '" count="' .$count. '" country="' .$country. '" city="' .$city. '" />';
+      echo $line;
+      flush();
     }		
-    fwrite($f,"</markers>\n");
+    echo "</markers>";
   }
-  fclose($f);
 } else {
-  $f = fopen("/tmp/data.cache.xml","w+");  // change this path
-  $mytime = time(0) - 24 * 3600 * 9;
-  fwrite($f,"<markers>\n");
-  fwrite($f,"</markers>\n");
-  fclose($f);
+  echo "<markers>";
+  echo "</markers>";
 }
 
-$f = fopen("/tmp/data.cache.xml","r");
-$contents = fread($f, filesize("/tmp/data.cache.xml"));
-trim($contents);
-echo $contents; 
-fclose($f);
+#$f = fopen("/tmp/data.cache.xml","r");
+#$contents = fread($f, filesize("/tmp/data.cache.xml"));
+#trim($contents);
+#echo $contents; 
+#fclose($f);
 ?>
