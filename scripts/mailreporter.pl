@@ -2,8 +2,8 @@
 ####################################
 # Mail reporter                    #
 # SURFnet IDS                      #
-# Version 2.10.02                  #
-# 13-12-2007                       #
+# Version 2.10.03                  #
+# 05-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 2.10.03 Added Nepenthes markup stuff
 # 2.10.02 Normal text mails are now sent without attachment
 # 2.10.01 Added Cymru mail report
 # 2.00.01 version 2.00 - improved mailreporter
@@ -335,9 +336,7 @@ while (@row = $email_query->fetchrow_array) {
         } 
         ############# Summary
         printmail("");
-      }
-
-      if ($detail =~ /^(1|2)$/) {
+      } elsif ($detail =~ /^(1|2)$/) {
         $totalcount = 0;
 
         # Detailed overview
@@ -381,8 +380,7 @@ while (@row = $email_query->fetchrow_array) {
           printmail("$keyname\t$ip\t\t$time\t$attacktype");
         }
         ############# Detail overview
-      }
-      if ($detail == 3) {
+      } elsif ($detail == 3) {
         # IDMEF
         ###############################################
         $sql = "SELECT attacks.id, sensors.keyname, sensors.vlanid, attacks.timestamp, attacks.severity, severity.txt, attacks.source, ";
@@ -467,9 +465,7 @@ while (@row = $email_query->fetchrow_array) {
           printattach("</idmef:Alert>");
         }
         printattach("</idmef:IDMEF-Message>");
-      }
-
-      if ($detail == 4) {
+      } elsif ($detail == 4) {
         # CYMRU format
         ###############################################
         $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
@@ -502,6 +498,7 @@ while (@row = $email_query->fetchrow_array) {
         $ipview_query = $dbh->prepare($sql);
         $ec = $ipview_query->execute();
 
+        $totalcount = 0;
         while (@row = $ipview_query->fetchrow_array) {
           $ip = $row[0];
           $timestamp = $row[1];
@@ -523,6 +520,111 @@ while (@row = $email_query->fetchrow_array) {
 
           $totalcount++;
           printmail("$asn | $ip | $time $attacktype | $desc");
+        }
+      } elsif ($detail == 5) {
+        # Nepenthes format
+        ###############################################
+        $sql = "SELECT attacks.source, attacks.timestamp, details.text, details.type, attacks.id, attacks.severity ";
+        $sql .= "FROM attacks ";
+        $sql .= " INNER JOIN sensors ";
+        $sql .= " ON attacks.sensorid = sensors.id ";
+        $sql .= " LEFT JOIN details ";
+        $sql .= " ON attacks.id = details.attackid ";
+        $sql .= " WHERE details.type IN (4,8) ";
+        $sql .= " AND attacks.severity IN (16,32) ";
+        $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+        $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+        if ($severity == 0) {
+          # Get the ranges of the organisation
+          $sql_ranges = "SELECT DISTINCT ranges FROM organisations WHERE id = $org AND NOT ranges IS NULL";
+          $sql_ranges = $dbh->prepare($sql_ranges);
+          $result_ranges = $sql_ranges->execute();
+          @rangerow = $sql_ranges->fetchrow_array;
+          $count = @rangerow;
+
+          if ($count > 0) {
+            @rangerow = split(/;/, "@rangerow");
+            foreach $range (@rangerow) {
+              $sql .= " AND attacks.source !<< '$range' "
+            }
+          }
+        }
+        $sql .= " $andorg $andsensor";
+        $sql .= " ORDER BY timestamp ASC";
+        $ipview_query = $dbh->prepare($sql);
+        $ec = $ipview_query->execute();
+  
+        $totalcount = 0;
+        $c = 0;
+        %buffer = ();
+        while (@row = $ipview_query->fetchrow_array) {
+          $ip = $row[0];
+          $timestamp = $row[1];
+          $time = getdatetime($timestamp);
+          $text = $row[2];
+          $type = $row[3];
+          $id = $row[4];
+          $sev = $row[5];
+
+          if ($c == 0) {
+            # Buffer the first record to enable the combination of md5 and url later on
+            $buffer{"source"} = $ip;
+            $buffer{"time"} = $time;
+            if ($type == 4) {
+              $buffer{"url"} = $text;
+            } elsif ($type == 8) {
+              $buffer{"md5"} = $text;
+            }
+            $buffer{"id"} = $id;
+            $buffer{"sev"} = $sev;
+            $c = 1;
+          } elsif ($c == 1) {
+            if ($id == $buffer{"id"}) {
+              # If the ID is the same as the previous attack it means that only an md5 or url
+              # has to be added to the buffer
+              if ($type == 4) {
+                $buffer{"url"} = $text;
+              } elsif ($type == 8) {
+                $buffer{"md5"} = $text;
+              }
+            } else {
+              # Retrieve attack info from the buffer
+              $log_url = $buffer{"url"};
+              $log_md5 = $buffer{"md5"};
+              $log_source = $buffer{"source"};
+              $log_time = $buffer{"time"};
+              $log_sev = $buffer{"sev"};
+              $log_id = $buffer{"id"};
+              printmail("[$log_time] $log_source -> $log_url $log_md5");
+              $totalcount++;
+
+              # Clear the buffer
+              %buffer = ();
+
+              # Add new attack to the buffer
+              $buffer{"source"} = $ip;
+              $buffer{"time"} = $time;
+              if ($type == 4) {
+                $buffer{"url"} = $text;
+              } elsif ($type == 8) {
+                $buffer{"md5"} = $text;
+              }
+              $buffer{"id"} = $id;
+              $buffer{"sev"} = $sev;
+            }
+          }
+        }
+        if ($buffer{"id"} != "") {
+          # After the while loop there could still be 1 attack left in the buffer
+          # If so, print it here
+          $log_url = $buffer{"url"};
+          $log_md5 = $buffer{"md5"};
+          $log_source = $buffer{"source"};
+          $log_time = $buffer{"time"};
+          $log_sev = $buffer{"sev"};
+          $log_id = $buffer{"id"};
+          printmail("[$log_time] $log_source -> $log_url $log_md5");
+          $totalcount++;
         }
       }
 
@@ -604,10 +706,7 @@ while (@row = $email_query->fetchrow_array) {
           }
           ############# Summary
           printmail("");
-        }
-
-        if ($detail =~ /^(1|2)$/) {
-
+        } elsif ($detail =~ /^(1|2)$/) {
           # Detailed overview
           ###############################################
           $totalcount = 0;
@@ -650,10 +749,7 @@ while (@row = $email_query->fetchrow_array) {
             }
           } #/foreach
           printmail("");
-        } #/detail
-
-        if ($detail == 3) {
-
+        } elsif ($detail == 3) {
           # IDMEF
           ###############################################
           $totalcount = 0;
@@ -741,6 +837,170 @@ while (@row = $email_query->fetchrow_array) {
             }
           }
           printattach("</idmef:IDMEF-Message>");
+        } elsif ($detail == 4) {
+          # CYMRU format
+          ###############################################
+          foreach $range (@rangerow) {
+          $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
+          $sql .= "FROM attacks ";
+          $sql .= " INNER JOIN sensors ";
+          $sql .= " ON attacks.sensorid = sensors.id ";
+          $sql .= " LEFT JOIN details ";
+          $sql .= " ON attacks.id = details.attackid ";
+          $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+          $sql .= " AND attacks.severity = 1 ";
+          $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+          $sql .= " AND attacks.source <<= '$range' ";
+          $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+          if ($severity == 0) {
+            # Get the ranges of the organisation
+            $sql_ranges = "SELECT DISTINCT ranges FROM organisations WHERE id = $org AND NOT ranges IS NULL";
+            $sql_ranges = $dbh->prepare($sql_ranges);
+            $result_ranges = $sql_ranges->execute();
+            @rangerow = $sql_ranges->fetchrow_array;
+            $count = @rangerow;
+
+            if ($count > 0) {
+              @rangerow = split(/;/, "@rangerow");
+              foreach $range (@rangerow) {
+                $sql .= " AND attacks.source !<< '$range' "
+              }
+            }        
+          }
+          $sql .= " $andorg $andsensor";
+          $sql .= " ORDER BY timestamp ASC";
+          $ipview_query = $dbh->prepare($sql);
+          $ec = $ipview_query->execute();
+
+          $totalcount = 0;
+          while (@row = $ipview_query->fetchrow_array) {
+            $ip = $row[0];
+            $timestamp = $row[1];
+            $time = getdatetime($timestamp);
+            if ($row[2]) {
+              $attacktype = $row[2]; 
+              $attacktype =~ s/Dialogue//;
+            } else {
+              $attacktype = "";
+            }
+
+            @asninfo = get_asn_info($ip);
+            $asn = $asninfo[0];
+            if ("$asn" ne "") {
+              $desc = get_as_description($asn);
+            } else {
+              $desc = "";
+            }
+
+            $totalcount++;
+            printmail("$asn | $ip | $time $attacktype | $desc");
+          }
+          }
+        } elsif ($detail == 5) {
+          # Nepenthes format
+          ###############################################
+          $sql = "SELECT attacks.source, attacks.timestamp, details.text, details.type, attacks.id, attacks.severity ";
+          $sql .= "FROM attacks ";
+          $sql .= " INNER JOIN sensors ";
+          $sql .= " ON attacks.sensorid = sensors.id ";
+          $sql .= " LEFT JOIN details ";
+          $sql .= " ON attacks.id = details.attackid ";
+          $sql .= " WHERE details.type IN (4,8) ";
+          $sql .= " AND attacks.severity IN (16,32) ";
+          $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+          $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+          if ($severity == 0) {
+            # Get the ranges of the organisation
+            $sql_ranges = "SELECT DISTINCT ranges FROM organisations WHERE id = $org AND NOT ranges IS NULL";
+            $sql_ranges = $dbh->prepare($sql_ranges);
+            $result_ranges = $sql_ranges->execute();
+            @rangerow = $sql_ranges->fetchrow_array;
+            $count = @rangerow;
+
+            if ($count > 0) {
+              @rangerow = split(/;/, "@rangerow");
+              foreach $range (@rangerow) {
+                $sql .= " AND attacks.source !<< '$range' "
+              }
+            }
+          }
+          $sql .= " $andorg $andsensor";
+          $sql .= " ORDER BY timestamp ASC";
+          $ipview_query = $dbh->prepare($sql);
+          $ec = $ipview_query->execute();
+  
+          $totalcount = 0;
+          $c = 0;
+          %buffer = ();
+          while (@row = $ipview_query->fetchrow_array) {
+            $ip = $row[0];
+            $timestamp = $row[1];
+            $time = getdatetime($timestamp);
+            $text = $row[2];
+            $type = $row[3];
+            $id = $row[4];
+            $sev = $row[5];
+
+            if ($c == 0) {
+              # Buffer the first record to enable the combination of md5 and url later on
+              $buffer{"source"} = $ip;
+              $buffer{"time"} = $time;
+              if ($type == 4) {
+                $buffer{"url"} = $text;
+              } elsif ($type == 8) {
+                $buffer{"md5"} = $text;
+              }
+              $buffer{"id"} = $id;
+              $buffer{"sev"} = $sev;
+              $c = 1;
+            } elsif ($c == 1) {
+              if ($id == $buffer{"id"}) {
+                # If the ID is the same as the previous attack it means that only an md5 or url
+                # has to be added to the buffer
+                if ($type == 4) {
+                  $buffer{"url"} = $text;
+                } elsif ($type == 8) {
+                  $buffer{"md5"} = $text;
+                }
+              } else {
+                # Retrieve attack info from the buffer
+                $log_url = $buffer{"url"};
+                $log_md5 = $buffer{"md5"};
+                $log_source = $buffer{"source"};
+                $log_time = $buffer{"time"};
+                $log_sev = $buffer{"sev"};
+                $log_id = $buffer{"id"};
+                printmail("[$log_time] $log_source -> $log_url $log_md5");
+                $totalcount++;
+
+                # Clear the buffer
+                %buffer = ();
+
+                # Add new attack to the buffer
+                $buffer{"source"} = $ip;
+                $buffer{"time"} = $time;
+                if ($type == 4) {
+                  $buffer{"url"} = $text;
+                } elsif ($type == 8) {
+                  $buffer{"md5"} = $text;
+                }
+                $buffer{"id"} = $id;
+                $buffer{"sev"} = $sev;
+              }
+            }
+          }
+          if ($buffer{"id"} != "") {
+            # After the while loop there could still be 1 attack left in the buffer
+            # If so, print it here
+            $log_url = $buffer{"url"};
+            $log_md5 = $buffer{"md5"};
+            $log_source = $buffer{"source"};
+            $log_time = $buffer{"time"};
+            $log_sev = $buffer{"sev"};
+            $log_id = $buffer{"id"};
+            printmail("[$log_time] $log_source -> $log_url $log_md5");
+            $totalcount++;
+          }
         }
 
         # Checking for threshold stuff
