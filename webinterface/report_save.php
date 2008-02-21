@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# Version 2.10.01                  #
+# 15-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added option to always send the report
 # 2.00.01 version 2.00
 # 1.04.05 Added hash check
 # 1.04.04 Fixed a bug with weekday count
@@ -64,7 +65,8 @@ $allowed_post = array(
 		"int_sdetail",
 		"int_filter",
 		"bool_active",
-		"md5_hash"
+		"md5_hash",
+        "int_always"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -227,6 +229,12 @@ if (!isset($clean['rcid'])) {
   }
 }
 
+if (!isset($clean['always'])) {
+  $always = $clean['always'];
+} else {
+  $always = 0;
+}
+
 # Setting some default values if the variables don't exist
 if (!$interval) {
   $interval = -1;
@@ -248,7 +256,7 @@ if ($err == 0) {
   # Adding new report
   $sql = "UPDATE report_content SET user_id = '$user_id', template = '$template', sensor_id = '$sensorid', frequency = '$freq', ";
   $sql .= " interval = '$interval', priority = '$prio', subject = '$subject', operator = '$operator', threshold = '$threshold', ";
-  $sql .= " severity = '$sev', active = '$active', detail = '$detail' WHERE id = '$reportid'";
+  $sql .= " severity = '$sev', active = '$active', detail = '$detail', always = '$always' WHERE id = '$reportid'";
   $debuginfo[] = $sql;
   $ec = pg_query($pgconn, $sql);
   $m = 3;

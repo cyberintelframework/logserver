@@ -1,13 +1,15 @@
 /*
  * ####################################
  * # SURFnet IDS                      #
- * # Version 2.10.03                  #
- * # 14-12-2007                       #
+ * # Version 2.10.05                  #
+ * # 12-02-2008                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 2.10.05 Added Last 24 Hours option for timeselector
+ * # 2.10.04 Added support for Nepenthes mail markup
  * # 2.10.03 Added selector functions
  * # 2.10.02 Fixed bug with Critera field in logsearch
  * # 2.10.01 version 2.10
@@ -141,11 +143,16 @@ function sh_mailreptype(si) {
       $('#timeandthresh').show();
       $('#filter').hide();
       $('#attack_sev').show();
-    } else if (si == 4) {
+    } else if (si == 4 || si == 5) {
       $('#timeandthresh').show();
-      $('#filter').show();
       $('#attack_sev').hide();
       $('#int_template').selectOptions(1);
+	  rep = $('#int_template').val();
+	  if (rep == 2) {
+        $('#filter').hide();
+      } else {
+        $('#filter').show();
+	  }
     }
   } else {
     $('#timeandthresh').hide();
@@ -159,21 +166,22 @@ function sh_mailfreq(si) {
     $('#daily_freq').hide();
     $('#weekly_freq').hide();
     $('#thresh_freq').hide();
-  }
-  if (si == 2) {
+    $('#always').show();
+  } else if (si == 2) {
     $('#daily_freq').show();
     $('#weekly_freq').hide();
     $('#thresh_freq').hide();
-  }
-  if (si == 3) {
+    $('#always').show();
+  } else if (si == 3) {
     $('#daily_freq').hide();
     $('#weekly_freq').show();
     $('#thresh_freq').hide();
-  }
-  if (si == 4) {
+    $('#always').show();
+  } else if (si == 4) {
     $('#daily_freq').hide();
     $('#weekly_freq').hide();
     $('#thresh_freq').show();
+    $('#always').hide();
   } 
 }
 
@@ -299,8 +307,10 @@ function setperiod(startofweek) {
   var start = new Date();
   var end = new Date();
 
-  if (period == 1) {
+  if (period == 0) {
     start.setHours(start.getHours()-1);
+  } else if (period == 1) {
+    start.setHours(start.getHours()-24);
   } else if (period == 2) {
     start.setHours(0);
     start.setMinutes(0);

@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.03                  #
-# 10-01-2008                       #
+# Version 2.10.04                  #
+# 12-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 2.10.04 Added Last 24 hours option + user selected value, fixed total count sensors
 # 2.10.03 Fixed #54 bug
 # 2.10.02 Fixed a CSRF vuln
 # 2.10.01 Added language support
@@ -74,6 +75,7 @@ if ($file != "login.php") {
     $s_access_user = intval($s_access{2});
     $s_access_sensor = intval($s_access{0});
     $s_access_search = intval($s_access{1});
+	$s_default_time = intval($_SESSION['s_default_time']);
 
     # Validate the session_id() against the SID in the database
     $chk_sid = checkSID();
@@ -92,9 +94,13 @@ if ($file != "login.php") {
   if ($s_admin == 1) {
     $sql_active = "SELECT COUNT(id) as total FROM sensors WHERE status = 1";
     $sql_sensors = "SELECT COUNT(id) as total FROM sensors WHERE status IN (0, 1)";
+	$debuginfo[] = $sql_active;
+	$debuginfo[] = $sql_sensors;
   } else {
-    $sql_active = "SELECT COUNT(tapip) as total FROM sensors WHERE status = 1 AND organisation = " .$s_org;
-    $sql_sensors = "SELECT COUNT(tapip) as total FROM sensors WHERE organisation = " .$s_org. "AND status IN (0, 1)";
+    $sql_active = "SELECT COUNT(id) as total FROM sensors WHERE status = 1 AND organisation = " .$s_org;
+    $sql_sensors = "SELECT COUNT(id) as total FROM sensors WHERE organisation = " .$s_org. " AND status IN (0, 1)";
+	$debuginfo[] = $sql_active;
+	$debuginfo[] = $sql_sensors;
   }
   $result_active = pg_query($pgconn, $sql_active);
   $row = pg_fetch_assoc($result_active);
@@ -317,6 +323,11 @@ function insert_selector($m_show = 1) {
   $to = date("U", mktime(0, 0, 0, date("n"), date("j")+1, date("Y")));
   $selperiod = -1;
 
+  if ($s_default_time == 0) {
+    $from = date("U", mktime(0, 0, 0, date("n"), date("j"), date("Y")));
+    $to = date("U", mktime(0, 0, 0, date("n"), date("j")+1, date("Y")));
+  }
+
   # Checking access
   if ($s_access_search == 9) {
     if (isset($clean['org'])) {
@@ -393,6 +404,7 @@ function insert_selector($m_show = 1) {
           $result_orgs = pg_query($pgconn, $sql_orgs);
           $row = pg_fetch_assoc($result_orgs);
           $q_org_name = $row['organisation'];
+          $q_org_name = substr($q_org_name,0 ,11); 
           echo "<font class='btext'>$q_org_name</font>\n";
           echo "<input type='hidden' name='int_org' value='$s_org' />\n";
         }

@@ -814,7 +814,10 @@ function debug_input() {
 # Function to print debug information about the SQL queries done
 function debug_sql() {
   global $c_debug_sql;
+  global $c_debug_sql_analyze;
   global $debuginfo;
+  include 'config.inc.php';
+  include 'connect.inc.php';
   if ($c_debug_sql == 1) {
     echo "<div class='centerbig'>\n";
       echo "<div class='block'>\n";
@@ -824,7 +827,21 @@ function debug_sql() {
             echo "<textarea rows=20 class='debugsql'>";
               if (is_array($debuginfo)) {
                 foreach ($debuginfo as $val) {
-                  echo "$val\n\n";
+                  echo "$val\n";
+                  if ($c_debug_sql_analyze == 1) {
+                    $pattern = '/^SELECT.*$/';
+                    if (preg_match($pattern, $val)) {
+                      echo str_repeat("-", 80) ."\n";
+                      $sql = "EXPLAIN ANALYZE $val";
+                      $result = pg_query($sql);
+                      while ($row = pg_fetch_assoc($result)) {
+                        $stuff = $row["QUERY PLAN"];
+                        echo "$stuff\n";
+                      }
+                      echo str_repeat("-", 80) ."\n";
+                    }
+                    echo "\n";
+                  }
                 }
               }
             echo "</textarea>\n";
@@ -834,6 +851,7 @@ function debug_sql() {
       echo "</div>\n"; #</block>
     echo "</div>\n"; #</centerbig>
   }
+  pg_close($pgconn);
 }
 
 ###############################

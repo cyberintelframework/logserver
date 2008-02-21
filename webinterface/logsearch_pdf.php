@@ -38,7 +38,7 @@ include "../lang/${c_language}.php";
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "reptype",
+        "reptype",
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
@@ -61,8 +61,8 @@ $allowed_get = array(
 		"orderm",
 		"int_page",
 		"int_binid",
-                "int_sourcechoice",
-                "int_destchoice"
+        "int_sourcechoice",
+        "int_destchoice"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -147,6 +147,11 @@ $f_filename = $clean['filename'];
 # Report type
 ####################
 $f_reptype = $rapport;
+
+####################
+# All ranges
+####################
+$f_sourcechoice = $clean['sourcechoice'];
 
 ####################
 # Sensor ID's
@@ -310,6 +315,8 @@ if (!empty($f_binid)) {
 ####################
 # Ranges
 ####################
+
+
 if ($f_sourcechoice == 3 && $ownsource == "") {
   add_to_sql(gen_org_sql(1), "where");
 } else {
@@ -403,15 +410,15 @@ if ($dst_txt != "") {
 
 #### SOURCE
 $pdf->ezText("Source:", 10);
-if ($f_sourcechoice == 3 && !isset($ownsource)) {
-  $pdf->ezText($smaspace $l['ls_own'], 10);
-}
+
 if (isset($source_ip)) {
   $src_txt = $l['ls_sourceip']. ": $source_ip";
 } elseif (isset($ownsource)) {
   $src_txt = $l['ls_own']. ": $ownsource";
 } elseif (isset($source_mac)) {
   $src_txt = $l['ls_sourcemac']. ": $source_mac";
+} elseif ($f_sourcechoice == 3 && !isset($ownsource)) {
+  $src_txt = "ALL " .$l['ls_own'];
 }
 if (isset($sport)) {
   $src_txt .= ":$sport";

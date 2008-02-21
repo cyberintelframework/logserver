@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# Version 2.10.02                  #
+# 15-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.02 Added option to always send the report
 # 2.10.01 Added language support
 # 2.00.02 Added support for search templates
 # 2.00.01 Initial release (used to be mailadmin.php)

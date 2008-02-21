@@ -66,8 +66,14 @@ if ($s_access_sensor > 1) {
   add_to_sql("argos.imageid", "group");
   add_to_sql("argos.sensorid", "group");
   add_to_sql("sensors.id", "order");
+  ## Organisation  
+  add_to_sql("organisations.id = sensors.organisation", "where");
+  add_to_sql("organisations.organisation", "select");
+  add_to_sql("organisations", "table");
+  add_to_sql("organisations.organisation", "group");
   if ($s_admin != 1) {
     add_to_sql("sensors.organisation = $s_org", "where");
+
   }
   prepare_sql();
   $sql_argos = "SELECT $sql_select ";
@@ -85,9 +91,9 @@ if ($s_access_sensor > 1) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='15%'>" .$l['g_sensor']. " " .printhelp("sensor"). "</th>\n";
+              echo "<th width='20%'>" .$l['g_sensor']. " " .printhelp("sensor"). "</th>\n";
               echo "<th width='15%'>" .$l['ac_deviceip']. " " .printhelp("deviceip"). "</th>\n";
-              echo "<th width='30%'>" .$l['ac_imagename']. " " .printhelp("imagename"). "</th>\n";
+              echo "<th width='25%'>" .$l['ac_imagename']. " " .printhelp("imagename"). "</th>\n";
               echo "<th width='20%'>" .$l['ac_template']. " " .printhelp("template"). "</th>\n";
               echo "<th width='10%'>" .$l['ac_timespan']. " " .printhelp("timespan"). "</th>\n";
               echo "<th width='5%'></th>\n";
@@ -99,6 +105,7 @@ if ($s_access_sensor > 1) {
               $vlanid = $row['vlanid'];
               $label = $row['label'];
               $tapip = $row['tapip'];
+              $org = $row["organisation"];
               $templateid = $row['templateid'];
               $imageid = $row['imageid'];
               $sensorid = $row['sensorid'];
@@ -106,7 +113,11 @@ if ($s_access_sensor > 1) {
               if ($label != "" ) $sensor = $label;
               echo "<tr>\n";
                 echo "<form name='argosadmin_update' action='argosupdate.php' method='post'>\n";
-                  echo "<td>$sensor</td>\n";
+                  if ($s_admin == 1) {
+					echo "<td>$sensor - $org</td>\n";
+				  } else {
+				    echo "<td>$sensor</td>\n";
+                  }
                   echo "<td>$tapip</td>\n";
                   echo "<td>";
                     echo "<select name='int_imageid'>\n";

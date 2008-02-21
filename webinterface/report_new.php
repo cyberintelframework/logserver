@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# Version 2.10.02                  #
+# 15-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added option to always send the report
 # 2.10.01 Added language support
 # 2.00.01 version 2.00
 # 1.04.06 Added more report detail options. Some cosmetic changes.
@@ -23,7 +24,7 @@
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_userid",
+        "int_userid",
 		"int_m"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -73,11 +74,11 @@ echo "<div class='leftmed'>\n";
       echo "<div class='blockContent'>\n";
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
-            echo "<td width='100'>" .$l['re_subject']. "</td>\n";
+            echo "<td width='100'>" .$l['re_subject']. ":</td>\n";
             echo "<td width='200'><input type='text' name='strip_html_escape_subject' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>" .$l['re_mailprio']. "</td>\n";
+            echo "<td>" .$l['re_mailprio']. ":</td>\n";
             echo "<td>";
               echo "<select name='int_priority'>\n";
                 foreach ($v_mail_priority_ar as $key => $val) {
@@ -244,6 +245,10 @@ echo "<div class='leftmed'>\n";
                     }
                   echo "</select>\n";
                 echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr id='always'>\n";
+                echo "<td>" .$l['re_always']. ":</td>\n";
+                echo "<td>" .printCheckBox("", "int_always", 1, 0). "</td>\n";
               echo "</tr>\n";
             echo "</table>\n";
           echo "</div>\n"; #</blockContent>

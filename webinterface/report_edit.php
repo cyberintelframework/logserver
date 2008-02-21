@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# Version 2.10.02                  #
+# 15-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added option to always send the report
 # 2.10.01 Added language support
 # 2.00.02 Fixed Bug with detail display in int_sdetail 
 # 2.00.01 version 2.00
@@ -23,7 +24,7 @@
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_userid",
+        "int_userid",
 		"int_rcid",
 		"int_m"
 );
@@ -93,6 +94,7 @@ if ($numrows > 0) {
   $threshold = $row['threshold'];
   $active = $row['active'];
   $detail = $row['detail'];
+  $always = $row['always'];
 
   echo "<div class='leftmed'>\n";
   echo "<form id='reportform' name='reportform' action='report_save.php' method='post'>\n";
@@ -187,7 +189,7 @@ if ($numrows > 0) {
               echo "</td>\n";
             echo "</tr>\n";
 
-            if ($detail == 4) {
+            if ($detail == 4 || $detail == 5) {
               echo "<tr style='display:;' id='filter' name='filter'>";
             } else {
               echo "<tr style='display: none;' id='filter' name='filter'>";
@@ -215,7 +217,7 @@ if ($numrows > 0) {
               echo "</td>\n";
             echo "</tr>\n";
             if ($temp == 1 || $temp == 2) {
-              if ($detail == 4) {
+              if ($detail == 4 || $detail == 5) {
                 echo "<tr style='display: none;' id='attack_sev' name='attack_sev'>";
               } else {
                 echo "<tr style='display: ;' id='attack_sev' name='attack_sev'>";
@@ -327,6 +329,14 @@ if ($numrows > 0) {
                       }
                     echo "</select>\n";
                   echo "</td>\n";
+                echo "</tr>\n";
+                if ($freq == 1 || $freq == 2 || $freq == 3) {
+                  echo "<tr id='always' style='display: ;'>\n";
+                } else {
+                  echo "<tr id='always' style='display: none;'>\n";
+                }
+                  echo "<td>" .$l['re_always']. ":</td>\n";
+                  echo "<td>" .printCheckBox("", "int_always", 1, $always). "</td>\n";
                 echo "</tr>\n";
               echo "</table>\n";
             echo "</div>\n"; #</blockContent>

@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.00.02                  #
-# 10-10-2007                       #
+# Version 2.10.01                  #
+# 21-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.01 Added debug_sql_analyze
 # 2.00.02 Removed header relocation on unauthorized access
 # 2.00.01 Initial release
 #############################################
@@ -108,6 +109,10 @@ echo "<div class='leftmed'>\n";
           echo "<tr>\n";
             echo "<td width='30%'>c_debug_sql</td>\n";
             echo "<td width='70%'>" .printled($c_debug_sql). "</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_debug_sql_analyze</td>\n";
+            echo "<td>" .printled($c_debug_sql_analyze). "</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td>c_debug_input</td>\n";

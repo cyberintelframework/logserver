@@ -3,13 +3,14 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 23-10-2007                       #
+# Version 2.10.02                  #
+# 01-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 2.10.02 Fixed bug #68
 # 2.10.01 Added language support
 # 2.00.02 Added access check
 # 2.00.01 Fixed a bug with url

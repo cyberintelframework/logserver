@@ -72,9 +72,9 @@ if ($s_admin == 1) {
                   echo "<td><input type='text' name='strip_html_escape_imagename' size='20' value='$imagename' /></td>";
                   echo "<td>\n";
                     echo "<select name='strip_html_escape_osname'>\n";
-                      echo printOption('win2k', 'win2k' , '$osname'); 
-                      echo printOption('winxp', 'winxp' , '$osname'); 
-                      echo printOption('linux', 'linux' , '$osname'); 
+                      echo printOption('win2k', 'win2k' , $osname); 
+                      echo printOption('winxp', 'winxp' , $osname); 
+                      echo printOption('linux', 'linux' , $osname); 
                     echo "</select>\n";
                   echo "</td>\n";
                   echo "<td>\n";
@@ -94,6 +94,7 @@ if ($s_admin == 1) {
                       while ($roworg = pg_fetch_assoc($query_org)) {
                         $idorg = $roworg["id"];
                         $organisation = $roworg["organisation"];
+                        $organisation = substr($organisation,0 ,11); 
                         if ($organisation != "ADMIN") {
                           echo printOption("$idorg", "$organisation" , "$organisationid");
                         }
@@ -140,6 +141,7 @@ if ($s_admin == 1) {
                     while ($roworg = pg_fetch_assoc($query_org)) {
                       $idorg = $roworg["id"];
                       $organisation = $roworg["organisation"];
+                      $organisation = substr($organisation,0 ,11); 
                       if ($organisation != "ADMIN") {
                         echo printOption("$idorg", "$organisation" , "");
                       }

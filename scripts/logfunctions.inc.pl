@@ -3,13 +3,14 @@
 #######################################
 # Function library for logging server #
 # SURFnet IDS                         #
-# Version 2.00.01                     #
-# 14-09-2007                          #
+# Version 2.10.01                     #
+# 11-02-2008                          #
 # Jan van Lith & Kees Trippelvitz     #
 #######################################
 
 #####################
 # Changelog:
+# 2.10.01 Added convert_to_utc
 # 2.00.01 version 2.00
 # 1.04.04 Added printattach
 # 1.04.03 Removed logging in connectdb
@@ -34,6 +35,7 @@
 # 4.05		printenv
 # 4.06		connectdb
 # 4.07		printattach
+# 4.08		convert_to_utc
 ###############################################
 
 # 2.01 getts
@@ -97,7 +99,11 @@ sub getdatetime {
   if ($hh < 10) { $hh = "0" .$hh; }
   if ($dd < 10) { $dd = "0" .$dd; }
   if ($mo < 10) { $mo = "0" .$mo; }
-  $datestring = "$dd-$mo-$yy $hh:$mm:$ss";
+  if ($enable_utc == 1) {
+    $datestring = "$yy-$mo-$dd" ."T". "$hh:$mm:$ss" ."Z";
+  } else {
+    $datestring = "$dd-$mo-$yy $hh:$mm:$ss";
+  }
   return $datestring;
 }
 
@@ -237,6 +243,21 @@ sub printattach() {
   open(ATTACH, ">> $attachfile");
   print ATTACH $msg . "\n";
   close(ATTACH);
+}
+
+# 4.08 utc
+# Function to modify a timestamp into a UTC timestamp
+# ie, it adds or substracts timezone difference and results in a UTC timestamp
+sub utc() {
+  my ($time, $utc);
+  $time = $_[0];
+  if ($enable_utc == 1) {
+    chomp($time);
+    $utc = (3600 * $c_utc_time) + $time;
+    return $utc;
+  } else {
+    return $time;
+  }
 }
 
 return "true";

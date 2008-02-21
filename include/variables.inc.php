@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# Version 2.10.02                  #
+# 12-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 2.10.02 Added Last 24 Hours option for timeselector
 # 2.10.01 Added selview array
 # 2.00.03 Added extra detail type
 # 2.00.02 Removed unused arrays
@@ -209,6 +210,7 @@ $v_mail_detail_ar = array(
 		2 => "Mail - Summary + Detail",
 		3 => "Mail - IDMEF Detail",
 		4 => "Mail - Cymru markup",			# <ASN>  | <IP>  | <time> <info> | <ASN description>
+		5 => "Mail - Nepenthes markup",			# [<time>] <source> -> <url> <md5>
 		10 => "RSS - Summary",
 		11 => "RSS - Summary + Detail"
 );
@@ -459,7 +461,8 @@ $v_proto_types = array(
 
 # Array with the different timespans for the selector
 $v_selector_period = array(
-        1 => "Last Hour",
+        0 => "Last Hour",
+	1 => "Last 24 Hours",
 	2 => "Today",
 	3 => "Last 7 days",
 	4 => "This Week",
