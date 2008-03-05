@@ -2,9 +2,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,30 +13,7 @@
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.12 Added yearly option 
-# 1.04.11 Added IP exclusion stuff
-# 1.04.10 Changed printhelp stuff
-# 1.04.09 Fixed severity stuff
-# 1.04.08 Fixed typo
-# 1.04.07 add_to_sql()
-# 1.04.06 Replaced $where[] with add_where()
-# 1.04.05 Changed some sql stuff
-# 1.04.04 Added ORDER BY for organisation select box
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug stuff
-# 1.04.01 Code layout
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.11 Added intval() for session variables
-# 1.02.10 Added some more input checks and removed includes
-# 1.02.09 Fixed a bug with the search querystring and the period
-# 1.02.08 Removed intval from date browsing
-# 1.02.07 Minor bugfixes and code cleaning
-# 1.02.06 Enhanced debugging
-# 1.02.05 Added debug option
-# 1.02.04 Bugfix: missing FROM-clause
-# 1.02.03 Added number formatting
+# 001 Added language support
 #############################################
 
 # Unsetting the total search result count if it is set

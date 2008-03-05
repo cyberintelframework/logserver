@@ -182,80 +182,99 @@ if ($err != 1) {
         echo "<div class='blockHeader'>$header</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
-            echo "<tr><th colspan='2'>" .$l['sd_name']. "</th></tr>\n";
+            echo "<tr><th colspan='4'>" .$l['sd_name']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td width='150'>" .$l['g_id']. ":</td>\n";
-              echo "<td width='300'>$sid</td>\n";
+              echo "<td width='25%'>" .$l['g_id']. ":</td>\n";
+              echo "<td width='75%' colspan='3'>$sid</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" ,$l['sd_sensorname']. ":</td>\n";
-              echo "<td>$sensor</td>\n";
+              echo "<td colspan='3'>$sensor</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_label']. ":</td>\n";
-              echo "<td>";
                 if ($s_access_sensor > 0) {
                   echo "<form name='chg_label' method='get'>\n";
                     echo "<input type='hidden' name='int_sid' value='$sid' />\n";
-                    echo "<div class='aleft'>\n";
-                      echo "<input type='text' name='strip_escape_html_label' value='$label' />";
-                    echo "</div>\n";
-                    echo "<div class='aright'>\n";
-                      echo "<input type='button' onclick=\"window.location='sensordetails.php?int_sid=$sid&int_dellabel=1&md5_hash=$s_hash';\" class='button' value='" .$l['sd_clear']. "' />\n";
-                      echo "<input type='submit' value='" .$l['g_update']. "' class='button' />\n";
-                    echo "</div>\n";
+                    echo "<td colspan='3'><input type='text' name='strip_escape_html_label' value='$label' />";
+                    echo "<input type='button' onclick=\"window.location='sensordetails.php?int_sid=$sid&int_dellabel=1&md5_hash=$s_hash';\" class='button' value='" .$l['sd_clear']. "' />\n";
+                    echo "<input type='submit' value='" .$l['g_update']. "' class='button' /></td>\n";
                     echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                   echo "</form>\n";
                 } else {
-                  echo "$label";
+                  echo "<td colspan='3'>$label</td>";
                 }
-              echo "</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['g_domain']. ":</td>\n";
-              echo "<td>$org</td>\n";
+              echo "<td colspan='3'>$org</td>\n";
             echo "</tr>\n";
-            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>" .$l['sd_sensorside']. "</th></tr>\n";
+            echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
+            echo "<tr><th colspan='4'>" .$l['sd_sensorside']. "</th></tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_rip']. ":</td>\n";
-              echo "<td>$remote</td>\n";
+              echo "<td colspan='3'>$remote</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_lip']. ":</td>\n";
-              echo "<td>$local</td>\n";
+              echo "<td colspan='3'>$local</td>\n";
             echo "</tr>\n";
-            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>" .$l['sd_serverside']. "</th></tr>\n";
+            echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
+            echo "<tr><th colspan='4'>" .$l['sd_serverside']. "</th></tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_device']. ":</td>\n";
-              echo "<td>$tap</td>\n";
+              echo "<td colspan='3'>$tap</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_devmac']. ":</td>\n";
-              echo "<td>$mac</td>\n";
+              echo "<td colspan='3'>$mac</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_devip']. ":</td>\n";
-              echo "<td>$tapip</td>\n";
+              echo "<td colspan='3'>$tapip</td>\n";
             echo "</tr>\n";
-            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>" .$l['sd_status']. "</th></tr>\n";
+            if ($s_access_sensor == 9) {
+              $sql_adet = "SELECT * FROM sensors_detail WHERE sid = '$sid'";
+              $result_adet = pg_query($sql_adet);
+              $num = 0;
+              while ($row = pg_fetch_assoc($result_adet)) {
+                $num++;
+                $type = $row['type'];
+                $status = $row['status'];
+
+                if (($num % 2) == 1) {
+                  echo "<tr>\n";
+                    echo "<td width='25%'>" .$v_sensor_system_detail_ar[$type]. ":</td>\n";
+                    echo "<td width='25%'>" .printled($status). "</td>\n";
+                } else {
+                    echo "<td width='25%'>" .$v_sensor_system_detail_ar[$type]. ":</td>\n";
+                    echo "<td width='25%'>" .printled($status). "</td>\n";
+                  echo "</tr>\n";
+                }
+              }
+              if (($num % 2) == 1) {
+                  echo "<td width='25%'></td>\n";
+                  echo "<td width='25%'></td>\n";
+                echo "</tr>\n";
+              }
+            }
+            echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
+            echo "<tr><th colspan='4'>" .$l['sd_status']. "</th></tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_started']. ":</td>\n";
-              echo "<td>$start_text</td>\n";
+              echo "<td colspan='3'>$start_text</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_stopped']. ":</td>\n";
-              echo "<td>$stop_text</td>\n";
+              echo "<td colspan='3'>$stop_text</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_updated']. ":</td>\n";
-              echo "<td>$update_text</td>\n";
+              echo "<td colspan='3'>$update_text</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_status']. ":</td>\n";
-              echo "<td>";
+              echo "<td colspan='3'>";
                 echo "<div class='sensorstatus'>";
                   echo "<div class='" .$v_sensorstatus_ar[$status]["class"]. "'>";
                     echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$status]["text"]. "</div>";

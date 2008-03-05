@@ -2,18 +2,15 @@
 <?php
 
 ###################################
-# SURFnet IDS                     #
-# Version 2.10.01                 #
-# 23-10-2007                      #
+# SURFnet IDS 2.10.00             #
+# Changeset 001                   #
+# 03-03-2008                      #
 # Jan van Lith & Kees Trippelvitz #
 ###################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.03 Fixed a bug with clear and missing sensor ID's
-# 2.00.02 Added access check
-# 2.00.01 Initial release
+# 001 Added language support
 #############################################
 
 # Checking access

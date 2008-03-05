@@ -2,9 +2,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,26 +13,7 @@
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.10 Added yearly option 
-# 1.04.09 Added IP exclusions stuff
-# 1.04.08 Set default back to weekly  
-# 1.04.07 Added possible attacks check 
-# 1.04.06 wrong amount of attacks bug fixed
-# 1.04.05 add_to_sql()
-# 1.04.04 Changed some sql stuff
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug stuff
-# 1.04.01 Code layout
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.08 Added intval() to session variables + pattern matching on $b + intval() for $month and $day
-# 1.02.07 Added some more input checks and removed includes
-# 1.02.06 Removed intval from date browsing
-# 1.02.05 Minor bugfixes and code cleaning
-# 1.02.04 Enhanced debugging
-# 1.02.03 Added number formatting
-# 1.02.02 Initial release
+# 001 Added language support
 #############################################
 
 $tsquery = "timestamp >= $from AND timestamp <= $to";

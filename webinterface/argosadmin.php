@@ -2,18 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 23-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.03 Added error message for unauthorized access
-# 2.00.02 Added hash check stuff
-# 2.00.01 Initial release
+# 001 Added language support
 ####################################
 
 # Retrieving posted variables from $_GET

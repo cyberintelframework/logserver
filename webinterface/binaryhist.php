@@ -2,9 +2,9 @@
 <?php
 
 ###################################
-# SURFnet IDS                     #
-# Version 2.10.03                 #
-# 05-11-2007                      #
+# SURFnet IDS 2.10.00             #
+# Changeset 003                   #
+# 03-03-2008                      #
 # Jan van Lith & Kees Trippelvitz #
 ###################################
 # Contributors:                   #
@@ -13,23 +13,9 @@
 
 #############################################
 # Changelog:
-# 2.10.03 Fixed a bug with long virusnames
-# 2.10.02 Added last scanned timestamp
-# 2.10.01 Added language support
-# 2.00.01 New Release 
-# 1.04.07 Added CWS support 
-# 1.04.06 Added check for binary history info
-# 1.04.05 Added download option for binaries
-# 1.04.04 Changed data input handling
-# 1.04.03 Fixed typo
-# 1.04.02 Changed debug stuff
-# 1.04.01 Added debugging for $sql_filename
-# 1.03.02 Fixed a concatenation bug
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.06 added intval() to session variables + pattern match on show variable + record existancy check + pg_close
-# 1.02.05 Added input checks and removed includes
-# 1.02.04 Enhanced debugging
-# 1.02.03 Initial release
+# 003 Fixed a bug with long virusnames
+# 002 Added last scanned timestamp
+# 001 Added language support
 #############################################
 
 $err = 0;

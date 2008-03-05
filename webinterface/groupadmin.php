@@ -2,15 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 06-11-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
-# 2.10.01 Initial release
+# 001 Initial release
 ####################################
 
 $err = 0;

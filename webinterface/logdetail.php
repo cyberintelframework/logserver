@@ -1,24 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.04 Fixed binname variable name
-# 1.04.03 Changed data input handling
-# 1.04.02 Changes due to new table layout binaries, uniq_binaries, scanners, etc
-# 1.04.01 Code layout
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.04 Added intval() to session variables + access handling change
-# 1.02.03 Added some more input checks and removed includes
-# 1.02.02 Initial release
+# 001 Added language support
 #############################################
 
 include '../include/config.inc.php';

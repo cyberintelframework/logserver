@@ -1,17 +1,15 @@
 <?php
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 26-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 IE bug "could not download" fixed 
-# 2.10.01 Added language support
-# 2.00.02 Fixed bugs for ARP poisoning
-# 2.00.01 Initial release (split from logsearch.php)
+# 002 IE bug "could not download" fixed 
+# 001 Added language support
 #############################################
 
 session_start();

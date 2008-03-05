@@ -2,23 +2,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 01-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
-# 2.10.02 Fixed bug #68
-# 2.10.01 Added language support
-# 2.00.02 Added access check
-# 2.00.01 Fixed a bug with url
-# 1.04.05 Fixed a bug with flagstring
-# 1.04.04 Split the different selector forms
-# 1.04.03 Fixed a bug with the sensor selector
-# 1.04.02 Added manufacturer stuff
-# 1.04.01 Initial release
+# 002 Fixed bug #68
+# 001 Added language support
 ####################################
 
 $allowed_get = array(

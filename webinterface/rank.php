@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 2.10.02                  #
-# 13-11-2007                       #
+# Version 2.10.03                  #
+# 22-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -15,6 +15,7 @@
 
 ####################################
 # Changelog:
+# 2.10.03 Fixed debug_sql logging
 # 2.10.02 Removed unneeded extractvars
 # 2.10.01 Added language support
 # 2.00.03 Fixed a bug where it would not show own organisation in top orgs list
@@ -149,7 +150,6 @@ prepare_sql();
 $sql_attacks_org = "SELECT $sql_select ";
 $sql_attacks_org .= " FROM $sql_from ";
 $sql_attacks_org .= " $sql_where ";
-$debuginfo[] = $sql_attacks_org;
 reset_sql();
 
 #########
@@ -167,7 +167,6 @@ prepare_sql();
 $sql_downloads_org = "SELECT $sql_select ";
 $sql_downloads_org .= " FROM $sql_from ";
 $sql_downloads_org .= " $sql_where ";
-$debuginfo[] = $sql_downloads_org;
 reset_sql();
 
 #########
@@ -208,7 +207,6 @@ $sql_topexp_org = "SELECT $sql_select ";
 $sql_topexp_org .= " FROM $sql_from ";
 $sql_topexp_org .= " $sql_where ";
 $sql_topexp_org .= " GROUP BY $sql_group ORDER BY $sql_order ";
-$debuginfo[] = $sql_topexp_org;
 reset_sql();
 
 #########
@@ -253,7 +251,6 @@ $sql_top_org = "SELECT $sql_select ";
 $sql_top_org .= " FROM $sql_from ";
 $sql_top_org .= " $sql_where ";
 $sql_top_org .= " GROUP BY $sql_group ORDER BY $sql_order";
-$debuginfo[] = $sql_top_org;
 reset_sql();
 
 #########
@@ -289,7 +286,6 @@ $sql_topports_org = "SELECT $sql_select ";
 $sql_topports_org .= " FROM $sql_from ";
 $sql_topports_org .= " $sql_where ";
 $sql_topports_org .= " GROUP BY $sql_group ORDER BY $sql_order";
-$debuginfo[] = $sql_topports_org;
 reset_sql();
 
 #########
@@ -324,7 +320,6 @@ $sql_topsource_org = "SELECT $sql_select ";
 $sql_topsource_org .= " FROM $sql_from ";
 $sql_topsource_org .= " $sql_where ";
 $sql_topsource_org .= " GROUP BY $sql_group ORDER BY $sql_order";
-$debuginfo[] = $sql_topsource_org;
 reset_sql();
 
 #########
@@ -357,7 +352,6 @@ $sql_topfiles_org = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
   $sql_topfiles_org .= " AND " .gen_org_sql();
   $sql_topfiles_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
 $sql_topfiles_org .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
-$debuginfo[] = $sql_topfiles_org;
 
 #########
 # 7.01 Top protocols (all)
@@ -389,7 +383,6 @@ $sql_topproto_org = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM "
   $sql_topproto_org .= " AND " .gen_org_sql();
   $sql_topproto_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
 $sql_topproto_org .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
-$debuginfo[] = $sql_topproto_org;
 
 #########
 # 8.01 Top OS (all)
@@ -421,7 +414,6 @@ $sql_topos_org = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
   $sql_topos_org .= " AND " .gen_org_sql();
   $sql_topos_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
 $sql_topos_org .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
-$debuginfo[] = $sql_topos_org;
 
 #########
 # 9.01 Top domains (all)
@@ -512,6 +504,7 @@ echo "<div class='all'>\n";
         echo "<div class='dataBlock'>\n";
           echo "<div class='blockHeader'>" .$l['ra_owndomain']. "</div>\n";
           echo "<div class='blockContent'>\n";
+            $debuginfo[] = $sql_attacks_org;
             $result_attacks = pg_query($pgconn, $sql_attacks_org);
             $row = pg_fetch_assoc($result_attacks);
             $org_attacks = $row['total'];
@@ -521,6 +514,7 @@ echo "<div class='all'>\n";
               $org_attacks_perc = floor(($org_attacks / $total_attacks) * 100);
             }
 
+            $debuginfo[] = $sql_downloads_org;
             $result_downloads = pg_query($pgconn, $sql_downloads_org);
             $row = pg_fetch_assoc($result_downloads);
             $org_downloads = $row['total'];
@@ -625,6 +619,7 @@ echo "<div class='all'>\n";
               $i = 1;
               $grandtotal = 0;
               $exploit_ar = "";
+              $debuginfo[] = $sql_topexp_org;
               $result_topexp_org = pg_query($pgconn, $sql_topexp_org);
               while ($row = pg_fetch_assoc($result_topexp_org)) {
                 $exploit = $row['text'];
@@ -739,6 +734,7 @@ echo "<div class='all'>\n";
                 echo "<th width='20%'>" .$l['ra_totalexpl']. "</th>\n";
               echo "</tr>\n";
               $i = 1;
+              $debuginfo[] = $sql_top_org;
               $result_top_org = pg_query($pgconn, $sql_top_org);
               while ($row_top_org = pg_fetch_assoc($result_top_org)) {
                 echo "<tr>\n";
@@ -834,6 +830,7 @@ echo "<div class='all'>\n";
               $i = 1;
               $grandtotal = 0;
               $port_ar = "";
+              $debuginfo[] = $sql_topports_org;
               $result_topports_org = pg_query($pgconn, $sql_topports_org);
               while ($row = pg_fetch_assoc($result_topports_org)) {
                 $port = $row['dport'];
@@ -961,6 +958,7 @@ echo "<div class='all'>\n";
               $i = 1;
               $grandtotal = 0;
               $source_ar = "";
+              $debuginfo[] = $sql_topsource_org;
               $result_topsource_org = pg_query($pgconn, $sql_topsource_org);
               while ($row = pg_fetch_assoc($result_topsource_org)) {
                 $source = $row['source'];
@@ -1088,6 +1086,7 @@ echo "<div class='all'>\n";
               $i = 0;
               $grandtotal = 0;
               $file_ar = "";
+              $debuginfo[] = $sql_topfiles_org;
               $result_topfiles_org = pg_query($pgconn, $sql_topfiles_org);
               while ($row = pg_fetch_assoc($result_topfiles_org)) {
                 if ($i == $c_topfilenames) {
@@ -1180,6 +1179,7 @@ echo "<div class='all'>\n";
               $i = 0;
               $grandtotal = 0;
               $proto_ar = "";
+              $debuginfo[] = $sql_topproto_org;
               $result_topproto_org = pg_query($pgconn, $sql_topproto_org);
               while ($row = pg_fetch_assoc($result_topproto_org)) {
                 if ($i == $c_topprotocols) {
@@ -1270,6 +1270,7 @@ echo "<div class='all'>\n";
               $i = 0;
               $grandtotal = 0;
               $os_ar = "";
+              $debuginfo[] = $sql_topos_org;
               $result_topos_org = pg_query($pgconn, $sql_topos_org);
               while ($row = pg_fetch_assoc($result_topos_org)) {
                 if ($i == $c_topos) {

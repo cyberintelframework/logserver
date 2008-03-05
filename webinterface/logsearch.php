@@ -1,8 +1,8 @@
 <?php
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.05                  #
-# 11-12-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 005                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,60 +11,11 @@
 
 #########################################################################
 # Changelog:
-# 2.10.05 Fixed BUG #59
-# 2.10.04 Fixed BUGS #42 + #43 
-# 2.10.03 Fixed a typo
-# 2.10.02 Fixed bug with Criterea 
-# 2.10.01 Added language support
-# 2.00.04 No additional info for ARP attacks
-# 2.00.03 Fixed a bug in the navigation
-# 2.00.02 Changed the info you see with Rogue DHCP attacks
-# 2.00.01 version 2.00 
-# 1.04.30 Fixed a bug with the wrong checks for binname
-# 1.04.29 Changed source and destination IP address search fields
-# 1.04.28 Removed PDF generation stuff (this will be redone)
-# 1.04.27 Fixed a bug with pdf 
-# 1.04.26 Fixed a bug with binname when there was no uniq_binaries record
-# 1.04.25 Added IP exclusion stuff
-# 1.04.24 Removed the fix
-# 1.04.23 Fix for newer PostgreSQL versions
-# 1.04.22 Fixed a bug with organisation ranges arrays
-# 1.04.21 Fixed severity check
-# 1.04.20 Removed chartof variable
-# 1.04.19 Fixed typo
-# 1.04.18 Removed libchart stuff, modified search results to include cross organisation attacks
-# 1.04.17 Fixed bug with destination port
-# 1.04.16 Added censorip stuff.
-# 1.04.15 Fixed some layout stuff
-# 1.04.14 Fixed a bug with md5_binname
-# 1.04.13 add_to_sql()
-# 1.04.12 Fixed bug with timestamps and multiple sensors
-# 1.04.11 Fixed bug with rendering time
-# 1.04.10 Fixed a bug with severity 1 and additional info; Added ORDER BY for pof
-# 1.04.09 Changed strip_html_escape_bin to strip_html_escape_binname
-# 1.04.08 Changed data input handling
-# 1.04.07 Bugfix with binaries table linking
-# 1.04.06 Changed debug stuff
-# 1.04.05 Changed binary search method conform database changes
-# 1.04.04 Added personal searchtemplate button for charts
-# 1.04.03 Added some default values for ts_start
-# 1.04.02 Added source and destination empty check
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.16 Changed the way graphs are generated
-# 1.02.15 strip_tags("ts_start"), 
-# 1.02.14 Moved the libchart directory to the surfnetids root dir
-# 1.02.13 Added some text layout to the idmef report
-# 1.02.12 Fixed typo + intval() for session variables
-# 1.02.11 Fixed typo
-# 1.02.10 Removed includes
-# 1.02.09 Enhanced debugging
-# 1.02.08 Fixed a bug with the destination address search
-# 1.02.07 Added debugging option
-# 1.02.06 Bugfix organisation_id in query string
-# 1.02.05 Added Classification and additional info to the IDMEF report
-# 1.02.04 Multiple sensor-select
-# 1.02.03 Query tuning
+# 005 Fixed BUG #59
+# 004 Fixed BUGS #42 + #43 
+# 003 Fixed a typo
+# 002 Fixed bug with Criterea 
+# 001 Added language support
 #########################################################################
 
 ####################

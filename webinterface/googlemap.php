@@ -2,18 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 version 2.00
-# 1.04.02 Added Legend 
-# 1.04.01 Code layout 
-# 1.04.00 initial release 
+# 001 Initial release
 #############################################
 
 # Retrieving some session variables

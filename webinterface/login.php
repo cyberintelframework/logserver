@@ -2,23 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 Changed the location of the md5 lib
-# 1.04.02 Changed data input handling
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.04 Added error message + pg_escape_string for $serverhash
-# 1.02.03 Login procedure changed to handshake between client and server
-# 1.02.02 Added url querystring support
-# 1.02.01 Initial release
+# 001 Added language support
 #############################################
 
 # Including language file

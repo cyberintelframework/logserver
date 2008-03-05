@@ -840,8 +840,8 @@ function debug_sql() {
                       }
                       echo str_repeat("-", 80) ."\n";
                     }
-                    echo "\n";
                   }
+                  echo "\n";
                 }
               }
             echo "</textarea>\n";

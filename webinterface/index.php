@@ -1,26 +1,17 @@
 <?php $tab="1"; $pagetitle="Home"; include("menu.php"); contentHeader();
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 13-12-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Added some comments, split up sql for readability
-# 2.10.01 Added language support
-# 2.00.02 Fixed bug with attacks.dport=0
-# 2.00.01 version 2.00
-# 1.04.07 Fixed a port link when today was selected
-# 1.04.06 Fixed some layout issues
-# 1.04.05 Added dropdown box
-# 1.04.04 Added empty flag for unknown countries
-# 1.04.03 Added geoip and p0f stuff
-# 1.04.02 Added some graphs and stats 
-# 1.04.01 Added changelog and GD check
+# 002 Added some comments, split up sql for readability
+# 001 Added language support
 #############################################
 
 session_start();

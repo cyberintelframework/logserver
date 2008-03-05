@@ -597,4 +597,10 @@ $v_plotters_ar = array(
 	1 => "PHPlot"
 );
 
+$v_sensor_system_detail_ar = array(
+	1 => "Main route",
+	3 => "Tap rule",
+	4 => "Tap route"
+);
+
 ?>

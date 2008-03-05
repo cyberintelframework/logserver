@@ -1,17 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.02 Fixed bugs: display criterea, source address  
-# 2.00.01 Initial release (split from logsearch.php)
+# 001 Added language support
 #############################################
 
 session_start();

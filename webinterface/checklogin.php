@@ -1,29 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 05-09-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #########################################################################
 # Changelog:
-# 2.00.01 Admin users always have 999 access
-# 1.04.05 Always add serverhash to be used for form validation
-# 1.04.04 Fixed wrong error code
-# 1.04.03 Changed data input handling
-# 1.04.02 Added support for user agent checking
-# 1.04.01 Released as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.08 $numrows_user == 1, intval() to $id and $db_org
-# 1.02.07 Changed the url redirection when $_GET['url'] is present
-# 1.02.06 Changed the location of the pg_close command
-# 1.02.05 Added some more input checks
-# 1.02.04 Server-client login handshake added
-# 1.02.03 Added modifications for the org_id table + url querystring support
-# 1.02.02 Added identifier column to organisations table
-# 1.02.01 Initial release
+# 001 Admin users always have 999 access
 #########################################################################
 
 include '../include/config.inc.php';

@@ -2,9 +2,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 24-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,22 +13,7 @@
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.03 Added missing timestamp stuff for the sql query
-# 2.00.02 Removed text on block header 
-# 2.00.01 Added support for possible attacks
-# 1.04.06 Added IP exclusion stuff
-# 1.04.05 add_to_sql()
-# 1.04.04 Replaced $where[] with add_where()
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug stuff
-# 1.04.01 Code layout
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.05 Added intval() to session variables + modified daily table header
-# 1.02.04 Added some more input checks and removed includes
-# 1.02.03 Enhanced debugging
-# 1.02.02 Added debug option
-# 1.02.01 Added number formatting
+# 001 Added language support
 #############################################
 
 # Including language file

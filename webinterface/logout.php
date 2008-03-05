@@ -1,21 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 10-09-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 001                    #
+# 03-03-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 Added a few session variables
-# 1.04.02 Changed data input handling
-# 1.04.01 Added pg_close
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.03 Added setcookie, and session sql query
-# 1.02.02 added session_unset() and session_destroy()
-# 1.02.01 Initial release
+# 001 2.10.00 release
 #############################################
 
 session_start();
