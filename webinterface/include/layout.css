@@ -1,0 +1,110 @@
+/* 
+ * +------------------ 1000 -------------------+ 
+ * 
+ * |8 |	 	984 (content)		    | 8| 
+ * |8 |    630 (left)      |16| 338(right)  | 8| 
+ * |8 |    630 (left)      |8 |             |  | 
+ * |8 |                    |8 | 338(right)  | 8| 
+ * |331 |             | 338(center)|  	  | 331| 
+ */
+
+#page {
+  width:		1000px;
+  margin:		-8px auto;
+}
+
+#page #pageHeader {
+}
+
+#page #pageHeader ul#globalNav {
+  float:		right;
+}
+
+#page #pageHeader ul#globalNav li {
+  float:		left;
+  display:		inline;
+}
+
+#page #pageHeader #globalNav a {
+  float:		left;
+  display:		block;
+}
+
+#page #pageHeader h1 {
+  margin:		0;
+}
+
+#page #pageBody .left {
+  width:		630px;
+  float:		left;
+  margin-left:		8px;
+}
+#page #pageBody .leftmed {
+  width:		488px;
+  float:		left;
+  margin-right:		4px;
+  margin-left:		8px;
+}
+#page #pageBody .leftsmall {
+  width:		338px;
+  float:		left;
+  margin-left:		8px;
+}
+
+#page #pageBody .right {
+  width:		630px;
+  float:		right;
+  margin-left:		4px;
+  margin-right:		8px;
+}
+#page #pageBody .rightmed {
+  width:		488px;
+  float:		right;
+  margin-left:		4px;
+  margin-right:		8px;
+}
+#page #pageBody .rightsmall {
+  width:		338px;
+  float:		right;
+  margin-left:		8px;
+  margin-right:		8px;
+}
+
+#page #pageBody .center {
+  margin-left:		5%;
+  margin-right:		5%;
+  margin-bottom:	20px;
+  width:		90%;
+  float:		left;
+}
+
+#page #pageBody .centersmall {
+  width:		338px;
+  float:		left;
+  margin-left:		331px;
+  margin-right:		331px;
+}
+
+#page #pageBody .centerbig {
+  margin-left:		8px;
+  margin-right:		8px;
+  margin-bottom:	20px;
+  width:		98%;
+  float:		left;
+}
+
+#page #pageBody .all {
+  width:		100%;
+  float:		left;
+}
+
+#page #pageFooter {
+  clear:		both;
+}
+#page #pagecleanFooter {
+  clear:		both;
+}
+
+.clearer {
+  clear:		both;
+}
