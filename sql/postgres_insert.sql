@@ -1,15 +1,15 @@
 --
--- SURFnet IDS database structure
--- Version 2.00.05
--- 25-10-2007
+-- SURFids 2.10.00
+-- Database content
+-- Changeset 002
+-- 18-04-2008
 --
 
+--
 -- Version history
--- 2.00.05 Updated F-prot commands
--- 2.00.04 Updated BitDefender commands
--- 2.00.03 Added scheme record for p0f-db
--- 2.00.02 Added argos_templates stuff
--- 2.00.01 version 2.00
+-- 002 Added arp_excl
+-- 001 Initial release
+--
 
 --
 -- ARGOS_TEMPLATES
@@ -20,6 +20,11 @@ INSERT INTO argos_templates VALUES (1, 'All Traffic', 'all');
 INSERT INTO argos_templates VALUES (2, 'Top 100 of all your sensors', 'top100org');
 INSERT INTO argos_templates VALUES (3, 'Top 100 of all sensors', 'top100all');
 INSERT INTO argos_templates VALUES (4, 'Top 100 sensor', 'top100sensor');
+
+--
+-- ARP_EXCL
+--
+INSERT INTO arp_excl VALUES (1, '01:00:0c:cd:cd:cd');
 
 --
 -- LOGIN

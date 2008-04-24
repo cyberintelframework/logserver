@@ -48,6 +48,12 @@ if (isset($_COOKIE[session_name()])) {
    setcookie(session_name(), '', time()-42000, '/');
 }
 
+if (isset($_COOKIE[SURFids])) {
+  delcookie("int_dplotter");
+  delcookie("int_dplottype");
+  delcookie("int_dutc");
+}
+
 # Some precautions if the previous steps didn't work
 session_unset();
 session_destroy();

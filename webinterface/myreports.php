@@ -2,18 +2,17 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 15-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 003                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
-# 2.10.02 Added option to always send the report
-# 2.10.01 Added language support
-# 2.00.02 Added support for search templates
-# 2.00.01 Initial release (used to be mailadmin.php)
+# 003 Fixed a sorting bug
+# 002 Added option to always send the report
+# 001 Added language support
 ####################################
 
 # Retrieving posted variables from $_GET
@@ -138,7 +137,7 @@ if ($s_access_user > 0) {
               echo "<th width='120'>" .printsort($l['mr_lastsent'], "last_sent"). "</th>\n";
               echo "<th width='100'>" .printsort($l['mr_temp'], "template"). "</th>\n";
               echo "<th width='200'>" .$l['mr_timeopts']. "</th>\n";
-              echo "<th width='140' class='norightb'>" .printsort($l['g_type'], "type"). "</th>\n";
+              echo "<th width='140' class='norightb'>" .printsort($l['g_type'], "detail"). "</th>\n";
               echo "<th width='16' class='noleftb'></th>\n";
               echo "<th width='60'>" .printsort($l['g_status'], "status"). "</th>\n";
               echo "<th>" .$l['g_delete']. "</th>\n";

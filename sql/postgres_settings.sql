@@ -1,32 +1,15 @@
 --
--- SURFnet IDS database structure
--- Version 2.00.03
--- 12-10-2007
+-- SURFids 2.10.00
+-- Database structure
+-- Changeset 002
+-- 18-04-2008
 --
 
+--
 -- Version history
--- 2.00.03 Added privileges for pofuser on scheme
--- 2.00.02 Removed stats_history tables (deprecated).
--- 2.00.01 version 2.00 (added logmessages, sensors_log, removed searchtemplates, arp_alerts)
--- 1.05.01 Added sniff_ tables, modified attacks and arp_cache tables
--- 1.04.16 Added unique constraint for stats_dialogue
--- 1.04.15 Added manufacturer column to arp_cache
--- 1.04.14 Added ARP tables
--- 1.04.13 Added CWS table and org_excl table
--- 1.04.12 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
--- 1.04.11 Added default value for status
--- 1.04.10 Removed nepenthes functions, located in separate sql file now
--- 1.04.09 Updated p0f-db tables
--- 1.04.08 Removed idslog priviliges for scanners
--- 1.04.07 Removed arp stuff from sensors table
--- 1.04.06 Updating sql file for 1.04beta
--- 1.04.05 Changed constraint for report_content
--- 1.04.04 Removed table report and modified login
--- 1.04.03 Switched source and dest in the Nepenthes function surfnet_attack_by_id
--- 1.04.02 Added Nepenthes log-surfnet pgsql functions
--- 1.04.01 Removed the tbl_ references
--- 1.02.06 Added serverhash column to the login table
--- 1.02.05 Initial 1.03 release
+-- 002 Added arp_excl
+-- 001 Initial release
+--
 
 --
 -- SENSORS 
@@ -70,7 +53,6 @@ GRANT SELECT ON TABLE sensors TO argos;
 
 GRANT ALL ON TABLE sensors_id_seq TO idslog;
 GRANT ALL ON TABLE sensors_id_seq TO nepenthes;
-
 
 --
 -- ARGOS 
@@ -178,6 +160,23 @@ ALTER TABLE ONLY arp_cache
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_cache TO idslog;
 GRANT SELECT,UPDATE ON TABLE arp_cache_id_seq TO idslog;
+
+--
+-- ARP_EXCL
+--
+
+CREATE TABLE arp_excl (
+    id serial NOT NULL,
+    mac macaddr NOT NULL
+);
+
+ALTER TABLE ONLY arp_excl
+    ADD CONSTRAINT arp_excl_mac_key UNIQUE (mac);
+
+ALTER TABLE ONLY arp_excl
+    ADD CONSTRAINT arp_excl_pkey PRIMARY KEY (id);
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_excl TO idslog;
 
 --
 -- ARP_STATIC 

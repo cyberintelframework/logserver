@@ -2,15 +2,16 @@
 
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 10-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
-#########################################################################
+#############################################
 # Changelog:
+# 002 Removed URL redirect option
 # 001 Admin users always have 999 access
-#########################################################################
+#############################################
 
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
@@ -35,7 +36,7 @@ $check = extractvars($_GET, $allowed_get);
 $f_user = $clean['user'];
 $f_pass = $clean['pass'];
 
-$sql_user = "SELECT id, access, password, serverhash, organisation FROM login WHERE username = '" .$f_user. "'";
+$sql_user = "SELECT id, access, password, serverhash, organisation, d_plotter, d_plottype, d_utc FROM login WHERE username = '" .$f_user. "'";
 $result_user = pg_query($pgconn, $sql_user);
 $numrows_user = pg_num_rows($result_user);
 
@@ -68,6 +69,13 @@ if ($numrows_user == 1) {
     session_start();
     session_regenerate_id();
     header("Cache-control: private");
+
+    $d_plotter = $row['d_plotter'];
+    $d_plottype = $row['d_plottype'];
+    $d_utc = $row['d_utc'];
+    addcookie("int_dplotter", $d_plotter);
+    addcookie("int_dplottype", $d_plottype);
+    addcookie("int_dutc", $d_utc);
 
     if ($db_org_name == "ADMIN") {
       $_SESSION['s_admin'] = 1;
@@ -117,16 +125,8 @@ if ($numrows_user == 1) {
     $sql_lastlogin = "UPDATE login SET lastlogin = $timestamp, serverhash = '$newserverhash' WHERE username = '" .$f_user. "'";
     $result_lastlogin = pg_query($pgconn, $sql_lastlogin);
 
-    if (isset($clean['url'])) {
-      # URL was set, redirect to URL instead of index
-      $url = $clean['url'];
-      pg_close($pgconn);
-      $address = getaddress();
-      header("location: $address$url");
-    } else {
-      pg_close($pgconn);
-      header("location: index.php");
-    }
+    pg_close($pgconn);
+    header("location: index.php");
   } else {
     pg_close($pgconn);
     header("location: login.php?int_m=125");

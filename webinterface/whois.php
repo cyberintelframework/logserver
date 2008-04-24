@@ -1,23 +1,17 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 09-01-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 003                    #
+# 14-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Added JPNIC support and fixed KRNIC
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.03 Added KRNIC and flush()
-# 1.04.02 Changed data input handling
-# 1.04.01 pg_close added
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.02 Added exit after failed preg_match
-# 1.02.01 Initial release
+# 003 Fixed bug #79
+# 002 Added JPNIC support and fixed KRNIC
+# 001 Added language support
 #############################################
 
 include '../include/config.inc.php';
@@ -27,6 +21,31 @@ include '../include/variables.inc.php';
 
 # Including language file
 include "../lang/${c_language}.php";
+
+# Starting the session
+session_start();
+
+if (isset($_SESSION['s_admin'])) {
+  # Validate the session_id() against the SID in the database
+  $chk_sid = checkSID();
+  if ($chk_sid == 1) {
+    $absfile = $_SERVER['SCRIPT_NAME'];
+    $file = basename($absfile);
+    $address = getaddress();
+
+    $url = basename($_SERVER['SCRIPT_NAME']);
+    header("location: ${address}login.php");
+    exit;
+  }
+} else {
+  $absfile = $_SERVER['SCRIPT_NAME'];
+  $file = basename($absfile);
+  $address = getaddress();
+
+  $url = basename($_SERVER['SCRIPT_NAME']);
+  header("location: ${address}login.php");
+  exit;
+}
 
 echo "<head>\n";
   echo "<link rel='stylesheet' href='${address}include/layout.css' />\n";

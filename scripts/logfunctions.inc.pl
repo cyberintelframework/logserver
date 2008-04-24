@@ -2,20 +2,16 @@
 
 #######################################
 # Function library for logging server #
-# SURFnet IDS                         #
-# Version 2.10.01                     #
-# 11-02-2008                          #
+# SURFnet IDS 2.10.00                 #
+# Changeset 002                       #
+# 04-04-2008                          #
 # Jan van Lith & Kees Trippelvitz     #
 #######################################
 
 #####################
 # Changelog:
-# 2.10.01 Added convert_to_utc
-# 2.00.01 version 2.00
-# 1.04.04 Added printattach
-# 1.04.03 Removed logging in connectdb
-# 1.04.02 Removed DB functions
-# 1.04.01 Initial release
+# 002 Added utc, removed convert_to_utc
+# 001 Added convert_to_utc
 #####################
 
 ###############################################
@@ -35,7 +31,7 @@
 # 4.05		printenv
 # 4.06		connectdb
 # 4.07		printattach
-# 4.08		convert_to_utc
+# 4.08		utc
 ###############################################
 
 # 2.01 getts

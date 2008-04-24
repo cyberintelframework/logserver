@@ -2,17 +2,18 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 004                    #
+# 17-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01
-# 2.00.02 Added hash check
-# 2.00.01 Initial release
+# 004 Changed sensor $status stuff
+# 003 Fixed uptime when uptime = NULL
+# 002 Removed some status leds
+# 001 Modified info message number for changing label
 #############################################
 
 # Retrieving posted variables from $_GET
@@ -64,7 +65,7 @@ if ($err == 0) {
           $label = $clean['label'];
           $sql = "UPDATE sensors SET label = '$label' WHERE id = $sid";
           $result = pg_query($pgconn, $sql);
-          geterror(1);
+          geterror(3);
         }
       } elseif (isset($clean['dellabel'])) {
         if ($clean['hash'] != $s_hash) {
@@ -79,7 +80,7 @@ if ($err == 0) {
     }
   }
   $sql_details = "SELECT keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
-  $sql_details .= " organisations.organisation ";
+  $sql_details .= " organisations.organisation, version, rev, sensormac ";
   $sql_details .= " FROM sensors, organisations WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
@@ -112,29 +113,28 @@ if ($err != 1) {
   $stop_text = date("d-m-Y H:i:s", $stop);
   $update = $row['lastupdate'];
   $update_text = date("d-m-Y H:i:s", $update);
-  $totaltime = $row['uptime'];
   $totaltime_text = sec_to_string($totaltime);
   $uptime = date("U") - $start;
+  if ($start != "") {
+    $uptime = date("U") - $start;
+  } else {
+    $uptime = 0;
+  }
   $uptime_text = sec_to_string($uptime);
   $status = $row['status'];
   $org = $row['organisation'];
+  $sensor_rev = $row['rev'];
+  $version = $row['version'];
+  $sensormac = $row['sensormac'];
 
-  $diffupdate = 0;
-  if ($update != "") {
-    $now = time();
-    $diffupdate = $now - $update;
-  }
+  # Fetching server updates revision
+  $sql_rev = "SELECT value FROM serverinfo WHERE name = 'updaterev'";
+  $debuginfo[] = $sql_rev;
+  $result_rev = pg_query($pgconn, $sql_rev);
+  $row_rev = pg_fetch_assoc($result_rev);
+  $server_rev = $row_rev['value'];
 
-  # Setting status correctly
-  if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
-    $status = 5;
-  } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
-    $status = 1;
-  } elseif ($diffupdate > 3600 && $status == 1) {
-    $status = 4;
-  } elseif ($status == 1 && empty($tap)) {
-    $status = 6;
-  }
+  $cstatus = sensorstatus();
 
   $sql_attack = "SELECT timestamp FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
   $debuginfo[] = $sql_attack;
@@ -219,6 +219,10 @@ if ($err != 1) {
               echo "<td>" .$l['sd_lip']. ":</td>\n";
               echo "<td colspan='3'>$local</td>\n";
             echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_sensormac']. ":</td>\n";
+              echo "<td colspan='3'>$sensormac</td>\n";
+            echo "</tr>\n";
             echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='4'>" .$l['sd_serverside']. "</th></tr>\n";
             echo "<tr>\n";
@@ -233,31 +237,6 @@ if ($err != 1) {
               echo "<td>" .$l['sd_devip']. ":</td>\n";
               echo "<td colspan='3'>$tapip</td>\n";
             echo "</tr>\n";
-            if ($s_access_sensor == 9) {
-              $sql_adet = "SELECT * FROM sensors_detail WHERE sid = '$sid'";
-              $result_adet = pg_query($sql_adet);
-              $num = 0;
-              while ($row = pg_fetch_assoc($result_adet)) {
-                $num++;
-                $type = $row['type'];
-                $status = $row['status'];
-
-                if (($num % 2) == 1) {
-                  echo "<tr>\n";
-                    echo "<td width='25%'>" .$v_sensor_system_detail_ar[$type]. ":</td>\n";
-                    echo "<td width='25%'>" .printled($status). "</td>\n";
-                } else {
-                    echo "<td width='25%'>" .$v_sensor_system_detail_ar[$type]. ":</td>\n";
-                    echo "<td width='25%'>" .printled($status). "</td>\n";
-                  echo "</tr>\n";
-                }
-              }
-              if (($num % 2) == 1) {
-                  echo "<td width='25%'></td>\n";
-                  echo "<td width='25%'></td>\n";
-                echo "</tr>\n";
-              }
-            }
             echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='4'>" .$l['sd_status']. "</th></tr>\n";
             echo "<tr>\n";
@@ -276,8 +255,8 @@ if ($err != 1) {
               echo "<td>" .$l['sd_status']. ":</td>\n";
               echo "<td colspan='3'>";
                 echo "<div class='sensorstatus'>";
-                  echo "<div class='" .$v_sensorstatus_ar[$status]["class"]. "'>";
-                    echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$status]["text"]. "</div>";
+                  echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
+                    echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
                   echo "</div>\n";
                 echo "</div>";
               echo "</td>\n";
@@ -358,6 +337,22 @@ if ($err != 1) {
               echo "<td><span id='js_uptime'>$uptime_text</span></td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_version']. "</th></tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_revision']. ":</td>\n";
+              echo "<td>$sensor_rev</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td colspan='2'>\n";
+                $version_ar = split(",", $version);
+                echo "<textarea id='version'>";
+                  foreach ($version_ar as $key => $a_ver) {
+                    print "$a_ver\n";
+                  }
+                echo "</textarea>\n";
+              echo "</td>\n";
+            echo "</tr>\n";
+            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='2'>" .$l['sd_events']. "</th></tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_totalevents']. ":</td>\n";
@@ -369,6 +364,8 @@ if ($err != 1) {
                     foreach ($v_logmessages_type_ar as $key => $val) {
                       echo printOption($key, "$val", $logfilter);
                     }
+                  echo "</select>\n";
+                echo "</div>\n";
               echo "</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
@@ -380,7 +377,6 @@ if ($err != 1) {
                     $ev_log = $row_events['log'];
                     $ev_args = $row_events['args'];
                     echo show_log_message($ev_timestamp, $ev_log, $ev_args);
-#                    echo "[$ev_timestamp] $ev_log\n";
                   }
                 echo "</textarea>\n";
               echo "</td>\n";

@@ -42,17 +42,11 @@ if (isset($clean['selview'])) {
   $selview = intval($c_selview);
 }
 
-$or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL AND NOT status = 3)";
 add_to_sql("sensors.*", "select");
 if ($selview == "1") {
-  add_to_sql("(status = 0 OR $or)", "where");
+  add_to_sql("status = 0", "where");
 } elseif ($selview == "2") {
-  add_to_sql("(status = 1 OR $or)", "where");
-} elseif ($selview == "3") {
-  $now = time();
-  $upd = $now - 3600;
-  add_to_sql("((NOT status = 0", "where");
-  add_to_sql("lastupdate < $upd) OR $or)", "where");
+  add_to_sql("status = 1", "where");
 }
 
 if ($s_admin == 1) {

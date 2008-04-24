@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 005                    #
-# 03-03-2008                       #
+# Changeset 006                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 007 Added MAC exclusion stuff
 # 005 Fixed BUG #59
 # 004 Fixed BUGS #42 + #43 
 # 003 Fixed a typo
@@ -85,7 +86,9 @@ $allowed_get = array(
 		"int_sourcechoice",
 		"int_destchoice",
 		"int_interval",
-		"int_gid"
+		"int_gid",
+		"int_macfilter",
+		"int_ipfilter"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -103,6 +106,21 @@ if (isset($tainted['sort'])) {
 } else {
   $sql_sort = " timestamp ASC";
   $sort = "timestampa";
+}
+
+###################
+# FILTERS
+###################
+if (isset($clean['macfilter'])) {
+  $filter_mac = $clean['macfilter'];
+} else {
+  $filter_mac = 1;
+}
+
+if (isset($clean['ipfilter'])) {
+  $filter_ip = $clean['ipfilter'];
+} else {
+  $filter_ip = 1;
 }
 
 ###################
@@ -185,7 +203,6 @@ $f_filename = $clean['filename'];
 # Report type
 ####################
 $f_reptype = $rapport;
-
 
 ####################
 # Choice Types
@@ -396,8 +413,14 @@ add_to_sql("sensors.label", "select");
 add_to_sql("sensors", "table");
 add_to_sql("attacks.sensorid = sensors.id", "where");
 
-# IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+if ($filter_ip == 1) {
+  # IP Exclusion stuff
+  add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+}
+if ($filter_mac == 1) {
+  # MAC Exclusion stuff
+  add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+}
 
 prepare_sql();
 
@@ -479,8 +502,7 @@ echo "<div class='leftmed'>";
                   elseif ($sensorid > 0) {
                     echo "$sensorid";
                     $graph[] = "sensorid=$sensorid";
-                  }
-                  else {
+                  } else {
                     foreach ($ar_sensorid as $key=>$sid) {
                       if ($q_org == 0) {
                         $sensor_where = " ";
@@ -615,16 +637,40 @@ echo "<div class='leftmed'>";
         echo "</table>"; 
         echo "<hr>\n";
         echo "<table class='actiontable'>\n";
-          $sql_exclusion = "SELECT exclusion FROM org_excl WHERE orgid = $q_org";
-          $result_exclusion = pg_query($pgconn, $sql_exclusion);
-          $query = pg_query($sql_exclusion);
-          $debuginfo[] = $sql_exclusion;
-          $nr_exclusionrows = intval(@pg_result($query, 0));
-          if ($nr_exclusionrows > 1) {
-            $ip_excl = "<a href='orgipadmin.php'>" .$l['ls_ipex_on']. "</a>";
-          } else { 
-            $ip_excl = "<a href='orgipadmin.php'>IP Exclusion off</a>"; 
-          } 
+          if ($filter_ip == 1) {
+            $sql_exclusion = "SELECT exclusion FROM org_excl WHERE orgid = $q_org";
+            $debuginfo[] = $sql_exclusion;
+            $result_exclusion = pg_query($pgconn, $sql_exclusion);
+            $ip_exclusionrows = pg_num_rows($result_exclusion);
+            while ($row_ip = pg_fetch_assoc($result_exclusion)) {
+              $ip_excl_text .= $row_ip['exclusion'] ."<br />";
+            }
+            if ($ip_exclusionrows > 0) {
+              $ip_excl = "<a href='orgipadmin.php' " .printover($ip_excl_text). ">" .$l['ls_ipex_on']. "</a>";
+            } else { 
+              $ip_excl = "<a href='orgipadmin.php'>" .$l['ls_ipex_off']. "</a>"; 
+            } 
+          } else {
+            $ip_excl = "<a href='orgipadmin.php'>" .$l['ls_ipex_off']. "</a>"; 
+          }
+
+          if ($filter_mac == 1) {
+            $sql_exclusion = "SELECT mac FROM arp_excl";
+            $debuginfo[] = $sql_exclusion;
+            $result_exclusion = pg_query($pgconn, $sql_exclusion);
+            $mac_exclusionrows = pg_num_rows($result_exclusion);
+            while ($row_mac = pg_fetch_assoc($result_exclusion)) {
+              $mac_excl_text .= $row_mac['mac'] ."<br />";
+            }
+            if ($mac_exclusionrows > 0) {
+              $mac_excl = "<a href='#' " .printover($mac_excl_text). ">" .$l['ls_macex_on']. "</a>";
+            } else { 
+              $mac_excl = $l['ls_macex_off'];
+            }
+          } else {
+            $mac_excl = $l['ls_macex_off'];
+          }
+
           echo "<tr>\n";
             echo "<td width='18%'>" .$l['ls_source']. ":</td>\n";
             echo "<th width='52%'>\n";
@@ -635,9 +681,7 @@ echo "<div class='leftmed'>";
               if (isset($source_mac)) echo "$source_mac";
               if (isset($sport)) echo ":$sport";
             echo "</th>\n";
-            echo "<td width='30%' class='aright'>";
-              if ($nr_exclusionrows > 1) echo " (" .$l['ls_ipex_on']. ") ";
-              else echo " (" .$l['ls_ipex_off']. ") ";
+            echo "<td width='30%' class='aright'>$ip_excl<br />$mac_excl<br />";
 	    echo "<a onclick='\$(\"#search_source\").toggle();'>" .$l['ls_change']. "</a></td>\n";
           echo "</tr>\n";
 	echo "</table>\n";
@@ -709,8 +753,12 @@ echo "<div class='leftmed'>";
             echo "<td><input type='text' name='int_sport' size='5' value='$sport' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td></td>\n";
-            echo "<td>$ip_excl</td>\n";
+            echo "<td>" .$l['ls_ipfilter']. ":</td>\n";
+            echo "<td>" .printradio($l['g_on'], "int_ipfilter", 1, $filter_ip). "&nbsp;&nbsp;" .printradio($l['g_off'], "int_ipfilter", 0, $filter_ip). "</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>" .$l['ls_macfilter']. ":</td>\n";
+            echo "<td>" .printradio($l['g_on'], "int_macfilter", 1, $filter_mac). "&nbsp;&nbsp;" .printradio($l['g_off'], "int_macfilter", 0, $filter_mac). "</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
@@ -1014,7 +1062,7 @@ if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" 
 #flush();
 prepare_sql();
 
-$sql =  " SELECT $sql_select";
+$sql =  "SELECT $sql_select";
 $sql .= " FROM $sql_from ";
 $sql .= " $sql_where ";
 $sql .= " ORDER BY $sql_sort ";

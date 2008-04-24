@@ -2,29 +2,22 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 15-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 003                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Added option to always send the report
-# 2.10.01 Added language support
-# 2.00.02 Fixed Bug with detail display in int_sdetail 
-# 2.00.01 version 2.00
-# 1.04.05 Added hash check
-# 1.04.04 Fixed a bug with weekday count
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug stuff
-# 1.04.01 Released as 1.04.01
-# 1.03.01 Split up report.php into seperate files
+# 003 Added UTC timestamp support
+# 002 Added option to always send the report
+# 001 Added language support
 #############################################
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-        "int_userid",
+	        "int_userid",
 		"int_rcid",
 		"int_m"
 );
@@ -95,6 +88,7 @@ if ($numrows > 0) {
   $active = $row['active'];
   $detail = $row['detail'];
   $always = $row['always'];
+  $utc = $row['utc'];
 
   echo "<div class='leftmed'>\n";
   echo "<form id='reportform' name='reportform' action='report_save.php' method='post'>\n";
@@ -231,6 +225,20 @@ if ($numrows > 0) {
                   echo printOption(-1, $l['re_allsev'], $sev);
                   foreach ($v_severity_ar as $key=>$val) {
                     echo printOption($key, $val, $sev);
+                  }
+                echo "</select>\n";
+              echo "</td>\n";
+            echo "</tr>\n";
+            if ($detail == 4 || $detail == 5) {
+              echo "<tr style='display:;' id='timestamps' name='timestamps'>";
+            } else {
+              echo "<tr style='display: none;' id='timestamps' name='timestamps'>";
+            }
+              echo "<td width='100'>" .$l['re_timeformat']. ":</td>\n";
+              echo "<td width='200'>";
+                echo "<select name='int_utc' id='int_filter'>\n";
+                  foreach ($v_timestamp_format_ar as $key=>$val) {
+                    echo printOption($key, $val, $utc);
                   }
                 echo "</select>\n";
               echo "</td>\n";

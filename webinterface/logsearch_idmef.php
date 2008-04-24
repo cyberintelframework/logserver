@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 002                    #
-# 03-03-2008                       #
+# Changeset 003                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Added ARP exclusion stuff
 # 002 IE bug "could not download" fixed 
 # 001 Added language support
 #############################################
@@ -320,6 +321,8 @@ add_to_sql("sensors.id = attacks.sensorid", "where");
 
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 
 prepare_sql();
 

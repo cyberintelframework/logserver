@@ -1,16 +1,17 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 15-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 003                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Fixed bug #74
-# 2.10.01 Initial release
+# 003 Added ARP exclusion stuff
+# 002 Fixed bug #74
+# 001 Initial release
 #############################################
 
 if ($c_geoip_enable == 1) {
@@ -33,6 +34,10 @@ echo "<div class='block'>\n";
         $query = "attacks.sensorid = sensors.id ";
         $query .= "AND timestamp >= $from AND timestamp <= $to ";
         $query .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org) ";
+
+        # MAC Exclusion stuff
+        add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
         if ($q_org != 0) {
           $query .= " AND sensors.organisation = '$q_org' ";
         }

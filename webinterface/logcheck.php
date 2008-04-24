@@ -3,8 +3,8 @@
 
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 002 Added ARP exclusion stuff
 # 001 Added language support
 #############################################
 
@@ -77,6 +78,8 @@ echo "<div class='left'>\n";
 
                 # IP Exclusion stuff
                 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+                # MAC Exclusion stuff
+                add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 
                 prepare_sql();
 

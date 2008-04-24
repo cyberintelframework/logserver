@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 ####################################
 # Mail reporter                    #
-# SURFnet IDS                      #
-# Version 2.10.05                  #
-# 15-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 006                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,54 +12,12 @@
 
 #########################################################################################
 # Changelog:
-# 2.10.05 Added support for the "always send" option
-# 2.10.04 Fixed bug with own ranges exclusion
-# 2.10.03 Added Nepenthes markup stuff
-# 2.10.02 Normal text mails are now sent without attachment
-# 2.10.01 Added Cymru mail report
-# 2.00.01 version 2.00 - improved mailreporter
-# 1.04.10 Fixed a bug with the ARP template
-# 1.04.09 Added IP exclusion stuff
-# 1.04.08 Fixed group by issue with all attacks reports
-# 1.04.07 Fixed $logstamp variable
-# 1.04.06 Fixed logsearch.php url
-# 1.04.05 Added vlanid to sensor name
-# 1.04.04 Removed out of date sensor message
-# 1.04.03 Restructured the code
-# 1.04.02 Fixed a bug with daily reports at a certain time and sensor specific reports
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.07 Fixed a bug in the sensorstatus query
-# 1.03.06 Fixed a send bug with template 4
-# 1.03.05 Fixed bug when email address was empty
-# 1.03.04 Updated with sensor status report
-# 1.03.03 Fixed division by zero bug
-# 1.03.02 Fixed average attack calculation
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.09 Bugfixes
-# 1.02.08 Bugfix
-# 1.02.07 Fully addapted for new mail reporting.                                        
-# 1.02.06 Fixed a bug in the timestamp of the logfiles.                                 
-#########################################################################################
-
-#########################################################################################
-# Copyright (C) 2005-2006 SURFnet                                                       #
-# Authors Jan van Lith & Kees Trippelvitz                                               #
-#                                                                                       #
-# This program is free software; you can redistribute it and/or                         #
-# modify it under the terms of the GNU General Public License                           #
-# as published by the Free Software Foundation; either version 2                        #
-# of the License, or (at your option) any later version.                                #
-#                                                                                       #
-# This program is distributed in the hope that it will be useful,                       #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of                        #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                         #
-# GNU General Public License for more details.                                          #
-#                                                                                       #
-# You should have received a copy of the GNU General Public License                     #
-# along with this program; if not, write to the Free Software                           #
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.       #
-#                                                                                       #
-# Contact ids@surfnet.nl                                                                #
+# 006 Added UTC support
+# 005 Added support for the "always send" option
+# 004 Fixed bug with own ranges exclusion
+# 003 Added Nepenthes markup stuff
+# 002 Normal text mails are now sent without attachment
+# 001 Added Cymru mail report
 #########################################################################################
 
 # This script will send a mail clearsigned with gnupgp (if configured in webinterface) containing information
@@ -147,7 +105,7 @@ $sql_email = "SELECT login.email, login.organisation, report_content.id, report_
 $sql_email .= " report_content.template, report_content.last_sent, report_content.sensor_id, ";
 $sql_email .= " report_content.frequency, report_content.interval, report_content.priority, ";
 $sql_email .= " report_content.subject, report_content.operator, report_content.threshold, ";
-$sql_email .= " report_content.severity, report_content.detail, login.gpg, report_content.always ";
+$sql_email .= " report_content.severity, report_content.detail, login.gpg, report_content.always, report_content.utc ";
 $sql_email .= " FROM login, report_content ";
 $sql_email .= " WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
 $sql_email .= " AND report_content.detail < 10 ";
@@ -175,6 +133,7 @@ while (@row = $email_query->fetchrow_array) {
   $detail = $row[14];
   $gpg_enabled = $row[15];
   $always = $row[16];
+  $enable_utc = $row[17];
 
   # The maill will be sent per default
   $sendit = 1;

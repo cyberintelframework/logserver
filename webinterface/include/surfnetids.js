@@ -104,6 +104,8 @@ function sh_mailtemp(si) {
     $('#timeoptions').hide();
     $('#repdetail').hide();
     $('#srepdetail').show();
+
+    $('#timestamps').hide();
   } else if (si == 5) {
     $('#attack_sev').hide();
     $('#sensor_sev').hide();
@@ -114,6 +116,8 @@ function sh_mailtemp(si) {
     $('#timeoptions').hide();
     $('#repdetail').hide();
     $('#srepdetail').hide();
+
+    $('#timestamps').hide();
   } else if (si == 7) {
     $('#attack_sev').hide();
     $('#sensor_sev').hide();
@@ -124,6 +128,8 @@ function sh_mailtemp(si) {
     $('#timeoptions').hide();
     $('#repdetail').hide();
     $('#srepdetail').hide();
+
+    $('#timestamps').hide();
   } else {
     $('#attack_sev').show();
     $('#sensor_sev').hide();
@@ -134,6 +140,8 @@ function sh_mailtemp(si) {
     $('#timeoptions').show();
     $('#repdetail').show();
     $('#srepdetail').hide();
+
+    $('#timestamps').show();
   }
 }
 
@@ -770,5 +778,14 @@ function submitform(formid, url, action, loc, str) {
         }
       }
     });
+  }
+}
+
+function redirmap() {
+  var val = $('#redirmapper').val();
+  if (val == 1) {
+    window.location='googlemap.php';
+  } else {
+    window.location='sensormap.php';
   }
 }

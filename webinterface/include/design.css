@@ -476,8 +476,10 @@ PRE {
 .sensorstatus .config {
   height:		20px;
 }
-
 .sensorstatus .starting {
+  height:		20px;
+}
+.sensorstatus .keepalive {
   height:		20px;
 }
 /*
@@ -570,7 +572,12 @@ PRE {
 */
 #eventlog {
   height:		210px;
-  width:		100%;
+  width:		99%;
+}
+
+#version {
+  height:		150px;
+  width:		99%;
 }
 
 .smallinput {
@@ -659,3 +666,45 @@ PRE {
   float:		left;
 }
 */
+
+/*
+ ********************
+ * Dashboard
+ ********************
+*/
+
+#dashboard {
+  padding-top:		20px;
+  position:             absolute;
+  background-color:	white;
+  border:		1px solid black;
+  top:                  0;
+  left:                 0;
+  z-index:              5000;
+  overflow-y:		scroll;
+  overflow-x:		hidden;
+}
+
+#dashsensor {
+  overflow-y:		auto;
+}
+
+#dash-sensors-main {
+  float:		left;
+}
+
+.dash-sensors-row {
+  float:		left;
+}
+
+.dash-sensors-item {
+  float:		left;
+}
+
+.draggable-hover {
+  cursor:		hand;
+}
+
+.draggable-normal {
+  cursor:		default;
+}

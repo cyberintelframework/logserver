@@ -1,18 +1,18 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 05-12-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 004                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Added s_access_user check
-# 2.10.01 Added language support
-# 2.00.02 Fixed pubDate to display attack timestamp
-# 2.00.01 Initial release
+# 004 Added ARP exclusion stuff
+# 003 Fixed sensorstatus RSS
+# 002 Added s_access_user check
+# 001 Added language support
 #############################################
 
 include '../include/config.inc.php';
@@ -163,7 +163,12 @@ if ($err == 0) {
     $sql .= " LEFT JOIN details ";
     $sql .= " ON attacks.id = details.attackid ";
     $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+
+    # IP Exclusion stuff
     $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+    # MAC Exclusion stuff
+    $sql .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))" ;
+
     $sql .= " $andorg $andsensor $andsev ";
     $sql .= " ORDER BY attacks.id DESC ";
     $sql .= " LIMIT 10 ";
@@ -226,7 +231,12 @@ if ($err == 0) {
         $sql .= " LEFT JOIN details ";
         $sql .= " ON attacks.id = details.attackid ";
         $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+
+        # IP Exclusion stuff
         $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
+        # MAC Exclusion stuff
+        $sql .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+
         $sql .= " AND attacks.source <<= '$val' ";
         $sql .= " $andorg $andsensor $andsev ";
         $sql .= " ORDER BY attacks.id DESC ";
@@ -285,7 +295,49 @@ if ($err == 0) {
       $rss_channel->items[] = $item;
     }
   } elseif ($template == 4) {
-    $sql = "SELECT * FROM sensors WHERE ";
+    $sql = "SELECT id, keyname, vlanid, status, label, netconf, tapip, tap, lastupdate FROM sensors WHERE status IN (0,1) $andorg $andsensor";
+    $result = pg_query($pgconn, $sql);
+    while ($row = pg_fetch_assoc($result)) {
+      $sid = $row['id'];
+      $keyname = $row['keyname'];
+      $vlanid = $row['vlanid'];
+      $label = $row['label'];
+      $lastupdate = $row['lastupdate'];
+      $status = $row['status'];
+      $tap = $row['tap'];
+      $tapip = $row['tapip'];
+
+      $sensor = sensorname($keyname, $vlanid, $label);
+      $ts = date("U");
+
+      # Setting status correctly
+      if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
+        $status = 5;
+      } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
+        $status = 1;
+      } elseif ($diffupdate > 3600 && $status == 1) {
+        $status = 4;
+      } elseif ($status == 1 && empty($tap)) {
+        $status = 6;
+      }
+
+      $sql_rev = "SELECT value FROM serverinfo WHERE name = 'updaterev'";
+      $debuginfo[] = $sql_rev;
+      $result_rev = pg_query($pgconn, $sql_rev);
+      $row_rev = pg_fetch_assoc($result_rev);
+      $server_rev = $row_rev['value'];
+      if ($server_rev != $sensorrev) {
+        $status = 7;
+      }
+
+      $statustext = $v_sensorstatus_ar[$status]["text"];
+
+      $item = new rssGenerator_item();
+      $item->title = "$sensor is $statustext";
+      $item->description = "Status code: $status";
+      $item->pubDate = "$ts";
+      $rss_channel->items[] = $item;
+    }
   }
 
   ################################

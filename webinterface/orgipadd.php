@@ -39,7 +39,9 @@ $s_hash = md5($_SESSION['s_hash']);
 $allowed_post = array(
                 "int_orgid",
                 "ip_exclusion",
-		"md5_hash"
+		"mac_exclusion",
+		"md5_hash",
+		"int_type"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -50,21 +52,33 @@ if ($s_access_user < 2) {
   $m = 101;
 }
 
+if (!isset($clean['type'])) {
+  $err = 1;
+  $m = 181;  
+} else {
+  $type = $clean['type'];
+  if ($type == 0 || $type > 2) {
+    $err = 1;
+    $m = 181;  
+  }
+}
+
 # Setting up organisation
-if ($s_admin == 1) {
-  if (isset($clean['orgid'])) {
-    $org = $clean['orgid'];
-    if ($org == 0) {
-      $err = 1;
-      $m = 107;
+if ($type == 1) {
+  if ($s_admin == 1) {
+    if (isset($clean['orgid'])) {
+      $org = $clean['orgid'];
+      if ($org == 0) {
+        $err = 1;
+        $m = 107;
+      }
+    } else {
+      $org = $s_org;
     }
   } else {
     $org = $s_org;
   }
-} else {
-  $org = $s_org;
 }
-
 
 if ($clean['hash'] != $s_hash) {
   $err = 1;
@@ -72,15 +86,19 @@ if ($clean['hash'] != $s_hash) {
 }
 
 if (!isset($clean['exclusion'])) {
-  $m = 121;
   $err = 1;
+  $m = 121;
 } else {
   $exclusion = $clean['exclusion'];
 }
 
 if ($err != 1) {
-  $sql = "INSERT INTO org_excl (orgid, exclusion) ";
-  $sql .= "VALUES ($org, '$exclusion')";
+  if ($type == 1) {
+    $sql = "INSERT INTO org_excl (orgid, exclusion) ";
+    $sql .= "VALUES ($org, '$exclusion')";
+  } elseif ($type == 2) {
+    $sql = "INSERT INTO arp_excl (mac) VALUES ('$exclusion')";
+  }
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;

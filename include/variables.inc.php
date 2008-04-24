@@ -1,44 +1,16 @@
 <?php
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 12-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 003                    #
+# 07-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Added Last 24 Hours option for timeselector
-# 2.10.01 Added selview array
-# 2.00.03 Added extra detail type
-# 2.00.02 Removed unused arrays
-# 2.00.01 added v_weekdays
-# 1.04.23 Modified some comments to correctly describe the variables
-# 1.04.22 Added some more options to v_mail_detail array
-# 1.04.21 Added IP address organisation identifier
-# 1.04.20 Added detail array
-# 1.04.19 Changed some variables values  
-# 1.04.18 Removed some unused arrays
-# 1.04.17 Added several ARGOS entries  
-# 1.04.16 Added v_arp_alerts array
-# 1.04.15 Added orgipadmin.php error messages
-# 1.04.14 Changed help message for sensorstatus - action
-# 1.04.13 Added error message for missing vlan id
-# 1.04.12 Changed help messages
-# 1.04.11 Added Argos attack
-# 1.04.10 Added error messages for mailadmin
-# 1.04.09 Added error messages
-# 1.04.08 Added v_phplot_data_colors array
-# 1.04.07 Added v_index_periods array
-# 1.04.06 Added v_indexcolors array
-# 1.04.05 Added error string for orgedit.php
-# 1.04.04 Added v_ prefix to the variables
-# 1.04.03 Added a few more error messages
-# 1.04.02 Added org_ident_type_ar
-# 1.04.01 Released as 1.04.01
-# 1.03.02 Added sensor status to mail report templates
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.02 Added new mailreporting arrays
+# 003 Added new error message
+# 002 Added Last 24 Hours option for timeselector
+# 001 Added selview array
 #############################################
 
 # The array with dialogue name, exploit name and additional info. Desc is not used at the moment.
@@ -348,7 +320,8 @@ $v_errors = array(
 		151 => "Sensor already a member of this group!",
 		152 => "The group needs to be approved by an admin first!",
 		153 => "Invalid or missing default graph!",
-		154 => "Invalid or missing default graph type!"
+		154 => "Invalid or missing default graph type!",
+		155 => "Invalid IP address. Choose a different IP address!"
 );
 
 # Array for the different types of plots available.
@@ -500,8 +473,8 @@ $v_sensorstatus_ar = array(
 		'text' => "Ignored"
 	),
 	4 => array(
-		'class' => "outdated",
-		'text' => "Out of date"
+		'class' => "keepalive",
+		'text' => "Missing keepalive"
 	),
 	5 => array(
 		'class' => "config",
@@ -510,6 +483,10 @@ $v_sensorstatus_ar = array(
 	6 => array(
 		'class' => "starting",
 		'text' => "Starting up"
+	),
+	7 => array(
+		'class' => "outdated",
+		'text' => "Out of date"
 	)
 );
 
@@ -567,8 +544,7 @@ $v_os_languages = array(
 $v_selview_ar = array(
 	0 => "View all sensors",
 	1 => "View offline sensors",
-	2 => "View online sensors",
-	3 => "View outdated sensors"
+	2 => "View online sensors"
 );
 
 $v_group_type_ar = array(
@@ -601,6 +577,11 @@ $v_sensor_system_detail_ar = array(
 	1 => "Main route",
 	3 => "Tap rule",
 	4 => "Tap route"
+);
+
+$v_timestamp_format_ar = array(
+	0 => "Local time",
+	1 => "UTC time"
 );
 
 ?>

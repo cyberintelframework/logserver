@@ -1,22 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 15-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added option to always send the report
-# 2.00.01 version 2.00
-# 1.04.05 Added hash check
-# 1.04.04 Fixed a bug with weekday count
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug stuff
-# 1.04.01 Released as 1.04.01
-# 1.03.01 Split up report.php into seperate files
+# 002 Added UTC support
+# 001 Added option to always send the report
 #############################################
 
 include '../include/config.inc.php';
@@ -64,7 +58,8 @@ $allowed_post = array(
 		"int_sdetail",
 		"int_filter",
 		"md5_hash",
-        "int_always"
+	        "int_always",
+		"int_utc"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -122,6 +117,12 @@ if (!isset($clean['template'])) {
   $m = 130;
 } else {
   $template = $clean['template'];
+}
+
+if (isset($clean['utc'])) {
+  $utc = $clean['utc'];
+} else {
+  $utc = 0;
 }
 
 if (!isset($clean['sevattack']) || !isset($clean['sevsensor'])) {
@@ -213,8 +214,8 @@ if ("$sev" == "") {
 }
 
 if ($err == 0) {
-  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity, detail, always) ";
-  $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev', '$detail', '$always')";
+  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity, detail, always, utc) ";
+  $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev', '$detail', '$always', '$utc')";
   $debuginfo[] = $sql;
   $ec = pg_query($pgconn, $sql);
   $m = 1;

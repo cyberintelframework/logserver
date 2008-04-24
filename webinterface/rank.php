@@ -2,9 +2,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.03                  #
-# 22-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 004                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -15,34 +15,10 @@
 
 ####################################
 # Changelog:
-# 2.10.03 Fixed debug_sql logging
-# 2.10.02 Removed unneeded extractvars
-# 2.10.01 Added language support
-# 2.00.03 Fixed a bug where it would not show own organisation in top orgs list
-# 2.00.02 Fixed a bug with tops source addresses.
-# 2.00.01 version 2.00
-# 1.04.14 Fixed links to logsearch + added vlan support for top 10 sensors
-# 1.04.13 Added links for top source addresses
-# 1.04.12 Added IP exclusions stuff
-# 1.04.11 Added percentages to the stats
-# 1.04.10 Fixed typo
-# 1.04.09 Added geoip and p0f stuff
-# 1.04.08 Added protocols ranking; add_to_sql();
-# 1.04.07 Replaced $where[] with add_where()
-# 1.04.06 Changed some sql stuff
-# 1.04.05 Changed some text
-# 1.04.04 Fixed a bug when selecting all data and with top filenames for organisation
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug stuff
-# 1.04.01 Added top 5 files and top 5 source IP's. Courtesy of Bjoern Weiland.
-# 1.03.02 Organisation name bugfix
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.06 Added some more checks and removed includes
-# 1.02.05 Removed the intval from date browsing
-# 1.02.04 Minor bugfixes and code cleaning
-# 1.02.03 Enhanced debugging
-# 1.02.02 Added number formatting
-# 1.02.01 Small fixes
+# 004 Added ARP exclusion stuff
+# 003 Fixed debug_sql logging
+# 002 Removed unneeded extractvars
+# 001 Added language support
 ####################################
 
 ### GEOIP STUFF
@@ -102,8 +78,12 @@ add_to_sql("attacks", "table");
 add_to_sql("attacks.severity = 1", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_attacks = "SELECT $sql_select ";
 $sql_attacks .= " FROM $sql_from ";
@@ -122,8 +102,12 @@ add_to_sql("attacks", "table");
 add_to_sql("attacks.severity = 32", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT COUNT(attacks.severity) as total", "select");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_downloads = "SELECT $sql_select ";
 $sql_downloads .= " FROM $sql_from ";
@@ -186,8 +170,12 @@ add_to_sql("COUNT(details.id) as total", "select");
 add_to_sql("stats_dialogue.id", "group");
 add_to_sql("details.text", "group");
 add_to_sql("total DESC LIMIT $c_topexploits OFFSET 0", "order");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_topexp = "SELECT $sql_select ";
 $sql_topexp .= " FROM $sql_from ";
@@ -232,8 +220,12 @@ add_to_sql("sensors.organisation", "group");
 add_to_sql("sensors.id", "group");
 add_to_sql("sensors.label", "group");
 add_to_sql("total DESC LIMIT $c_topsensors OFFSET 0", "order");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_top = "SELECT $sql_select";
 $sql_top .= " FROM $sql_from ";
@@ -264,8 +256,12 @@ add_to_sql("$tsquery", "where");
 add_to_sql("NOT attacks.dport = 0", "where");
 add_to_sql("attacks.dport", "group");
 add_to_sql("total DESC LIMIT $c_topports OFFSET 0", "order");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_topports = "SELECT $sql_select ";
 $sql_topports .= " FROM $sql_from ";
@@ -298,8 +294,12 @@ add_to_sql("attacks", "table");
 add_to_sql("$tsquery", "where");
 add_to_sql("attacks.source", "group");
 add_to_sql("total DESC LIMIT $c_topsourceips", "order");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_topsource = "SELECT $sql_select ";
 $sql_topsource .= " FROM $sql_from ";
@@ -333,7 +333,13 @@ $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
     $sql_topfiles .= " AND $tsquery ";
   }
   $sql_topfiles .= "AND type = 4  AND details.attackid = attacks.id AND ";
-  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
+
+  # IP Exclusion stuff
+  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  # MAC Exclusion stuff
+  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+
+  $sql_topfiles .= ") as sub ";
 $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
 $debuginfo[] = $sql_topfiles;
 
@@ -364,7 +370,13 @@ $sql_topproto = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM ";
     $sql_topproto .= " AND $tsquery ";
   }
   $sql_topproto .= "AND type = 4  AND details.attackid = attacks.id AND ";
-  $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
+
+  # IP Exclusion stuff
+  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  # MAC Exclusion stuff
+  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+
+  $sql_topproto .= ") as sub ";
 $sql_topproto .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
 $debuginfo[] = $sql_topproto;
 
@@ -381,7 +393,13 @@ $sql_topproto_org = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM "
   $sql_topproto_org .= "AND sensors.id = details.sensorid ";
   $sql_topproto_org .= "AND type = 4  AND details.attackid = attacks.id ";
   $sql_topproto_org .= " AND " .gen_org_sql();
-  $sql_topproto_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+
+  # IP Exclusion stuff
+  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  # MAC Exclusion stuff
+  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+
+  $sql_topproto_org .= " ) as sub ";
 $sql_topproto_org .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
 
 #########
@@ -395,7 +413,13 @@ $sql_topos = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
     $sql_topos .= " AND $tsquery ";
   }
   $sql_topos .= " AND attacks.source = system.ip_addr AND ";
-  $sql_topos .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
+
+  # IP Exclusion stuff
+  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  # MAC Exclusion stuff
+  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+
+  $sql_topos .= ") as sub ";
 $sql_topos .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
 $debuginfo[] = $sql_topos;
 
@@ -412,7 +436,13 @@ $sql_topos_org = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
   $sql_topos_org .= "AND sensors.id = attacks.sensorid AND sensors.organisation = $q_org ";
   $sql_topos_org .= "AND attacks.source = system.ip_addr ";
   $sql_topos_org .= " AND " .gen_org_sql();
-  $sql_topos_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)) as sub ";
+
+  # IP Exclusion stuff
+  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  # MAC Exclusion stuff
+  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+
+  $sql_topos_org .= " ) as sub ";
 $sql_topos_org .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
 
 #########
@@ -432,8 +462,12 @@ add_to_sql("$tsquery", "where");
 add_to_sql("organisations.organisation", "group");
 add_to_sql("sensors.organisation", "group");
 add_to_sql("total DESC LIMIT $c_toporgs OFFSET 0", "order");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 $sql_organisation = "SELECT $sql_select ";
 $sql_organisation .= " FROM $sql_from ";

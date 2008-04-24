@@ -40,13 +40,24 @@ if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
   exit;
 } else {
 
-  $sql_getdef = "SELECT d_plotter, d_plottype FROM login ";
-  $sql_getdef .= "WHERE id = $s_userid";
-  $result_getdef = pg_query($sql_getdef);
-  $debuginfo[] = $sql_getdef;
-  $row_def = pg_fetch_assoc($result_getdef);
-  $d_plotter = $row_def['d_plotter'];
-  $d_plottype = $row_def['d_plottype'];
+  # Retrieving cookie variables from $_COOKIE[SURFids]
+  $allowed_cookie = array(
+                "int_dplotter",
+                "int_dplottype"
+  );
+  $check = extractvars($_COOKIE[SURFids], $allowed_cookie);
+  debug_input();
+
+  if (isset($clean['dplotter'])) {
+    $d_plotter = $clean['dplotter'];
+  } else {
+    $d_plotter = 0;
+  }
+  if (isset($clean['dplottype'])) {
+    $d_plottype = $clean['dplottype'];
+  } else {
+    $d_plottype = 1;
+  }
 
   # Calculate the best interval time
   ########################

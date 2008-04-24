@@ -1,15 +1,16 @@
-<?php $tab="2.3"; $pagetitle="Google Map"; include("menu.php"); contentHeader(); ?>
+<?php $tab="2.3"; include("menu.php"); $pagetitle=$l['gm_attackmap']; contentHeader(); ?>
 <?php
 
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 14-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Changed Count into Attacks
 # 001 Initial release
 #############################################
 
@@ -24,7 +25,15 @@ echo "<div id='search_wait'><center>" .$l['gm_process']. "<br /><br />" .$l['gm_
 echo "<div class='center'>\n";
 echo "<div class='block'>\n";
 echo "<div class='dataBlock'>\n";
-echo "<div class='blockHeader'>" .$l['gm_gmap']. "</div>\n";
+echo "<div class='blockHeader'>\n";
+  echo "<div class='blockHeaderLeft'>" .$l['gm_attackmap']. "</div>\n";
+  echo "<div class='blockHeaderRight'>\n";
+    echo "<select class='smallselect' id='redirmapper' name='redir' onChange='redirmap();'>\n";
+      echo printoption(1, "Attacks", 1);
+      echo printoption(2, "Sensors", 1);
+    echo "</select>\n";
+  echo "</div>\n";
+echo "</div>\n";
 echo "<div class='blockContent'>\n";
 echo "<div id='map' style='width: 890px; height: 400px'></div>\n";
 echo "<script src='include/jquery.jmap2.js' type='text/javascript'></script>";
@@ -133,7 +142,7 @@ $.ajax({
 
       var msg = "<small><b>Country:</b> " + country +"<br/>";
       msg = msg+"<b>City:</b> " + city +"<br/>";
-      msg = msg+"<b>Count:</b> " + count +"<br/>";
+      msg = msg+"<b>Attacks:</b> " + count +"<br/>";
       msg = msg+"</small>";
 
       if (count <= 5) {

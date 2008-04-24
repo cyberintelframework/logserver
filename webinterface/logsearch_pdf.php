@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Added ARP exclusion stuff
 # 001 Added language support
 #############################################
 
@@ -36,7 +37,7 @@ include "../lang/${c_language}.php";
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-        "reptype",
+	        "reptype",
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
@@ -59,8 +60,8 @@ $allowed_get = array(
 		"orderm",
 		"int_page",
 		"int_binid",
-        "int_sourcechoice",
-        "int_destchoice"
+	        "int_sourcechoice",
+        	"int_destchoice"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -314,7 +315,6 @@ if (!empty($f_binid)) {
 # Ranges
 ####################
 
-
 if ($f_sourcechoice == 3 && $ownsource == "") {
   add_to_sql(gen_org_sql(1), "where");
 } else {
@@ -330,6 +330,8 @@ add_to_sql("sensors.id = attacks.sensorid", "where");
 
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 
 prepare_sql();
 

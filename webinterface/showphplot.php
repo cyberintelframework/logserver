@@ -1,28 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 10-01-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Fixed bug #55
-# 2.00.02 Fixed a bug with empty data points
-# 2.00.01 version 2.00
-# 1.04.11 Fixed attack-dialogue graph
-# 1.04.10 Added IP exclusions stuff
-# 1.04.09 Shows empty graph when no data
-# 1.04.08 Added data colors array, background color
-# 1.04.07 Added virus graphs
-# 1.04.06 Fixed bug when not giving any port exclusions
-# 1.04.05 Added extra dport and timestamp functionality 
-# 1.04.04 Fixed bugs with organisation  
-# 1.04.03 Location of phplot.php is a config value now
-# 1.04.02 Fixed typo
-# 1.04.01 Initial release
+# 002 Added ARP exclusion stuff
+# 001 Fixed bug #55
 #############################################
 
 #header("Content-type: image/png");
@@ -418,6 +406,8 @@ if (isset($clean['ports'])) {
 
     # IP Exclusion stuff
     add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+    # MAC Exclusion stuff
+    add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 
     prepare_sql();
   } else {
@@ -498,8 +488,12 @@ $sevtotal = 0;
 ###############################################
 add_to_sql("severity", "order");
 add_to_sql("COUNT(attacks.severity) as total", "select");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 
 if ($limit != "") {

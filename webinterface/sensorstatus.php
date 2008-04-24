@@ -1,35 +1,20 @@
-<?php $tab="4.1"; $pagetitle="Sensor Status"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="4.1"; $pagetitle="Sensor Status"; include("menu.php"); contentHeader(); ?>
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 005                    #
+# 17-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.02 Removed check on SSH, action always available now
-# 2.00.01 version 2.00
-# 1.04.12 Added ignore/unignore actions
-# 1.04.11 Added new status code
-# 1.04.10 Fixed sort bug
-# 1.04.09 Changed printhelp stuff
-# 1.04.08 Added help message for static IP addresses
-# 1.04.07 Added config status, removed organisation query and added help links
-# 1.04.06 Added censorip stuff
-# 1.04.05 Fixed bug where 2 error messages where shown
-# 1.04.04 Changed data input handling
-# 1.04.03 Changed debug stuff
-# 1.04.02 Added VLAN support 
-# 1.04.01 Released as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.09 Added some more input checks and removed includes
-# 1.02.08 Enhanced debugging
-# 1.02.07 Change the way SSH remote control is handled
-# 1.02.06 Initial release
+# 005 Changed sensor $status stuff
+# 004 Added selector for org selection
+# 003 Removed outdated status view
+# 002 Fixed uptime when uptime = NULL
+# 001 Added language support
 #############################################
 
 # Retrieving posted variables from $_GET
@@ -74,11 +59,6 @@ if ($selview == "1") {
   add_to_sql("(status = 0 OR $or)", "where");
 } elseif ($selview == "2") {
   add_to_sql("(status = 1 OR $or)", "where");
-} elseif ($selview == "3") {
-  $now = time();
-  $upd = $now - 3600;
-  add_to_sql("((NOT status = 0", "where");
-  add_to_sql("lastupdate < $upd) OR $or)", "where");
 }
 
 if ($s_access_sensor < 9) {
@@ -87,6 +67,9 @@ if ($s_access_sensor < 9) {
   add_to_sql("organisations", "table");
   add_to_sql("organisations.organisation as org", "select");
   add_to_sql("sensors.organisation = organisations.id", "where");
+}
+if ($q_org != 0) {
+  add_to_sql("sensors.organisation = '$q_org'", "where");
 }
 
 add_to_sql("sensors", "table");
@@ -99,6 +82,13 @@ $sql_sensors .= " ORDER BY $sql_order ";
 
 $debuginfo[] = $sql_sensors;
 $result_sensors = pg_query($pgconn, $sql_sensors);
+
+$sql_rev = "SELECT value, timestamp FROM serverinfo WHERE name = 'updaterev'";
+$debuginfo[] = $sql_rev;
+$result_rev = pg_query($pgconn, $sql_rev);
+$row_rev = pg_fetch_assoc($result_rev);
+$server_rev = $row_rev['value'];
+$server_rev_ts = $row_rev['timestamp'];
 
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
@@ -144,32 +134,23 @@ echo "<div class='centerbig'>\n";
             $action = $row['action'];
             $ssh = $row['ssh'];
             $status = $row['status'];
-            $uptime = date("U") - $start;
+            $sensor_rev = $row['rev'];
+            if ($start != "") {
+              $uptime = date("U") - $start;
+            } else {
+              $uptime = 0;
+            }
             $uptime_text = sec_to_string($uptime);
             $netconf = $row['netconf'];
             $vlanid = $row['vlanid'];
             $arp = $row['arp'];
             $sensor = sensorname($keyname, $vlanid);
             $lastupdate = $row['lastupdate'];
-            $diffupdate = 0;
-            if ($lastupdate != "") {
-              $diffupdate = $now - $lastupdate;
-              $lastupdate = date("d-m-Y H:i:s", $lastupdate);
-            }
             if ($s_access_sensor == 9) {
               $org = $row['org'];
             }
 
-            # Setting status correctly
-            if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
-              $status = 5;
-            } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
-              $status = 1;
-            } elseif ($diffupdate > 3600 && $status == 1) {
-              $status = 4;
-            } elseif ($status == 1 && empty($tap)) {
-              $status = 6;
-            }
+            $cstatus = sensorstatus();
 
             echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview'>\n";
               echo "<tr>\n";
@@ -202,33 +183,15 @@ echo "<div class='centerbig'>\n";
                     }
                   echo "</td>\n";
                 }
-                echo "<td>$uptime_text<input type='hidden' name='js_uptime' value='$uptime' /></td>\n";
+#                echo "<td>$uptime_text<input type='hidden' name='js_uptime' value='$uptime' /></td>\n";
+                echo "<td>$uptime_text</td>\n";
                 echo "<td>";
                   echo "<div class='sensorstatus'>";
-                    echo "<div class='" .$v_sensorstatus_ar[$status]["class"]. "'>";
-                      echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$status]["text"]. "</div>";
+                    echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
+                      echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
                     echo "</div>";
                   echo "</div>";
                 echo "</td>\n";
-/*
-                if ($status == 3) {
-                  echo "<td></td>\n";
-                } elseif (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
-                  echo "<td bgcolor='blue'></td>\n";
-                } elseif ($status == 0) {
-                  echo "<td bgcolor='red'></td>\n";
-                } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
-                  echo "<td bgcolor='green'></td>\n";
-                } elseif ($diffupdate > 3600 && $status == 1) {
-                  echo "<td bgcolor='orange'></td>\n";
-                } elseif ($status == 1 && empty($tap)) {
-                  echo "<td bgcolor='yellow'></td>\n";
-                } elseif ($status == 2) {
-                  echo "<td bgcolor='black'></td>\n";
-                } else {
-                  echo "<td bgcolor='red'></td>\n";
-                }
-*/
                 if ($s_access_sensor == 9) {
                   echo "<td>$org</td>\n";
                 }
@@ -302,6 +265,10 @@ echo "<div class='centerbig'>\n";
         echo "<div class='legendItem'>\n";
           echo "<div class='sensorstatus'><div class='" .$v_sensorstatus_ar[6]["class"]. "'></div></div>\n";
           echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[6]["text"]. "</div>\n";
+        echo "</div>\n";
+        echo "<div class='legendItem'>\n";
+          echo "<div class='sensorstatus'><div class='" .$v_sensorstatus_ar[7]["class"]. "'></div></div>\n";
+          echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[7]["text"]. "</div>\n";
         echo "</div>\n";
       echo "</div>\n";
     echo "</div>\n";

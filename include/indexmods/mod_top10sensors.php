@@ -1,15 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 15-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Initial release
+# 002 Added ARP exclusion stuff
+# 001 Initial release
 #############################################
 
 $tsquery = " timestamp >= $from AND timestamp <= $to";
@@ -39,6 +40,8 @@ add_to_sql("sensors.label", "group");
 add_to_sql("total DESC LIMIT 10 OFFSET 0", "order");
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 
 prepare_sql();
 $sql_top = "SELECT $sql_select";

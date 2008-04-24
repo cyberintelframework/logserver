@@ -1,15 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 14-12-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Initial version
+# 002 Added default UTC value
+# 001 Initial version
 #############################################
 
 include '../include/config.inc.php';
@@ -42,7 +43,8 @@ $allowed_get = array(
 		"int_plottype",
 		"int_userid",
 		"md5_hash",
-		"int_my"
+		"int_my",
+		"int_utc"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -65,6 +67,12 @@ if (isset($clean['plottype'])) {
 } else {
   $err = 1;
   $m = 154;
+}
+
+if (isset($clean['utc'])) {
+  $utc = $clean['utc'];
+} else {
+  $utc = 0;
 }
 
 if ($s_auser == 9) {
@@ -92,7 +100,7 @@ if ($s_auser == 9) {
 
 if ($err != 1) {
   $m = 3;
-  $sql_save = "UPDATE login SET d_plotter = '$plotter', d_plottype = '$plottype' WHERE id = $uid";
+  $sql_save = "UPDATE login SET d_plotter = '$plotter', d_plottype = '$plottype', d_utc = '$utc' WHERE id = $uid";
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
 }

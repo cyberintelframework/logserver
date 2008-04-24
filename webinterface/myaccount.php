@@ -2,17 +2,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.02 Added check on 0 user access
-# 2.00.01 Initial release (copied from report_edit.php)
+# 002 Added UTC support
+# 001 Added language support
 #############################################
 
 $err = 0;
@@ -75,6 +74,7 @@ if ($err == 0) {
   $access_user = $access{2};
   $d_plotter = $row['d_plotter'];
   $d_plottype = $row['d_plottype'];
+  $d_utc = $row['d_utc'];
 
   echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
 ?>
@@ -241,6 +241,16 @@ if ($err == 0) {
                   echo "<select name='int_plottype'>\n";
                     foreach ($v_plottertypes as $key => $plottype) {
                       echo printOption($key, $plottype, $d_plottype);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_utc']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_utc'>\n";
+                    foreach ($v_timestamp_format_ar as $key => $val) {
+                      echo printOption($key, $val, $d_utc);
                     }
                   echo "</select>\n";
                 echo "</td>\n";

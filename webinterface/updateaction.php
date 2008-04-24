@@ -128,7 +128,7 @@ if (isset($clean['sid'])) {
     $result_checkip = pg_query($pgconn, $sql_checkip);
     $checkip = pg_num_rows($result_checkip);
     if ($checkip > 0) {
-      $m = 129;
+      $m = 155;
       $err = 1;
     } else {
       $sql_updatestatus = "UPDATE sensors SET tapip = '$tapip' WHERE id = '$sid' AND vlanid = '$vlanid'";

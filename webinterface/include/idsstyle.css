@@ -518,6 +518,10 @@ img {
 .sensorstatus .outdated {
   background-color:     orange;
 }
+.sensorstatus .keepalive {
+  background-color:     lawngreen;
+  color:                black;
+}
 .sensorstatus .config {
   background-color:     blue;
 }

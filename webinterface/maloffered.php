@@ -110,6 +110,5 @@ echo "</div>\n"; #</left>
 
 # Debug info
 debug_sql();
-pg_close($pgconn);
 ?>
 <?php footer(); ?>

@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 02-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Removed the need for a file in /tmp
 # 001 version 2.00
 #############################################
 
@@ -43,45 +44,30 @@ $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_org",
+                "q_org",
 		"int_to",
 		"int_from"
 );
 $check = extractvars($_GET, $allowed_get);
 
-if (isset($clean['org'])) {
-  $int_org = $clean['org'];
-} else {
-  $int_org = intval($s_org);
-}
+# Checking access
+$q_org = intval($_SESSION['q_org']);
 
-if ($int_org == 0 && $s_admin == 1) { $orgquery = ""; }
-elseif ($int_org != 0 && $s_org == $int_org) { $orgquery = "sensors.organisation = '$int_org' AND"; }
-elseif ($int_org != 0 && $s_admin == 1) { $orgquery = "sensors.organisation = '$int_org' AND"; }
-else { $err = 1; }
+$orgquery = "";
+if ($q_org != 0) {
+  $orgquery = "sensors.organisation = '$q_org' AND";
+}
 
 if (isset($clean['to']) && isset($clean['from'])) {
   $start = $clean['from'];
   $end = $clean['to'];
   $tsquery = "timestamp >= $start AND timestamp <= $end AND";
 }
-$query = false;
  
-if ( ($st = @stat("data.cache.xml")) != false ) {
-  if ($st['mtime'] < ( time(0) - 900 )) {
-    $query = true;
-  }
-} else {
-  $query = true;
-}
- 
-if ( $query == true && $err == 0) {
-  $f = fopen("/tmp/data.cache.xml","w+");  // change this path
-  $mytime = time(0) - 24 * 3600 * 9;
-
+if ( $err == 0) {
   $query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks ";
   $query .= "WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1' ";
-  $query .= "AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC"; 
+  $query .= "AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC";
   $r_hit = pg_query($pgconn, $query);
   if (pg_num_rows($r_hit)) {
     echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
@@ -126,10 +112,4 @@ if ( $query == true && $err == 0) {
   echo "<markers>";
   echo "</markers>";
 }
-
-#$f = fopen("/tmp/data.cache.xml","r");
-#$contents = fread($f, filesize("/tmp/data.cache.xml"));
-#trim($contents);
-#echo $contents; 
-#fclose($f);
 ?>

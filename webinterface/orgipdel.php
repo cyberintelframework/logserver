@@ -38,7 +38,8 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_id",
-		"int_orgid"
+		"int_orgid",
+		"int_type"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -66,8 +67,19 @@ if ($s_access_user < 2) {
   $err = 1;
 }
 
+if (!isset($clean['type'])) {
+  $m = 118;
+  $err = 1;
+} else {
+  $type = $clean['type'];
+}
+
 if ($err == 0) {
-  $sql = "DELETE FROM org_excl WHERE id = $id AND orgid = $org";
+  if ($type == 1) {
+    $sql = "DELETE FROM org_excl WHERE id = $id AND orgid = $org";
+  } elseif ($type == 2) {
+    $sql = "DELETE FROM arp_excl WHERE id = $id";
+  }
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   

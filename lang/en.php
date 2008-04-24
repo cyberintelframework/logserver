@@ -1,9 +1,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.03                  #
-# 06-11-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 004                    #
+# 09-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,9 +12,10 @@
 
 #############################################
 # Changelog:
-# 2.10.03 Added group pages
-# 2.10.02 Added missing timestamp text for search page
-# 2.10.01 Initial release
+# 004 Changed Server Info to Server Stats
+# 003 Added group pages
+# 002 Added missing timestamp text for search page
+# 001 Initial release
 #############################################
 
 ##########################
@@ -48,6 +49,8 @@ $l['g_domain']          = "Domain";
 $l['g_status']          = "Status";
 $l['g_modify']          = "Modify";
 $l['g_total']           = "Total";
+$l['g_on']		= "On";
+$l['g_off']		= "Off";
 
 ##########################
 # Global (Lowercase first letter)
@@ -62,6 +65,7 @@ $l['g_edit_l']          = "edit";
 $l['g_exploits_l']      = "exploits";
 $l['g_ports_l']         = "ports";
 $l['g_files_l']         = "files";
+$l['g_sensors_l']	= "sensors";
 
 ##########################
 # argosadmin.php
@@ -180,7 +184,8 @@ $l['gm_process']        = "Your request is being processed...";
 $l['gm_setting']        = "Setting up google map...";
 $l['gm_loading']        = "Loading data points...";
 $l['gm_patient']        = "Please be patient";
-$l['gm_gmap']           = "Google Map";
+$l['gm_attackmap']      = "Attacks Map";
+$l['gm_sensormap']      = "Sensors Map";
 
 ##########################
 # index.php
@@ -232,8 +237,12 @@ $l['ls_destip']         = "Destination IP";
 $l['ls_desstmac']       = "Destination MAC";
 $l['ls_port']           = "Port";
 $l['ls_source']         = "Source";
-$l['ls_ipex_on']        = "IP exclusion ON";
-$l['ls_ipex_off']       = "IP exclusion OFF";
+$l['ls_ipex_on']        = "IP filter ON";
+$l['ls_ipex_off']       = "IP filter OFF";
+$l['ls_macex_on']       = "MAC filter ON";
+$l['ls_macex_off']      = "MAC filter OFF";
+$l['ls_ipfilter']	= "IP filter";
+$l['ls_macfilter']	= "MAC filter";
 $l['ls_own']            = "Own ranges";
 $l['ls_address']        = "Address";
 $l['ls_sourceip']       = "Source IP";
@@ -296,9 +305,9 @@ $l['me_home']           = "Home";
 $l['me_report']         = "Report";
 $l['me_rank']           = "Ranking";
 $l['me_cross']          = "Cross Domain";
-$l['me_google']         = "Google Map";
+$l['me_google']         = "Maps";
 $l['me_traffic']        = "Traffic";
-$l['me_serverinfo']     = "Server Info";
+$l['me_serverinfo']     = "Server Stats";
 $l['me_detprot']        = "Detected Protocols";
 $l['me_graphs']         = "Graphs";
 $l['me_reports']        = "My Reports";
@@ -343,6 +352,7 @@ $l['ma_modules']        = "My Home";
 $l['ma_pref']           = "My preferences";
 $l['ma_def_graph']      = "Default graph";
 $l['ma_def_graph_type'] = "Default graph type";
+$l['ma_def_utc']	= "Default report timestamp";
 
 ##########################
 # myreports.php
@@ -382,7 +392,8 @@ $l['oe_confirmdel']     = "Are you sure you want to delete this identifier";
 # orgipadmin.php
 ##########################
 $l['oi_excls']          = "Exclusions";
-$l['oi_excl']           = "Exclusion";
+$l['oi_ip_excl']        = "IP Exclusion";
+$l['oi_mac_excl']       = "MAC Exclusion";
 $l['oi_confirmdel']     = "Are you sure you want to delete this record";
 
 ##########################
@@ -477,6 +488,7 @@ $l['re_op']             = "Operator";
 $l['re_thresh_amount']  = "Threshold amount";
 $l['re_timespan']       = "Timespan";
 $l['re_always']         = "Always send report";
+$l['re_timeformat']	= "Timestamps format";
 
 ##########################
 # rssfeed.php
@@ -497,6 +509,7 @@ $l['sd_clear']          = "Clear";
 $l['sd_sensorside']     = "Sensor side";
 $l['sd_rip']            = "Remote IP";
 $l['sd_lip']            = "Local IP";
+$l['sd_sensormac']      = "MAC address";
 $l['sd_serverside']     = "Server side";
 $l['sd_device']         = "Device";
 $l['sd_devmac']         = "Device MAC";
@@ -512,6 +525,8 @@ $l['sd_total']          = "Total log time";
 $l['sd_events']         = "Events";
 $l['sd_totalevents']    = "Total number of events";
 $l['sd_members']        = "Member of groups";
+$l['sd_version']        = "Sensor scripts";
+$l['sd_revision']       = "Scripts revision";
 
 ##########################
 # sensorstatus.php

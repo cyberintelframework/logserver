@@ -1,16 +1,17 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 14-12-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 003                    #
+# 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Fixed a bug with the severity
-# 2.10.01 Initial release
+# 003 Added ARP exclusion stuff
+# 002 Fixed a bug with the severity
+# 001 Initial release
 #############################################
 
 include '../include/config.inc.php';
@@ -389,6 +390,8 @@ if (isset($clean['ports'])) {
 
     # IP Exclusion stuff
     add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
+    # MAC Exclusion stuff
+    add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 
     prepare_sql();
   } else {
@@ -465,8 +468,12 @@ $sevtotal = 0;
 ###############################################
 add_to_sql("severity", "order");
 add_to_sql("COUNT(attacks.severity) as total", "select");
+
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+# MAC Exclusion stuff
+add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
+
 prepare_sql();
 
 if ($limit != "") {

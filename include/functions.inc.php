@@ -1,48 +1,21 @@
 <?php
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 08-11-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 005                    #
+# 17-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
-# Modified by Peter Arts           #
+####################################
+# Contributors:                    #
+# Peter Arts                       #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Changed sensorname function to take $label as 3rd arg
-# 2.00.03 Rearranged functions and index
-# 2.00.02 Modified sec_to_string for specifying a type
-# 2.00.01 Added array support for printoption
-# 1.05.01 Added sec_to_string and sensorname functions
-# 1.04.19 Added footer function
-# 1.04.18 Fixed typo in inet check
-# 1.04.17 Added inet check for extractvars
-# 1.04.16 Fixed bool check in extractvars
-# 1.04.15 Removed cleansql function
-# 1.04.14 Removed / from logsearch.php url
-# 1.04.13 Added mac type to extractvars
-# 1.04.12 Modified printhelp
-# 1.04.11 Modified censorip()
-# 1.04.10 Added censorip()
-# 1.04.09 Removed unused sql functions and added INDEX
-# 1.04.08 Added add_to_sql, reset_sql
-# 1.04.07 Bugfix in getEndWeek()
-# 1.04.06 Added getepoch() function
-# 1.04.05 Removed the stripinput function
-# 1.04.04 Changed the debug function
-# 1.04.03 Added getPortDescr() function
-# 1.04.02 Added showSearchTemplates() function
-# 1.04.01 Added cleansql() function
-# 1.03.03 Added debug function
-# 1.03.02 Changed getStartWeek() to correctly display the start of the week
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.09 Added genpass and stripinput function
-# 1.02.08 Removed admin_header function and fixed prepare_sql bug
-# 1.02.07 Fixed a bug with empty $db_table when preparing the sql
-# 1.02.06 Added pgboolval() function
-# 1.02.05 Added validate_email() fucntion
-# 1.02.04 Modified prepare_sql_where function. Renamed to prepare_sql with a hook to prepare_sql_from()
-# 1.02.03 Initial release
+# 005 Added sensorstatus
+# 004 Added cookie stuff
+# 003 Fixed sec_to_string if $sec = NULL
+# 002 Changed show_log_messages handling of args
+# 001 Changed sensorname function to take $label as 3rd arg
 #############################################
 
 #############################################
@@ -77,6 +50,9 @@
 # 3.18		gen_org_sql
 # 3.19		cleanfooter
 # 3.20		roundup
+# 3.21		addcookie
+# 3.22		delcookie
+# 3.23		sensorstatus
 #
 # 4 Debug Functions
 # 4.01		printer
@@ -674,7 +650,7 @@ function sec_to_string($sec, $type = 4) {
     }
     return $string;
   } else {
-    return "undefined";
+    return "0d 0h 0m 0s";
   }
 }
 
@@ -767,6 +743,55 @@ function cleanfooter() {
 # Function to round upwards
 function roundup($value, $dp) {
   return ceil($value*pow(10, $dp))/pow(10, $dp);
+}
+
+# 3.21 addcookie
+# Function to add a value to the SURFids cookie
+function addcookie($name, $value) {
+  global $c_cookie_name, $c_cookie_domain, $c_cookie_path, $c_cookie_expiry, $c_cookie_https;
+  $expiry = time() + $c_cookie_expiry;
+  setcookie($c_cookie_name."[".$name."]", $value, $expiry, $c_cookie_path, $c_cookie_domain, $c_cookie_https);
+}
+
+# 3.22 delcookie
+# Function to add a value to the SURFids cookie
+function delcookie($name) {
+  global $c_cookie_name, $c_cookie_domain, $c_cookie_path, $c_cookie_expiry, $c_cookie_https;
+  $expiry = time() - 44000;
+  setcookie($c_cookie_name."[".$name."]", "", $expiry, $c_cookie_path, $c_cookie_domain, $c_cookie_https);
+}
+
+# 3.23 sensorstatus
+# Function to calculate the actual sensor status
+function sensorstatus() {
+  global $server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip;
+
+  $diffupdate = 0;
+  if ($lastupdate != "") {
+    $diffupdate = $now - $lastupdate;
+  } else {
+    $diffupdate = 0;
+    $lastupdate = 0;
+  }
+#  echo "SERVERREV: $server_rev - $sensor_rev - $lastupdate<br />\n";
+  if ($status == 1 && "$server_rev" != "$sensor_rev" && $server_rev_ts < $lastupdate) {
+    $rtn = 7;
+  } elseif ($status == 1 && $sensor_rev == 0 && $lastupdate != 0) {
+    $rtn = 7;
+  } else {
+    if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
+      $rtn = 5;
+    } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
+      $rtn = 1;
+    } elseif ($diffupdate > 3600 && $status == 1) {
+      $rtn = 4;
+    } elseif ($status == 1 && empty($tap)) {
+      $rtn = 6;
+    } else {
+      $rtn = $status;
+    }
+  }
+  return $rtn;
 }
 
 ###############################
@@ -1051,11 +1076,9 @@ function show_log_message($ts, $log, $args) {
   }
   if ($args != "") {
     $args_ar = explode(",", $args);
-    foreach ($args_ar as $keyval) {
-      $keyval_ar = explode(" = ", $keyval);
-      $key = $keyval_ar[0];
-      $val = $keyval_ar[1];
-      $log = str_replace($key, $val, $log);
+    foreach ($args_ar as $key => $val) {
+      $key += 1;
+      $log = str_replace("%$key", $val, $log);
     }
   }
   $s = "[$ts] $log\n";

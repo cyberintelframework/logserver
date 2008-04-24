@@ -1,8 +1,8 @@
 <?php
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.04                  #
-# 12-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 005                    #
+# 14-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,36 +11,11 @@
 
 #############################################
 # Changelog:
-# 2.10.04 Added Last 24 hours option + user selected value, fixed total count sensors
-# 2.10.03 Fixed #54 bug
-# 2.10.02 Fixed a CSRF vuln
-# 2.10.01 Added language support
-# 2.00.09 Fixed bug with int_page
-# 2.00.08 Not showing admin tab when contents are empty
-# 2.00.07 Added contact mail
-# 2.00.06 Added popout to overlay
-# 2.00.05 Fixed typo
-# 2.00.04 jQuery compatible
-# 2.00.03 Fixed typo
-# 2.00.02 Added arp_enable check for detectedprotos.php
-# 2.00.01 version 2.00
-# 1.04.11 Added ARGOS admin button
-# 1.04.10 Added ARP admin button
-# 1.04.09 Added IP exclusions button
-# 1.04.08 Added home button
-# 1.04.07 Uncommented server admin
-# 1.04.06 Fixed another redirection bug with the $url variable
-# 1.04.05 Fixed a redirection bug with the $url variable
-# 1.04.04 Added server info page
-# 1.04.03 Changed REQUEST_URI to SCRIPT_NAME for $url
-# 1.04.02 Added JavaScript functions submitSearchTemplate(), submitSearchTemplateFromResults(), URLDecode()
-# 1.04.01 Released as 1.04.01
-# 1.03.02 Replaced REQUEST_URI with SCRIPT_NAME for $url
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.04 Added pg_close to footer()
-# 1.02.03 Moved the include directory to the surfnetids root dir
-# 1.02.02 Changed the url redirection when $_GET['url'] is present + added intval() to session variables
-# 1.02.01 Initial release
+# 005 Removed url redirection stuff
+# 004 Added Last 24 hours option + user selected value, fixed total count sensors
+# 003 Fixed #54 bug
+# 002 Fixed a CSRF vuln
+# 001 Added language support
 #############################################
 
 include '../include/config.inc.php';
@@ -56,13 +31,7 @@ include "../lang/${c_language}.php";
 
 $absfile = $_SERVER['SCRIPT_NAME'];
 $file = basename($absfile);
-$qs = $_SERVER['QUERY_STRING'];
 $address = getaddress();
-if ($qs == "") {
-  $url = $file . "?";
-} else {
-  $url = $file . "?" . $qs . "&";
-}
 
 if ($file != "login.php") {
   if (isset($_SESSION['s_admin'])) {
@@ -75,18 +44,17 @@ if ($file != "login.php") {
     $s_access_user = intval($s_access{2});
     $s_access_sensor = intval($s_access{0});
     $s_access_search = intval($s_access{1});
-	$s_default_time = intval($_SESSION['s_default_time']);
 
     # Validate the session_id() against the SID in the database
     $chk_sid = checkSID();
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);
-      header("location: ${address}login.php?strip_html_url=$url");
+      header("location: ${address}login.php");
       exit;
     }
   } else {
     $url = basename($_SERVER['SCRIPT_NAME']);
-    header("location: ${address}login.php?strip_html_url=$url");
+    header("location: ${address}login.php");
     exit;
   }
   $s_org = $_SESSION['s_org'];
@@ -94,13 +62,13 @@ if ($file != "login.php") {
   if ($s_admin == 1) {
     $sql_active = "SELECT COUNT(id) as total FROM sensors WHERE status = 1";
     $sql_sensors = "SELECT COUNT(id) as total FROM sensors WHERE status IN (0, 1)";
-	$debuginfo[] = $sql_active;
-	$debuginfo[] = $sql_sensors;
+    $debuginfo[] = $sql_active;
+    $debuginfo[] = $sql_sensors;
   } else {
     $sql_active = "SELECT COUNT(id) as total FROM sensors WHERE status = 1 AND organisation = " .$s_org;
     $sql_sensors = "SELECT COUNT(id) as total FROM sensors WHERE organisation = " .$s_org. " AND status IN (0, 1)";
-	$debuginfo[] = $sql_active;
-	$debuginfo[] = $sql_sensors;
+    $debuginfo[] = $sql_active;
+    $debuginfo[] = $sql_sensors;
   }
   $result_active = pg_query($pgconn, $sql_active);
   $row = pg_fetch_assoc($result_active);
@@ -322,11 +290,6 @@ function insert_selector($m_show = 1) {
   $from = date("U", mktime(0, 0, 0, date("n"), date("j"), date("Y")));
   $to = date("U", mktime(0, 0, 0, date("n"), date("j")+1, date("Y")));
   $selperiod = -1;
-
-  if ($s_default_time == 0) {
-    $from = date("U", mktime(0, 0, 0, date("n"), date("j"), date("Y")));
-    $to = date("U", mktime(0, 0, 0, date("n"), date("j")+1, date("Y")));
-  }
 
   # Checking access
   if ($s_access_search == 9) {

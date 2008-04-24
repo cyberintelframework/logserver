@@ -2,9 +2,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 04-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,21 +13,8 @@
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.03 Added check for user access 0
-# 2.00.02 Fixed typo in sensor access text
-# 2.00.01 version 2.00
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug info
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.02 Removed and changed some stuff referring to the report table
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.07 Added some more input checks and removed includes
-# 1.02.06 Enhanced debugging
-# 1.02.05 Fixed a userid bug
-# 1.02.04 Automatic table creation if user doesn't have mailreporting record
-# 1.02.03 Extended mailreporting
-# 1.02.02 Initial release
+# 002 Added UTC support
+# 001 Added language support
 #############################################
 
 if ($s_access_user == 0) {
@@ -95,6 +82,7 @@ if ($err == 0) {
   $access_user = $access{2};
   $d_plotter = $row['d_plotter'];
   $d_plottype = $row['d_plottype'];
+  $d_utc = $row['d_utc'];
 
   echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
 ?>
@@ -106,7 +94,8 @@ if ($err == 0) {
   });
 </script>
 <?php
- echo "<div class='all'>\n";
+
+echo "<div class='all'>\n";
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
@@ -266,6 +255,16 @@ if ($err == 0) {
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_utc']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_utc'>\n";
+                    foreach ($v_timestamp_format_ar as $key => $val) {
+                      echo printOption($key, $val, $d_utc);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
                 echo "<td colspan='2'><input class='button aright' type='submit' name='submit' value='" .$l['g_update']. "' /></td>\n";
                 echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                 echo "<input type='hidden' name='int_userid' value='$s_userid' />\n";
@@ -283,27 +282,26 @@ if ($err == 0) {
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>" .$l['ma_edit']. " " .$l['ma_modules']. "</div>\n";
         echo "<div class='blockContent'>\n";
-
-	$sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
-	$debuginfo[] = $sql_mods;
-	$result_mods = pg_query($pgconn, $sql_mods);
-        while ($row_mods = pg_fetch_assoc($result_mods)) {
-		$mod_id = $row_mods['indexmod_id'];
-		$mods[$mod_id] = $mod_id;
-	}
+          $sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
+          $debuginfo[] = $sql_mods;
+          $result_mods = pg_query($pgconn, $sql_mods);
+          while ($row_mods = pg_fetch_assoc($result_mods)) {
+            $mod_id = $row_mods['indexmod_id'];
+            $mods[$mod_id] = $mod_id;
+          }
           echo "<form name='indexmods' action='updateindexmods.php' method='post'>\n";
-                echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
-                echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
-                echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
-                echo printCheckBox("".$l['mo_top10']. " ".$l['in_attackers']."", "mods[]", 4, $mods[4]) . "<br />\n";
-                echo printCheckBox("".$l['mo_top10']." ".$l['ra_proto_org']."", "mods[]", 5, $mods[5]) . "<br />\n";
-                echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
-                echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
-                echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
-                echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
-                echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
-                echo printCheckBox("".$l['mo_top10']." ".$l['pl_sensors']."", "mods[]", 11, $mods[11]) . "<br />\n";
-             echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />\n";
+            echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
+            echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
+            echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
+            echo printCheckBox("".$l['mo_top10']. " ".$l['in_attackers']."", "mods[]", 4, $mods[4]) . "<br />\n";
+            echo printCheckBox("".$l['mo_top10']." ".$l['ra_proto_org']."", "mods[]", 5, $mods[5]) . "<br />\n";
+            echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
+            echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
+            echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
+            echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
+            echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
+            echo printCheckBox("".$l['mo_top10']." ".$l['pl_sensors']."", "mods[]", 11, $mods[11]) . "<br />\n";
+            echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />\n";
             echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
             echo "<input type='hidden' name='int_userid' value='$userid' />\n";
           echo "</form>\n";
@@ -311,13 +309,9 @@ if ($err == 0) {
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
-  echo "</div>\n"; #</right>
- echo "</div>\n"; #</all>
-  
-  
+  echo "</div>\n"; #</rightmed>
+echo "</div>\n"; #</all>
 }
-
-
 
 pg_close($pgconn);
 debug_sql();
