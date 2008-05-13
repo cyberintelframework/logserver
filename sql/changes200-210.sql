@@ -30,6 +30,6 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_excl TO idslog;
 --
 -- LOGIN
 --
-ALTER TABLE attacks ADD COLUMN d_plotter integer DEFAULT 0 NOT NULL;
-ALTER TABLE attacks ADD COLUMN d_plottype integer DEFAULT 1 NOT NULL;
-ALTER TABLE attacks ADD COLUMN d_utc integer DEFAULT 0 NOT NULL;
+ALTER TABLE login ADD COLUMN d_plotter integer DEFAULT 0 NOT NULL;
+ALTER TABLE login ADD COLUMN d_plottype integer DEFAULT 1 NOT NULL;
+ALTER TABLE login ADD COLUMN d_utc integer DEFAULT 0 NOT NULL;
