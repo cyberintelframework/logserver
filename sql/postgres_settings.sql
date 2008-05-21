@@ -1,12 +1,13 @@
 --
 -- SURFids 2.10.00
 -- Database structure
--- Changeset 002
--- 18-04-2008
+-- Changeset 003
+-- 21-05-2008
 --
 
 --
 -- Version history
+-- 003 Added ostypes & modified system, login, report_content
 -- 002 Added arp_excl
 -- 001 Initial release
 --
@@ -342,7 +343,10 @@ CREATE TABLE "login" (
     organisation integer DEFAULT 0 NOT NULL,
     "access" character varying DEFAULT '000'::character varying NOT NULL,
     serverhash character varying,
-    gpg integer DEFAULT 0
+    gpg integer DEFAULT 0,
+    d_plotter integer DEFAULT 0 NOT NULL,
+    d_plottype integer DEFAULT 1 NOT NULL,
+    d_utc integer DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE ONLY "login"
@@ -433,6 +437,26 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE organisations TO idslog;
 GRANT SELECT,UPDATE ON TABLE organisations_id_seq TO idslog;
 
 --
+-- OSTYPES
+--
+
+CREATE TABLE ostypes (
+    id serial NOT NULL,
+    os character varying NOT NULL
+);
+
+ALTER TABLE ONLY ostypes
+    ADD CONSTRAINT ostypes_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY ostypes
+    ADD CONSTRAINT unique_os UNIQUE (os);
+
+GRANT INSERT,SELECT ON TABLE ostypes TO pofuser;
+GRANT SELECT ON TABLE ostypes TO idslog;
+
+GRANT SELECT ON TABLE ostypes_id_seq TO idslog;
+GRANT SELECT,UPDATE ON TABLE ostypes_id_seq TO pofuser;
+
+--
 -- REPORT_CONTENT 
 --
 
@@ -453,7 +477,9 @@ CREATE TABLE report_content (
     detail integer DEFAULT 0 NOT NULL,
     qs character varying,
     from_ts integer DEFAULT -1 NOT NULL,
-    to_ts integer DEFAULT -1 NOT NULL
+    to_ts integer DEFAULT -1 NOT NULL,
+    always integer DEFAULT 0 NOT NULL,
+    utc integer DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE ONLY report_content
@@ -706,6 +732,8 @@ GRANT SELECT ON TABLE "system" TO idslog;
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE "system" TO pofuser;
 
 GRANT SELECT,UPDATE ON TABLE system_sid_seq TO pofuser;
+
+CREATE RULE insert_name AS ON INSERT TO "system" WHERE (NOT (split_part((new.name)::text, ' '::text, 1) IN (SELECT ostypes.os FROM ostypes))) DO INSERT INTO ostypes (os) VALUES (split_part((new.name)::text, ' '::text, 1));
 
 --
 -- SYSTEM_DETAILS 
