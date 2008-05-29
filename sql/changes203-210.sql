@@ -1,11 +1,12 @@
 -- SURFids 2.10.00
--- Database conversion 2.02 -> 2.10
--- Changeset 003
--- 21-05-2008
+-- Database conversion 2.03 -> 2.10
+-- Changeset 004
+-- 29-05-2008
 --
 
 --
 -- Changelog
+-- 004 Removed report_content modification
 -- 003 Added report_content modification
 -- 002 Added LOGIN modifications
 -- 001 Initial release
@@ -34,9 +35,3 @@ GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_excl TO idslog;
 ALTER TABLE login ADD COLUMN d_plotter integer DEFAULT 0 NOT NULL;
 ALTER TABLE login ADD COLUMN d_plottype integer DEFAULT 1 NOT NULL;
 ALTER TABLE login ADD COLUMN d_utc integer DEFAULT 0 NOT NULL;
-
---
--- REPORT_CONTENT
---
-ALTER TABLE report_content ADD COLUMN always integer DEFAULT 0 NOT NULL;
-ALTER TABLE report_content ADD COLUMN utc integer DEFAULT 0 NOT NULL;
