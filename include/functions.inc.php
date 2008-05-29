@@ -763,6 +763,15 @@ function delcookie($name) {
 
 # 3.23 sensorstatus
 # Function to calculate the actual sensor status
+# Required variables to be global:
+#   - $server_rev               = Server revision of the sensor scripts
+#   - $sensor_rev               = Sensor revision of the sensor scripts
+#   - $status                   = Unmodified status of the sensor
+#   - $server_rev_ts            = Modify time of the server revision
+#   - $lastupdate               = Timestamp of last keepalive check
+#   - $netconf                  = Network configuration method of the sensor
+#   - $tap                      = Tap device
+#   - $tapip                    = IP address of the tap device
 function sensorstatus() {
   global $server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip;
 
@@ -773,7 +782,6 @@ function sensorstatus() {
     $diffupdate = 0;
     $lastupdate = 0;
   }
-#  echo "SERVERREV: $server_rev - $sensor_rev - $lastupdate<br />\n";
   if ($status == 1 && "$server_rev" != "$sensor_rev" && $server_rev_ts < $lastupdate) {
     $rtn = 7;
   } elseif ($status == 1 && $sensor_rev == 0 && $lastupdate != 0) {

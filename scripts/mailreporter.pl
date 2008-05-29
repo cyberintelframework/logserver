@@ -431,6 +431,7 @@ while (@row = $email_query->fetchrow_array) {
         }
         printattach("</idmef:IDMEF-Message>");
       } elsif ($detail == 4) {
+        print "CYMRU: $subject\n";
         # CYMRU format
         ###############################################
         $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
@@ -486,6 +487,7 @@ while (@row = $email_query->fetchrow_array) {
           $totalcount++;
           printmail("$asn | $ip | $time $attacktype | $desc");
         }
+        print "TOTAL: $totalcount\n";
       } elsif ($detail == 5) {
         # Nepenthes format
         ###############################################
@@ -620,6 +622,7 @@ while (@row = $email_query->fetchrow_array) {
           $sendit = 0;
         }
       }
+      print "SENDIT: $sendit\n";
     } elsif ($template == 2) {  
       ################################
       # OWN RANGES TEMPLATE

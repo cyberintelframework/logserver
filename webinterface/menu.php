@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 005                    #
-# 14-04-2008                       #
+# Changeset 006                    #
+# 27-05-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 006 Made jquery version configurable
 # 005 Removed url redirection stuff
 # 004 Added Last 24 hours option + user selected value, fixed total count sensors
 # 003 Fixed #54 bug
@@ -101,7 +102,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<style type='text/css'>@import url('${address}include/calendar.css');</style>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib${min}.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
-    echo "<script type='text/javascript' src='${address}include/jquery-1.2.1${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/jquery-${c_jquery_version}${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.selectboxes${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/surfnetids${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar${min}.js'></script>\n";

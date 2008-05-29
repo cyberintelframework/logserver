@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 006                    #
-# 18-04-2008                       #
+# Changeset 007                    #
+# 27-05-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 008 Fixed a navigational bug
 # 007 Added MAC exclusion stuff
 # 005 Fixed BUG #59
 # 004 Fixed BUGS #42 + #43 
@@ -1029,6 +1030,9 @@ if ($num_rows == 0) {
 # NAVIGATION
 ####################
 $nav = "";
+$url = $_SERVER['PHP_SELF'];
+$qs = urldecode($_SERVER['QUERY_STRING']);
+$url = $url . "?" . $qs;
 $url = preg_replace('/&$/', '', $url);
 $url = str_replace("&int_page=" . $clean["page"], "", $url);
 $url = str_replace("?int_page=" . $clean["page"], "", $url);

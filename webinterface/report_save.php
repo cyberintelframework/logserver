@@ -135,7 +135,7 @@ if (!isset($clean['template'])) {
   $template = $clean['template'];
 }
 
-if (isset($clean['template'])) {
+if (isset($clean['utc'])) {
   $utc = $clean['utc'];
 } else {
   $utc = 0;

@@ -17,6 +17,7 @@ header("Cache-control: private");
 
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
+include '../include/functions.inc.php';
 
 # Deleting the session info from the database
 $remoteip = pg_escape_string($_SERVER['REMOTE_ADDR']);

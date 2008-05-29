@@ -2,17 +2,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 21-02-2008                       #
+# SURFnet IDS 2.10.00              #
+# Changeset 002                    #
+# 27-05-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added debug_sql_analyze
-# 2.00.02 Removed header relocation on unauthorized access
-# 2.00.01 Initial release
+# 002 Added utc_time
+# 001 Added debug_sql_analyze
 #############################################
 
 # Checking access
@@ -262,6 +261,10 @@ echo "<div class='rightmed'>\n";
           echo "<tr>\n";
             echo "<td>c_subject_prefix</td>\n";
             echo "<td>$c_subject_prefix</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_utc_time</td>\n";
+            echo "<td>$c_utc_time</td>\n";
           echo "</tr>\n";
         echo "</table>\n";
 
