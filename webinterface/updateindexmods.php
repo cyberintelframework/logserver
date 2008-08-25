@@ -1,17 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 13-12-2007                       #
+# SURFids 2.10.00                  #
+# Changeset 002                    #
+# 03-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 version 2.10
-# 2.00.02 Added hash check
-# 2.00.01 Initial release
+# 002 Fixed an authorization issue
+# 001 version 2.10
 #############################################
 
 include '../include/config.inc.php';
@@ -74,9 +73,9 @@ if (@is_array($tainted["mods"])) {
 }
 
 if ($s_access_user == 9) {
-  $sql_user = "SELECT access FROM login WHERE id = $userid";
+  $sql_user = "SELECT id FROM login WHERE id = $userid";
 } else {
-  $sql_user = "SELECT access FROM login WHERE id = $userid AND organisation = $q_org";
+  $sql_user = "SELECT id FROM login WHERE id = $userid AND organisation = $q_org";
 }
 $debuginfo[] = $sql_user;
 $result_user = pg_query($pgconn, $sql_user);
@@ -86,12 +85,9 @@ $numrows_user = pg_num_rows($result_user);
 if ($numrows_user == 0) {
   $err = 1;
   $m = 139;
-} else {
-  $access_user = pg_result($result_user, "access");
-  $access_user = intval($access_user{2});
 }
 
-if ($s_access_user < $access_user) {
+if ($s_access_user < 1) {
   $err = 1;
   $m = 101;
 }

@@ -27,6 +27,7 @@ $l['g_delete']          = "Delete";
 $l['g_edit']            = "Edit";
 $l['g_insert']          = "Insert";
 $l['g_sensor']          = "Sensor";
+$l['g_sensors']          = "Sensors";
 $l['g_select_sensor']   = "Select a sensor";
 $l['g_type']            = "Type";
 $l['g_mac']             = "MAC address";
@@ -51,6 +52,8 @@ $l['g_modify']          = "Modify";
 $l['g_total']           = "Total";
 $l['g_on']		= "On";
 $l['g_off']		= "Off";
+$l['g_addsensor']	= "Add sensor";
+$l['g_addorg']		= "Add all sensors";
 
 ##########################
 # Global (Lowercase first letter)
@@ -278,6 +281,17 @@ $l['ls_timestamp']      = "Timestamp";
 $l['ls_graphit']        = "Graph it!";
 
 ##########################
+# logsys.php
+##########################
+$l['ly_level']		= "Level";
+$l['ly_ts']		= "Timestamp";
+$l['ly_source']		= "Source";
+$l['ly_error']		= "Message";
+$l['ly_sensorid']	= "Sensor ID";
+$l['ly_dev']		= "Device";
+$l['ly_default']	= "Set as Default";
+
+##########################
 # maldownloaded.php
 ##########################
 $l['md_title']          = "Malware downloaded";
@@ -298,6 +312,7 @@ $l['mo_top10']          = "Top 10";
 $l['me_contact']        = "Contact";
 $l['me_logout']         = "Logout";
 $l['me_about']          = "About";
+$l['me_manual']		= "Manual";
 $l['me_active']         = "Active sensors";
 $l['me_of']             = "of";
 $l['me_logged']         = "Logged in as";
@@ -332,6 +347,7 @@ $l['me_from']           = "From";
 $l['me_until']          = "Until";
 $l['me_groups']         = "Groups";
 $l['me_grouping']       = "Group compare";
+$l['me_syslog']		= "System logs";
 
 ##########################
 # myaccount.php
@@ -348,7 +364,7 @@ $l['ma_asearch']        = "Access: Search";
 $l['ma_auseradmin']     = "Access: User Admin";
 $l['ma_arpac']          = "ARP access";
 $l['ma_argosac']        = "ARGOS access";
-$l['ma_modules']        = "My Home";
+$l['ma_modules']        = "Page configuration";
 $l['ma_pref']           = "My preferences";
 $l['ma_def_graph']      = "Default graph";
 $l['ma_def_graph_type'] = "Default graph type";
@@ -510,6 +526,7 @@ $l['sd_sensorside']     = "Sensor side";
 $l['sd_rip']            = "Remote IP";
 $l['sd_lip']            = "Local IP";
 $l['sd_sensormac']      = "MAC address";
+$l['sd_smac']  	 	= "Sensor MAC";
 $l['sd_serverside']     = "Server side";
 $l['sd_device']         = "Device";
 $l['sd_devmac']         = "Device MAC";
@@ -527,6 +544,8 @@ $l['sd_totalevents']    = "Total number of events";
 $l['sd_members']        = "Member of groups";
 $l['sd_version']        = "Sensor scripts";
 $l['sd_revision']       = "Scripts revision";
+$l['sd_netconf']	= "Netconfig";
+$l['sd_osv']		= "OS version";
 
 ##########################
 # sensorstatus.php
@@ -564,6 +583,7 @@ $l['sc_maillog']        = "Maillogging script options";
 $l['sc_sandbox']        = "Sandbox script options";
 $l['sc_module']         = "Module options";
 $l['sc_virus']          = "Virus scanner info";
+$l['sc_cookie']		= "Cookie options";
 
 ##########################
 # serverstats.php
@@ -583,6 +603,11 @@ $l['sv_daily']          = "Daily";
 $l['sv_weekly']         = "Weekly";
 $l['sv_monthly']        = "Monthly";
 $l['sv_yearly']         = "Yearly";
+
+##########################
+# sensormanage.php
+##########################
+$l['sm_emails']		= "Contact";
 
 ##########################
 # traffic.php

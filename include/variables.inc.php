@@ -267,6 +267,9 @@ $v_errors = array(
 		6 => "Disabled all reports!",
 		7 => "Enabled all reports!",
 		8 => "Successfully purged events!",
+		9 => "Successfully retrieved data!",
+		10 => "Successfully stored defaults!",
+		100 => "Session expired, login again!",
 		101 => "You don't have sufficient rights to perform the requested action!",
 		102 => "Invalid or missing name!",
 		103 => "Invalid or missing OS!",
@@ -321,7 +324,9 @@ $v_errors = array(
 		152 => "The group needs to be approved by an admin first!",
 		153 => "Invalid or missing default graph!",
 		154 => "Invalid or missing default graph type!",
-		155 => "Invalid IP address. Choose a different IP address!"
+		155 => "Invalid IP address. Choose a different IP address!",
+		156 => "Invalid or missing page configuration array!",
+		157 => "Invalid or missing page ID!"
 );
 
 # Array for the different types of plots available.
@@ -544,7 +549,8 @@ $v_os_languages = array(
 $v_selview_ar = array(
 	0 => "View all sensors",
 	1 => "View offline sensors",
-	2 => "View online sensors"
+	2 => "View online sensors",
+	9 => "View deactivated sensors"
 );
 
 $v_group_type_ar = array(
@@ -582,6 +588,29 @@ $v_sensor_system_detail_ar = array(
 $v_timestamp_format_ar = array(
 	0 => "Local time",
 	1 => "UTC time"
+);
+
+# Array with configurable pages
+$v_page_select_ar = array(
+	0 => "Home",
+	1 => "Sensor Status"
+);
+
+# Array with the different syslog levels
+$v_syslog_levels_ar = array(
+	0 => "Debug",
+	1 => "Info",
+	2 => "Warning",
+	3 => "Error",
+	4 => "Critical"
+);
+
+$v_syslog_level_colours_ar = array(
+	0 => "Green",
+	1 => "Yellow",
+	2 => "Orange",
+	3 => "Red",
+	4 => "Red"
 );
 
 ?>

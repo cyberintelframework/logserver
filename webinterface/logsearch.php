@@ -1,8 +1,8 @@
 <?php
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 007                    #
-# 27-05-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 009                    #
+# 13-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 009 Added link to sensordetails
 # 008 Fixed a navigational bug
 # 007 Added MAC exclusion stuff
 # 005 Fixed BUG #59
@@ -1197,7 +1198,7 @@ while ($row = pg_fetch_assoc($result)) {
     } else {
       $name = $sensorname;
     }
-    echo "<td>$name</td>\n";
+    echo "<td><a href='sensordetails.php?int_sid=$sensorid'>$name</a></td>\n";
 
     if ($numrows_details != 0) {
       if ($sev == 1 && $sevtype == 0) {

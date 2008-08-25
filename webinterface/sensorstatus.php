@@ -1,4 +1,4 @@
-<?php $tab="4.1"; $pagetitle="Sensor Status"; include("menu.php"); contentHeader(); ?>
+<?php $tab="4.1"; $pagetitle="Sensor Status"; include("menu.php"); contentHeader(1,0); ?>
 <?php
 
 ####################################
@@ -27,6 +27,18 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+if (isset($clean['selview'])) {
+  $selview = $clean['selview'];
+} elseif (isset($c_selview)) {
+  $selview = intval($c_selview);
+}
+
+# Showing info/error messages if any
+if (isset($clean['m'])) {
+  $m = $clean['m'];
+  geterror($m);
+}
+
 # Setting up sorting stuff
 if (isset($tainted['sort'])) {
   $pattern = '/^(keynamea|keynamed|labela|labeld|tapipa|tapipd|netconfa|netconfd|statusa|statusd|uptimea|uptimed|orga|orgd)$/';
@@ -41,38 +53,32 @@ if (isset($tainted['sort'])) {
   $sort = "keynamea";
 }
 
-if (isset($clean['selview'])) {
-  $selview = $clean['selview'];
-} elseif (isset($c_selview)) {
-  $selview = intval($c_selview);
+if ($selview == 9) {
+  add_to_sql("deactivated_sensors", "table");
+  add_to_sql("deactivated_sensors.*", "select");
+} else {
+  $or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL AND NOT status = 3)";
+  add_to_sql("sensors.*", "select");
+  if ($selview == "1") {
+    add_to_sql("(status = 0 OR $or)", "where");
+  } elseif ($selview == "2") {
+    add_to_sql("(status = 1 OR $or)", "where");
+  }
+
+  if ($s_access_sensor < 9) {
+    add_to_sql("organisation = '$s_org'", "where");
+  } elseif ($s_access_sensor == 9) {
+    add_to_sql("organisations", "table");
+    add_to_sql("organisations.organisation as org", "select");
+    add_to_sql("organisations.id as orgid", "select");
+    add_to_sql("sensors.organisation = organisations.id", "where");
+  }
+  if ($q_org != 0) {
+    add_to_sql("sensors.organisation = '$q_org'", "where");
+  }
+  add_to_sql("sensors", "table");
 }
 
-# Showing info/error messages if any
-if (isset($clean['m'])) {
-  $m = $clean['m'];
-  geterror($m);
-}
-
-$or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL AND NOT status = 3)";
-add_to_sql("sensors.*", "select");
-if ($selview == "1") {
-  add_to_sql("(status = 0 OR $or)", "where");
-} elseif ($selview == "2") {
-  add_to_sql("(status = 1 OR $or)", "where");
-}
-
-if ($s_access_sensor < 9) {
-  add_to_sql("organisation = '$s_org'", "where");
-} elseif ($s_access_sensor == 9) {
-  add_to_sql("organisations", "table");
-  add_to_sql("organisations.organisation as org", "select");
-  add_to_sql("sensors.organisation = organisations.id", "where");
-}
-if ($q_org != 0) {
-  add_to_sql("sensors.organisation = '$q_org'", "where");
-}
-
-add_to_sql("sensors", "table");
 prepare_sql();
 
 $sql_sensors = "SELECT $sql_select ";
@@ -90,16 +96,61 @@ $row_rev = pg_fetch_assoc($result_rev);
 $server_rev = $row_rev['value'];
 $server_rev_ts = $row_rev['timestamp'];
 
+$sql_conf = "SELECT config FROM pageconf WHERE pageid = 1 AND userid = '$s_userid'";
+$debuginfo[] = $sql_conf;
+$result_conf = pg_query($pgconn, $sql_conf);
+$row_conf = pg_fetch_assoc($result_conf);
+$pageconf = $row_conf['config'];
+$pageconf = split(",", $pageconf);
+
+foreach ($pageconf as $key => $val) {
+  $pconf[$val] = 1;
+}
+
+# Headers
+# 01: Sensor name
+# 02: Sensor label
+# 03: Config
+# 04: Status
+# 05: Uptime
+# 06: Remote IP
+# 07: Local IP
+# 08: Sensor MAC
+# 09: Tap
+# 10: Tap MAC
+# 11: Tap IP
+
+if ($s_admin == 1) {
+  echo "<div id='adminmenu' onclick='adminmenu();'>\n";
+    echo "<div class='center'>\n";
+    echo "<table class='actiontable'>\n";
+      echo "<tr>\n";
+        echo "<th><span id='sensort'></span></th>\n";
+      echo "</tr>\n";
+    if ($selview != 9) {
+      echo "<tr><td><a id='activator' href=''>Deactivate</a></td></tr>\n";
+    } else {
+       echo "<tr><td><a id='activator' href=''>Activate</a></td></tr>\n";
+    }
+    echo "</table>\n";
+    echo "</div>\n";
+  echo "</div>\n";
+}
+
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
-        echo "<div class='blockHeaderLeft'>Sensors</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['g_sensors']. "</div>\n";
         echo "<div class='blockHeaderRight'>\n";
           echo "<form name='viewform' action='$url' method='GET'>\n";
             echo "<select name='int_selview' class='smallselect' onChange='javascript: this.form.submit();'>\n";
               foreach ($v_selview_ar as $key => $val) {
-                echo printOption($key, $val, $selview) . "\n";
+                if ($key != 9) {
+                  echo printOption($key, $val, $selview) . "\n";
+                } elseif ($key == 9 && $s_admin == 1) {
+                  echo printOption($key, $val, $selview) . "\n";
+                }
               }
             echo "</select>\n";
           echo "</form>\n";
@@ -108,12 +159,46 @@ echo "<div class='centerbig'>\n";
       echo "<div class='blockContent'>\n";
         echo "<table class='datatable' width='100%'>\n";
           echo "<tr>\n";
-            echo "<th>" .printsort($l['g_sensor'], "keyname"). "</th>\n";
-            echo "<th>" .printsort($l['ss_label'], "label"). "</th>\n";
-            echo "<th>" .printsort($l['ss_config'], "netconf"). "</th>\n";
-            echo "<th>" .printsort($l['sd_devip'], "tapip"). "</th>\n";
-            echo "<th>" .printsort($l['sd_uptime'], "uptime"). "</th>\n";
-            echo "<th>" .$l['g_status']. "</th>\n";
+            # Main info
+            if (array_key_exists("1", $pconf)) {
+              echo "<th>" .printsort($l['g_sensor'], "keyname"). "</th>\n";
+            }
+            if (array_key_exists("2", $pconf)) {
+              echo "<th>" .printsort($l['ss_label'], "label"). "</th>\n";
+            }
+            if (array_key_exists("3", $pconf)) {
+              echo "<th>" .printsort($l['ss_config'], "netconf"). "</th>\n";
+            }
+            if (array_key_exists("4", $pconf)) {
+              echo "<th>" .$l['g_status']. "</th>\n";
+            }
+            if (array_key_exists("5", $pconf)) {
+              echo "<th>" .printsort($l['sd_uptime'], "uptime"). "</th>\n";
+            }
+
+            # Sensor side
+            if (array_key_exists("6", $pconf)) {
+              echo "<th>" .printsort($l['sd_rip'], "remoteip"). "</th>\n";
+            }
+            if (array_key_exists("7", $pconf)) {
+              echo "<th>" .printsort($l['sd_lip'], "localip"). "</th>\n";
+            }
+            if (array_key_exists("8", $pconf)) {
+              echo "<th>" .printsort($l['sd_smac'], "sensormac"). "</th>\n";
+            }
+
+            # Server side
+            if (array_key_exists("9", $pconf)) {
+              echo "<th>" .printsort($l['sd_device'], "tap"). "</th>\n";
+            }
+            if (array_key_exists("10", $pconf)) {
+              echo "<th>" .printsort($l['sd_devmac'], "mac"). "</th>\n";
+            }
+            if (array_key_exists("11", $pconf)) {
+              echo "<th>" .printsort($l['sd_devip'], "tapip"). "</th>\n";
+            }
+
+
             if ($s_access_sensor == 9) {
               echo "<th>" .printsort($l['g_domain'], "org"). "</th>\n";
             }
@@ -121,6 +206,9 @@ echo "<div class='centerbig'>\n";
               echo "<th>" .$l['g_action']. "</th>\n";
             }
             echo "<th></th>\n";
+            if ($s_admin == 1) {
+              echo "<th></th>\n";
+            }
           echo "</tr>\n";
 
           while ($row = pg_fetch_assoc($result_sensors)) {
@@ -128,8 +216,18 @@ echo "<div class='centerbig'>\n";
             $sid = $row['id'];
             $keyname = $row['keyname'];
             $label = $row['label'];
+            $vlanid = $row['vlanid'];
+            $sensor = sensorname($keyname, $vlanid);
+            $netconf = $row['netconf'];
+
             $tap = $row['tap'];
             $tapip = censorip($row['tapip']);
+            $mac = $row['mac'];
+
+            $sensormac = $row['sensormac'];
+            $localip = $row['localip'];
+            $remoteip = $row['remoteip'];
+
             $start = $row['laststart'];
             $action = $row['action'];
             $ssh = $row['ssh'];
@@ -141,59 +239,91 @@ echo "<div class='centerbig'>\n";
               $uptime = 0;
             }
             $uptime_text = sec_to_string($uptime);
-            $netconf = $row['netconf'];
-            $vlanid = $row['vlanid'];
             $arp = $row['arp'];
-            $sensor = sensorname($keyname, $vlanid);
             $lastupdate = $row['lastupdate'];
             if ($s_access_sensor == 9) {
               $org = $row['org'];
+              $orgid = $row['orgid'];
             }
 
-            $cstatus = sensorstatus();
+            $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime);
 
             echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview'>\n";
               echo "<tr>\n";
-                echo "<td><a href='sensordetails.php?int_sid=$sid'>$sensor</a></td>\n";
-                echo "<td><a href='sensordetails.php?int_sid=$sid'>$label</a></td>\n";
-                echo "<td>";
-                  echo $v_sensornetconf_ar["$netconf"];
-                echo "</td>\n";
-                # Tap IP address
-                if ($netconf == "dhcp" || $netconf == "" || $netconf == "vland") {
-                  if (empty($tapip)) {
-                    echo "<td></td>\n";
-                  } else {
-                    echo "<td>$tapip</td>\n";
-                  }
-                } elseif ($netconf == "vlans") {
+                ########################
+                # GENERAL
+                ########################
+                if (array_key_exists("1", $pconf)) {
+                  echo "<td><a href='sensordetails.php?int_sid=$sid' " .printover($label). ">$sensor</a></td>\n";
+                }
+                if (array_key_exists("2", $pconf)) {
+                  echo "<td><a href='sensordetails.php?int_sid=$sid'>$label</a></td>\n";
+                }
+                if (array_key_exists("3", $pconf)) {
+                  echo "<td>" .$v_sensornetconf_ar["$netconf"]. "</td>\n";
+                }
+                if (array_key_exists("4", $pconf)) {
                   echo "<td>";
-                    if ($s_access_sensor == 0) {
-                      echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
-                    } else {
-                      echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
-                    }
-                  echo "</td>\n";
-                } else {
-                  echo "<td>";
-                    if ($s_access_sensor == 0) {
-                      echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
-                    } else {
-                      echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
-                    }
+                    echo "<div class='sensorstatus'>";
+                      echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
+                        echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
+                      echo "</div>";
+                    echo "</div>";
                   echo "</td>\n";
                 }
-#                echo "<td>$uptime_text<input type='hidden' name='js_uptime' value='$uptime' /></td>\n";
-                echo "<td>$uptime_text</td>\n";
-                echo "<td>";
-                  echo "<div class='sensorstatus'>";
-                    echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
-                      echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
-                    echo "</div>";
-                  echo "</div>";
-                echo "</td>\n";
+                if (array_key_exists("5", $pconf)) {
+                  echo "<td>$uptime_text</td>\n";
+                }
+                ########################
+                # SENSOR SIDE
+                ########################
+                if (array_key_exists("6", $pconf)) {
+                  echo "<td>$remoteip</td>\n";
+                }
+                if (array_key_exists("7", $pconf)) {
+                  echo "<td>$localip</td>\n";
+                }
+                if (array_key_exists("8", $pconf)) {
+                  echo "<td>$sensormac</td>\n";
+                }
+
+                ########################
+                # SERVER SIDE
+                ########################
+                if (array_key_exists("9", $pconf)) {
+                  echo "<td>$tap</td>\n";
+                }
+                if (array_key_exists("10", $pconf)) {
+                  echo "<td>$mac</td>\n";
+                }
+                # Tap IP address
+                if (array_key_exists("11", $pconf)) {
+                  if ($netconf == "dhcp" || $netconf == "" || $netconf == "vland") {
+                    if (empty($tapip)) {
+                      echo "<td></td>\n";
+                    } else {
+                      echo "<td>$tapip</td>\n";
+                    }
+                  } elseif ($netconf == "vlans") {
+                    echo "<td>";
+                      if ($s_access_sensor == 0) {
+                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
+                      } else {
+                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
+                      }
+                    echo "</td>\n";
+                  } else {
+                    echo "<td>";
+                      if ($s_access_sensor == 0) {
+                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
+                      } else {
+                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
+                      }
+                    echo "</td>\n";
+                  }
+                }
                 if ($s_access_sensor == 9) {
-                  echo "<td>$org</td>\n";
+                  echo "<td><a onclick='arequest(\"xml_getcontact.php?int_orgid=$orgid&int_sid=$sid\", \"getcontact\");'>$org</a></td>\n";
                 }
                 if ($s_access_sensor > 0) {
                   echo "<td>\n";
@@ -216,9 +346,12 @@ echo "<div class='centerbig'>\n";
                         echo "" . printOption("ENABLEARP", $l['ss_enable_arp'], $action) . "\n";
                       }
                     echo "</select>\n";
-                    echo "<td colspan='12' align='right'>\n";
+                    echo "<td>\n";
                       echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
                     echo "</td>\n";
+                    if ($s_admin == 1) {
+                      echo "<td><a onclick='adminmenu(this, \"$sid\", \"$sensor\");'>Admin</a></td>";
+                    }
                   echo "</td>\n";
                 }
               echo "</tr>\n";

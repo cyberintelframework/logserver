@@ -1,12 +1,13 @@
 --
 -- SURFids 2.10.00
 -- Database structure
--- Changeset 003
--- 21-05-2008
+-- Changeset 004
+-- 18-06-2008
 --
 
 --
 -- Version history
+-- 004 Modified report_content, added pageconf, indexmods
 -- 003 Added ostypes & modified system, login, report_content
 -- 002 Added arp_excl
 -- 001 Initial release
@@ -330,6 +331,46 @@ GRANT ALL ON TABLE details_id_seq TO nepenthes;
 GRANT SELECT,UPDATE ON TABLE details_id_seq TO argos;
 
 --
+-- INDEXMODS
+--
+CREATE TABLE indexmods (
+    id serial NOT NULL,
+    phppage character varying
+);
+
+SELECT pg_catalog.setval(pg_catalog.pg_get_serial_sequence('indexmods', 'id'), 11, true);
+
+INSERT INTO indexmods VALUES (1, 'mod_attacks.php');
+INSERT INTO indexmods VALUES (2, 'mod_exploits.php');
+INSERT INTO indexmods VALUES (3, 'mod_search.php');
+INSERT INTO indexmods VALUES (4, 'mod_top10attackers.php');
+INSERT INTO indexmods VALUES (5, 'mod_top10protocols.php');
+INSERT INTO indexmods VALUES (6, 'mod_virusscanners.php');
+INSERT INTO indexmods VALUES (7, 'mod_crossdom.php');
+INSERT INTO indexmods VALUES (8, 'mod_maloffered.php');
+INSERT INTO indexmods VALUES (9, 'mod_sensorstatus.php');
+INSERT INTO indexmods VALUES (10, 'mod_top10ports.php');
+INSERT INTO indexmods VALUES (11, 'mod_top10sensors.php');
+
+ALTER TABLE ONLY indexmods
+    ADD CONSTRAINT indexmods_pkey PRIMARY KEY (id);
+
+GRANT SELECT ON TABLE indexmods TO idslog;
+
+-- 
+-- INDEXMODS_SELECTED
+--
+CREATE TABLE indexmods_selected (
+    login_id integer,
+    indexmod_id integer
+);
+
+ALTER TABLE ONLY indexmods_selected
+    ADD CONSTRAINT foreign_indexmods FOREIGN KEY (login_id) REFERENCES "login"(id) ON DELETE CASCADE;
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE indexmods_selected TO idslog;
+
+--
 -- LOGIN 
 --
 
@@ -457,6 +498,23 @@ GRANT SELECT ON TABLE ostypes_id_seq TO idslog;
 GRANT SELECT,UPDATE ON TABLE ostypes_id_seq TO pofuser;
 
 --
+-- PAGECONF
+--
+CREATE TABLE pageconf (
+    userid integer DEFAULT 0 NOT NULL,
+    pageid integer DEFAULT 0 NOT NULL,
+    config character varying
+);
+
+ALTER TABLE ONLY pageconf
+    ADD CONSTRAINT unique_pageconf UNIQUE (userid, pageid);
+
+ALTER TABLE ONLY pageconf
+    ADD CONSTRAINT foreign_pageconf FOREIGN KEY (userid) REFERENCES "login"(id) ON DELETE CASCADE;
+
+GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE pageconf TO idslog;
+
+--
 -- REPORT_CONTENT 
 --
 
@@ -485,7 +543,7 @@ CREATE TABLE report_content (
 ALTER TABLE ONLY report_content
     ADD CONSTRAINT primary_report_content PRIMARY KEY (id);
 ALTER TABLE ONLY report_content
-    ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES "login"(id);
+    ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES "login"(id) ON DELETE CASCADE;
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE report_content TO idslog;
 GRANT SELECT,UPDATE ON TABLE report_content_id_seq TO idslog;

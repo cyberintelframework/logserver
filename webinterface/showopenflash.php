@@ -705,7 +705,8 @@ if ($x_steps == 0) {
 
 # Including the php open flash library
 ###############################################
-include_once('../include/php-ofc-library/open-flash-chart.php');
+#include_once('../include/php-ofc-library/open-flash-chart.php');
+include_once('../include/open-flash-chart.php');
 
 # Initialising the new graph
 ###############################################

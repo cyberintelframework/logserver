@@ -1,4 +1,4 @@
-<?php $tab="5.2"; $pagetitle="Users - New"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="5.2"; $pagetitle="Users - New"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################

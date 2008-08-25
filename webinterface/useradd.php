@@ -150,6 +150,16 @@ if ($err != 1) {
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
+
+  $sql = "SELECT id FROM login WHERE username = '$username'";
+  $debuginfo[] = $sql;
+  $result_user = pg_query($pgconn, $sql);
+  $row = pg_fetch_assoc($result_user);
+  $db_uid = $row['id'];
+
+  $sql = "INSERT INTO pageconf (userid, pageid, config) values ($db_uid, 1, '1,3,4,6,9,11')";
+  $debuginfo[] = $sql;
+  $execute = pg_query($pgconn, $sql);
 }
 
 # Close connection and redirect

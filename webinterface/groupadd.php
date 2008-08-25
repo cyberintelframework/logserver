@@ -35,7 +35,7 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
-$c_debug_input = 1;
+
 # Retrieving posted variables from $_POST
 $allowed_get = array(
                 "strip_html_escape_name",
@@ -58,15 +58,6 @@ if (isset($clean['name'])) {
   $m = 145;
   $err = 1;
 }
-if (isset($clean['type'])) {
-  $type = $clean['type'];
-} else {
-  if ($s_access_user == 9) {
-    $type = 1;
-  } else {
-    $type = 0;
-  }
-}
 
 if ($s_access_user < 2) {
   $m = 101;
@@ -84,9 +75,12 @@ if ($err != 1) {
   }
 }
 
+header("Content-type: application/xml");
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+
 if ($err != 1) {
-  $sql = "INSERT INTO groups (name, type, owner) ";
-  $sql .= "VALUES ('$name', '$type', '$s_org')";
+  $sql = "INSERT INTO groups (name, owner) ";
+  $sql .= "VALUES ('$name', '$s_org')";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
   $m = 1;
@@ -101,24 +95,23 @@ if ($err != 1) {
   $row = pg_fetch_assoc($result_owner);
   $gid = $row['id'];
 
-  echo "<tr id='$gid'>\n";
-    echo "<td>$name</td>\n";
-    echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
-    echo "<td>$owner</td>\n";
-    echo "<td>0</td>\n";
-    echo "<td>";
-      echo "[<a href='groupedit.php?int_gid=$gid'>" .$l['g_edit_l']. "</a>]\n";
-      echo "[<a onclick=\"javascript: submitform('', 'groupdel.php?int_gid=$gid', 'd', '$gid', '" .$l['ga_confirmdel']. "');\">" .$l['g_delete_l']. "</a>]";
-    echo "</td>\n";
-  echo "</tr>\n";
+  echo "<result>";
+    echo "<status>OK</status>";
+    echo "<error>" .$v_errors[$m]. "</error>";
+    echo "<data>";
+      echo "<gid>$gid</gid>";
+      echo "<name>$name</name>";
+      echo "<owner>$owner</owner>";
+      echo "<members>0</members>";
+    echo "</data>";
+  echo "</result>";
 } else {
-  echo "ERROR\n";
-  geterror($m, 1);
+  echo "<result>";
+    echo "<status>FAILED</status>";
+    echo "<error>" .$v_errors[$m]. "</error>";
+  echo "</result>";
 }
 
 # Close connection and redirect
 pg_close($pgconn);
-$c_debug_sql = 1;
-#debug_sql();
-#header("location: groupadmin.php?int_m=$m");
 ?>

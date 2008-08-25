@@ -15,6 +15,7 @@
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
+include '../include/variables.inc.php';
 
 # Starting the session
 session_start();
@@ -33,6 +34,7 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 # Retrieving posted variables from $_GET
@@ -41,7 +43,7 @@ $allowed_get = array(
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
-debug_input();
+#debug_input();
 
 # Checking if the logged in user actually requested this action.
 if ($clean['hash'] != $s_hash) {
@@ -72,6 +74,9 @@ if ($s_access_user < 2) {
   }
 }
 
+header("Content-type: application/xml");
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+
 if ($err == 0) {
   $sql = "DELETE FROM groupmembers WHERE groupid = '$gid'";
   $debuginfo[] = $sql;
@@ -82,6 +87,19 @@ if ($err == 0) {
   $execute = pg_query($pgconn, $sql);
   
   $m = 2;
+
+  echo "<result>";
+    echo "<status>OK</status>";
+    echo "<error>" .$v_errors[$m]. "</error>";
+    echo "<data>";
+      echo "<id>$gid</id>";
+    echo "</data>";
+  echo "</result>";
+} else {
+  echo "<result>";
+    echo "<status>FAILED</status>";
+    echo "<error>" .$v_errors[$m]. "</error>";
+  echo "</result>";
 }
 
 # Close connection and redirect

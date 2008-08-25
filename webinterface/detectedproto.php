@@ -1,4 +1,4 @@
-<?php $tab="2.7"; $pagetitle="Detected Protocols"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="2.7"; $pagetitle="Detected Protocols"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################

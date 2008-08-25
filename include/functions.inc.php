@@ -1,8 +1,8 @@
 <?php
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 005                    #
-# 17-04-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 007                    #
+# 18-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,8 @@
 
 #############################################
 # Changelog:
+# 007 Correctly chain checks in extractvars
+# 006 Several bugfixes sensorstatus
 # 005 Added sensorstatus
 # 004 Added cookie stuff
 # 003 Fixed sec_to_string if $sec = NULL
@@ -225,6 +227,8 @@ function getepoch($stamp) {
 #   net - network range regexp
 #   inet - ip address with/without cidr
 #   mac - mac address regexp
+#   date - date/time in the format of 22-08-98 21:45
+#   intcsv - Comma separated list of integers (1,23,5432,2)
 # These checks should be prepended to the variable name separated by a _ character
 # Examples:
 # int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
@@ -252,6 +256,9 @@ function extractvars($source, $allowed) {
             $count = count($explodedkey);
             if ($count != 0) {
               foreach ($explodedkey as $check) {
+                if (isset($clean[$temp])) {
+                  $var = $clean[$temp];
+                }
                 if ($check == "int") {
                   $var = intval($var);
                   $clean[$temp] = $var;
@@ -320,6 +327,20 @@ function extractvars($source, $allowed) {
                 } elseif ($check == "mac") {
                   $macregexp = '/^([a-zA-Z0-9]{2}:){5}[a-zA-Z0-9]{2}$/';
                   if (preg_match($macregexp, $var)) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "date") {
+                  $dateregexp = '/^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-[0-9]{2} (0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/';
+                  if (preg_match($dateregexp, $var)) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "intcsv") {
+                  $intcsv_regexp = '/^([0-9]*,){1,}([0-9]){1,}$/';
+                  if (preg_match($intcsv_regexp, $var)) {
                     $clean[$temp] = $var;
                   } else {
                     $tainted[$temp] = $var;
@@ -749,7 +770,11 @@ function roundup($value, $dp) {
 # Function to add a value to the SURFids cookie
 function addcookie($name, $value) {
   global $c_cookie_name, $c_cookie_domain, $c_cookie_path, $c_cookie_expiry, $c_cookie_https;
-  $expiry = time() + $c_cookie_expiry;
+  if ($c_cookie_expiry != 0) {
+    $expiry = time() + $c_cookie_expiry;
+  } else {
+    $expiry = 0;
+  }
   setcookie($c_cookie_name."[".$name."]", $value, $expiry, $c_cookie_path, $c_cookie_domain, $c_cookie_https);
 }
 
@@ -757,32 +782,25 @@ function addcookie($name, $value) {
 # Function to add a value to the SURFids cookie
 function delcookie($name) {
   global $c_cookie_name, $c_cookie_domain, $c_cookie_path, $c_cookie_expiry, $c_cookie_https;
-  $expiry = time() - 44000;
-  setcookie($c_cookie_name."[".$name."]", "", $expiry, $c_cookie_path, $c_cookie_domain, $c_cookie_https);
+  $expiry = time() - 3600;
+#  setcookie($c_cookie_name."[".$name."]", "", $expiry, $c_cookie_path, $c_cookie_domain, $c_cookie_https);
+  setcookie($c_cookie_name."[".$name."]");
 }
 
 # 3.23 sensorstatus
 # Function to calculate the actual sensor status
-# Required variables to be global:
-#   - $server_rev               = Server revision of the sensor scripts
-#   - $sensor_rev               = Sensor revision of the sensor scripts
-#   - $status                   = Unmodified status of the sensor
-#   - $server_rev_ts            = Modify time of the server revision
-#   - $lastupdate               = Timestamp of last keepalive check
-#   - $netconf                  = Network configuration method of the sensor
-#   - $tap                      = Tap device
-#   - $tapip                    = IP address of the tap device
-function sensorstatus() {
-  global $server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip;
-
+function sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime) {
   $diffupdate = 0;
   if ($lastupdate != "") {
+    $now = date("U");
     $diffupdate = $now - $lastupdate;
   } else {
     $diffupdate = 0;
     $lastupdate = 0;
   }
-  if ($status == 1 && "$server_rev" != "$sensor_rev" && $server_rev_ts < $lastupdate) {
+  if ($status == 3) {
+    $rtn = 3;
+  } elseif ($status == 1 && "$server_rev" != "$sensor_rev" && $server_rev_ts < $lastupdate) {
     $rtn = 7;
   } elseif ($status == 1 && $sensor_rev == 0 && $lastupdate != 0) {
     $rtn = 7;
@@ -791,7 +809,7 @@ function sensorstatus() {
       $rtn = 5;
     } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
       $rtn = 1;
-    } elseif ($diffupdate > 3600 && $status == 1) {
+    } elseif ($diffupdate > 3600 && $uptime > 3600 && $status == 1) {
       $rtn = 4;
     } elseif ($status == 1 && empty($tap)) {
       $rtn = 6;
@@ -849,8 +867,7 @@ function debug_sql() {
   global $c_debug_sql;
   global $c_debug_sql_analyze;
   global $debuginfo;
-  include 'config.inc.php';
-  include 'connect.inc.php';
+  global $pgconn;
   if ($c_debug_sql == 1) {
     echo "<div class='centerbig'>\n";
       echo "<div class='block'>\n";
@@ -866,7 +883,7 @@ function debug_sql() {
                     if (preg_match($pattern, $val)) {
                       echo str_repeat("-", 80) ."\n";
                       $sql = "EXPLAIN ANALYZE $val";
-                      $result = pg_query($sql);
+                      $result = pg_query($pgconn, $sql);
                       while ($row = pg_fetch_assoc($result)) {
                         $stuff = $row["QUERY PLAN"];
                         echo "$stuff\n";
@@ -884,7 +901,6 @@ function debug_sql() {
       echo "</div>\n"; #</block>
     echo "</div>\n"; #</centerbig>
   }
-  pg_close($pgconn);
 }
 
 ###############################

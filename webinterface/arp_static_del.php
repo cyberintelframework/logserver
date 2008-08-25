@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 18-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Fixed access issue
 # 001 Initial release
 #############################################
 
@@ -33,7 +34,7 @@ $s_org = intval($_SESSION['s_org']);
 $q_org = intval($_SESSION['q_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
-$s_access_sensor = intval($s_access{2});
+$s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 

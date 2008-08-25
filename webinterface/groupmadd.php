@@ -33,13 +33,14 @@ if (!isset($_SESSION['s_admin'])) {
 # Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
-$s_access_user = intval($s_access{2});
+$s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_gid",
                 "int_sid",
+		"int_org",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -58,19 +59,24 @@ if (isset($clean['gid'])) {
   $m = 150;
   $err = 1;
 }
+
 if (isset($clean['sid'])) {
   $sid = $clean['sid'];
+  $org = 0;
+} elseif (isset($clean['org']) && $s_access_sensor == 9) {
+  $org = $clean['org'];
+  $sid = 0;
 } else {
   $m = 110;
   $err = 1;
 }
 
-if ($s_access_user < 2) {
+if ($s_access_sensor < 2) {
   $m = 101;
   $err = 1;
 }
 
-if ($err != 1) {
+if ($err != 1 && $sid != 0) {
   $sql = "SELECT id FROM groupmembers WHERE sensorid = '$sid' AND groupid = '$gid'";
   $debuginfo[] = $sql;
   $result_user = pg_query($pgconn, $sql);
@@ -82,61 +88,123 @@ if ($err != 1) {
 }
 
 if ($err != 1) {
-  $sql = "SELECT type, owner FROM groups WHERE id = '$gid'";
+  $sql = "SELECT owner FROM groups WHERE id = '$gid'";
   $debuginfo[] = $sql;
   $result_check = pg_query($pgconn, $sql);
   $row_check = pg_fetch_assoc($result_check);
-  $type = $row_check['type'];
   $owner = $row_check['owner'];
-  if ($type == 0 && $owner != $s_org && $s_access_user != 9) {
+  if ($owner != $s_org && $s_access_user != 9) {
     $m = 101;
     $err = 1;
   }
 }
 
+header("Content-type: application/xml");
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+
 if ($err != 1) {
-  $sql = "INSERT INTO groupmembers (groupid, sensorid) ";
-  $sql .= "VALUES ('$gid', '$sid')";
-  $debuginfo[] = $sql;
-  $execute = pg_query($pgconn, $sql);
-  $m = 1;
-
-  $sql = "SELECT keyname, label, vlanid, sensorid, groups.owner, organisations.id as orgid, organisations.organisation, groups.type";
-  $sql .= " FROM sensors, groupmembers, groups, organisations ";
-  $sql .= " WHERE groupid = '$gid' AND sensorid = '$sid' AND sensorid = sensors.id ";
-  $sql .= " AND groupmembers.groupid = groups.id AND sensors.organisation = organisations.id";
-  $debuginfo[] = $sql;
-  $result = pg_query($pgconn, $sql);
-  $row = pg_fetch_assoc($result);
-
-  $sid = $row['sensorid'];
-  $keyname = $row['keyname'];
-  $vlanid = $row['vlanid'];
-  $label = $row['label'];
-  $sensor = sensorname($keyname, $vlanid, $label);
-  $owner = $row['owner'];
-  $org = $row['orgid'];
-  $orgname = $row['organisation'];
-  $type = $row['type'];
-
-  if ($type == 0) {
-    $ts = date("U");
-    $sql = "INSERT INTO sensors_log (sensorid, timestamp, logid, args) ";
-    $sql .= " VALUES ('$sid', '$ts', 15, '%group% = $name')";
+  if ($org == 0) {
+    # Inserting member
+    $sql = "INSERT INTO groupmembers (groupid, sensorid) ";
+    $sql .= "VALUES ('$gid', '$sid')";
+    $debuginfo[] = $sql;
     $execute = pg_query($pgconn, $sql);
-  }
+    $m = 1;
 
-  echo "<tr id='sensor$sid'>\n";
-    echo "<td>$sensor - $orgname</td>\n";
-    echo "<td>";
-      if ($org == $s_org || $s_access_user == 9 || $owner == $s_org) {
-        echo "[<a onclick=\"submitform('', 'groupmdel.php?int_gid=$gid&int_sid=$sid&md5_hash=$s_hash', 'u', 'sensor$sid');\">" .$l['g_remove_l']. "</a>]\n";
-      }
-    echo "</td>\n";
-  echo "</tr>\n";
+    # Getting sensor info
+    $sql = "SELECT keyname, label, vlanid";
+    $sql .= " FROM sensors ";
+    $sql .= " WHERE id = '$sid' ";
+    $debuginfo[] = $sql;
+    $result = pg_query($pgconn, $sql);
+    $row = pg_fetch_assoc($result);
+
+    $keyname = $row['keyname'];
+    $vlanid = $row['vlanid'];
+    $label = $row['label'];
+    $sensor = sensorname($keyname, $vlanid, $label);
+
+    # Getting group info
+    $sql = "SELECT groups.id, name, organisation FROM groups, organisations WHERE groups.id = '$gid' AND organisations.id = groups.owner";
+    $debuginfo[] = $sql;
+    $result = pg_query($pgconn, $sql);
+    $row_group = pg_fetch_assoc($result);
+
+    $name = $row_group['name'];
+    $owner = $row_group['organisation'];
+
+    $sql_count = "SELECT COUNT(id) as total FROM groupmembers WHERE groupid = '$gid'";
+    $debuginfo[] = $sql_count;
+    $result_count = pg_query($pgconn, $sql_count);
+    $rowmembers = pg_fetch_assoc($result_count);
+    $members = $rowmembers['total'];
+
+    echo "<result>";
+      echo "<status>OK</status>";
+      echo "<error>" .$v_errors[$m]. "</error>";
+      echo "<data>";
+        echo "<sensor sid=\"$sid\" name=\"$sensor\" />";
+        echo "<group gid=\"$gid\">";
+          echo "<name>$name</name>";
+          echo "<owner>$owner</owner>";
+          echo "<members>$members</members>";
+        echo "</group>";
+      echo "</data>";
+    echo "</result>";
+  } else {
+    $m = 1;
+    echo "<result>";
+      echo "<status>OK</status>";
+      echo "<error>" .$v_errors[$m]. "</error>";
+      echo "<data>";
+
+        $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$org'";
+        $debuginfo[] = $sql;
+        $result = pg_query($pgconn, $sql);
+ 
+        while($row = pg_fetch_assoc($result)) {
+          $sid = $row['id'];
+          $keyname = $row['keyname'];
+          $vlanid = $row['vlanid'];
+          $label = $row['label'];
+          $sensor = sensorname($keyname, $vlanid, $label);
+
+          $sql_insert = "INSERT INTO groupmembers (groupid, sensorid) ";
+          $sql_insert .= "VALUES ('$gid', '$sid')";
+          $debuginfo[] = $sql_insert;
+          $ec = pg_query($pgconn, $sql_insert);
+
+          echo "<sensor sid=\"$sid\" name=\"$sensor\" />";
+        }
+
+        # Getting group info
+        $sql = "SELECT groups.id, name, organisation FROM groups, organisations WHERE groups.id = '$gid' AND organisations.id = groups.owner";
+        $debuginfo[] = $sql;
+        $result = pg_query($pgconn, $sql);
+        $row_group = pg_fetch_assoc($result);
+
+        $name = $row_group['name'];
+        $owner = $row_group['organisation'];
+
+        $sql_count = "SELECT COUNT(id) as total FROM groupmembers WHERE groupid = '$gid'";
+        $debuginfo[] = $sql_count;
+        $result_count = pg_query($pgconn, $sql_count);
+        $rowmembers = pg_fetch_assoc($result_count);
+        $members = $rowmembers['total'];
+ 
+        echo "<group gid=\"$gid\">";
+          echo "<name>$name</name>";
+          echo "<owner>$owner</owner>";
+          echo "<members>$members</members>";
+        echo "</group>";
+      echo "</data>";
+    echo "</result>";
+  }
 } else {
-  echo "ERROR\n";
-  geterror($m, 1);
+  echo "<result>";
+    echo "<status>FAILED</status>";
+    echo "<error>" .$v_errors[$m]. "</error>";
+  echo "</result>";
 }
 
 #echo "M: $m<br />\n";

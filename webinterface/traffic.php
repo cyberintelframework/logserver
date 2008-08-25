@@ -1,4 +1,4 @@
-<?php $tab="2.4"; $pagetitle="Traffic"; include("menu.php"); contentHeader(0); ?> 
+<?php $tab="2.4"; $pagetitle="Traffic"; include("menu.php"); contentHeader(0,0); ?> 
 <?php
 
 ####################################

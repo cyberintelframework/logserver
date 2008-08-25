@@ -1,4 +1,4 @@
-<?php $tab="2.6"; $pagetitle="Report - Edit"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="2.6"; $pagetitle="Report - Edit"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
@@ -236,7 +236,7 @@ if ($numrows > 0) {
             }
               echo "<td width='100'>" .$l['re_timeformat']. ":</td>\n";
               echo "<td width='200'>";
-                echo "<select name='int_utc' id='int_filter'>\n";
+                echo "<select name='int_utc'>\n";
                   foreach ($v_timestamp_format_ar as $key=>$val) {
                     echo printOption($key, $val, $utc);
                   }

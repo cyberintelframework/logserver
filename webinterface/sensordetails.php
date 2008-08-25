@@ -1,15 +1,16 @@
-<?php $tab="4.1"; $pagetitle="Sensor Details"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="4.1"; $pagetitle="Sensor Details"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 004                    #
-# 17-04-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 005                    #
+# 20-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Added network config
 # 004 Changed sensor $status stuff
 # 003 Fixed uptime when uptime = NULL
 # 002 Removed some status leds
@@ -80,7 +81,7 @@ if ($err == 0) {
     }
   }
   $sql_details = "SELECT keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
-  $sql_details .= " organisations.organisation, version, rev, sensormac ";
+  $sql_details .= " organisations.organisation, version, rev, sensormac, netconf, osv ";
   $sql_details .= " FROM sensors, organisations WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
@@ -96,6 +97,13 @@ if (isset($clean['m'])) {
 }
 
 if ($err != 1) {
+  $netconf_ar = array(
+	'dhcp' => "DHCP",
+	'static' => "Static",
+	'vland' => "VLAN DHCP",
+	'vlans' => "VLAN Static"
+  );
+
   $row = pg_fetch_assoc($result_details);
 
   $keyname = $row['keyname'];
@@ -104,6 +112,8 @@ if ($err != 1) {
   $label = $row['label'];
   $remote = $row['remoteip'];
   $local = $row['localip'];
+  $netconf = $row['netconf'];
+  $netconf_t = $netconf_ar[$netconf];
   $tap = $row['tap'];
   $tapip = $row['tapip'];
   $mac = $row['mac'];
@@ -114,7 +124,6 @@ if ($err != 1) {
   $update = $row['lastupdate'];
   $update_text = date("d-m-Y H:i:s", $update);
   $totaltime_text = sec_to_string($totaltime);
-  $uptime = date("U") - $start;
   if ($start != "") {
     $uptime = date("U") - $start;
   } else {
@@ -126,6 +135,7 @@ if ($err != 1) {
   $sensor_rev = $row['rev'];
   $version = $row['version'];
   $sensormac = $row['sensormac'];
+  $osv = $row['osv'];
 
   # Fetching server updates revision
   $sql_rev = "SELECT value FROM serverinfo WHERE name = 'updaterev'";
@@ -134,7 +144,7 @@ if ($err != 1) {
   $row_rev = pg_fetch_assoc($result_rev);
   $server_rev = $row_rev['value'];
 
-  $cstatus = sensorstatus();
+  $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $update, $netconf, $tap, $tapip, $uptime);
 
   $sql_attack = "SELECT timestamp FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
   $debuginfo[] = $sql_attack;
@@ -222,6 +232,14 @@ if ($err != 1) {
             echo "<tr>\n";
               echo "<td>" .$l['sd_sensormac']. ":</td>\n";
               echo "<td colspan='3'>$sensormac</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_netconf']. ":</td>\n";
+              echo "<td colspan='3'>$netconf_t</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_osv']. ":</td>\n";
+              echo "<td colspan='3'>$osv</td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='4'>" .$l['sd_serverside']. "</th></tr>\n";
@@ -357,7 +375,7 @@ if ($err != 1) {
             echo "<tr>\n";
               echo "<td>" .$l['sd_totalevents']. ":</td>\n";
               echo "<td>";
-                echo "<div class='aleft'><div class='text'>$num_events</div></div>\n";
+                echo "<div class='fleft'><div class='text'>$num_events</div></div>\n";
                 echo "<div class='aright'>";
                   echo "<select name='int_logfilter' class='smallselect' onchange='document.sensorlog.submit();'>";
                     echo printOption(-1, $l['g_all'], $logfilter);

@@ -1,4 +1,4 @@
-<?php $tab="2.6"; $pagetitle="Report - New"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="2.6"; $pagetitle="Report - New"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
@@ -182,10 +182,10 @@ echo "<div class='leftmed'>\n";
               echo "</select>\n";
             echo "</td>\n";
           echo "</tr>\n";
-          echo "<tr style='display:;' id='timestamps' name='timestamps'>";
+          echo "<tr style='display: none;' id='timestamps' name='timestamps'>";
             echo "<td width='100'>" .$l['re_timeformat']. ":</td>\n";
             echo "<td width='200'>";
-              echo "<select name='int_utc' id='int_filter'>\n";
+              echo "<select name='int_utc'>\n";
                 foreach ($v_timestamp_format_ar as $key=>$val) {
                   echo printOption($key, $val, $d_utc);
                 }

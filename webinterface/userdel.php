@@ -79,9 +79,14 @@ if ($s_access_user < 2) {
 
 if ($err == 0) {
   # Deleting all mailreports from the user
-  $sql = "DELETE FROM report_content WHERE user_id = '$userid'";
-  $debuginfo[] = $sql;
-  $query = pg_query($pgconn, $sql);
+#  $sql = "DELETE FROM report_content WHERE user_id = '$userid'";
+#  $debuginfo[] = $sql;
+#  $query = pg_query($pgconn, $sql);
+
+  # Deleting all page configs from the user
+#  $sql = "DELETE FROM pageconf WHERE userid = '$userid'";
+#  $debuginfo[] = $sql;
+#  $query = pg_query($pgconn, $sql);
 
   # Deleting the actual user records
   $sql = "DELETE FROM login WHERE id = $userid";

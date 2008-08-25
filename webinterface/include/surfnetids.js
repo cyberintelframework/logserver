@@ -24,6 +24,24 @@
  */
 
 /***********************************
+ * Trim functions
+ ***********************************/
+
+function trim(str, chars) {
+  return ltrim(rtrim(str, chars), chars);
+}
+
+function ltrim(str, chars) {
+  chars = chars || "\\s";
+  return str.replace(new RegExp("^[" + chars + "]+", "g"), "");
+}
+
+function rtrim(str, chars) {
+  chars = chars || "\\s";
+  return str.replace(new RegExp("[" + chars + "]+$", "g"), "");
+}
+
+/***********************************
  * Timer functions
  ***********************************/
 
@@ -91,56 +109,46 @@ function showtab(selected) {
 function sh_mailtemp(si) {
   $('#int_detail').selectOptions("0");
   $('#int_sdetail').selectOptions("0");
-  $('#timeandthresh').show();
   $('#filter').hide();
+  $('#timeandthresh').show();
   if (si == 4) {
     $('#attack_sev').hide();
-    $('#sensor_sev').show();
-
     $('#attack_time').hide();
-    $('#sensor_time').show();
     $('#thresh_freq').hide();
-
     $('#timeoptions').hide();
     $('#repdetail').hide();
-    $('#srepdetail').show();
-
     $('#timestamps').hide();
+    $('#srepdetail').show();
+    $('#sensor_time').show();
+    $('#sensor_sev').show();
   } else if (si == 5) {
     $('#attack_sev').hide();
     $('#sensor_sev').hide();
-
-    $('#attack_time').show();
     $('#sensor_time').hide();
-
     $('#timeoptions').hide();
     $('#repdetail').hide();
     $('#srepdetail').hide();
-
     $('#timestamps').hide();
+    $('#attack_time').show();
   } else if (si == 7) {
     $('#attack_sev').hide();
     $('#sensor_sev').hide();
-
-    $('#attack_time').show();
+    $('#timestamps').hide();
     $('#sensor_time').hide();
-
     $('#timeoptions').hide();
     $('#repdetail').hide();
     $('#srepdetail').hide();
 
-    $('#timestamps').hide();
-  } else {
-    $('#attack_sev').show();
-    $('#sensor_sev').hide();
-
-    $('#sensor_time').hide();
     $('#attack_time').show();
+  } else {
+    $('#srepdetail').hide();
+    $('#sensor_sev').hide();
+    $('#sensor_time').hide();
 
+    $('#attack_sev').show();
+    $('#attack_time').show();
     $('#timeoptions').show();
     $('#repdetail').show();
-    $('#srepdetail').hide();
-
     $('#timestamps').show();
   }
 }
@@ -148,23 +156,26 @@ function sh_mailtemp(si) {
 function sh_mailreptype(si) {
   if (si < 10) {
     if (si < 4) {
-      $('#timeandthresh').show();
       $('#filter').hide();
+      $('#timestamps').hide();
+      $('#timeandthresh').show();
       $('#attack_sev').show();
     } else if (si == 4 || si == 5) {
-      $('#timeandthresh').show();
       $('#attack_sev').hide();
+      $('#timeandthresh').show();
       $('#int_template').selectOptions(1);
-	  rep = $('#int_template').val();
-	  if (rep == 2) {
+      $('#timestamps').show();
+      rep = $('#int_template').val();
+      if (rep == 2) {
         $('#filter').hide();
       } else {
         $('#filter').show();
-	  }
+      }
     }
   } else {
     $('#timeandthresh').hide();
     $('#filter').hide();
+    $('#timestamps').hide();
     $('#attack_sev').show();
   }
 }
@@ -176,20 +187,20 @@ function sh_mailfreq(si) {
     $('#thresh_freq').hide();
     $('#always').show();
   } else if (si == 2) {
-    $('#daily_freq').show();
     $('#weekly_freq').hide();
     $('#thresh_freq').hide();
+    $('#daily_freq').show();
     $('#always').show();
   } else if (si == 3) {
     $('#daily_freq').hide();
-    $('#weekly_freq').show();
     $('#thresh_freq').hide();
+    $('#weekly_freq').show();
     $('#always').show();
   } else if (si == 4) {
     $('#daily_freq').hide();
     $('#weekly_freq').hide();
-    $('#thresh_freq').show();
     $('#always').hide();
+    $('#thresh_freq').show();
   } 
 }
 
@@ -222,7 +233,7 @@ function getScrollSize(){
   return yScroll;
 }
 
-function popit(url,h,w) {
+function popit(url, lock ,h ,w) {
   var wh = getScrollSize();
   $("#popupcontent").load(url);
 
@@ -231,9 +242,13 @@ function popit(url,h,w) {
     $("#popup").width(w);
   }
   $("#popup").show();
-  $("#overlay").show();
-
-  $("#overlay").height(wh);
+  if (lock == true) {
+    $("#overlay_lock").show();
+//    $("#overlay_lock").height(wh);
+  } else {
+    $("#overlay").show();
+//    $("#overlay").height(wh);
+  }
   return false;
 }
 
@@ -241,6 +256,7 @@ function popout() {
   $("#popup").hide();
   $("#error").hide();
   $("#overlay").hide();
+  $("#overlay_lock").hide();
   $("#popupcontent").html('Loading...');
 }
 
@@ -611,6 +627,26 @@ function sec_to_string(sec) {
   return sec;
 }
 
+function switch_page_conf() {
+  id = $('#page_select').val();
+  if (id == 0) {
+    $('#page_sensorstatus').hide();
+    $('#page_indexmods').show();
+  } else {
+    $('#page_indexmods').hide();
+    $('#page_sensorstatus').show();
+  }
+}
+
+function redirmap() {
+  var val = $('#redirmapper').val();
+  if (val == 1) {
+    window.location='googlemap.php';
+  } else {
+    window.location='sensormap.php';
+  }
+}
+
 /***********************************
  * Plotter functions
  ***********************************/
@@ -728,6 +764,9 @@ function buildqs() {
  * Test AJAX functions
  ***********************************/
 
+/* Generic AJAX helper functions */
+/*********************************/
+
 $.fn.clearForm = function() {
   // iterate each matching form
   return this.each(function() {
@@ -744,48 +783,341 @@ $.fn.clearForm = function() {
   });
 };
 
-function submitform(formid, url, action, loc, str) {
-  if (formid != '') {
-    var qs = $('#'+formid).serialize();
-    var url = url+'?'+qs;
-  }
-  if (action == 'd') {
-    var chk = confirm(str);
+function expand_edit(id, title, divid_block, divid_title, url, type) {
+  var status = $('#'+divid_block).css("display");
+  var item = $('#'+divid_title).text();
+  $('.edit_id').val(id);
+  if (item == title || item == '') {
+    if (status == "none" || status == "inline") {
+      $('.groupmember').remove();
+      var titlecontent = $('#'+divid_title).text() + title;
+      $('#'+divid_title).text(titlecontent);
+      $('#'+divid_block).show();
+      arequest(url, type);
+    } else if (status == "block") {
+      $('#'+divid_block).hide();
+      $('.groupmember').remove();
+      $('#'+divid_title).text("");
+    }
   } else {
-    chk = true;
-  }
-  if (chk) {
-    $.ajax({
-      url: url,
-      type: 'GET',
-      dataType: 'html',
-      error: function(){
-        alert('Error processing your request!');
-      },
-      success: function(data){
-        var str = data;
-        if (data.match(/ERROR.*/)) {
-          poperr(str);
-        } else {
-          if (action == 'a') {
-            $('#'+loc).before(data);
-            $('#'+formid).clearForm();
-          } else if (action == 'u') {
-            $('#'+loc).replaceWith(data);
-          } else if (action == 'd') {
-            $('#'+loc).remove();
-          }
-        }
-      }
-    });
+    $('#'+divid_title).text("");
+    $('.groupmember').remove();
+    var titlecontent = $('#'+divid_title).text() + title;
+    $('#'+divid_title).text(titlecontent);
+    arequest(url, type);
   }
 }
 
-function redirmap() {
-  var val = $('#redirmapper').val();
-  if (val == 1) {
-    window.location='googlemap.php';
+function db_add_record(url, type, formid) {
+  var qs = $('#'+formid).serialize();
+  var url = url+'?'+qs;
+  $('#'+formid).clearForm();
+
+  arequest(url, type);
+}
+
+function db_del_record(url, type) {
+  arequest(url, type);
+}
+
+function db_del_selected_cb(url, type, formid, name) {
+  var retstr = '';
+  var len = $('#'+formid).length;
+  $('#'+formid+' :checked').each(function() {
+    var val = $(this).val();
+    retstr += val + ',';
+  });
+
+  var chk = retstr.substring(retstr.length-1, retstr.length);
+  if (chk == ',') {
+    retstr = retstr.substring(0, retstr.length-1);
+  }
+
+  var qs = $('#'+formid).serialize();
+  var url = url + '?' + name + '=' + retstr + '&' + qs;
+  arequest(url, type);
+}
+
+function setdefault(formid, url) {
+  var qs = $('#'+formid).serialize();
+  var url = url+'?'+qs;
+  var type = '';
+  arequest(url, type);
+}
+
+function process_aresult(data, type) {
+  var result = $("result", data);
+  var ec = result.find("status").text();
+  if (ec == "OK") {
+    if (type == "groupdel") {
+      groupdel(result);
+    } else if (type == "groupadd") {
+      groupadd(result);
+    } else if (type == "getgroupmembers") {
+      get_group_members(result);
+    } else if (type == "groupaddorg") {
+      get_group_members(result);
+    } else if (type == "groupaddsensor") {
+      get_group_members(result);
+    } else if (type == "groupmdel") {
+      groupmdel(result);
+    } else if (type == "groupdelsensors") {
+      groupmsdel(result);
+    } else if (type == "logsys") {
+      get_logsys(result);
+    } else if (type == "getcontact") {
+      getcontact(result);
+    }
+
+    var err = result.find("error").text();
+    if (err != "") {
+      $.jGrowl(err, { life: 500, header: "Success" });
+    }
+  } else if (ec == "RELOG") {
+    GB_show("test","popup_login.php",470,600);
+//    popit("popup_login.php", true, 50);
   } else {
-    window.location='sensormap.php';
+    var err = result.find("error").text();
+    $.jGrowl(err, { sticky: true, header: "Error" });
+  }
+}
+
+function arequest(url, type) {
+  $.ajax({
+    url: url,
+    type: 'GET',
+    dataType: 'xml',
+    error: function(xmlobj){
+      var err = 'Could not retrieve data!';
+      $.jGrowl(err, { sticky: true, header: "Error" });
+      var url_ar = url.split("?");
+      url = url_ar[0];
+      var err = 'Request for ' +url+ ' returned: ' +xmlobj.status;
+      $.jGrowl(err, { sticky: true, header: "Error" });
+    },
+    success: function(data){
+      process_aresult(data, type);
+    }
+  });
+}
+
+/* Group member functions */
+/**************************/
+
+function groupmdel(result) {
+  var members = result.find("members");
+  $("memberid", members).each(function () {
+    var id = $(this).text();
+    $('#sensor'+id).remove();
+  });
+
+  var group = result.find("data").find("group");
+  var gid = group.attr("gid");
+  var name = group.find("name").text();
+  var owner = group.find("owner").text();
+  var members = group.find("members").text();
+  var hash = $('#md5_globalhash').val();
+
+  var html = '<tr id="group' +gid+ '">';
+    html += '<td>' +name+ '</td>';
+    html += '<td>' +owner+ '</td>';
+    html += '<td>' +members+ '</td>';
+    html += '<td>';
+      html += '[<a onclick="javascript: expand_edit(\''+name+'\', \'edit_block\', \'edit_title\', \'groupmget.php?int_gid='+gid+'&md5_hash='+hash+'\', \'getgroupmembers\');">edit</a>]\n';
+      html += '[<a onclick="javascript: db_del_record(\'groupdel.php?int_gid='+gid+'&md5_hash='+hash+'\', \'groupdel\');\">delete</a>]';
+    html += '</td>\n';
+  html += '</tr>\n';
+
+  $('#group'+gid).replaceWith(html);
+}
+
+function get_group_members(result) {
+  var group = result.find("data").find("group");
+  if (group) {
+    var gid = group.attr("gid");
+    var name = group.find("name").text();
+    var owner = group.find("owner").text();
+    var members = group.find("members").text();
+    var hash = $('#md5_globalhash').val();
+
+    var html = '<tr id="group' +gid+ '">';
+      html += '<td>' +name+ '</td>';
+      html += '<td>' +owner+ '</td>';
+      html += '<td>' +members+ '</td>';
+      html += '<td>';
+        html += '[<a onclick="javascript: expand_edit(\''+name+'\', \'edit_block\', \'edit_title\', \'groupmget.php?int_gid='+gid+'&md5_hash='+hash+'\', \'getgroupmembers\');">edit</a>]\n';
+        html += '[<a onclick="javascript: db_del_record(\'groupdel.php?int_gid='+gid+'&md5_hash='+hash+'\', \'groupdel\');\">delete</a>]';
+      html += '</td>\n';
+    html += '</tr>\n';
+    $('#group'+gid).replaceWith(html);
+  }
+
+  $("sensor", result).each(function() {
+    var sensor = $(this);
+
+    var sid = sensor.attr("sid");
+    var name = sensor.attr("name");
+    var hash = $('#md5_globalhash').val();
+
+    var html = '<tr id="sensor' +sid+ '" class="groupmember">';
+      html += '<td>' +name+ '</td>';
+      html += '<td><input type="checkbox" value="'+sid+'" />';
+    html += '</tr>\n';
+
+    $('#edit_row').before(html);
+  });
+}
+
+/* Group functions */
+/*******************/
+
+function groupdel(result) {
+  var gid = result.find("id").text();
+  $('#group' +gid).remove();
+  $('#edit_block').hide();
+}
+
+function groupadd(result) {
+  var data = result.find("data");
+
+  var gid = data.find("gid").text();
+  var name = data.find("name").text();
+  var owner = data.find("owner").text();
+  var members = data.find("members").text();
+  var hash = $('#md5_globalhash').val();
+
+  var html = '<tr id="group' +gid+ '">';
+    html += '<td>' +name+ '</td>';
+    html += '<td>' +owner+ '</td>';
+    html += '<td>' +members+ '</td>';
+    html += '<td>';
+      html += '[<a onclick="javascript: expand_edit(\''+gid+'\', \''+name+'\', \'edit_block\', \'edit_title\', \'groupmget.php?int_gid='+gid+'&md5_hash='+hash+'\', \'getgroupmembers\');">edit</a>]\n';
+      html += '[<a onclick="javascript: db_del_record(\'groupdel.php?int_gid='+gid+'&md5_hash='+hash+'\', \'groupdel\');\">delete</a>]';
+    html += '</td>\n';
+  html += '</tr>\n';
+  $("#inputrow").before(html);
+}
+
+/* Logsys functions */
+/********************/
+
+function browsedata(dir, formid, url, type) {
+  var offset = $("#int_offset").val() - 0;
+  var limit = $("#int_limit").val() - 0;
+  var total = $("#int_total").val() - 0;
+  if (dir == "start") {
+    $("#int_offset").val("0");
+    if (offset != 0) {
+      var qs = $('#'+formid).serialize();
+      var url = url+'?'+qs;
+      arequest(url, type);
+    }
+  } else if (dir == "prev") {
+    var new_offset = offset - limit;
+    if (new_offset < 0) {
+      new_offset = 0;
+    }
+    $("#int_offset").val(new_offset);
+    if (offset != new_offset) {
+      var qs = $('#'+formid).serialize();
+      var url = url+'?'+qs;
+      arequest(url, type);
+    }
+  } else if (dir == "next") {
+    var new_offset = offset + limit;
+    if ((new_offset >= total) === false) {
+      $("#int_offset").val(new_offset);
+      var qs = $('#'+formid).serialize();
+      var url = url+'?'+qs;
+      arequest(url, type);
+    }
+  } else if (dir == "end") {
+    if (total > limit) {
+      var new_offset = total - limit;
+      $("#int_offset").val(new_offset);
+      if (offset != new_offset) {
+        var qs = $('#'+formid).serialize();
+        var url = url+'?'+qs;
+        arequest(url, type);
+      }
+    }
+  } else if (dir == "filter") {
+    $("#int_offset").val("0");
+    var qs = $('#'+formid).serialize();
+    var url = url+'?'+qs;
+    arequest(url, type);
+  }
+}
+
+function get_logsys(result) {
+  var data = result.find("data");
+  var pagecounter = data.find("pagecounter").text();
+  pagecounter = '<span id="pagecounter">' + pagecounter + '</span>';
+  var total = data.find("total").text();
+  $("#pagecounter").replaceWith(pagecounter);
+  $("#int_total").val(total);
+  var html = '';
+  $(".syslogrow").remove();
+  $("message", data).each(function() {
+    var message = $(this);
+
+    var level = message.find("level").text();
+    var ts = message.find("ts").text();
+    var source = message.find("source").text();
+    var msg = message.find("msg").text();
+    var dev = message.find("device").text();
+    var sid = message.find("sid").text();
+    var sensor = message.find("sensor").text();
+
+    html += '<tr class="syslogrow">';
+      html += '<td class="syslog_'+level+'">'+level+'</td>\n';
+      html += '<td>'+ts+'</td>\n';
+      html += '<td>'+source+'</td>\n';
+      html += '<td>'+msg+'</td>\n';
+      html += '<td><a href="sensordetails.php?int_sid='+sid+'">'+sensor+'</a></td>\n';
+      html += '<td>'+dev+'</td>\n';
+    html += '</tr>';
+
+  });
+  $('#edit_row').before(html);
+}
+
+/* Sensorstatus functions */
+/**************************/
+
+function getcontact(result) {
+  var data = result.find("data");
+  var sensor = data.find("sensor").text();
+  var html = '<div class="center">';
+  html += '<table class="datatable">';
+  html += '<tr><th>'+sensor+'</th></tr>';
+  
+  $("email", data).each(function() {
+    var email = $(this).text();
+    html += '<tr><td>'+email+'</td></tr>';
+  });
+  html += '</table></div>';
+  $("#popupcontent").html(html);
+  $("#popup").show();
+}
+
+function adminmenu(obj, sid, sensor) {
+  if (obj) {
+    var chk = $("#adminmenu").css("display");
+    var chksensor = $("#sensort").html();
+    if ((chk == "inline" || chk == "block") && chksensor == sensor) {
+      $("#adminmenu").hide();
+    } else {
+      var offset = $(obj).offset();
+      var top = offset.top;
+      var left = offset.left - 0 + 35;
+      $("#activator").attr("href", "movesensor.php?int_sid="+sid);
+      $("#adminmenu").css("top", top);
+      $("#adminmenu").css("left", left);
+      $("#sensort").html(sensor);
+      $("#adminmenu").show();
+    }
+  } else {
+    $("#adminmenu").hide();
   }
 }

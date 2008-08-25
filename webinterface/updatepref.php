@@ -103,6 +103,16 @@ if ($err != 1) {
   $sql_save = "UPDATE login SET d_plotter = '$plotter', d_plottype = '$plottype', d_utc = '$utc' WHERE id = $uid";
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
+
+  if (isset($_COOKIE[SURFids])) {
+    delcookie("int_dplotter");
+    delcookie("int_dplottype");
+    delcookie("int_dutc");
+  }
+
+  addcookie("int_dplotter", $d_plotter);
+  addcookie("int_dplottype", $d_plottype);
+  addcookie("int_dutc", $d_utc);
 }
 
 # Close connection and redirect

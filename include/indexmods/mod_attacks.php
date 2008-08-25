@@ -1,14 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 002                    #
-# 18-04-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 003                    #
+# 19-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed organisation stuff
 # 002 Added ARP exclusion stuff
 # 001 Initial release
 #############################################
@@ -27,7 +28,7 @@ add_to_sql("COUNT(attacks.severity) as total", "select");
 add_to_sql("attacks.severity", "group");
 
 # IP Exclusion stuff
-add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $s_org)", "where");
+add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
 # MAC Exclusion stuff
 add_to_sql("(attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))", "where");
 

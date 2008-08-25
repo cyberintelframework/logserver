@@ -1,15 +1,16 @@
-<?php $tab="4.6"; $pagetitle="Config Info"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="4.6"; $pagetitle="Config Info"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 002                    #
-# 27-05-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 003                    #
+# 07-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Added jquery_version + cookie stuff
 # 002 Added utc_time
 # 001 Added debug_sql_analyze
 #############################################
@@ -76,6 +77,10 @@ echo "<div class='leftmed'>\n";
           echo "<tr>\n";
             echo "<td>c_minified_enable</td>\n";
             echo "<td>" .printled($c_minified_enable). "</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_jquery_version</td>\n";
+            echo "<td>$c_jquery_version</td>\n";
           echo "</tr>\n";
         echo "</table>\n";
 
@@ -151,15 +156,27 @@ echo "<div class='leftmed'>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>" .$l['sc_perl']. "</th>\n";
+            echo "<th colspan='2'>" .$l['sc_cookie']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td width='30%'>c_logfile</td>\n";
-            echo "<td width='70%'>$c_logfile</td>\n";
+            echo "<td width='30%'>c_cookie_name</td>\n";
+            echo "<td width='70%'>$c_cookie_name</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>c_logstamp</td>\n";
-            echo "<td>" .printled($c_logstamp). "</td>\n";
+            echo "<td>c_cookie_domain</td>\n";
+            echo "<td>$c_cookie_domain</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_cookie_path</td>\n";
+            echo "<td>$c_cookie_path</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_cookie_expiry</td>\n";
+            echo "<td>$c_cookie_expiry</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_cookie_https</td>\n";
+            echo "<td>" .printled($c_cookie_https) ."</td>\n";
           echo "</tr>\n";
         echo "</table>\n";
 
@@ -313,6 +330,20 @@ echo "<div class='rightmed'>\n";
           echo "<tr>\n";
             echo "<td>c_enable_argos</td>\n";
             echo "<td>" .printled($c_enable_argos). "</td>\n";
+          echo "</tr>\n";
+        echo "</table>\n";
+
+        echo "<table class='multipletable'>\n";
+          echo "<tr>\n";
+            echo "<th colspan='2'>" .$l['sc_perl']. "</th>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td width='30%'>c_logfile</td>\n";
+            echo "<td width='70%'>$c_logfile</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_logstamp</td>\n";
+            echo "<td>" .printled($c_logstamp). "</td>\n";
           echo "</tr>\n";
         echo "</table>\n";
 

@@ -24,6 +24,13 @@ PRE {
   white-space:		-o-pre-wrap; /* Opera 7+ */
 }
 
+body {
+  height:		100%;
+  width:		100%;
+  margin:		0px;
+  padding:		0px;
+}
+
 /*
  ********************
  * Page
@@ -31,6 +38,7 @@ PRE {
 */
 #page {
   padding-bottom:	8px;
+  height:		100%;
 }
 
 #page #pageHeader {
@@ -106,6 +114,7 @@ PRE {
 
 #pageBody {
   margin-top:		35px;
+  height:		100%;
 }
 
 #pageBody h2 {
@@ -340,20 +349,8 @@ PRE {
   padding-left:		10%;
 }
 
-.datatable .aright {
-  float:		right;
-}
-
-.datatable .aleft {
-  float:		left;
-}
-
 .datatable .aright .button {
   margin-top:		1px;
-}
-
-.datatable .aleft .text {
-  margin-top:		4px;
 }
 
 /*
@@ -405,6 +402,20 @@ PRE {
 
 .multipletable td {
   padding-left:		4px;
+}
+
+/*
+ ********************
+ * Floating & Aligning
+ ********************
+*/
+
+.fright {
+  float:		right;
+}
+
+.fleft {
+  float:		left;
 }
 
 /*
@@ -643,16 +654,6 @@ PRE {
 
 #plot {
   margin-left:		5px;
-}
-
-#overlay{
-  display:		none;
-  position:		absolute;
-  top:			0;
-  left:			0;
-  width:		100%;
-  height:		0px;
-  z-index:		5000;
 }
 
 #whois {

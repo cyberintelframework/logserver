@@ -117,7 +117,7 @@ if ($lname != "" && $rname != "") {
   $sql_attacks_l = "SELECT $sql_select ";
   $sql_attacks_l .= " FROM $sql_from ";
   $sql_attacks_l .= " $sql_where ";
-  $sql_attacks_l .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid' AND status = 1) ";
+  $sql_attacks_l .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid') ";
   $sql_attacks_l .= " GROUP BY $sql_group ";
   $sql_attacks_l .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_attacks_l;
@@ -126,7 +126,7 @@ if ($lname != "" && $rname != "") {
   $sql_attacks_r = "SELECT $sql_select ";
   $sql_attacks_r .= " FROM $sql_from ";
   $sql_attacks_r .= " $sql_where ";
-  $sql_attacks_r .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid' AND status = 1) ";
+  $sql_attacks_r .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid') ";
   $sql_attacks_r .= " GROUP BY $sql_group ";
   $sql_attacks_r .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_attacks_r;
@@ -135,7 +135,7 @@ if ($lname != "" && $rname != "") {
   $sql_atype_l = "SELECT DISTINCT attacks.atype, COUNT(attacks.atype) as total ";
   $sql_atype_l .= " FROM $sql_from ";
   $sql_atype_l .= " $sql_where AND severity = 1 ";
-  $sql_atype_l .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid' AND status = 1) ";
+  $sql_atype_l .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid') ";
   $sql_atype_l .= " GROUP BY atype ";
 #  $sql_atype_l .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_atype_l;
@@ -144,7 +144,7 @@ if ($lname != "" && $rname != "") {
   $sql_atype_r = "SELECT DISTINCT attacks.atype, COUNT(attacks.atype) as total ";
   $sql_atype_r .= " FROM $sql_from ";
   $sql_atype_r .= " $sql_where AND severity = 1 ";
-  $sql_atype_r .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid' AND status = 1) ";
+  $sql_atype_r .= " AND sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid') ";
   $sql_atype_r .= " GROUP BY atype ";
 #  $sql_atype_r .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_atype_r;
@@ -174,7 +174,7 @@ if ($lname != "" && $rname != "") {
   $sql_topexp_l = "SELECT $sql_select ";
   $sql_topexp_l .= " FROM $sql_from ";
   $sql_topexp_l .= " $sql_where ";
-  $sql_topexp_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid' AND status = 1) ";
+  $sql_topexp_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid') ";
   $sql_topexp_l .= " GROUP BY $sql_group ";
   $sql_topexp_l .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_topexp_l;
@@ -182,7 +182,7 @@ if ($lname != "" && $rname != "") {
   $sql_topexp_r = "SELECT $sql_select ";
   $sql_topexp_r .= " FROM $sql_from ";
   $sql_topexp_r .= " $sql_where ";
-  $sql_topexp_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid' AND status = 1) ";
+  $sql_topexp_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid') ";
   $sql_topexp_r .= " GROUP BY $sql_group ";
   $sql_topexp_r .= " ORDER BY $sql_order ";
   $debuginfo[] = $sql_topexp_r;
@@ -206,14 +206,14 @@ if ($lname != "" && $rname != "") {
   $sql_topports_l = "SELECT $sql_select ";
   $sql_topports_l .= " FROM $sql_from ";
   $sql_topports_l .= " $sql_where ";
-  $sql_topports_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid' AND status = 1) ";
+  $sql_topports_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid') ";
   $sql_topports_l .= " GROUP BY $sql_group ORDER BY $sql_order ";
   $debuginfo[] = $sql_topports_l;
 
   $sql_topports_r = "SELECT $sql_select ";
   $sql_topports_r .= " FROM $sql_from ";
   $sql_topports_r .= " $sql_where ";
-  $sql_topports_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid' AND status = 1) ";
+  $sql_topports_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid') ";
   $sql_topports_r .= " GROUP BY $sql_group ORDER BY $sql_order ";
   $debuginfo[] = $sql_topports_r;
 
@@ -230,7 +230,7 @@ if ($lname != "" && $rname != "") {
     if ($tsquery != "") {
       $sql_topfiles_l .= " AND $tsquery ";
     }
-    $sql_topfiles_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid' AND status = 1) ";
+    $sql_topfiles_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid') ";
     $sql_topfiles_l .= " AND type = 4  AND details.attackid = attacks.id ";
     $sql_topfiles_l .= " ) as sub ";
   $sql_topfiles_l .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
@@ -242,7 +242,7 @@ if ($lname != "" && $rname != "") {
     if ($tsquery != "") {
       $sql_topfiles_r .= " AND $tsquery ";
     }
-    $sql_topfiles_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid' AND status = 1) ";
+    $sql_topfiles_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid') ";
     $sql_topfiles_r .= " AND type = 4  AND details.attackid = attacks.id ";
     $sql_topfiles_r .= " ) as sub ";
   $sql_topfiles_r .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
@@ -259,7 +259,7 @@ if ($lname != "" && $rname != "") {
       $sql_topos_l .= " AND $tsquery ";
     }
     $sql_topos_l.= " AND attacks.source = system.ip_addr ";
-    $sql_topos_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid' AND status = 1) ";
+    $sql_topos_l .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$lgid') ";
     $sql_topos_l .= " ) as sub ";
   $sql_topos_l .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
   $debuginfo[] = $sql_topos_l;
@@ -271,7 +271,7 @@ if ($lname != "" && $rname != "") {
       $sql_topos_r .= " AND $tsquery ";
     }
     $sql_topos_r .= " AND attacks.source = system.ip_addr ";
-    $sql_topos_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid' AND status = 1) ";
+    $sql_topos_r .= " AND attacks.sensorid IN (SELECT sensorid FROM groupmembers WHERE groupid = '$rgid') ";
     $sql_topos_r .= " ) as sub ";
   $sql_topos_r .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
   $debuginfo[] = $sql_topos_r;

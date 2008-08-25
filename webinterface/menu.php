@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 006                    #
-# 27-05-2008                       #
+# Changeset 007                    #
+# 14-07-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 007 Changed some $url handling for sort functions
 # 006 Made jquery version configurable
 # 005 Removed url redirection stuff
 # 004 Added Last 24 hours option + user selected value, fixed total count sensors
@@ -31,8 +32,14 @@ session_start();
 include "../lang/${c_language}.php";
 
 $absfile = $_SERVER['SCRIPT_NAME'];
+$qs = $_SERVER['QUERY_STRING'];
 $file = basename($absfile);
 $address = getaddress();
+if ($qs == "") {
+  $url = $file . "?";
+} else {
+  $url = $file . "?" . $qs . "&";
+}
 
 if ($file != "login.php") {
   if (isset($_SESSION['s_admin'])) {
@@ -97,6 +104,8 @@ echo "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www
 echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
   echo "<head>\n";
     echo "<title>SURFids - $pagetitle</title>\n";
+    echo "<link rel='stylesheet' href='${address}include/jquery.jgrowl.css' />\n";
+    echo "<link rel='stylesheet' href='${address}include/greybox/greybox.css' />\n";
     echo "<link rel='stylesheet' href='${address}include/layout.css' />\n";
     echo "<link rel='stylesheet' href='${address}include/design.css' />\n";
     echo "<style type='text/css'>@import url('${address}include/calendar.css');</style>\n";
@@ -104,10 +113,13 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib${min}.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery-${c_jquery_version}${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.selectboxes${min}.js'></script>\n";
+#    echo "<script type='text/javascript' src='${address}include/jquery.ui.all${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/jquery.jgrowl${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/surfnetids${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-en${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-setup${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/greybox/greybox.js'></script>\n";
   echo "</head>\n";
   echo "<body>\n";
   echo "<div id='page'>\n";
@@ -115,7 +127,8 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       echo "<ul id='globalNav'>\n";
         echo "<li><a href='mailto:$c_contact_mail'>" .$l['me_contact']. "</a></li>\n";
         echo "<li><a href='logout.php'>" .$l['me_logout']. "</a></li>\n";
-        echo "<li><a href='http://ids.surfnet.nl/'>" .$l['me_about']. " SURFids</a></li>\n";
+        echo "<li><a href='http://ids.surfnet.nl/'>" .$l['me_about']. "</a></li>\n";
+        echo "<li><a href='http://www.surfnet.nl/Documents/Manual_IDS_v1.0.pdf'>" .$l['me_manual']. "</a></li>\n";
       echo "</ul>\n";
       echo "<h1><a href=''>SURFids</a></h1>\n";
       echo "<div class='infoBar'>\n";
@@ -239,6 +252,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                     if ($s_access_user > 1) {
                       echo printMenuitem(5.4, "groupadmin.php", $l['me_groups'], $tab);
                     }
+                    if ($s_admin == 1) {
+                      echo printMenuitem(5.5, "logsys.php", $l['me_syslog'], $tab);
+                    }
                   echo "</ul>\n";
                 echo "</div>\n";
               echo "</li>";
@@ -249,6 +265,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         }
       echo "</div>";
       echo "<div id='pageBody'>";
+      echo "<input type='hidden' id='md5_globalhash' value='$s_hash' />\n";
 
       echo "<div id='popup'>";
         echo "<div id='popupheader'>";
@@ -257,11 +274,11 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         echo "</div>\n";
         echo "<div id='popupcontent'>" .$l['me_loading']. "</div>\n";
       echo "</div>\n";
-      echo "<center><div id='error'></div></center>\n";
       echo "<div id='overlay' onclick='popout();'></div>\n";
+      echo "<div id='overlay_lock'></div>\n";
 
 
-function insert_selector($m_show = 1) {
+function insert_selector($o_show = 1, $t_show = 1) {
   global $s_org, $pgconn, $s_access_search, $s_access_sensor, $s_access_user, $v_selector_period, $c_startdayofweek, $_GET, $_POST;
   global $clean, $tainted, $to, $from, $to_date, $from_date, $q_org, $q_org_name, $c_debug_sql, $c_debug_input, $c_allow_global_debug, $l;
   # Retrieving URL
@@ -346,83 +363,91 @@ function insert_selector($m_show = 1) {
   $from_date = date("d-m-Y H:i", $from);
   $to_date = date("d-m-Y H:i", $to);
 
-  if ($m_show == 1) {
+  if ($o_show == 1 || $t_show == 1) {
   echo "<div id='selector'>\n";
     echo "<form id='fselector' name='fselector' action='$url' method='get'>\n";
       echo "<div id='orgsel'>";
-        if ($s_access_search == 9) {
-          $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
-          $debuginfo[] = $sql_orgs;
-          $result_orgs = pg_query($pgconn, $sql_orgs);
-          echo "<select name='int_org' class='smallwidthselect' onChange='javascript: this.form.submit();'>\n";
-            echo printOption(0, "All", $q_org) . "\n";
-            while ($row = pg_fetch_assoc($result_orgs)) {
-              $org_id = $row['id'];
-              $organisation = $row['organisation'];
-              echo printOption($org_id, $organisation, $q_org) . "\n";
-            }
-          echo "</select>\n";
+        if ($o_show == 1) {
+          if ($s_access_search == 9) {
+            $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
+            $debuginfo[] = $sql_orgs;
+            $result_orgs = pg_query($pgconn, $sql_orgs);
+            echo "<select name='int_org' class='smallwidthselect' onChange='javascript: this.form.submit();'>\n";
+              echo printOption(0, "All", $q_org) . "\n";
+              while ($row = pg_fetch_assoc($result_orgs)) {
+                $org_id = $row['id'];
+                $organisation = $row['organisation'];
+                echo printOption($org_id, $organisation, $q_org) . "\n";
+              }
+            echo "</select>\n";
+          } else {
+            $sql_orgs = "SELECT organisation FROM organisations WHERE id = '$s_org'";
+            $debuginfo[] = $sql_orgs;
+            $result_orgs = pg_query($pgconn, $sql_orgs);
+            $row = pg_fetch_assoc($result_orgs);
+            $q_org_name = $row['organisation'];
+            $q_org_name = substr($q_org_name,0 ,11); 
+            echo "<font class='btext'>$q_org_name</font>\n";
+            echo "<input type='hidden' name='int_org' value='$s_org' />\n";
+          }
         } else {
-          $sql_orgs = "SELECT organisation FROM organisations WHERE id = '$s_org'";
-          $debuginfo[] = $sql_orgs;
-          $result_orgs = pg_query($pgconn, $sql_orgs);
-          $row = pg_fetch_assoc($result_orgs);
-          $q_org_name = $row['organisation'];
-          $q_org_name = substr($q_org_name,0 ,11); 
-          echo "<font class='btext'>$q_org_name</font>\n";
-          echo "<input type='hidden' name='int_org' value='$s_org' />\n";
+          echo "&nbsp;";
         }
       echo "</div>\n";
       echo "<div id='border'></div>\n";
-      echo "<div id='arrowleft'>\n";
-        echo "<a onclick='browse(\"prev\");'><img src='images/selector_arrow_left.gif' /></a>\n";
-      echo "</div>\n";
+      if ($t_show == 1) {
+        echo "<div id='arrowleft'>\n";
+          echo "<a onclick='browse(\"prev\");'><img src='images/selector_arrow_left.gif' /></a>\n";
+        echo "</div>\n";
 
-      echo "<div id='timesel'>\n";
-        echo "<div id='timesel_top'>\n";
-          echo "<font class='btext'>" .$l['me_period']. ":</font>\n";
-          echo "<select name='int_selperiod' id='selperiod' class='smallselect' onchange='setperiod(\"$c_startdayofweek\");'>\n";
-            if ($selperiod == -1) {
-              $per = $to - $from;
-              if ($per <= 3600) {
-                $hours = floor($per / 3600);
-                $per = $sec % 3600;
-                $minutes = floor($per / 60);
-                $str = "$hours hour(s)";
-                if ($minutes != 0) {
-                  $str = " $minutes minute(s)";
+        echo "<div id='timesel'>\n";
+          echo "<div id='timesel_top'>\n";
+            echo "<font class='btext'>" .$l['me_period']. ":</font>\n";
+            echo "<select name='int_selperiod' id='selperiod' class='smallselect' onchange='setperiod(\"$c_startdayofweek\");'>\n";
+              if ($selperiod == -1) {
+                $per = $to - $from;
+                if ($per <= 3600) {
+                  $hours = floor($per / 3600);
+                  $per = $sec % 3600;
+                  $minutes = floor($per / 60);
+                  $str = "$hours hour(s)";
+                  if ($minutes != 0) {
+                    $str = " $minutes minute(s)";
+                  }
+                 } else {
+                  $days = floor($per / 86400);
+                  $str = "$days day(s)";
                 }
+                echo printOption(-1, $str, -1);
               } else {
-                $days = floor($per / 86400);
-                $str = "$days day(s)";
+                echo printOption(-1, $v_selector_period[$selperiod], -1);
               }
-              echo printOption(-1, $str, -1);
-            } else {
-              echo printOption(-1, $v_selector_period[$selperiod], -1);
-            }
-            foreach ($v_selector_period as $key => $val) {
-              echo printOption($key, $val, -1);
-            }
-          echo "</select>\n";
-          echo "<a><img src='images/calendar.gif' id='trigger' onclick='shcals();' /></a>\n";
-        echo "</div>\n";
-        echo "<div id='timesel_bottom'>\n";
-          echo "<div id='showstart'>\n";
-            echo "<div class='showtext btext'>" .$l['me_from']. ":</div>\n";
-            echo "<div id='showdate_start'>$from_date</div>\n";
-            echo "<div id='fromcal' style='display: none;'></div>\n";
+              foreach ($v_selector_period as $key => $val) {
+                echo printOption($key, $val, -1);
+              }
+            echo "</select>\n";
+            echo "<a><img src='images/calendar.gif' id='trigger' onclick='shcals();' /></a>\n";
           echo "</div>\n";
-          echo "<div id='showend'>\n";
-            echo "<div class='showtext btext'>" .$l['me_until']. ":</div>\n";
-            echo "<div id='showdate_end'>$to_date</div>\n";
-            echo "<div id='tocal' style='display: none;'></div>\n";
+          echo "<div id='timesel_bottom'>\n";
+            echo "<div id='showstart'>\n";
+              echo "<div class='showtext btext'>" .$l['me_from']. ":</div>\n";
+              echo "<div id='showdate_start'>$from_date</div>\n";
+              echo "<div id='fromcal' style='display: none;'></div>\n";
+            echo "</div>\n";
+            echo "<div id='showend'>\n";
+              echo "<div class='showtext btext'>" .$l['me_until']. ":</div>\n";
+              echo "<div id='showdate_end'>$to_date</div>\n";
+              echo "<div id='tocal' style='display: none;'></div>\n";
+            echo "</div>\n";
           echo "</div>\n";
         echo "</div>\n";
-      echo "</div>\n";
 
-      echo "<div id='arrowright'>\n";
-        echo "<a onclick='browse(\"next\");'><img src='images/selector_arrow_right.gif' /></a>\n";
-      echo "</div>\n";
+        echo "<div id='arrowright'>\n";
+          echo "<a onclick='browse(\"next\");'><img src='images/selector_arrow_right.gif' /></a>\n";
+        echo "</div>\n";
+      } else {
+        echo "<div id='arrowleft'></div><div id='timesel'>&nbsp;</div><div id='arrowright'></div>\n";
+      }
       echo "<input type='hidden' name='int_to' id='int_to' value='$to' />\n";
       echo "<input type='hidden' name='int_from' id='int_from' value='$from' />\n";
       echo "<input type='hidden' name='dir' id='selector_dir' value='$dir' />\n";
@@ -445,6 +470,7 @@ function insert_selector($m_show = 1) {
       }
     echo "</form>\n";
   echo "</div>\n"; #</selector>
+  if ($t_show == 1) {
   ?>
   <script>
     ts_from = $('#int_from').val() * 1000;
@@ -486,11 +512,15 @@ function insert_selector($m_show = 1) {
   </script>
   <?php
   }
+  } else {
+  echo "<div id='selector' style='display: none;'>\n";
+  echo "</div>\n";
+  }
 }
 
-function set_title($m_show = 1) {
+function set_title($o_show = 1, $t_show = 1) {
   global $pagetitle;
-  if ($m_show == 1) {
+  if ($o_show == 1 || $t_show == 1) {
     echo "<div id='pagetitle'>$pagetitle</div>\n";
   } else {
     echo "<div class='all'>\n";
@@ -499,10 +529,10 @@ function set_title($m_show = 1) {
   }
 }
 
-function contentHeader($m_show = 1) {
+function contentHeader($o_show = 1, $t_show = 1) {
   echo "<div class='contentHeader'>\n";
-    set_title($m_show);
-    insert_selector($m_show);
+    set_title($o_show, $t_show);
+    insert_selector($o_show, $t_show);
   echo "</div>\n";
 }
 

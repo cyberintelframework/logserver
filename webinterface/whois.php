@@ -2,13 +2,14 @@
 
 ####################################
 # SURFnet IDS 2.10.00              #
-# Changeset 003                    #
-# 14-04-2008                       #
+# Changeset 004                    #
+# 16-07-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Added extra flush()
 # 003 Fixed bug #79
 # 002 Added JPNIC support and fixed KRNIC
 # 001 Added language support
@@ -126,6 +127,7 @@ if ($err == 0) {
           echo "<pre id='whois'>\n";
             flush();
             echo $l['wh_connect']. " $server:43...<br>\n";
+            flush();
             $fp = @fsockopen($server,43,&$errno,&$errstr,15);
             if(!$fp || $err != 0) {
               echo $l['wh_connto']. " $server:43 " .$l['wh_couldnot']. ".<br>\n";

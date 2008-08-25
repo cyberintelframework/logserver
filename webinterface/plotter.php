@@ -24,7 +24,7 @@
 if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
   $qs = $_SERVER['QUERY_STRING'];
   $qs = strip_tags($qs);
-  include_once '../include/php-ofc-library/open_flash_chart_object.php';
+  include_once '../include/open_flash_chart_object.php';
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";

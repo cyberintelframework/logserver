@@ -1,4 +1,4 @@
-<?php $tab="4.5"; $pagetitle="Argos Templates"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="4.5"; $pagetitle="Argos Templates"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################

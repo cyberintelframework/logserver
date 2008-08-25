@@ -1,4 +1,4 @@
-<?php $tab="5.1"; $pagetitle="My Account"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="5.1"; $pagetitle="My Account"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
@@ -272,8 +272,19 @@ if ($err == 0) {
   echo "<div class='rightmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['ma_modules']. "</div>\n";
+        echo "<div class='blockHeader'>\n";
+          echo "<div class='blockHeaderLeft'>" .$l['ma_modules']. "</div>\n";
+          echo "<div class='blockHeaderRight'>";
+            echo "<select name='page_select' id='page_select' class='smallselect' onchange='switch_page_conf();'>";
+              foreach ($v_page_select_ar as $key => $val) {
+                echo printOption($key, $val, 0);
+              }
+            echo "</select>\n";
+          echo "</div>\n";
+        echo "</div>\n";
+
         echo "<div class='blockContent'>\n";
+
           $sql_mods = "SELECT indexmod_id FROM indexmods_selected WHERE login_id = $userid";
           $debuginfo[] = $sql_mods;
           $result_mods = pg_query($pgconn, $sql_mods);
@@ -281,23 +292,71 @@ if ($err == 0) {
             $mod_id = $row_mods['indexmod_id'];
             $mods[$mod_id] = $mod_id;
           }
-          echo "<form name='indexmods' action='updateindexmods.php' method='post'>\n";
-            echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
-            echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
-            echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
-            echo printCheckBox($l['mo_top10']." ".$l['in_attackers'], "mods[]", 4, $mods[4]) . "<br />\n";
-            echo printCheckBox($l['mo_top10']." ".$l['ra_proto_org'], "mods[]", 5, $mods[5]) . "<br />\n";
-            echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
-            echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
-            echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
-            echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
-            echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
-            echo printCheckBox($l['mo_top10']." ".$l['pl_sensors'], "mods[]", 11, $mods[11]) . "<br />\n";
-            echo "<table class='datatable'>\n";
-              echo "<tr><td>\n";
-                echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button aright' />\n";
-                echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
-              echo "</td></tr>\n";
+
+          # INDEXMODS
+          echo "<form name='indexmodsform' action='updateindexmods.php' method='post'>\n";
+            echo "<input type='hidden' name='int_pageid' value='0' />\n";
+            echo "<table class='datatable' id='page_indexmods' name='page_indexmods'>\n";
+              echo "<tr>\n";
+                echo "<td>\n";
+                  echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
+                  echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
+                  echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
+                  echo printCheckBox($l['mo_top10']. " ".$l['in_attackers']."", "mods[]", 4, $mods[4]) . "<br />\n";
+                  echo printCheckBox($l['mo_top10']." ".$l['ra_proto_org']."", "mods[]", 5, $mods[5]) . "<br />\n";
+                  echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
+                  echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
+                  echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
+                  echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
+                  echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
+                  echo printCheckBox($l['mo_top10']." ".$l['pl_sensors']."", "mods[]", 11, $mods[11]) . "<br />\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td>\n";
+                  echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />\n";
+                  echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+                  echo "<input type='hidden' name='int_userid' value='$userid' />\n";
+                echo "</td>\n";
+            echo "</table>\n";
+          echo "</form>\n";
+
+          $sql_pageconf = "SELECT config FROM pageconf WHERE userid = '$userid' AND pageid = '1'";
+          $debuginfo[] = $sql_pageconf;
+          $result_pageconf = pg_query($pgconn, $sql_pageconf);
+          $row = pg_fetch_assoc($result_pageconf);  
+          $pageconfig = $row['config'];
+          $config_ar = split(",", $pageconfig);
+          foreach ($config_ar as $key => $val) {
+            $sensorstatus[$val] = $val;
+          }
+
+          # SENSOR STATUS (PAGE ID: 1)
+          echo "<form name='sensorstatusform' action='updatepageconf.php' method='post''>\n";
+            echo "<input type='hidden' name='int_pageid' value='1' />\n";
+            echo "<table class='datatable' id='page_sensorstatus' name='page_sensorstatus' style='display:none;'>\n";
+              echo "<tr>\n";
+                echo "<td>\n";
+                  echo printCheckBox($l['sd_sensorname'], "mods[]", 1, $sensorstatus[1]) . "<br />\n";
+                  echo printCheckBox($l['sd_label'], "mods[]", 2, $sensorstatus[2]) . "<br />\n";
+                  echo printCheckBox($l['ss_config'], "mods[]", 3, $sensorstatus[3]) . "<br />\n";
+                  echo printCheckBox($l['sd_status'], "mods[]", 4, $sensorstatus[4]) . "<br />\n";
+                  echo printCheckBox($l['sd_uptime'], "mods[]", 5, $sensorstatus[5]) . "<br />\n";
+                  echo "<br /><b>" .$l['sd_sensorside']. "</b><br />\n";
+                  echo printCheckBox($l['sd_rip'], "mods[]", 6, $sensorstatus[6]) . "<br />\n";
+                  echo printCheckBox($l['sd_lip'], "mods[]", 7, $sensorstatus[7]) . "<br />\n";
+                  echo printCheckBox($l['sd_sensormac'], "mods[]", 8, $sensorstatus[8]) . "<br />\n";
+                  echo "<br /><b>" .$l['sd_serverside']. "</b><br />\n";
+                  echo printCheckBox($l['sd_device'], "mods[]", 9, $sensorstatus[9]) . "<br />\n";
+                  echo printCheckBox($l['sd_devmac'], "mods[]", 10, $sensorstatus[10]) . "<br />\n";
+                  echo printCheckBox($l['sd_devip'], "mods[]", 11, $sensorstatus[11]) . "<br />\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
+                echo "<td>\n";
+                  echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />\n";
+                  echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+                echo "</td>\n";
             echo "</table>\n";
           echo "</form>\n";
         echo "</div>\n"; #</blockContent>

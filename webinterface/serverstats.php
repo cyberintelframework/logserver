@@ -1,4 +1,4 @@
-<?php $tab="2.5"; $pagetitle="Server Info"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="2.5"; $pagetitle="Server Info"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################

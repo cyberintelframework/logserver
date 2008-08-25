@@ -1,4 +1,4 @@
-<?php $tab="5.4"; $pagetitle="Groups"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="5.4"; $pagetitle="Groups"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
@@ -42,18 +42,17 @@ if ($s_access_user < 2) {
 }
 
 if ($err == 0) {
-  $sql = "SELECT name, type, owner, organisations.organisation ";
+  $sql = "SELECT name, owner, organisations.organisation ";
   $sql .= " FROM groups, organisations WHERE groups.owner = organisations.id AND groups.id = '$gid'";
   $debuginfo[] = $sql;
   $result = pg_query($pgconn, $sql);
 
   $row = pg_fetch_assoc($result);
   $name = $row['name'];
-  $type = $row['type'];
   $owner = $row['owner'];
   $org = $row['organisation'];
 
-  if ($type == 0 && $owner != $s_org && $s_access_user < 9) {
+  if ($owner != $s_org && $s_access_user < 9) {
     $err = 1;
     $m = 101;
   }
@@ -74,7 +73,6 @@ if ($err == 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
               echo "<th width='100'>" .$l['ga_name']. "</th>\n";
-              echo "<th width='50'>" .$l['ga_type']. "</th>\n";
               echo "<th width='50'>" .$l['ga_owner']. "</th>\n";
               echo "<th width='100'>" .$l['g_actions']. "</th>\n";
             echo "</tr>\n";
@@ -82,12 +80,10 @@ if ($err == 0) {
             echo "<tr id='grouprow'>\n";
               if ($owner == $q_org || $s_access_user == 9) {
                 echo "<td><input type='text' name='strip_html_escape_name' value='$name' size='40' /></td>\n";
-                echo "<td>" .$v_group_type_ar[$type]. "</td>\n";
                 echo "<td>$org</td>\n";
                 echo "<td><input type='button' onclick=\"submitform('groupedit', 'groupsave.php', 'u', 'grouprow');\" class='button' value='" .$l['g_update']. "' /></td>\n";
               } else {
                 echo "<td>$name</td>\n";
-                echo "<td>$v_group_type_ar[$type]</td>\n";
                 echo "<td>$org</td>\n";
                 echo "<td></td>\n";
               }

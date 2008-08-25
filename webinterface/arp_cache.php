@@ -1,4 +1,4 @@
-<?php $tab="3.6"; $pagetitle="ARP Cache"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="3.6"; $pagetitle="ARP Cache"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ###################################

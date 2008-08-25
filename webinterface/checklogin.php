@@ -1,14 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 002                    #
-# 10-04-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 003                    #
+# 14-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Added pageconfs to cookie
 # 002 Removed URL redirect option
 # 001 Admin users always have 999 access
 #############################################
@@ -76,6 +77,15 @@ if ($numrows_user == 1) {
     addcookie("int_dplotter", $d_plotter);
     addcookie("int_dplottype", $d_plottype);
     addcookie("int_dutc", $d_utc);
+
+    # Getting pageconfs
+    $sql_pc = "SELECT pageid, config FROM pageconf WHERE userid = '$id'";
+    $result_pc = pg_query($pgconn, $sql_pc);
+    while ($row_pc = pg_fetch_assoc($result_pc)) {
+      $pid = $row_pc['pageid'];
+      $config = $row_pc['config'];
+      addcookie("pageconf[$pid]", $config);
+    }
 
     if ($db_org_name == "ADMIN") {
       $_SESSION['s_admin'] = 1;

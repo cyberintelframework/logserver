@@ -1,4 +1,4 @@
-<?php $tab="5.3"; $pagetitle="Domain Admin - Edit"; include("menu.php"); contentHeader(0); ?>
+<?php $tab="5.3"; $pagetitle="Domain Admin - Edit"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
 ####################################
