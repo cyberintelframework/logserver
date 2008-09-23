@@ -36,6 +36,7 @@ use Net::Abuse::Utils qw( :all );
 use GnuPG qw( :algo );
 use POSIX qw(floor);
 use POSIX qw(ceil);
+use Data::Dumper;
 
 ####################
 # Variables used
@@ -982,9 +983,9 @@ while (@row = $email_query->fetchrow_array) {
       printmail("");
       $sendit = 0;
 
-      $sql = "SELECT status, tap, tapip, keyname, vlanid, laststart FROM sensors ";
-      $sql .= " WHERE sensors.id = sensors.id $andorg $andsensor ";
-      $sql .= " ORDER BY keyname";
+      $sql = "SELECT status, tap, tapip, keyname, vlanid, laststart, organisations.organisation, laststop FROM sensors, organisations ";
+      $sql .= " WHERE sensors.organisation = organisations.id $andorg $andsensor ";
+      $sql .= " ORDER BY laststop DESC";
 
       $sensors_query = $dbh->prepare($sql);
       $ec = $sensors_query->execute();
@@ -995,6 +996,20 @@ while (@row = $email_query->fetchrow_array) {
         $keyname = $sensors[3];
         $vlanid = $sensors[4];
         $laststart = $sensors[5];
+        $date_laststart = getdatetime($laststart);
+        $str_laststart = "";
+        if ($aid == $org) {
+          $str_laststart = "[" .$date_laststart. "]";
+        }
+
+        $db_org = $sensors[6];
+
+        $ts_laststop = $sensors[7];
+        $date_laststop = getdatetime($ts_laststop);
+        $str_laststop = "";
+        if ($aid == $org) {
+          $str_laststop = "[" .$date_laststop. "]";
+        }
 
         if ($vlanid != 0) {
           $keyname = "$keyname-$vlanid";
@@ -1006,8 +1021,7 @@ while (@row = $email_query->fetchrow_array) {
             ###############################################
             if ($status == 0) {
               $sendit = 1;
-              printmail("$keyname is down!");
-              printmail("");
+              $ss{"$db_org"} .= " $str_laststop $keyname is down!  ";
             } elsif ($status == 1) {
               if ("$tap" eq "") {
                 # Checking for failed startups (of sensors)
@@ -1016,8 +1030,7 @@ while (@row = $email_query->fetchrow_array) {
                 if ($ts_now > $check) {
                   # Sensor has been trying to start for 10 minutes now
                   $sendit = 1;
-                  printmail("$keyname has been trying to start for 10 minutes now!");
-                  printmail("");
+                  $ss{"$db_org"} .= " $str_laststart $keyname failed to start!  ";
                 }
               } #/$tap
             } #/$status
@@ -1030,8 +1043,7 @@ while (@row = $email_query->fetchrow_array) {
                 if ($ts_now > $check) {
                   # Sensor has been trying to start for 10 minutes now
                   $sendit = 1;
-                  printmail("$keyname has been trying to start for 10 minutes now!");
-                  printmail("");
+                  $ss{"$db_org"} .= " $str_laststart $keyname failed to start!  ";
                 }
               } #/$tap
             } #/$status
@@ -1040,15 +1052,31 @@ while (@row = $email_query->fetchrow_array) {
             ###############################################
             if ("$status" eq "0") {
               $sendit = 1;
-              printmail("$keyname is down!");
-              printmail("");
+              $ss{"$db_org"} .= " $str_laststop $keyname is down!  ";
             }
           } #/$severity
+        }
+      }
+      if ($org == $aid) {
+        for my $key ( keys %ss ) {
+          $val = $ss{$key};
+          printmail("$key: $val");
+          printmail("");
+        }
+      } else {
+        for my $key ( keys %ss ) {
+          $val = $ss{$key};
+          @vals = split(/  /, $val);
+          foreach $s (@vals) {
+            chomp($s);
+            printmail("$s");
+          }
         }
       }
     } else {
       $sendit = 0;
     }
+
 
     if ($sendit == 1 || $always == 1) {
       &sendmail($email, $mid, $subject, $priority, $gpg_enabled, $attach);
