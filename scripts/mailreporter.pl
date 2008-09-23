@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 ####################################
 # Mail reporter                    #
-# SURFnet IDS 2.10.00              #
-# Changeset 006                    #
-# 07-07-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 009                    #
+# 23-09-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,8 @@
 
 #########################################################################################
 # Changelog:
+# 009 Added timestamps to sensor status format
+# 008 Changed sensor status format
 # 007 Fixed missing detail overview for certain reports
 # 006 Added UTC support
 # 005 Added support for the "always send" option
