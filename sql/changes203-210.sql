@@ -1,11 +1,12 @@
 -- SURFids 2.10.00
 -- Database conversion 2.03 -> 2.10
--- Changeset 005
--- 18-06-2008
+-- Changeset 006
+-- 03-10-2008
 --
 
 --
 -- Changelog
+-- 006 Added type conversion of severity.val
 -- 005 Added pageconf, report_content, indexmods
 -- 004 Removed report_content modification
 -- 003 Added report_content modification
@@ -102,3 +103,8 @@ ALTER TABLE report_content
 
 ALTER TABLE ONLY report_content
     ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES "login"(id) ON DELETE CASCADE;
+
+--
+-- SEVERITY
+--
+ALTER TABLE severity ALTER val TYPE integer USING val::integer
