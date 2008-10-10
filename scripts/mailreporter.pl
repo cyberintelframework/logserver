@@ -287,7 +287,7 @@ while (@row = $email_query->fetchrow_array) {
         ###############################################
         printmail("######### Summary #########");
         $sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total ";
-        $sql .= " FROM attacks, sensors, severity WHERE attacks.severity = severity.val ";
+        $sql .= " FROM attacks, sensors, severity WHERE attacks.severity = severity.val::integer ";
         $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
         $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
         $sql .= " AND attacks.sensorid = sensors.id $andorg $andsensor $andsev ";
@@ -653,7 +653,7 @@ while (@row = $email_query->fetchrow_array) {
           $totalcount = 0;
           foreach $range (@rangerow) {
             $sql = "SELECT DISTINCT severity.txt, severity.val, COUNT(attacks.severity) as total ";
-            $sql .= " FROM attacks, sensors, severity WHERE attacks.severity = severity.val ";
+            $sql .= " FROM attacks, sensors, severity WHERE attacks.severity = severity.val::integer ";
             $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
             $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
             $sql .= " AND attacks.sensorid = sensors.id AND attacks.source <<= '$range' $andorg $andsensor $andsev ";
@@ -691,7 +691,7 @@ while (@row = $email_query->fetchrow_array) {
             $sql .= " INNER JOIN sensors ";
             $sql .= " ON attacks.sensorid = sensors.id ";
             $sql .= " INNER JOIN severity ";
-            $sql .= " ON severity.val = attacks.severity ";
+            $sql .= " ON severity.val::integer = attacks.severity ";
             $sql .= " LEFT JOIN details ";
             $sql .= " ON attacks.id = details.attackid ";
             $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";

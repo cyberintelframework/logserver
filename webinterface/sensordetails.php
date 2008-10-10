@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 2.10.00                  #
-# Changeset 005                    #
-# 20-08-2008                       #
+# Changeset 006                    #
+# 03-09-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 006 Fixed sensorstatus calc bug
 # 005 Added network config
 # 004 Changed sensor $status stuff
 # 003 Fixed uptime when uptime = NULL
@@ -138,11 +139,12 @@ if ($err != 1) {
   $osv = $row['osv'];
 
   # Fetching server updates revision
-  $sql_rev = "SELECT value FROM serverinfo WHERE name = 'updaterev'";
+  $sql_rev = "SELECT value, timestamp FROM serverinfo WHERE name = 'updaterev'";
   $debuginfo[] = $sql_rev;
   $result_rev = pg_query($pgconn, $sql_rev);
   $row_rev = pg_fetch_assoc($result_rev);
   $server_rev = $row_rev['value'];
+  $server_rev_ts = $row_rev['timestamp'];
 
   $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $update, $netconf, $tap, $tapip, $uptime);
 
