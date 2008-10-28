@@ -1,7 +1,7 @@
 -- SURFids 2.10.00
 -- Database conversion 2.03 -> 2.10
 -- Changeset 007
--- 03-10-2008
+-- 28-10-2008
 --
 
 --
@@ -62,6 +62,7 @@ GRANT SELECT ON TABLE indexmods TO idslog;
 --
 -- BINARIES_DETAIL
 --
+UPDATE binaries_detail SET bin = uniq_binaries.id WHERE bin = uniq_binaries.name;
 ALTER TABLE binaries_detail ALTER bin TYPE integer USING binaries_detail.bin::integer;
 
 --
