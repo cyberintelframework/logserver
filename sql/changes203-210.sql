@@ -1,11 +1,12 @@
 -- SURFids 2.10.00
 -- Database conversion 2.03 -> 2.10
--- Changeset 006
+-- Changeset 007
 -- 03-10-2008
 --
 
 --
 -- Changelog
+-- 007 Added missing binaries_detail.bin conversion
 -- 006 Added type conversion of severity.val
 -- 005 Added pageconf, report_content, indexmods
 -- 004 Removed report_content modification
@@ -57,6 +58,11 @@ ALTER TABLE ONLY indexmods
     ADD CONSTRAINT indexmods_pkey PRIMARY KEY (id);
 
 GRANT SELECT ON TABLE indexmods TO idslog;
+
+--
+-- BINARIES_DETAIL
+--
+ALTER TABLE binaries_detail ALTER bin TYPE integer USING binaries_detail.bin::integer;
 
 --
 -- INDEXMODS_SELECTED
