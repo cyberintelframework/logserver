@@ -3,13 +3,14 @@
 
 ###################################
 # SURFnet IDS                     #
-# Version 1.04.06                 #
-# 13-02-2007                      #
+# Version 1.04.07                 #
+# 09-08-2007                      #
 # Kees Trippelvitz & Peter Arts   #
 ###################################
 
 #############################################
 # Changelog:
+# 1.04.07 Fixed int_binid bug
 # 1.04.06 Added check for binary history info
 # 1.04.05 Added download option for binaries
 # 1.04.04 Changed data input handling
@@ -252,11 +253,11 @@ if ($err == 0) {
   if ($i >= 10) {
     if ($show != "all") {
       echo "<tr>\n";
-        echo "<td><a href='binaryhist.php?int_bin=$bin_id&show=all'>Show full list</a></td>\n";
+        echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=all'>Show full list</a></td>\n";
       echo "</tr>\n";
     } else {
       echo "<tr>\n";
-        echo "<td><a href='binaryhist.php?int_bin=$bin_id&show=top'>Show top 10</a></td>\n";
+        echo "<td><a href='binaryhist.php?int_binid=$bin_id&show=top'>Show top 10</a></td>\n";
       echo "</tr>\n";
     }
   }

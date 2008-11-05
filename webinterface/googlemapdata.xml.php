@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.00                  #
-# 05-01-2007                       #
+# Version 1.04.01                  #
+# 08-08-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.01 Fixed Bug with GeoIP include 
 # 1.04.00 initial release
 #############################################
 
@@ -135,7 +136,7 @@ if ( $query == true && $err == 0)
                 {
 			$source = $hit['source'];
 			$count = $hit['count'];
-			$record = geoip_record_by_addr($gi, $source);
+			$record = GeoIP_record_by_addr($gi, $source);
 			$country = $record->country_name;
 			$city = $record->city;
 			if ($city == "") $city = "Unkown";

@@ -1,10 +1,11 @@
 --
 -- SURFnet IDS database structure
--- Version 1.04.12
--- 16-04-2007
+-- Version 1.04.13
+-- 01-06-2007
 --
 
 -- Version history
+-- 1.04.13 Added unique constraint for stats_dialogue
 -- 1.04.12 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
 -- 1.04.11 Added default value for status
 -- 1.04.10 Removed nepenthes functions, located in separate sql file now
@@ -399,6 +400,9 @@ CREATE TABLE stats_dialogue (
 
 ALTER TABLE ONLY stats_dialogue
     ADD CONSTRAINT primary_stats_dialogue PRIMARY KEY (id);
+
+ALTER TABLE ONLY stats_dialogue
+    ADD CONSTRAINT unique_stats_dialogue UNIQUE (name);
 
 GRANT ALL ON TABLE stats_dialogue TO idslog;
 GRANT SELECT,UPDATE ON TABLE stats_dialogue_id_seq TO idslog;

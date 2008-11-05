@@ -2,14 +2,15 @@
 
 ####################################
 # SURFnet IDS                      #
-# Version 1.04.09                  #
-# 28-03-2007                       #
+# Version 1.04.10                  #
+# 06-07-2007                       #
 # Peter Arts                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 1.04.10 Removed PDF option
 # 1.04.09 Removed chartof stuff
 # 1.04.08 Removed libchart stuff & fixed sensors query
 # 1.04.07 Fixed a bug with the destination radiobutton
@@ -181,7 +182,6 @@ function check_byte(b_val,next_field) {
     <option value="multi">Multi page</option>
     <option value="single">Single page</option>
     <option value="idmef">IDMEF</option>
-    <option value="pdf">PDF</option>
    </select>
   </td>
  </tr>

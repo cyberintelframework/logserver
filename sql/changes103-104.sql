@@ -1,8 +1,9 @@
 -- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.07
--- 16-04-2007
+-- Version: 1.04.08
+-- 01-06-2007
 
 -- Changelog
+-- 1.04.08 Fixed a bug with netconfdetail
 -- 1.04.07 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
 -- 1.04.06 Added default value for sensors.status
 -- 1.04.05 Fixed binaries conversion, updated antivirus stuff
@@ -119,9 +120,9 @@ ALTER TABLE org_id ADD COLUMN type integer;
 --
 -- SENSORS
 --
+ALTER TABLE sensors ADD COLUMN netconfdetail text;
 UPDATE sensors SET netconfdetail = sensors.netconf WHERE NOT netconf IN ('vlans', 'vland', 'dhcp', 'static');
 UPDATE sensors SET netconf = 'static' WHERE NOT netconf IN ('vlans', 'vland', 'dhcp', 'static');
-ALTER TABLE sensors ADD COLUMN netconfdetail text;
 ALTER TABLE sensors ADD COLUMN vlanid integer DEFAULT 0;
 ALTER TABLE sensors ALTER COLUMN status SET DEFAULT 0;
 
