@@ -63,7 +63,7 @@ if ($c_geoip_enable == 1) {
 ####################
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "reptype",
+        "reptype",
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
@@ -1227,7 +1227,7 @@ while ($row = pg_fetch_assoc($result)) {
         $module = $dia_result_ar[0]['text'];
 
         echo "<td>$module";
-	if ($smac != "") {
+		if ($smac != "") {
           echo "<br />$smac";
         }
         echo "</td>\n";

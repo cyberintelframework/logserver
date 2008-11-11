@@ -1,9 +1,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# SURFids 2.10.00                  #
+# Changeset 002                    #
+# 03-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,16 +12,8 @@
 
 #############################################
 # Changelog:
-# 2.00.01 version 2.00
-# 1.04.04 Changed stuff relating to the reports (report_content)
-# 1.04.03 Changed data input handling
-# 1.04.02 Added debug info
-# 1.04.01 Released as 1.04.01
-# 1.03.02 Removed and changed some stuff referring to the report table
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.03 Added some more input checks and login check
-# 1.02.02 Remove mailreporting records
-# 1.02.01 Initial release
+# 002 Added md5 hash check
+# 001 version 2.10
 #############################################
 
 include '../include/config.inc.php';
@@ -45,14 +37,22 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_userid"
+                "int_userid",
+		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
+
+# Checking if the logged in user actually requested this action.
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 116;
+}
 
 # Checking $_GET'ed variables
 if (!isset($clean['userid']) ) {

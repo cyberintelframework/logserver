@@ -2,14 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 001                    #
-# 03-03-2008                       #
+# SURFids 2.10                     #
+# Changeset 002                    #
+# 10-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 002 Fixed bug for non-admin users
 # 001 Initial release
 ####################################
 
@@ -46,7 +47,7 @@ echo "<div class='leftmed'>\n";
         echo "<form id='lgidsel' name='lgidsel' method='get'>\n";
         if ($s_access_user != 9) {
           $sql = "SELECT groups.id, name, organisation ";
-          $sql .= " FROM groups, organisations WHERE (type = 1 OR (type = 0 AND owner = '$q_org')) AND groups.owner = organisations.id";
+          $sql .= " FROM groups, organisations WHERE owner = '$q_org' AND groups.owner = organisations.id";
         } else {
           $sql = "SELECT groups.id, name, organisation FROM groups, organisations WHERE groups.owner = organisations.id";
         }

@@ -1,25 +1,19 @@
 /*
  * ####################################
- * # SURFnet IDS                      #
- * # Version 2.10.05                  #
- * # 12-02-2008                       #
+ * # SURFids 2.10                     #
+ * # Changeset 006                    #
+ * # 10-11-2008                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * ####################################
  *
  * #############################################
  * # Changelog:
- * # 2.10.05 Added Last 24 Hours option for timeselector
- * # 2.10.04 Added support for Nepenthes mail markup
- * # 2.10.03 Added selector functions
- * # 2.10.02 Fixed bug with Critera field in logsearch
- * # 2.10.01 version 2.10
- * # 2.00.01 version 2.00
- * # 1.04.06 Added selector functions
- * # 1.04.05 Added sh_mailreptype()
- * # 1.04.04 Removed submitSearchTemplate()
- * # 1.04.03 Added sh_mail functions
- * # 1.04.02 Fixed searchtemplate url bug
- * # 1.04.01 Initial release
+ * # 006 Changed setperiod. Removed submit, added window.location
+ * # 005 Added Last 24 Hours option for timeselector
+ * # 004 Added support for Nepenthes mail markup
+ * # 003 Added selector functions
+ * # 002 Fixed bug with Critera field in logsearch
+ * # 001 version 2.10
  * #############################################
  */
 
@@ -408,7 +402,27 @@ function setperiod(startofweek) {
   $("#int_to").val(end.print("%s"));
   $("#showdate_start").html(start.print("%d-%m-%Y %H:%M"));
   $("#showdate_end").html(end.print("%d-%m-%Y %H:%M"));
-  $('#fselector').submit();
+
+  url = window.location + "";
+  url = url.split("?", 1);
+  qs = window.location.search.substring(1);
+  tmp = qs.replace(/(int_selperiod|int_org|int_to|int_from)=[0-9]*&?/g, "");
+  tmp = tmp.replace(/(dir=.*)&/, "");
+  tmp = tmp.replace(/(dir=.*)$/, "");
+  tmp = tmp.replace(/&$/, "");
+  periodqs = $("#fselector").serialize();
+  if (tmp != "") {
+    newreq = url + "?" + tmp;
+    if (periodqs != "") {
+      newreq = newreq + "&" + periodqs;
+    }
+  } else {
+    newreq = url;
+    if (periodqs != "") {
+      newreq = newreq + "?" + periodqs;
+    }
+  }
+  window.location = newreq;
 }
 
 function closecal(cal) {

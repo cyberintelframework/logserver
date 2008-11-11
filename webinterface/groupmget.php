@@ -38,7 +38,7 @@ $s_hash = md5($_SESSION['s_hash']);
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_gid",
+        "int_gid",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -69,7 +69,7 @@ if ($err != 1) {
   $result_check = pg_query($pgconn, $sql);
   $row_check = pg_fetch_assoc($result_check);
   $owner = $row_check['owner'];
-  if ($owner != $s_org && $s_access_user != 9) {
+  if ($owner != $s_org && $s_access_sensor != 9) {
     $m = 101;
     $err = 1;
   }
@@ -102,6 +102,7 @@ if ($err != 1) {
   echo "<result>";
     echo "<status>FAILED</status>";
     echo "<error>" .$v_errors[$m]. "</error>";
+    echo "<info>" .$s_access_sensor. "</info>";
   echo "</result>";
 }
 

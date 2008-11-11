@@ -1,15 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 05-09-2007                       #
+# SURFids 2.10.00                  #
+# Changeset 002                    #
+# 03-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 Initial release
+# 002 Added md5_hash check
+# 001 version 2.10.00
 #############################################
 
 include '../include/config.inc.php';
@@ -37,10 +38,17 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_sid",
-		"int_time"
+		"int_time",
+		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
+
+# Checking if the logged in user actually requested this action.
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 116;
+}
 
 if (isset($clean['sid'])) {
   $sid = $clean['sid'];

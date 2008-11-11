@@ -1,27 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# SURFids 2.10.00                  #
+# Changeset 002                    #
+# 03-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 version 2.00
-# 1.04.08 Added ARP actions
-# 1.04.07 Fixed redirection typo, ip check on same sensor
-# 1.04.06 Added ignore/unignore stuff
-# 1.04.05 Saving action for all sensors with the same keyname
-# 1.04.04 Changed data input handling
-# 1.04.03 Added input checks for $action, $vlanid and $keyname
-# 1.04.02 Added VLAN support 
-# 1.04.01 Released as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.04 SQL injection fix
-# 1.02.03 Added some more input checks
-# 1.02.02 Initial release
+# 002 Added md5_hash check
+# 001 version 2.10.00
 #############################################
 
 include '../include/config.inc.php';
@@ -48,10 +37,17 @@ $s_access_sensor = intval($s_access{0});
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_selview"
+                "int_selview",
+		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
+
+# Checking if the logged in user actually requested this action.
+if ($clean['hash'] != $s_hash) {
+  $err = 1;
+  $m = 116;
+}
 
 # Checking access
 if ($s_access_sensor == 0) {

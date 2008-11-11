@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 2.10.00                  #
-# Changeset 002                    #
-# 14-08-2008                       #
+# Changeset 003                    #
+# 03-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 003 Added md5_hash to userdel link
 # 002 Added email address
 # 001 Added language support
 ####################################
@@ -140,7 +141,7 @@ echo "<div class='centerbig'>\n";
               echo "<td>$access</td>\n";
               echo "<td>";
                 echo "[<a href='useredit.php?int_userid=$id'><font size=1>" .$l['g_edit']. "</font></a>]\n";
-                echo "[<a href='userdel.php?int_userid=$id' onclick=\"javascript: return confirm('" .$l['ua_confirmdel']. "?');\"><font size=1>" .$l['g_delete']. "</font></a>]\n";
+                echo "[<a href='userdel.php?int_userid=$id&md5_hash=$s_hash' onclick=\"javascript: return confirm('" .$l['ua_confirmdel']. "?');\"><font size=1>" .$l['g_delete']. "</font></a>]\n";
                 echo "[<a href='myreports.php?int_userid=$id'><font size=1>" .$l['ua_er']. "</font></a>]";
               echo "</td>\n";
             echo "</tr>\n";

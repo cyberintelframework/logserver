@@ -2,14 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 005                    #
-# 17-04-2008                       #
+# SURFids 2.10.00                  #
+# Changeset 006                    #
+# 03-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 006 Added md5_hash to updateaction link
 # 005 Changed sensor $status stuff
 # 004 Added selector for org selection
 # 003 Removed outdated status view
@@ -248,7 +249,7 @@ echo "<div class='centerbig'>\n";
 
             $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime);
 
-            echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview'>\n";
+            echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview&md5_hash=$s_hash'>\n";
               echo "<tr>\n";
                 ########################
                 # GENERAL

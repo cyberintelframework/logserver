@@ -1,8 +1,8 @@
 <?php
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 007                    #
-# 14-07-2008                       #
+# SURFids 2.10                     #
+# Changeset 008                    #
+# 10-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 008 Changed handling for the time selector
 # 007 Changed some $url handling for sort functions
 # 006 Made jquery version configurable
 # 005 Removed url redirection stuff
@@ -451,23 +452,23 @@ function insert_selector($o_show = 1, $t_show = 1) {
       echo "<input type='hidden' name='int_to' id='int_to' value='$to' />\n";
       echo "<input type='hidden' name='int_from' id='int_from' value='$from' />\n";
       echo "<input type='hidden' name='dir' id='selector_dir' value='$dir' />\n";
-      $check_ar = array("int_to", "int_from", "dir", "int_org", "int_selperiod");
-      if ($qs != "") {
-        $qs_ar = split("&", $qs);
-        foreach ($qs_ar as $pair) {
-          $pair_ar = split("=", $pair);
-          $key = strip_tags($pair_ar[0]);
-          $val = strip_tags($pair_ar[1]);
-          if (!in_array($key, $check_ar)) {
-            $val = str_replace("%3A", ":", "$val");
-            $key = str_replace("%5B", "[", "$key");
-            $key = str_replace("%5D", "]", "$key");
-            if ($key != "int_page" && $key != "" && $val != "") {
-              echo "<input type='hidden' name='$key' value='$val' />\n";
-            }
-          }
-        }
-      }
+#      $check_ar = array("int_to", "int_from", "dir", "int_org", "int_selperiod");
+#      if ($qs != "") {
+#        $qs_ar = split("&", $qs);
+#        foreach ($qs_ar as $pair) {
+#          $pair_ar = split("=", $pair);
+#          $key = strip_tags($pair_ar[0]);
+#          $val = strip_tags($pair_ar[1]);
+#          if (!in_array($key, $check_ar)) {
+#            $val = str_replace("%3A", ":", "$val");
+#            $key = str_replace("%5B", "[", "$key");
+#            $key = str_replace("%5D", "]", "$key");
+#            if ($key != "int_page" && $key != "" && $val != "") {
+#              echo "<input type='hidden' name='$key' value='$val' />\n";
+#            }
+#          }
+#        }
+#      }
     echo "</form>\n";
   echo "</div>\n"; #</selector>
   if ($t_show == 1) {
