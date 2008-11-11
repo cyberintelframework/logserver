@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 ####################################
 # Mail reporter                    #
-# SURFids 2.10.00                  #
-# Changeset 009                    #
-# 23-09-2008                       #
+# SURFids 2.10                     #
+# Changeset 010                    #
+# 10-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 010 Fixed own ranges nepenthes format
 # 009 Added timestamps to sensor status format
 # 008 Changed sensor status format
 # 007 Fixed missing detail overview for certain reports
@@ -866,6 +867,7 @@ while (@row = $email_query->fetchrow_array) {
             $sql .= " WHERE details.type IN (4,8) ";
             $sql .= " AND attacks.severity IN (16,32) ";
             $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
+            $sql .= " AND attacks.source <<= '$range' ";
             $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
             $sql .= " $andorg $andsensor";
             $sql .= " ORDER BY timestamp ASC";

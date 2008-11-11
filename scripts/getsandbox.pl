@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ####################################
 # CWSandbox retrieval script       #
-# SURFnet IDS                      #
-# Version 2.00.01                  #
+# SURFids 2.10                     #
+# Changeset 001                    #
 # 13-09-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
 # Dave De Coster (Mods for CWS)    #
@@ -10,11 +10,7 @@
 
 ###############################################
 # Changelog:
-# 2.10.01 version 2.10
-# 2.00.01 version 2.00 (Norman and CWSandbox supported)
-# 1.04.03 Added Norman sandbox support again
-# 1.04.02 Skipping messages without md5
-# 1.04.01 Initial release
+# 001 version 2.10
 ###############################################
 
 ####################
