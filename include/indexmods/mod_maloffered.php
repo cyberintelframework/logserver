@@ -1,15 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
+# SURFids 2.10                     #
+# Changeset 001                  #
 # 15-02-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Initial release
+# 001 Initial release
 #############################################
 
 echo "<div class='block'>\n";
