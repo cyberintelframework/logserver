@@ -1,7 +1,7 @@
 <?php
 
 ####################################
-# SURFids 2.10.00                  #
+# SURFids 2.10                     #
 # Changeset 002                    #
 # 03-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #

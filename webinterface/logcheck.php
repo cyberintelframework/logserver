@@ -2,7 +2,7 @@
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
+# SURFids 2.10                     #
 # Changeset 002                    #
 # 18-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
