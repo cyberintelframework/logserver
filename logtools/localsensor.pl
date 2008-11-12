@@ -101,7 +101,7 @@ if ($rev eq "") {
 }
 
 # First check if the organisation already exists in the database
-$chk = dbnumrows("SELECT id FROM sensors WHERE keyname = '$sensor'");
+$chk = dbnumrows("SELECT id FROM organisations WHERE organisation = '$org'");
 if ($chk > 0) {
   $sth = dbquery("SELECT id FROM organisations WHERE organisation = '$org'");
   @row = $sth->fetchrow_array;
