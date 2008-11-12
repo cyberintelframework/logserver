@@ -19,7 +19,7 @@ require "$c_surfidsdir/scripts/tnfunctions.inc.pl";
 # Main script
 ##################
 
-$chk = connectdb();
+$chk = dbconnect();
 
 # Get the IP address configuration for the tap device from the database.
 $sql = "SELECT tap FROM sensors WHERE keyname = 'nepenthes'";

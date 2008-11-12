@@ -28,40 +28,40 @@ require "$c_surfidsdir/scripts/tnfunctions.inc.pl";
 ##################
 # Main script
 ##################
-$chk = connectdb();
+$chk = dbconnect();
 $sql = "SELECT id, arp, tap FROM sensors WHERE status = 1 AND NOT tap = ''";
 $sth = $dbh->prepare($sql);
 $er = $sth->execute();
 
 while (@row = $sth->fetchrow_array) {
-$id = $row[0];
-$arp = $row[1];
-$tap = $row[2];
+    $id = $row[0];
+    $arp = $row[1];
+    $tap = $row[2];
 
-if (!$tap) {
-  $tap = "";
-}
-
-if ("$tap" ne "") {
-  if ("$arp" ne "") {
-    if ("$arp" eq "0") {
-      $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | awk '{print \$2}'`;
-      chomp($pid);
-      if (!pid) {
-        $pid = "";
-      }
-      if ("$pid" ne "") {
-        print "killing $pid from $tap\n";
-	`kill -9 $pid`;
-      }
-    } else {
-      $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | wc -l`;
-      chomp($pid);
-      if ("$pid" eq "0") {
-        print "Starting detectarp $tap\n";
-        system("$c_surfidsdir/scripts/detectarp.pl $tap &");
-      }    
+    if (!$tap) {
+        $tap = "";
     }
-  }
-}
+
+    if ("$tap" ne "") {
+        if ("$arp" ne "") {
+            if ("$arp" eq "0") {
+                $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | awk '{print \$2}'`;
+                chomp($pid);
+                if (!pid) {
+                    $pid = "";
+                }
+                if ("$pid" ne "") {
+                    print "killing $pid from $tap\n";
+                	`kill -9 $pid`;
+                }
+            } else {
+                $pid = `ps -ef | grep -v grep | grep detectarp | grep $tap | wc -l`;
+                chomp($pid);
+                if ("$pid" eq "0") {
+                    print "Starting detectarp $tap\n";
+                    system("$c_surfidsdir/scripts/detectarp.pl $tap &");
+                }    
+            }
+        }
+    }
 }
