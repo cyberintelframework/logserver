@@ -79,7 +79,7 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 open(LOG, ">> $logfile");
 
 # Connect to the database (dbh = DatabaseHandler or linkserver)
-$check = connectdb();
+$check = dbconnect();
 
 # ts_ means timestamp
 # dt_ means formatted datetime

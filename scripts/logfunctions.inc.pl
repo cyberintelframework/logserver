@@ -3,13 +3,14 @@
 #######################################
 # Function library for logging server #
 # SURFids 2.10                        #
-# Changeset 002                       #
-# 04-04-2008                          #
+# Changeset 003                       #
+# 12-11-2008                          #
 # Jan van Lith & Kees Trippelvitz     #
 #######################################
 
 #####################
 # Changelog:
+# 003 Added getifip, getifmac
 # 002 Added utc, removed convert_to_utc
 # 001 Added convert_to_utc
 #####################
@@ -24,14 +25,19 @@
 # 2.03		getdatetime
 # 2.04		getdate
 # 2.05		gettime
+# 2.06      getifip
+# 2.07      getifmac
+# 3     ALL DB functions
+# 3.01      dbconnect
+# 3.02      dbquery
+# 3.03      dbnumrows
 # 4		ALL misc functions
 # 4.01		printlog
 # 4.02		printmail
 # 4.03		printdebug
 # 4.05		printenv
-# 4.06		connectdb
-# 4.07		printattach
-# 4.08		utc
+# 4.06		printattach
+# 4.07		utc
 ###############################################
 
 # 2.01 getts
@@ -132,7 +138,85 @@ sub gettime {
   if ($hh < 10) { $hh = "0" .$hh; }
   $datestring = "$hh:$mm";
   return $datestring;
-} 
+}
+
+# 2.06 getifip
+# Function to retrieve the IP address from an interface
+# Returns IP address on success
+# Returns false on failure
+sub getifip() {
+  my ($if, $ip);
+  $if = $_[0];
+  $ip = `ifconfig $if | grep "inet addr" | awk '{print \$2}' | awk -F: '{print \$2}'`;
+  chomp($ip);
+  if ("$ip" ne "") {
+    return $ip;
+  } else {
+    return "false";
+  }
+  return "false";
+}
+
+# 2.07 getifmac
+# Function to retrieve the MAC address from a given interface
+# Returns MAC address on success
+# Returns false on failure
+sub getifmac() {
+  my ($if, $mac);
+  $if = $_[0];
+  $mac = `ifconfig $if | head -n1 | awk -F" " '{print \$5}'`;
+  chomp($mac);
+  if ($mac ne "") {
+    return $mac;
+  } else {
+    return "false";
+  }
+}
+
+# 3.01 dbconnect
+# Function to connect to the database
+# Returns "true" on success
+# Returns "false" on failure
+sub dbconnect() {
+  my ($ts, $pgerr, $args);
+  $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass)
+    or die $DBI::errstr;
+}
+
+# 3.02 dbquery
+# Performs a query to the database. If the query fails, return false. Otherwise, return the data.
+sub dbquery() {
+  my ($sql, $er, $sth);
+  $sql = $_[0];
+
+  if (!$dbh) {
+    return 'false';
+  }
+  $sth = $dbh->prepare($sql);
+  $er = $sth->execute();
+  if (!$er) {
+    return 'false';
+  }
+
+  return $sth;
+}
+
+# 3.03 dbnumrows
+# Performs a query to the database and return the amount of rows
+sub dbnumrows() {
+  my ($sql, $er, $sth);
+  $sql = $_[0];
+
+  if (!$dbh) {
+    return 0;
+  }
+  $sth = $dbh->prepare($sql);
+  $er = $sth->execute();
+  if (!$er) {
+    return 0;
+  }
+  return $sth->rows;
+}
 
 # 4.01 printlog
 # Function to print something to a logfile
@@ -209,25 +293,6 @@ sub printenv() {
   close(ENVLOG);
 }
 
-# 4.06 connectdb
-# Function to connect to the database
-# Returns "true" on success
-# Returns "false" on failure
-sub connectdb() {
-  my ($ts, $pgerr);
-  $dbh = DBI->connect($c_dsn, $c_pgsql_user, $c_pgsql_pass);
-  if ($dbh ne "") {
-    &printlog("Connect result: Ok");
-    return "true";
-  } else {
-    &printlog("Connect result: failed");
-    $pgerr = $DBI::errstr;
-    chomp($pgerr);
-    &printlog("Error message: $pgerr");
-    return "false";
-  }
-}
-
 # 4.07 printattach
 # Function to print a line in a mail attachment
 sub printattach() {
@@ -255,5 +320,7 @@ sub utc() {
     return $time;
   }
 }
+
+
 
 return "true";
