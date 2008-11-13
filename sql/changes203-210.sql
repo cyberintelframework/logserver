@@ -1,11 +1,12 @@
--- SURFids 2.10.00
+-- SURFids 2.10
 -- Database conversion 2.03 -> 2.10
--- Changeset 007
--- 28-10-2008
+-- Changeset 008
+-- 13-11-2008
 --
 
 --
 -- Changelog
+-- 008 Added scanner modifications
 -- 007 Added missing binaries_detail.bin conversion
 -- 006 Added type conversion of severity.val
 -- 005 Added pageconf, report_content, indexmods
@@ -110,6 +111,17 @@ ALTER TABLE report_content
 
 ALTER TABLE ONLY report_content
     ADD CONSTRAINT foreign_report_content_login_id FOREIGN KEY (user_id) REFERENCES "login"(id) ON DELETE CASCADE;
+
+--
+-- SCANNERS
+--
+ALTER TABLE scanners DROP COLUMN command;
+ALTER TABLE scanners DROP COLUMN update;
+ALTER TABLE scanners DROP COLUMN vercommand;
+ALTER TABLE scanners ADD COLUMN getvirus character varying;
+ALTER TABLE scanners ADD COLUMN matchvirus character varying;
+ALTER TABLE scanners ADD COLUMN getbin character varying;
+ALTER TABLE scanners ADD COLUMN matchclean character varying;
 
 --
 -- SEVERITY
