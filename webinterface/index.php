@@ -1,7 +1,7 @@
 <?php $tab="1"; $pagetitle="Home"; include("menu.php"); contentHeader();
 
 ####################################
-# SURFids 2.04                     #
+# SURFids 2.00.04                  #
 # Changeset 003                    #
 # 26-10-2007                       #
 # Jan van Lith & Kees Trippelvitz  #

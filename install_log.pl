@@ -2,7 +2,7 @@
 
 ####################################
 # Installation script              #
-# SURFids 2.04                     #
+# SURFids 2.00.04                  #
 # Changeset 005                    #
 # 30-05-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
