@@ -1,0 +1,657 @@
+/*
+ * Design stylesheet
+ * SURFids 2.00.03
+ * Changeset 002
+ * 27-05-2008
+ * Kees Trippelvitz
+*/
+
+/*
+ * Changelog:
+ * 002 Added new sensor status
+ * 001 version 2.0
+*/
+
+/*
+ ********************
+ * HTML elements
+ ********************
+*/
+PRE {
+  padding:              8px;
+  width:		98%;
+  white-space:		pre-wrap; /* CSS2.1 compliant */
+  white-space:		-moz-pre-wrap; /* Mozilla-based browsers */
+  white-space:		-o-pre-wrap; /* Opera 7+ */
+}
+
+/*
+ ********************
+ * Page
+ ********************
+*/
+#page {
+  padding-bottom:	8px;
+}
+
+#page #pageHeader {
+  background-repeat:	no-repeat; 
+}
+
+#page #pageHeader h1 {
+  width:		159px;
+  height:		100px;
+  float:		left;
+}
+
+#page #pageHeader h1 a {
+  display:		block;
+  height:		100px;
+  width:		150px;
+  text-indent:		-1000px;
+}
+
+#page #pageHeader ul#globalNav {
+  width:		312px;
+  margin:		0 8px 0 0;
+  padding:		10px 0 0 10px;
+  height:		28px;
+  background-position:	top left;
+  background-repeat:	no-repeat;
+  list-style-type:	none;
+}
+
+#page #pageHeader ul#globalNav li {
+  background-position:	3px 4px;
+  background-repeat:	no-repeat;
+  padding:		0 10px 0 16px;
+}
+
+#page #pageHeader ul#globalNav a {
+}
+
+#page #pageHeader .infoBar {
+  clear:		both;
+  height:		19px;
+  padding:		8px 0;
+}
+
+#page #pageHeader .infoBar #headerUser {
+  float:		left;
+  padding:		0 10px 0;
+  margin-left:		8px;
+}
+
+#page #pageHeader .infoBar #headerTime {
+  float:		right;
+  width:		250px;
+  padding:		0 10px 0;
+}
+#page #pageHeader .infoBar #headerSensors {
+  float:		right;
+  width:		170px;
+  padding:		0 10px 0;
+  margin-right:		8px;
+}
+#page #pageFooter {
+  padding-top:		8px;
+}
+#page #pageFooter .pageFooterLeft {
+  margin-left:		8px;
+  float:		left;
+}
+#page #pageFooter .pageFooterRight {
+  margin-right:		8px;
+  float:		right;
+}
+
+#pageBody {
+  margin-top:		35px;
+}
+
+#pageBody h2 {
+  padding:		0 10px 0;
+}
+
+/*
+ ********************
+ * Tab-menu
+ ********************
+*/
+#tab-menu {
+  height:		30px;
+}
+
+#tab-menu ul{
+  position:		relative;	
+  margin:		0 auto 0;	
+  padding:		0;
+  width:		100%;
+}
+
+#tab-menu ul:after {
+  content:		".";
+  display:		block; 
+  overflow:		hidden;	
+  visibility:		hidden;	
+  clear:		both;
+}
+
+#tab-menu a {
+  padding:		8px 5px 11px; 
+  display:		block;
+}
+
+#tab-menu ul li {
+  margin:		4px 0px 0px 5px;
+  padding:		0; 
+  line-height:		5px;
+  display:		block; 
+  float:		left;	
+}
+
+#tab-menu ul li ul {
+  width:		100%;
+  min-width:		100%;
+  margin:		0;
+  padding:		0;
+  position:		absolute;
+  left:			0;
+  clear:		both;
+  height:		30px;
+}
+
+#tab-menu ul li.selected ul {
+  visibility:		visible;
+  left:			0;
+}
+
+#tab-menu ul li.selected ul li a {
+  height:		6px;
+}
+
+#tab-menu ul li ul li, #tab-menu li ul li.selected {
+  border-right:		0px none;
+}
+
+/*
+ ********************
+ * Block
+ ********************
+*/
+.block {
+  margin:		0 0 16px;
+}
+
+.block .actionBlock {
+}
+
+.block .actionBlock .pbutton {
+  margin-left:          4px;
+  position:             relative;
+  top:                  1px;
+}
+
+.block .actionBlock .sbutton {
+  margin:               5px;
+}
+
+.block .actionBlock .sbuttonneg {
+  margin:               5px;
+}
+
+.block .dataBlock {
+}
+
+.block .errorBlock .blockHeader {
+  height:		18px;
+}
+
+.block .infoBlock .blockHeader {
+  height:		18px;
+}
+
+.block .blockHeader {
+  padding:		2px;
+  height:		20px;
+}
+.block .blockHeader .blockHeaderLeft {
+  float:		left;
+}
+.block .blockHeader .blockHeaderRight {
+  float:		right;
+}
+.block .blockContent {
+  border-collapse:	collapse;
+  padding:		5px 5px 5px 5px;
+}
+
+.block .blockFooter {
+}
+
+/*
+ ********************
+ * Selector
+ ********************
+*/
+#selector {
+  width:		500px;
+  height:		37px;
+  float:		right;
+  clear:		right;
+  margin-top:		-32px;
+}
+#selector #orgsel {
+  width:		20%;
+  float:		left;
+  position:		relative;
+  top:			10px;
+}
+#selector #border {
+  height:		27px;
+  float:		left;
+  border-left: 		2px solid #FFF;
+  margin-top:		4px;
+}
+#selector #arrowleft {
+  float:		left;
+  margin-top:		11px;
+  width:		5%;
+  height:		100%;
+  margin-left:		3px;
+  vertical-align:	middle;
+}
+#selector #timesel {
+  width:		70%;
+  float:		left;
+}
+#selector #timesel #trigger {
+  height:		22px;
+  margin-top:		-3px;
+  position:		relative;
+  top:			2px;
+  vertical-align:	middle;
+}
+#selector #timesel #timesel_top {
+  margin-top:		2px;
+}
+#selector #timesel #timesel_bottom {
+  width:		100%;
+  float:		left;
+}
+#selector #timesel #timesel_bottom #showstart {
+  width:		50%;
+  float:		left;
+}
+#selector #timesel #timesel_bottom #showend {
+  width:		50%;
+  float:		left;
+}
+#selector #timesel #timesel_bottom #showstart #showdate_start {
+  height:		16px;
+  font-weight:		normal;
+}
+#selector #timesel #timesel_bottom #showend #showdate_end {
+  height:		16px;
+  font-weight:		normal;
+}
+#selector #arrowright {
+  float:		right;
+  clear:		right;
+  margin-top:		11px;
+  height:		100%;
+  vertical-align:	middle;
+  margin-right:		3px;
+}
+#selector .showtext {
+  float:		left;
+  width:		20%;
+}
+#selector #timesel_sub {
+  width:		227px;
+  z-index:		90;
+}
+#selector #fromcal {
+  width:		100%;
+  position:		relative;
+  z-index:		10;
+}
+#selector #tocal {
+  width:		100%;
+  position:		relative;
+  z-index:		10;
+}
+
+/*
+ ********************
+ * DataTable
+ ********************
+*/
+
+.datatable {
+  border-collapse:	collapse; 
+  width:		100%;
+}
+
+.datatable td {
+  padding-left:		4px;
+}
+
+.datatable .indented {
+  padding-left:		10%;
+}
+
+.datatable .aright {
+  float:		right;
+}
+
+.datatable .aleft {
+  float:		left;
+}
+
+.datatable .aright .button {
+  margin-top:		1px;
+}
+
+.datatable .aleft .text {
+  margin-top:		4px;
+}
+
+/*
+ ********************
+ * Calendar
+ ********************
+*/
+
+.calendar {
+  width:		20px;
+}
+
+/*
+ ********************
+ * SearchTable
+ ********************
+*/
+
+.searchtable {
+  width:		100%;
+}
+
+.searchtable td {
+  padding-left:		4px;
+}
+
+/*
+ ********************
+ * ActionTable
+ ********************
+*/
+
+.actiontable {
+  border-collapse:	collapse; 
+  width:		100%;
+}
+
+/*
+ ********************
+ * MultipleTable
+ ********************
+*/
+
+.multipletable {
+  border-collapse:	collapse; 
+  width:		100%;
+  margin-bottom:	10px;
+}
+
+.multipletable td {
+  padding-left:		4px;
+}
+
+/*
+ ********************
+ * Sensorstatus
+ ********************
+*/
+
+.legend {
+  width:		630px;
+  float:		left;
+}
+
+.legend .legendHeader {
+  padding-left:		8px;
+  margin-top:		-10px;
+  margin-left:		20px;
+  width:		68px;
+}
+
+.legend .legendContent {
+  height:		100%;
+  width:		100%;
+  float:		left;
+}
+
+.legend .legendContent .legendContentLeft {
+  float:		left;
+  width:		50%;
+}
+
+.legend .legendContent .legendContentRight {
+  float:		right;
+  width:		50%;
+}
+
+.legend .legendContent .legendItem {
+  float:		left;
+  width:		100%;
+  margin-top:		2px;
+  margin-bottom:	2px;
+  margin-left:		8px;
+}
+.legend .legendFooter {
+  height:		4px;
+  width:		100%;
+  float:		left;
+}
+
+/*
+ ********************
+ * Sensorstatus
+ ********************
+*/
+.sensorstatus {
+  width:		100px;
+  height:		20px;
+  float:		left;
+}
+.sensorstatustext {
+  float:		left;
+  margin-left:		5px;
+  margin-top:		3px;
+  padding-top:		2px;
+}
+
+.sensorstatus .offline {
+  height:		20px;
+}
+.sensorstatus .online {
+  height:		20px;
+}
+.sensorstatus .disabled {
+  height:		20px;
+}
+.sensorstatus .ignored {
+  height:		20px;
+}
+.sensorstatus .outdated {
+  height:		20px;
+}
+.sensorstatus .config {
+  height:		20px;
+}
+.sensorstatus .starting {
+  height:		20px;
+}
+.sensorstatus .keepalive {
+  height:               20px;
+}
+
+/*
+ ********************
+ * Search  
+ ********************
+*/
+.details {
+  width:		500px;
+  float:		left;
+}
+
+.details .detailsHeader {
+  padding-left:		8px;
+  margin-top:		-10px;
+  margin-left:		20px;
+  width:		68px;
+}
+
+.details .detailsContent {
+  height:		100%;
+  width:		100%;
+  float:		left;
+}
+.details .detailsFooter {
+  height:		4px;
+  width:		100%;
+  float:		left;
+}
+
+.searchheader {
+  height:		100%;
+  padding-bottom:	2px;
+}
+
+/*
+ ********************
+ * Popup
+ ********************
+*/
+
+#popup {
+  position:		absolute;
+  left:			30%;
+  top:			15%;
+  width:		500px;
+  height:		300px;
+  z-index:		5001;
+  display:		none;
+  padding-bottom:	30px;
+}
+
+#popup #popupheader {
+  height:		14px;
+  margin-bottom:	4px;
+}
+
+#popup #popupheaderleft {
+  float:                left;
+  width:                49%;
+  height:		14px;
+  padding-left:		2px;
+}
+
+#popup #popupheaderright {
+  float:                right;
+  width:                50%;
+  height:		14px;
+}
+
+#popup #popupcontent {
+  float:		left;
+  width:		100%;
+}
+
+/*
+ ********************
+ * Miscellaneous
+ ********************
+*/
+#eventlog {
+  height:		210px;
+  width:		99%;
+}
+
+.smallinput {
+  height:		14px;
+}
+
+.helpmessage {
+  float:		right;  
+}
+
+#search_wait {
+  position:		absolute;
+  left:			40%;
+  width:		250px;
+  height:		100px;
+  padding:		10px;
+  z-index:		99;
+}
+
+.searchnav {
+  height:		18px;
+  margin-top:		0px;
+  padding-top:		0px;
+}
+
+.debugsql {
+  width:		100%;
+}
+
+.fingerprint {
+  margin-left:		2px;
+  margin-right:		2px;
+}
+
+.flag {
+  margin-left:		2px;
+  margin-right:		4px;
+}
+
+#pagetitle {
+  margin-left:		8px;
+}
+
+.contentHeader {
+  float:		left;
+  margin-bottom:	20px;
+  width:		100%;
+}
+
+#plot {
+  margin-left:		5px;
+}
+
+#overlay{
+  display:		none;
+  position:		absolute;
+  top:			0;
+  left:			0;
+  width:		100%;
+  height:		0px;
+  z-index:		5000;
+}
+
+#whois {
+  overflow:		auto;
+  width:		451px;
+  height:		300px;
+}
+
+.search_suggest {
+  position:             absolute;
+  display:		none;
+}
+
+#map {
+  z-index:		1;
+}

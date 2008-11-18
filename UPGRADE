@@ -1,0 +1,7 @@
+Upgrading notes
+---------------------------------------
+
+Upgrading from 2.00+ to 2.00.03 will require the installation of an additional perl package.
+This package can be installed via cpan:
+
+cpan install Net::Abuse::Utils
