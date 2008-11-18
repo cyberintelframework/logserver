@@ -59,7 +59,11 @@ if ($org eq "") {
 # Variables used
 ##################
 do "/etc/surfnetids/surfnetids-log.conf";
-require "$c_surfidsdir/scripts/logfunctions.inc.pl";
+if (-e "logfunctions.inc.pl") {
+  require "logfunctions.inc.pl";
+} else {
+  require "$c_surfidsdir/scripts/logfunctions.inc.pl";
+}
 $ts = time;
 
 ##################
