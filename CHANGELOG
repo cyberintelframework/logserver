@@ -1,7 +1,9 @@
-### SURFids 2.04
+### SURFids 2.00.04
 
+* Fixed a few minor bugs
 * Fixed a bug with the plotter
 * Fixed a XSS vulnerability in menu.php
+* Added some minor changes to sensor status mails for admins
 
 ### SURFids 2.00.03
 
