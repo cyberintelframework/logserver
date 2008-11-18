@@ -61,6 +61,8 @@ if ($org eq "") {
 do "/etc/surfnetids/surfnetids-log.conf";
 if (-e "logfunctions.inc.pl") {
   require "logfunctions.inc.pl";
+} elsif (-e "$c_surfidsdir/logtools/logfunctions.inc.pl") {
+  require "$c_surfidsdir/logtools/logfunctions.inc.pl";
 } else {
   require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 }
