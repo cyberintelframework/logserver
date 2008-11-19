@@ -1,12 +1,12 @@
 #!/usr/bin/perl 
 
-#######################################
-# Function library for logging server #
-# SURFids 2.10                        #
-# Changeset 003                       #
-# 12-11-2008                          #
-# Jan van Lith & Kees Trippelvitz     #
-#######################################
+####################################
+# Function library                 #
+# SURFids 2.10                     #
+# Changeset 003                    #
+# 12-11-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
 
 #####################
 # Changelog:

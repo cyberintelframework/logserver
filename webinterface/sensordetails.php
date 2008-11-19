@@ -82,7 +82,7 @@ if ($err == 0) {
     }
   }
   $sql_details = "SELECT keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
-  $sql_details .= " organisations.organisation, version, rev, sensormac, netconf, osv ";
+  $sql_details .= " organisations.organisation, version, rev, sensormac, netconf, osv, permanent ";
   $sql_details .= " FROM sensors, organisations WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
@@ -146,7 +146,9 @@ if ($err != 1) {
   $server_rev = $row_rev['value'];
   $server_rev_ts = $row_rev['timestamp'];
 
-  $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $update, $netconf, $tap, $tapip, $uptime);
+  $permanent = $row['permanent'];
+
+  $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $update, $netconf, $tap, $tapip, $uptime, $permanent);
 
   $sql_attack = "SELECT timestamp FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
   $debuginfo[] = $sql_attack;

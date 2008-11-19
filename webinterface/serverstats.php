@@ -2,22 +2,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Hiroshi Suzuki of NTT-CERT       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.04 Added support for multiple servers 
-# 1.04.04 Changed debug stuff
-# 1.04.03 Added pg_close when admin != 1
-# 1.04.02 Changed the database storage to base64
-# 1.04.01 Initial release by Mr. Hiroshi Suzuki
+# 001 Added language support
 #############################################
 
 # Checking access

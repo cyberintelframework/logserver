@@ -1,20 +1,16 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Hiroshi Suzuki of NTT-CERT       #
 # Modified by Kees Trippelvitz     #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 version 2.00
-# 1.04.04 Added header content-disposition
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed the database storage to base64
-# 1.04.01 Initial release by Mr. Hiroshi Suzuki
+# 001 Initial release
 #############################################
 
 # Starting the session

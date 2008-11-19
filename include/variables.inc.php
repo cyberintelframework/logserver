@@ -1,6 +1,6 @@
 <?php
 ####################################
-# SURFnet IDS 2.10.00              #
+# SURFids 2.10                     #
 # Changeset 003                    #
 # 07-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
@@ -51,6 +51,10 @@ $v_attacks_ar = array(
 						'Attack'	=> 'Wkssvc',
 						'Desc'		=> 'MS06070 vulnerability',
 						'URL'		=> 'http://www.microsoft.com/technet/security/Bulletin/MS06-070.mspx'),
+		'MS08067Dialogue'	=> array(
+						'Attack'	=> 'MS08-067',
+						'Desc'		=> 'MS08-67 vulnerability',
+						'URL'		=> 'http://www.microsoft.com/technet/security/Bulletin/MS08-067.mspx'),
 		'MSDTCDialogue'		=> array(
 						'Attack'	=> 'MSDTC/Dasher',
 						'Desc'		=> 'Dasher worm',
@@ -154,14 +158,14 @@ $v_attacktype_ar = array(
 
 # Array with the different types of access for the search engine.
 $v_access_ar_search = array(
-		'0'	=> 'No access',				# Disables search engine for that user.
+        		'0'	=> 'No access',		    		# Disables search engine for that user.
                 '1'	=> 'Domain records',			# User can search all records of his domain.
                 '9'	=> 'All records (admin)'		# User can search all records.
 );
 
 # Array with the different types of access for the sensor remote control options.
 $v_access_ar_sensor = array(
-		'0'	=> 'Read only access',			# User can view all sensors of his domain.
+		        '0'	=> 'Read only access',			# User can view all sensors of his domain.
                 '1'	=> 'Remote control access',		# User can view and control all sensors of his domain.
                 '2'	=> 'ARP & ARGOS access',		# User can add ARP monitoring + ARGOS redirecting.
                 '9'	=> 'Total access (admin)'		# User can view and control all sensors.
@@ -169,8 +173,8 @@ $v_access_ar_sensor = array(
 
 # Array with the different types of access for the user administration.
 $v_access_ar_user = array(
-		'0'	=> 'No access',				# User cannot modify any user accounts.
-                '1'	=> 'Own account',			# User can modify only his own account.
+        		'0'	=> 'No access',				    # User cannot modify any user accounts.
+                '1'	=> 'Own account',			    # User can modify only his own account.
                 '2'	=> 'Domain accounts',			# User can modify and add user accounts for his domain.
                 '9'	=> 'All accounts (admin)'		# Total admin control for user and domain administration.
 );
@@ -251,7 +255,7 @@ $v_mail_timespan_ar = array(
 # Array with the organisation identifier types.
 $v_org_ident_type_ar = array(
 		0 => "IP address",
-		1 => "Random Identifier String",
+		1 => "Organisation Identifier",
 		2 => "WHOIS netname",
 		3 => "Domain name",
 		4 => "SURFnet SOAP"
@@ -470,8 +474,8 @@ $v_sensorstatus_ar = array(
 		'text' => "Online"
 	),
 	2 => array(
-		'class' => "disabled",
-		'text' => "Disabled by admin"
+		'class' => "permanent",
+		'text' => "Permanent"
 	),
 	3 => array(
 		'class' => "ignored",

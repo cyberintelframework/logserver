@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-###################################
-# p0f-db init script              #
-# SURFids 2.10                    #
-# Changeset 001                   #
-# 14-11-2008                      #
-# Jan van Lith & Kees Trippelvitz #
-###################################
+####################################
+# p0f-db init script               #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 14-11-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
 
 #####################
 # Changelog:

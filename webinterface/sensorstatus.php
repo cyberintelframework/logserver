@@ -246,8 +246,9 @@ echo "<div class='centerbig'>\n";
               $org = $row['org'];
               $orgid = $row['orgid'];
             }
+            $permanent = $row['permanent'];
 
-            $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime);
+            $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime, $permanent);
 
             echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview&md5_hash=$s_hash'>\n";
               echo "<tr>\n";

@@ -1,9 +1,9 @@
 <?php $tab="3.5"; $pagetitle="Search"; include("menu.php"); contentHeader();
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 25-10-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,26 +12,7 @@
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.13 Fixed some autocomplete stuff
-# 1.04.12 Changed source IP and destination IP address search fields
-# 1.04.11 Removed PDF option (is being redone)
-# 1.04.10 Added autocomplete function
-# 1.04.09 Removed chartof stuff
-# 1.04.08 Removed libchart stuff & fixed sensors query
-# 1.04.07 Fixed a bug with the destination radiobutton
-# 1.04.06 Changed strip_html_escape_bin to strip_html_escape_binname
-# 1.04.05 Changed data input handling
-# 1.04.04 Query tuning
-# 1.04.03 Added Searchtemplates
-# 1.04.02 Added VLAN support 
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.06 Removed includes
-# 1.02.05 Added search templates
-# 1.02.04 Added multiple sensor select
-# 1.02.03 Added IDMEF to the report types
+# 001 Added language support
 #############################################
 
 if (isset($_SESSION['s_total_search_records'])) {

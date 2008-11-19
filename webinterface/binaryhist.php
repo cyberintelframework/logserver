@@ -1,15 +1,15 @@
 <?php $tab="3.4"; $pagetitle="Binary Info"; include("menu.php"); contentHeader(); ?>
 <?php
 
-###################################
-# SURFnet IDS 2.10.00             #
-# Changeset 003                   #
-# 03-03-2008                      #
-# Jan van Lith & Kees Trippelvitz #
-###################################
-# Contributors:                   #
-# Peter Arts                      #
-###################################
+####################################
+# SURFids 2.10                     #
+# Changeset 003                    #
+# 03-03-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
+# Contributors:                    #
+# Peter Arts                       #
+####################################
 
 #############################################
 # Changelog:

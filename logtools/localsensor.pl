@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-###################################
-# Local sensor script             #
-# SURFids 2.10                    #
-# Changeset 003                   #
-# 12-11-2008                      #
-# Jan van Lith & Kees Trippelvitz #
-###################################
+####################################
+# Local sensor script              #
+# SURFids 2.10                     #
+# Changeset 003                    #
+# 12-11-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
 
 #####################
 # Changelog:

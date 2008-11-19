@@ -1,15 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 06-11-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Initial release
+# 001 Initial release
 #############################################
 
 include '../include/config.inc.php';

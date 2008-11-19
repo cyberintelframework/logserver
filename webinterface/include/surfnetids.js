@@ -1,4 +1,5 @@
 /*
+ * 003
  * ####################################
  * # SURFids 2.10                     #
  * # Changeset 006                    #
@@ -317,7 +318,7 @@ function generatep() {
 
 function browse(dir) {
   $("#selector_dir").val(dir);
-  document.fselector.submit();
+  submitPeriod();
 }
 
 function setperiod(startofweek) {
@@ -403,6 +404,10 @@ function setperiod(startofweek) {
   $("#showdate_start").html(start.print("%d-%m-%Y %H:%M"));
   $("#showdate_end").html(end.print("%d-%m-%Y %H:%M"));
 
+  submitPeriod();
+}
+
+function submitPeriod() {
   url = window.location + "";
   url = url.split("?", 1);
   qs = window.location.search.substring(1);
@@ -421,7 +426,7 @@ function setperiod(startofweek) {
     if (periodqs != "") {
       newreq = newreq + "?" + periodqs;
     }
-  }
+  } 
   window.location = newreq;
 }
 
@@ -443,7 +448,7 @@ function closecal(cal) {
     $('#selperiod').selectedIndex = 0;
     $('#fromcal').hide();
     $('#tocal').hide();
-    $('#fselector').submit();
+    submitPeriod();
   }
 }
 

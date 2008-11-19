@@ -488,7 +488,7 @@ body {
 .sensorstatus .online {
   height:		20px;
 }
-.sensorstatus .disabled {
+.sensorstatus .permanent {
   height:		20px;
 }
 .sensorstatus .ignored {

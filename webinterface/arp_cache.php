@@ -1,12 +1,12 @@
 <?php $tab="3.6"; $pagetitle="ARP Cache"; include("menu.php"); contentHeader(0,0); ?>
 <?php
 
-###################################
-# SURFnet IDS 2.10.00             #
-# Changeset 001                   #
-# 03-03-2008                      #
-# Jan van Lith & Kees Trippelvitz #
-###################################
+####################################
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 03-03-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
 
 #############################################
 # Changelog:

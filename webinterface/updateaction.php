@@ -34,10 +34,11 @@ $s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
+$s_hash = md5($_SESSION['s_hash']);
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_selview",
+        "int_selview",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -68,7 +69,7 @@ $allowed_post = array(
                 "int_sid",
                 "int_vlanid",
                 "action",
-		"ip_tapip"
+        		"ip_tapip"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();

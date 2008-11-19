@@ -1,23 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 version 2.00
-# 1.04.03 Changed data input handling
-# 1.04.02 Fixed a bug with access handling
-# 1.04.01 Fixed username check
-# 1.03.02 Removed and changed some stuff referring to the report table
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.03 SQL injection fix
-# 1.02.02 Added some more input checks and removed includes
-# 1.02.01 Initial release
+# 001 Initial release
 #############################################
 
 include '../include/config.inc.php';

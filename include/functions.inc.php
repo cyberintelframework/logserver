@@ -1,6 +1,6 @@
 <?php
 ####################################
-# SURFids 2.10.00                  #
+# SURFids 2.10                     #
 # Changeset 007                    #
 # 18-08-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
@@ -789,7 +789,7 @@ function delcookie($name) {
 
 # 3.23 sensorstatus
 # Function to calculate the actual sensor status
-function sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime) {
+function sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime, $perm = 0) {
   $diffupdate = 0;
   if ($lastupdate != "") {
     $now = date("U");
@@ -800,6 +800,8 @@ function sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastup
   }
   if ($status == 3) {
     $rtn = 3;
+  } elseif ($perm == 1) {
+    $rtn = 2;
   } elseif ($status == 1 && "$server_rev" != "$sensor_rev" && $server_rev_ts < $lastupdate) {
     $rtn = 7;
   } elseif ($status == 1 && $sensor_rev == 0 && $lastupdate != 0) {

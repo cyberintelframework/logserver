@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 2.10                     #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Bugfix access check
 # 001 Initial release
 #############################################
 
@@ -31,7 +32,7 @@ if (!isset($_SESSION['s_admin'])) {
 # Retrieving some session variables
 $q_org = $_SESSION['q_org'];
 $s_access = $_SESSION['s_access'];
-$s_access_sensor = intval($s_access{2});
+$s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 

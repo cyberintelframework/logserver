@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 
-###################################
-# Logserver uninstallation script #
-# SURFnet IDS                     #
-# Version 2.00.01                 #
-# 27-09-2007                      #
-# Jan van Lith & Kees Trippelvitz #
-###################################
+####################################
+# Logserver uninstallation script  #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 19-11-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
 
 #####################
 # Changelog:
-# 2.00.01 initial release
+# 001 initial release
 #####################
 
 # Color codes

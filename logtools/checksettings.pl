@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 
-###################################
-# Check settings script           #
-# SURFnet IDS                     #
-# Version 2.10.01                 #
-# 29-10-2007                      #
-# Jan van Lith & Kees Trippelvitz #
-###################################
+####################################
+# Check settings script            #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 29-10-2007                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
 
 #####################
 # Changelog:
-# 2.10.01 Initial version
+# 001 Initial version
 #####################
 
 ##################

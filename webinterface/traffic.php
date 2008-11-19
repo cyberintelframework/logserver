@@ -2,31 +2,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 26-10-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Added language support
-# 2.00.01 version 2.00
-# 1.04.10 Removed offline choice 
-# 1.04.09 Fixed a bug with displaying organisation and the all sensors image 
-# 1.04.08 Fixed a bug when no traffic graphs are present and user is admin
-# 1.04.07 Fixed display of allsensor when no admin
-# 1.04.06 Added allsensors pictures again
-# 1.04.05 Changed location debug info 
-# 1.04.04 Added online/offline status selector
-# 1.04.03 Changed debug stuff
-# 1.04.02 Added vlan support 
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.04 Storing images in the database
-# 1.02.03 Removed includes
-# 1.02.02 Changed the way sensor is passed along the querystring
-# 1.02.01 Initial release
+# 001 Added language support
 #############################################
 
 # Retrieving posted variables from $_GET

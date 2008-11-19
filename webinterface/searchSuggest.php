@@ -1,16 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.01                  #
-# 13-12-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.01 Replaced addslashes with pg_escape_string
-# 2.00.01 Initial release
+# 001 Replaced addslashes with pg_escape_string
 #############################################
 
 include '../include/config.inc.php';

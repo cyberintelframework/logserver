@@ -1,29 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.01                  #
-# 12-09-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.01 version 2.00
-# 1.04.10 Fixed network ranges regexp
-# 1.04.09 Added hash check
-# 1.04.08 Added pattern check for organisation IP ranges
-# 1.04.07 Fixed bug with organisation existancy check. Case insensitive search.
-# 1.04.06 Removed orgname check when type = ident
-# 1.04.05 Added more checks on the ranges
-# 1.04.04 Changed data input handling
-# 1.04.03 Fixed a bug where it wouldn't save organisation changes
-# 1.04.02 Added identifier type
-# 1.04.01 pg_close() when not logged in
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.03 Added some more input checks
-# 1.02.02 Added identifier column to table.
-# 1.02.01 Initial release
+# 001 Initial release
 #############################################
 
 include '../include/config.inc.php';

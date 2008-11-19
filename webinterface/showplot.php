@@ -1,27 +1,15 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.02                  #
-# 08-10-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.00.02 Fixed a bug with empty data points
-# 2.00.01 version 2.00
-# 1.04.11 Fixed attack-dialogue graph
-# 1.04.10 Added IP exclusions stuff
-# 1.04.09 Shows empty graph when no data
-# 1.04.08 Added data colors array, background color
-# 1.04.07 Added virus graphs
-# 1.04.06 Fixed bug when not giving any port exclusions
-# 1.04.05 Added extra dport and timestamp functionality 
-# 1.04.04 Fixed bugs with organisation  
-# 1.04.03 Location of phplot.php is a config value now
-# 1.04.02 Fixed typo
-# 1.04.01 Initial release
+# 001 Initial release
 #############################################
 
 #header("Content-type: image/png");

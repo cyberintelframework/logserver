@@ -1,24 +1,16 @@
 <?php $tab="2.8"; $pagetitle="Graphs"; include("menu.php"); contentHeader();
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.10.02                  #
-# 14-12-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
-# 2.10.02 Added default settings support, interval suggest
-# 2.10.01 Added language support
-# 2.00.04 Fixed bug with the popups
-# 2.00.03 Fixed some layout issues
-# 2.00.02 Graphs now shown in popups
-# 2.00.01 2.00 version
-# 1.04.04 Added virus graphs
-# 1.04.03 updated destination port graphs & added timepstamp + organisation option in menu
-# 1.04.02 Added destination port graphs
-# 1.04.01 Initial release
+# 002 Added default settings support, interval suggest
+# 001 Added language support
 #############################################
 
 if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {

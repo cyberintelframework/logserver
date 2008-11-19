@@ -2,9 +2,9 @@
 <?php
 
 ####################################
-# SURFnet IDS                      #
-# Version 2.00.02                  #
-# 24-09-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 18-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,19 +13,7 @@
 
 #############################################
 # Changelog:
-# 2.00.02 Fixed typo in sensor access text
-# 2.00.01 version 2.00
-# 1.04.06 Fixed no level 2 sensor (ARP & Argos) selection 
-# 1.04.05 Added hash check
-# 1.04.04 Fixed a radio button name
-# 1.04.03 Changed data input handling
-# 1.04.02 Changed debug info
-# 1.04.01 Rereleased as 1.04.01
-# 1.03.02 Added email and gpg input fields
-# 1.03.01 Released as part of the 1.03 package
-# 1.02.04 Added some more input checks and removed includes
-# 1.02.03 Removed old maillogging and email fields
-# 1.02.02 Initial release
+# 001 Initial release
 #############################################
 
 $err = 0;

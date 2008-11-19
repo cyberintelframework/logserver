@@ -1,3 +1,20 @@
+### SURFids 2.04
+
+* Fixed a few minor bugs
+* Fixed a bug with the plotter
+* Fixed a XSS vulnerability in menu.php
+* Added some minor changes to sensor status mails for admins
+
+### SURFids 2.00.03
+
+* Added authorization check to whois.php
+* Added "Always send" option to mail logs
+* Added UTC time format to mail logs
+* Added Nepenthes & Cymru mail logging formats
+* Upgraded jQuery to 1.2.1
+* Added sensor version information to the sensor details page
+* Added sensor MAC address to the sensor details page
+
 ### SURF IDS 2.00
 
 * Layer 2 detection

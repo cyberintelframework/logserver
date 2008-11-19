@@ -537,8 +537,8 @@ img {
 .sensorstatus .online {
   background-color:     green;
 }
-.sensorstatus .disabled {
-  background-color:     gray;
+.sensorstatus .permanent {
+  background-color:     green;
 }
 .sensorstatus .ignored {
   background-color:     #7FFFD4;
@@ -564,8 +564,8 @@ img {
 .sensorstatustd .online {
   background-color:     green;
 }
-.sensorstatustd .disabled {
-  background-color:     gray;
+.sensorstatustd .permanent {
+  background-color:     green;
 }
 .sensorstatustd .ignored {
   background-color:     #7FFFD4;
@@ -588,8 +588,8 @@ option.offline {
 option.online {
   background-color:	green;
 }
-option.disabled {
-  background-color:	gray;
+option.permanent {
+  background-color:	green;
 }
 option.ignored {
   background-color:	#7FFFD4;
