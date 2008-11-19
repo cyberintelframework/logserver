@@ -27,22 +27,67 @@ use Getopt::Std;
 ##################
 sub usage() {
     print "Usage: ./localsensor.pl -i <interface name> -s <sensor name> -o <organisation name>\n";
+    print "Usage: ./localsensor.pl -p <ip address> -m <mac address> -s <sensor name> -o <organisation name>\n";
     print "\n";
     print "   -i <interface name>                   Interface that has to be added as a sensor\n";
+    print "   -p <ip address>                       IP address of the sensor\n";
+    print "   -m <mac address>                      MAC address of the sensor, defaults to 00:00:00:00:00:00\n";
     print "   -s <sensor name>                      Name of the sensor, defaults to Nepenthes\n";
     print "   -o <organisation name>                Organisation name, defaults to LOCAL\n";
     print "\n";
     print "Example: ./localsensor.pl -i eth0 -s mySensor -o SURFnet\n";
+    print "Example: ./localsensor.pl -p 192.168.10.12 -m 00:11:22:33:44:55 -s mySensor -o SURFnet\n";
     print "\n";
 }
 
-getopt('iso', \%opts);
+getopt('ipmso', \%opts);
 
 $sensor = $opts{"s"};
 $if = $opts{"i"};
 $org = $opts{"o"};
+$ip = $opts{"p"};
+$mac = $opts{"m"};
 
-if ($if eq "") {
+##################
+# Configuration
+##################
+if (-r "/etc/surfnetids/surfnetids-log.conf") {
+  do "/etc/surfnetids/surfnetids-log.conf";
+} else {
+  # The root directory for the SURFids files (no trailing forward slash).
+  $c_surfidsdir = "/opt/surfnetids";
+
+  # User info for the logging user in the postgresql database
+  $c_pgsql_pass = "enter_database_password_here";
+  $c_pgsql_user = "idslog";
+
+  # Postgresql database info
+  $c_pgsql_host = "enter_database_host_here";
+  $c_pgsql_dbname = "idsserver";
+
+  # The port number where the postgresql database is running on.
+  $c_pgsql_port = "5432";
+
+  # Connection string, default should be correct.
+  $c_dsn = "DBI:Pg:dbname=$c_pgsql_dbname;host=$c_pgsql_host;port=$c_pgsql_port";
+}
+
+##################
+# Functions
+##################
+if (-e "logfunctions.inc.pl") {
+  require "logfunctions.inc.pl";
+} elsif (-e "$c_surfidsdir/logtools/logfunctions.inc.pl") {
+  require "$c_surfidsdir/logtools/logfunctions.inc.pl";
+} else {
+  require "$c_surfidsdir/scripts/logfunctions.inc.pl";
+}
+
+##################
+# Main script
+##################
+
+if ($if eq "" && $ip eq "") {
   usage();
   exit;
 }
@@ -55,33 +100,27 @@ if ($org eq "") {
   $org = "LOCAL";
 }
 
-##################
-# Variables used
-##################
-do "/etc/surfnetids/surfnetids-log.conf";
-if (-e "logfunctions.inc.pl") {
-  require "logfunctions.inc.pl";
-} elsif (-e "$c_surfidsdir/logtools/logfunctions.inc.pl") {
-  require "$c_surfidsdir/logtools/logfunctions.inc.pl";
+if ($if ne "") {
+  $ifip = getifip($if);
+  if ($ifip eq "false") {
+    print "Could not retrieve IP address for interface $if\n";
+    exit;
+  }
+  $ifmac = getifmac($if);
+  if ($ifmac eq "false") {
+    print "Could not retrieve MAC address for interface $if\n";
+    exit;
+  }
 } else {
-  require "$c_surfidsdir/scripts/logfunctions.inc.pl";
+  $ifip = $ip;
+  if ($mac eq "") {
+    $ifmac = "00:00:00:00:00:00";
+  } else {
+    $ifmac = $mac;
+  }
 }
+
 $ts = time;
-
-##################
-# Main script
-##################
-
-$ifip = getifip($if);
-if ($ifip eq "false") {
-  print "Could not retrieve IP address for interface $if\n";
-  exit;
-}
-$ifmac = getifmac($if);
-if ($ifmac eq "false") {
-  print "Could not retrieve MAC address for interface $if\n";
-  exit;
-}
 
 dbconnect();
 
@@ -120,11 +159,30 @@ if ($chk > 0) {
   $orgid = $row[0];
 }
 
-if ($orgid ne "") {
-  $sql = "INSERT INTO sensors (keyname, remoteip, localip, lastupdate, laststart, status, uptime, tap, tapip, mac, netconf, organisation, rev, sensormac) ";
-  $sql .= " VALUES ('$sensor', '$ifip', '$ifip', $ts, $ts, 1, 0, '$if', '$ifip', '$ifmac', 'dhcp', $orgid, $rev, '$ifmac')";
-  $chk = dbnumrows($sql);
-  if ($chk != 0) {
-    print "Sensor successfully added to the database!\n";
+print "Sensor: $sensor\n";
+print "IP address: $ifip\n";
+print "MAC address: $ifmac\n";
+print "Organisation: $org\n";
+print "Org ID: $orgid\n";
+print "\n";
+
+$chk = "none";
+while ($chk !~ /^(n|N|y|Y)$/) {
+  $chk = prompt("Add this sensor? [yN]", "N");
+}
+
+if ($chk =~ /^(y|Y)/) {
+  print "Adding sensor to the database!\n";
+  if ($orgid ne "") {
+    $sql = "INSERT INTO sensors (keyname, remoteip, localip, lastupdate, laststart, status, uptime, tap, tapip, mac, netconf, organisation, rev, sensormac) ";
+    $sql .= " VALUES ('$sensor', '$ifip', '$ifip', $ts, $ts, 1, 0, '$if', '$ifip', '$ifmac', 'dhcp', $orgid, $rev, '$ifmac')";
+    $chk = dbnumrows($sql);
+    if ($chk != 0) {
+      print "Sensor successfully added to the database!\n";
+    } else {
+      print "Failed to add sensor!\n";
+    }
   }
+} else {
+  print "Not adding sensor!\n";
 }
