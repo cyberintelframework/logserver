@@ -976,8 +976,8 @@ echo "<div class='leftmed'>\n";
                     $days = floor($per / 86400);
                     $perstr = "$days day(s)";
                   }
-                  $from_date = date("d-m-Y H:i", $from);
-                  $to_date = date("d-m-Y H:i", $to);
+                  $from_date = date($c_date_format, $from);
+                  $to_date = date($c_date_format, $to);
                   echo printRadio("$perstr", int_timespan, 1, 0) . "<br />";
                   echo printRadio("$from_date - $to_date", int_timespan, 2, 0) . "<br />";
                   echo printRadio($l['ls_dontsave'], int_timespan, 3, 3) . "<br />";
@@ -1221,6 +1221,13 @@ while ($row = pg_fetch_assoc($result)) {
           echo "$smac";
         }
         echo "</td>\n";
+
+      } elseif ( ( $sev == 1 || $sev == 0 ) && $sevtype == 2) {
+        $dia_ar = array('attackid' => $id, 'type' => 40);
+        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+        $module = $dia_result_ar[0]['text'];
+
+        echo "<td>$module</td>";
       } elseif ($sev == 1 && $sevtype == 1) {
         $dia_ar = array('attackid' => $id, 'type' => 20);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);

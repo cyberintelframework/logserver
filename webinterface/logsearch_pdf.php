@@ -32,7 +32,7 @@ include "../lang/${c_language}.php";
 # Setting headers
 #header("Content-type: text/pdf");
 #header("Cache-control: private");
-#$fn = "SURFnet_IDMEF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".xml";
+#$fn = "SURFnet_IDMEF_" . date($c_date_format) . "_" . ucfirst($_SESSION['s_user']) . ".xml";
 #header("Content-disposition: attachment; filename=$fn");
 
 # Retrieving posted variables from $_GET
@@ -91,8 +91,8 @@ if (@is_array($tainted["sensorid"])) {
 }
 $to = $_SESSION['s_to'];
 $from = $_SESSION['s_from'];
-$txt_to = date('d-m-Y, H:i', $to);
-$txt_from = date('d-m-Y, H:i', $from);
+$txt_to = date($c_date_from, $to);
+$txt_from = date($c_date_format, $from);
 
 ####################
 # Severity
@@ -353,7 +353,7 @@ $pdf =& new Cezpdf();
 $pdf->addPngFromFile("images/logo.png", 15, 755, 126, 80);
 $pdf->selectFont('../include/fonts/Helvetica.afm');
 $pdf->ezText($space . 'SURFnet IDS PDF results',20);
-$pdf->ezText($bigspace . 'Generated at ' . date("d-m-Y H:i:s") . ' by SURFnetIDS webinterface', 10);
+$pdf->ezText($bigspace . 'Generated at ' . date($c_date_format) . ' by SURFnetIDS webinterface', 10);
 $pdf->ezText('    ', 30);
 
 #####################
@@ -519,7 +519,7 @@ while ($row = pg_fetch_assoc($result)) {
   //Timestamp 	Severity 	Source Port 	Destination Port 	Sensor 	Additional Info
   $ar = array();
 #  $ar["ID"] = $id;
-  $ar["Timestamp"] = date("d-m-Y H:i:s", $timestamp);
+  $ar["Timestamp"] = date($c_date_format, $timestamp);
   $ar["Severity"] = $sev_text;
   if ($sevtype == 10) $ar["Source"] = $srcmac; 
   else $ar["Source"] = $source;
@@ -542,7 +542,7 @@ while ($row = pg_fetch_assoc($result)) {
 $pdf->ezTable($data, '', '', array( 'fontSize' => 8));
 $pdf->ezText('__________________________________________________________', 15);
 $pdf->ezText($space . 'http://ids.surfnet.nl', 10);
-$fn = "SURFnet_PDF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".pdf";
+$fn = "SURFnet_PDF_" . date($c_date_format) . "_" . ucfirst($_SESSION['s_user']) . ".pdf";
 $ar = array('Content-Disposition'=>$fn);
 $pdf->ezStream($ar);
 pg_close($pgconn);

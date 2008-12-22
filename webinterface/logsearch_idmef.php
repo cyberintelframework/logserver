@@ -33,7 +33,7 @@ include "../lang/${c_language}.php";
 header("Pragma: public");
 header("Cache-Control: max-age=0");
 header("Content-type: application/xml");
-$fn = "SURFnet_IDMEF_" . date("d-m-Y_H:i:s") . "_" . ucfirst($_SESSION['s_user']) . ".xml";
+$fn = "SURFnet_IDMEF_" . date($c_date_format) . "_" . ucfirst($_SESSION['s_user']) . ".xml";
 header("Content-disposition: attachment; filename=$fn");
 
 # Retrieving posted variables from $_GET
@@ -413,6 +413,14 @@ while ($row = pg_fetch_assoc($result)) {
   } elseif ($sev == 16 && $malware != "") {
     echo "  <idmef:AdditionalData type=\"string\" meaning=\"" .$l['ls_fo']. "\">\n";
     echo "    <idmef:string>$malware</idmef:string>\n";
+    echo "  </idmef:AdditionalData>\n";
+  } elseif ( ( $sev == 1 || $sev == 0 ) && $sevtype == 2) {
+    $dia_ar = array('attackid' => $id, 'type' => 40);
+    $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+    $module = $dia_result_ar[0]['text'];
+
+    echo "  <idmef:AdditionalData type=\"string\" meaning=\"snort-rule\">\n";
+    echo "    <idmef:string>$module</idmef:string>\n";
     echo "  </idmef:AdditionalData>\n";
   }
   echo "</idmef:Alert>\n";
