@@ -67,15 +67,10 @@ if (!document.all) {
 
 function startclock() {
   var uptime = $("#js_hiduptime").val() - 0;
-  var total = $("#js_hidtotal").val() - 0;
   uptime = uptime + 1;
-  total = total + 1;
   $("#js_hiduptime").val(uptime);
-  $("#js_hidtotal").val(total);
   uptime = sec_to_string(uptime);
-  total = sec_to_string(total);
   $("#js_uptime").html(uptime);
-  $("#js_total").html(total);
   setTimeout('startclock()',1000);
 }
 
@@ -1083,7 +1078,9 @@ function get_logsys(result) {
     var level = message.find("level").text();
     var ts = message.find("ts").text();
     var source = message.find("source").text();
+    var pid = message.find("pid").text();
     var msg = message.find("msg").text();
+    var args = message.find("args").text();
     var dev = message.find("device").text();
     var sid = message.find("sid").text();
     var sensor = message.find("sensor").text();
@@ -1091,8 +1088,9 @@ function get_logsys(result) {
     html += '<tr class="syslogrow">';
       html += '<td class="syslog_'+level+'">'+level+'</td>\n';
       html += '<td>'+ts+'</td>\n';
-      html += '<td>'+source+'</td>\n';
+      html += '<td>'+source+' (' + pid + ')</td>\n';
       html += '<td>'+msg+'</td>\n';
+      html += '<td>'+args+'</td>\n';
       html += '<td><a href="sensordetails.php?int_sid='+sid+'">'+sensor+'</a></td>\n';
       html += '<td>'+dev+'</td>\n';
     html += '</tr>';
