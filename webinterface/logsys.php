@@ -21,32 +21,50 @@ if ($s_admin != 1) {
   exit;
 }
 
+if ($c_logsys_flexi == 1) {
+  # Check for minified option
+  if ($c_minified_enable == 1) {
+    $min = "-min";
+  } else {
+    $min = "";
+  }
+
+  $address = getaddress();
+  echo "<link rel='stylesheet' href='${address}include/flexi/flexigrid.css' />\n";
+  echo "<script type='text/javascript' src='${address}include/flexi/flexigrid${min}.js'></script>\n";
+  echo "<script type='text/javascript' src='${address}include/surfnetids.logsys${min}.js'></script>\n";
+} else {  # START_NO_FLEXI
+
 # Retrieving default values from $_COOKIE
 $allowed_cookie = array(
-                "strip_html_escape_error",
-                "strip_html_escape_prefix",
-                "strip_html_escape_dev",
+        "strip_html_escape_error",
+        "strip_html_escape_prefix",
+        "strip_html_escape_dev",
 		"int_sid",
 		"int_level",
 		"int_levelop",
 		"int_prefixop",
 		"int_devop",
-		"int_sidop",
 		"int_errorop"
 );
 $check = extractvars($_COOKIE[$c_cookie_name], $allowed_cookie);
 debug_input();
 
 add_to_sql("syslog.*", "select");
+add_to_sql("sensors.label", "select");
+add_to_sql("sensors.id as sid", "select");
 add_to_sql("syslog", "table");
+#add_to_sql("sensors", "table");
+
+#add_to_sql("sensors.keyname = syslog.keyname", "where");
 
 $from = $_SESSION['s_from'];
 $to = $_SESSION['s_to'];
-add_to_sql("timestamp >= '$from'", "where");
-add_to_sql("timestamp <= '$to'", "where");
+add_to_sql("timestamp >= epoch_to_ts($from)", "where");
+add_to_sql("timestamp <= epoch_to_ts($to)", "where");
 
 $operators_ar = array(
-	'' => "=",
+    	'' => "=",
         0 => "!=",
         1 => "=",
         2 => ">",
@@ -63,7 +81,6 @@ $sel_dev = -1;
 $sel_errorop = 1;
 $sel_prefixop = 1;
 $sel_levelop = 1;
-$sel_sidop = 1;
 $sel_devop = 1;
 
 if (isset($clean['errorop'])) {
@@ -96,14 +113,18 @@ if (isset($clean['dev'])) {
   add_to_sql("device $devop '$sel_dev'", "where");
 }
 
-if (isset($clean['sidop'])) {
-  $sel_sidop = $clean['sidop'];
-}
-$sidop = $operators_ar[$sel_sidop];
-
 if (isset($clean['sid'])) {
   $sel_sid = $clean['sid'];
-  add_to_sql("sensorid $sidop '$sel_sid'", "where");
+  if ($sel_sid != "unknown") {
+    $sql_get = "SELECT keyname, vlanid FROM sensors WHERE id = $sel_sid ";
+    $res_get = pg_query($pgconn, $sql_get);
+    $row_get = pg_fetch_assoc($res_get);
+    $keyname = $row_get['keyname'];
+    $vlanid = $row_get['vlanid'];
+    add_to_sql("keyname = '$keyname' AND (vlanid = $vlanid OR vlanid = 0) ", "where");
+  } else {
+    add_to_sql("syslog.keyname = 'unknown'", "where");
+  }
 }
 
 if (isset($clean['levelop'])) {
@@ -116,33 +137,42 @@ if (isset($clean['level'])) {
   add_to_sql("level $levelop '$sel_level'", "where");
 }
 
-add_to_sql("timestamp DESC", "order");
+add_to_sql("timestamp ASC", "order");
 
 prepare_sql();
-$sql_count = "SELECT COUNT(sensorid) as total FROM $sql_from $sql_where";
+$sql_count = "SELECT COUNT(syslog.keyname) as total ";
+$sql_count .= " FROM $sql_from ";
+$sql_count .= "LEFT JOIN sensors ";
+$sql_count .= " ON sensors.keyname = syslog.keyname AND sensors.vlanid = syslog.vlanid ";
+$sql_count .= " $sql_where";
 $debuginfo[] = $sql_count;
 $result_count = pg_query($pgconn, $sql_count);
 $row_count = pg_fetch_assoc($result_count);
 $count = $row_count['total'];
 
-$sql = "SELECT $sql_select FROM $sql_from $sql_where ORDER BY $sql_order LIMIT 20";
+$sql = "SELECT $sql_select FROM $sql_from ";
+$sql .= "LEFT JOIN sensors ";
+$sql .= " ON sensors.keyname = syslog.keyname AND sensors.vlanid = syslog.vlanid ";
+$sql .= " $sql_where ORDER BY $sql_order LIMIT 20";
 $debuginfo[] = $sql;
 $result = pg_query($pgconn, $sql);
 
-$sql_prefix = "SELECT DISTINCT source FROM syslog WHERE timestamp >= '$from' AND timestamp <= '$to'";
+$sql_prefix = "SELECT DISTINCT source FROM syslog WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to)";
 $debuginfo[] = $sql_prefix;
 $result_prefix = pg_query($pgconn, $sql_prefix);
 
-$sql_error = "SELECT DISTINCT error FROM syslog WHERE timestamp >= '$from' AND timestamp <= '$to'";
+$sql_error = "SELECT DISTINCT error FROM syslog WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to)";
 $debuginfo[] = $sql_error;
 $result_error = pg_query($pgconn, $sql_error);
 
-$sql_sid = "SELECT DISTINCT sensorid, keyname, vlanid, label FROM syslog, sensors ";
-$sql_sid .= " WHERE timestamp >= '$from' AND timestamp <= '$to' AND syslog.sensorid = sensors.id";
+$sql_sid = "SELECT DISTINCT syslog.vlanid, syslog.keyname, sensors.id as sid FROM syslog ";
+$sql_sid .= " LEFT JOIN sensors ";
+$sql_sid .= " ON sensors.keyname = syslog.keyname AND sensors.vlanid = syslog.vlanid ";
+$sql_sid .= " WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to) ";
 $debuginfo[] = $sql_sid;
 $result_sid = pg_query($pgconn, $sql_sid);
 
-$sql_dev = "SELECT DISTINCT device FROM syslog WHERE timestamp >= '$from' AND timestamp <= '$to'";
+$sql_dev = "SELECT DISTINCT device FROM syslog WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to) ";
 $debuginfo[] = $sql_dev;
 $result_dev = pg_query($pgconn, $sql_dev);
 
@@ -210,22 +240,26 @@ echo "<div class='leftbig'>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['ly_sensorid']. "</td>";
-              echo "<td>\n";
-                echo "<select name='int_sidop' id='int_sidop'>\n";
-                  echo printOption(1, "IS", $sel_sidop);
-                  echo printOption(0, "IS NOT", $sel_sidop);
-                echo "</select>\n";
+              echo "<td>IS\n";
+#                echo "<select name='int_sidop' id='int_sidop'>\n";
+#                  echo printOption(1, "IS", $sel_sidop);
+#                  echo printOption(0, "IS NOT", $sel_sidop);
+#                echo "</select>\n";
               echo "</td>\n";
               echo "<td>\n";
                 echo "<select name='int_sid' id='int_sid'>\n";
                   echo printOption(-1, $l['g_all'], $sel_sid);
                   while ($row = pg_fetch_assoc($result_sid)) {
-                    $sid = $row['sensorid'];
+                    $sid = $row['sid'];
                     $keyname = $row['keyname'];
                     $vlanid = $row['vlanid'];
                     $label = $row['label'];
                     $sensor = sensorname($keyname, $vlanid, $label);
-                    echo printOption($sid, $sensor, $sel_sid);
+                    if ($sensor == "unknown") {
+                      echo printOption("unknown", $sensor, $sel_sid);
+                    } else {
+                      echo printOption($sid, $sensor, $sel_sid);
+                    }
                   }
                 echo "</select><br />\n";
               echo "</td>\n";
@@ -265,58 +299,65 @@ echo "<div class='leftbig'>\n";
     echo "</div>\n"; #</actionBlock>
   echo "</div>\n"; #</block>
 echo "</div>\n"; #</leftsmall>
+} # STOP_NO_FLEXI
 
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>" .$l['me_syslog']. "</div>\n";
       echo "<div class='blockContent'>\n";
-        echo "<table class='datatable'>\n";
-          echo "<tr id='headerrow'>\n";
-            echo "<th width='80'>" .$l['ly_level']. "</th>\n";
-            echo "<th width='150'>" .$l['ly_ts']. "</th>\n";
-            echo "<th width='80'>" .$l['ly_source']. "</th>\n";
-            echo "<th width='400'>" .$l['ly_error']. "</th>\n";
-            echo "<th width='50'>" .$l['g_sensor']. "</th>\n";
-            echo "<th width='50'>" .$l['ly_dev']. "</th>\n";
-          echo "</tr>\n";
-          while ($row = pg_fetch_assoc($result)) {
-            $level = $v_syslog_levels_ar[$row['level']];
-            $ts = $row['timestamp'];
-            $ts = date("d-m-Y H:i:s", $ts);
-            $source = $row['source'];
-            $error = $row['error'];
-            $sid = $row['sensorid'];
-            $tap = $row['device'];
-            if ($sid != "") {
-              $sql_sid = "SELECT keyname, vlanid, label FROM sensors WHERE id = '$sid'";
-              $result_sid = pg_query($pgconn, $sql_sid);
-              $row_sid = pg_fetch_assoc($result_sid);
-              $keyname = $row_sid['keyname'];
-              $vlanid = $row_sid['vlanid'];
-              $label = $row_sid['label'];
-              $sensor = sensorname($keyname, $vlanid, $label);
-            }
+        if ($c_logsys_flexi == 1) {
+          echo "<div id='flexi'></div>\n";
+        } else {
+          echo "<table class='datatable'>\n";
+            echo "<tr id='headerrow'>\n";
+              echo "<th width='40'>" .$l['ly_level']. "</th>\n";
+              echo "<th width='110'>" .$l['ly_ts']. "</th>\n";
+              echo "<th width='120'>" .$l['ly_source']. "</th>\n";
+              echo "<th width='90'>" .$l['ly_error']. "</th>\n";
+              echo "<th width='350'>" .$l['ly_args']. "</th>\n";
+              echo "<th width='50'>" .$l['g_sensor']. "</th>\n";
+              echo "<th width='50'>" .$l['ly_dev']. "</th>\n";
+            echo "</tr>\n";
+            while ($row = pg_fetch_assoc($result)) {
+              $level = $v_syslog_levels_ar[$row['level']];
+              $ts = $row['timestamp'];
+              $ts = date($c_date_format, $ts);
+              $source = $row['source'];
+              $pid = $row['pid'];
+              $error = $row['error'];
+              $args = $row['args'];
+              $sid = $row['sid'];
+              $tap = $row['device'];
+              $vlanid = $row['vlanid'];
+              $keyname = $row['keyname'];
+              $sensor = sensorname($keyname, $vlanid);
 
-            echo "<tr class='syslogrow'>";
-              echo "<td class='syslog_$level'>$level</td>\n";
-              echo "<td>$ts</td>\n";
-              echo "<td>$source</td>\n";
-              echo "<td>$error</td>\n";
-              echo "<td><a href='sensordetails.php?int_sid=$sid'>$sensor</a></td>\n";
-              echo "<td>$tap</td>\n";
-            echo "</tr>";
-          }
-          echo "<tr id='edit_row'>\n";
-            echo "<td colspan='6' class='acenter'>";
-              echo "<a onclick='browsedata(\"start\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_stop_left.png' height=16 width=16 /></a>";
-              echo "<a onclick='browsedata(\"prev\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_left.png' height=16 width=16 /></a>";
-              echo "<span id='pagecounter'>0 - 20 from $count</span>";
-              echo "<a onclick='browsedata(\"next\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_right.png' height=16 width=16 /></a>";
-              echo "<a onclick='browsedata(\"end\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_stop_right.png' height=16 width=16 /></a>";
-            echo "</td>\n";
-          echo "</tr>\n";
-        echo "</table>\n";
+              echo "<tr class='syslogrow'>";
+                echo "<td class='syslog_$level'>$level</td>\n";
+                echo "<td>$ts</td>\n";
+                echo "<td>$source ($pid)</td>\n";
+                echo "<td>$error</td>\n";
+                echo "<td>$args</td>\n";
+                if ($sensor != "unknown") {
+                  echo "<td><a href='sensordetails.php?int_sid=$sid'>$sensor</a></td>\n";
+                } else {
+                  echo "<td>$sensor</td>\n";
+                }
+                echo "<td>$tap</td>\n";
+              echo "</tr>";
+            }
+            echo "<tr id='edit_row'>\n";
+              echo "<td colspan='6' class='acenter'>";
+                echo "<a onclick='browsedata(\"start\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_stop_left.png' height=16 width=16 /></a>";
+                echo "<a onclick='browsedata(\"prev\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_left.png' height=16 width=16 /></a>";
+                echo "<span id='pagecounter'>0 - 20 from $count</span>";
+                echo "<a onclick='browsedata(\"next\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_right.png' height=16 width=16 /></a>";
+                echo "<a onclick='browsedata(\"end\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");'><img src='images/new_arrow_stop_right.png' height=16 width=16 /></a>";
+              echo "</td>\n";
+            echo "</tr>\n";
+          echo "</table>\n";
+        }
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";
     echo "</div>\n"; #</dataBlock>
