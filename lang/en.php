@@ -141,6 +141,7 @@ $l['bh_filenames']      = "Filenames used";
 $l['bh_full']           = "Show full list";
 $l['bh_top10']          = "Show top 10";
 $l['bh_last_scanned']   = "Last scanned";
+$l['bh_upx']            = "UPX info";
 
 ##########################
 # detectedproto.php
@@ -284,12 +285,13 @@ $l['ls_graphit']        = "Graph it!";
 # logsys.php
 ##########################
 $l['ly_level']		= "Level";
-$l['ly_ts']		= "Timestamp";
+$l['ly_ts']		    = "Timestamp";
 $l['ly_source']		= "Source";
-$l['ly_error']		= "Message";
+$l['ly_error']		= "Class";
 $l['ly_sensorid']	= "Sensor ID";
 $l['ly_dev']		= "Device";
 $l['ly_default']	= "Set as Default";
+$l['ly_args']       = "Message";
 
 ##########################
 # maldownloaded.php
@@ -526,7 +528,7 @@ $l['sd_sensorside']     = "Sensor side";
 $l['sd_rip']            = "Remote IP";
 $l['sd_lip']            = "Local IP";
 $l['sd_sensormac']      = "MAC address";
-$l['sd_smac']  	 	= "Sensor MAC";
+$l['sd_smac']  	 	    = "Sensor MAC";
 $l['sd_serverside']     = "Server side";
 $l['sd_device']         = "Device";
 $l['sd_devmac']         = "Device MAC";
@@ -542,16 +544,16 @@ $l['sd_total']          = "Total log time";
 $l['sd_events']         = "Events";
 $l['sd_totalevents']    = "Total number of events";
 $l['sd_members']        = "Member of groups";
-$l['sd_version']        = "Sensor scripts";
-$l['sd_revision']       = "Scripts revision";
-$l['sd_netconf']	= "Netconfig";
-$l['sd_osv']		= "OS version";
+$l['sd_sensortype']	    = "Sensor type";
+$l['sd_networkconfig']  = "Network configuration";
+$l['sd_networkrev']     = "Revision";
+$l['sd_configtype']     = "Type";
 
 ##########################
 # sensorstatus.php
 ##########################
 $l['ss_label']          = "Label";
-$l['ss_config']         = "Config method";
+$l['ss_config']         = "Type";
 $l['ss_none']           = "None";
 $l['ss_reboot']         = "Reboot";
 $l['ss_sshoff']         = "SSH off";
