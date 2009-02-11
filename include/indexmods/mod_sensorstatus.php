@@ -127,7 +127,7 @@ echo "<div class='block'>\n";
           $diffupdate = 0;
           if ($lastupdate != "") {
             $diffupdate = $now - $lastupdate;
-            $lastupdate = date("d-m-Y H:i:s", $lastupdate);
+            $lastupdate = date($c_date_format, $lastupdate);
           }
           if ($q_org == 0) {
             $org = $row['org'];

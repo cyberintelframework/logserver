@@ -61,7 +61,7 @@ echo "<div class='block'>\n";
           $chk = date("w", $ls);
           $cur = date("w");
           $dif = $cur - $chk;
-          $ls = date("d-m-Y H:i:s", $ls);
+          $ls = date($c_date_format, $ls);
 
           echo "<tr>\n";
             echo "<td>";
