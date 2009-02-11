@@ -158,7 +158,7 @@ echo "<div class='centerbig'>\n";
               $vlanid = $row_cache['vlanid'];
               $sensorid = $row_cache['sid'];
               $man = $row_cache['manufacturer'];
-              $lastseen = date("d-m-Y H:i:s", $row_cache['last_seen']);
+              $lastseen = date($c_date_format, $row_cache['last_seen']);
               if ($vlanid != 0) {
                 $sensor = "$sensor-$vlanid";
               }
