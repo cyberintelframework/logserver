@@ -3,8 +3,8 @@
 
 ####################################
 # SURFids 2.10                     #
-# Changeset 003                    #
-# 03-03-2008                       #
+# Changeset 004                    #
+# 03-12-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 004 Fixed last scanned timestamp
 # 003 Fixed a bug with long virusnames
 # 002 Added last scanned timestamp
 # 001 Added language support
@@ -86,15 +87,18 @@ if ($err == 0) {
 }
 
 if ($err == 0) {
-  $sql_bindetail = "SELECT fileinfo, filesize, last_scanned FROM binaries_detail WHERE bin = $bin_id";
+  $sql_bindetail = "SELECT fileinfo, filesize, last_scanned, upx FROM binaries_detail WHERE bin = $bin_id";
   $result_bindetail = pg_query($pgconn, $sql_bindetail);
   $row_bindetail = pg_fetch_assoc($result_bindetail);
   $filesize = $row_bindetail['filesize'];
   $filesize = size_hum_read($filesize);
   $fileinfo = $row_bindetail['fileinfo'];
   $last_scanned = $row_bindetail['last_scanned'];
+  $upx = $row_bindetail['upx'];
   if ("$last_scanned" == "") {
     $last_scanned = $l['mr_never'];
+  } else {
+    $last_scanned = date($c_date_format, $last_scanned);
   }
 
   $sql_firstseen = "SELECT attacks.timestamp, details.* ";
@@ -104,7 +108,7 @@ if ($err == 0) {
   $result_firstseen = pg_query($pgconn, $sql_firstseen);
   $row_firstseen = pg_fetch_assoc($result_firstseen);
   $first_seen = $row_firstseen['timestamp'];
-  $first_seen = date("d-m-Y H:i:s", $first_seen);
+  $first_seen = date($c_date_format, $first_seen);
 
   $sql_lastseen = "SELECT attacks.timestamp, details.* ";
   $sql_lastseen .= "FROM attacks, details ";
@@ -113,7 +117,7 @@ if ($err == 0) {
   $result_lastseen = pg_query($pgconn, $sql_lastseen);
   $row_lastseen = pg_fetch_assoc($result_lastseen);
   $last_seen = $row_lastseen['timestamp'];
-  $last_seen = date("d-m-Y H:i:s", $last_seen);
+  $last_seen = date($c_date_format, $last_seen);
 
   $debuginfo[] = $sql_bindetail;
   $debuginfo[] = $sql_firstseen;
@@ -128,7 +132,7 @@ if ($err == 0) {
             echo "<tr>\n";
               echo "<td><b>" .$l['bh_binary']. "</b></td>";
               echo "<td>";
-                echo "$bin_name";
+                echo "$bin_name ";
                 if (file_exists("$c_surfidsdir/binaries/$bin_name") && $s_admin == 1 && $c_download_binaries == 1) {
                   echo "[<a href='download.php?md5_binname=$bin_name'>". $l['bh_download']. "</a>]\n";
                 }
@@ -138,7 +142,7 @@ if ($err == 0) {
               echo "<td><b>" .$l['bh_size']. "</b></td><td>$filesize</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>" .$l['g_info']. "</b></td><td>$fileinfo</td>\n";
+              echo "<td><b>" .$l['g_info']. "</b> " .printhelp("fileinfo"). "</td><td>$fileinfo</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td><b>" .$l['bh_first_seen']. "</b></td><td>$first_seen</td>\n";
@@ -148,6 +152,9 @@ if ($err == 0) {
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td><b>" .$l['bh_last_scanned']. "</b></td><td>$last_scanned</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td><b>" .$l['bh_upx']. "</b> " .printhelp("upx"). "</td><td>$upx</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</div>\n"; #</blockContent>
@@ -223,7 +230,7 @@ if ($err == 0) {
 
             while ($row = pg_fetch_assoc($result_binhist)) {
               $timestamp = $row['timestamp'];
-              $ts = date("d-m-Y H:i:s", $timestamp);
+              $ts = date($c_date_format, $timestamp);
               echo "<tr>\n";
                 echo "<td>$ts</td>\n";
                 while ($row_scanners = pg_fetch_assoc($result_getscanners)) {
