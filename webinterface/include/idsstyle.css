@@ -188,16 +188,16 @@ img {
 .block .actionBlock .sbutton {
   background-color:     #808080;
   color:                #FFF;
-  border:               0px;
+  border:               1px solid #808080;
   font-weight:          bold;
-  cursor:		pointer;
+  cursor:		        pointer;
 }
 .block .actionBlock .sbuttonneg {
   background-color:     #FFF;
   color:                #000;
   border:               1px solid #808080;
   font-weight:          bold;
-  cursor:		pointer;
+  cursor:		        pointer;
 }
 
 .block .actionBlock .blockHeader {
@@ -267,14 +267,14 @@ img {
   font-size:            12pt;
   border:               1px solid #FF7800;
   font-weight:          bold;
-  cursor:		pointer;
+  cursor:		        pointer;
 }
 .buttonneg {
   background-color:     #FFF;
   color:                #000;
   border:               1px solid #FF7800;
   font-weight:          bold;
-  cursor:		pointer;
+  cursor:		        pointer;
 }
 
 /*
@@ -830,27 +830,33 @@ option.starting {
 }
 
 #pagecounter {
-  vertical-align:	bottom;
+  vertical-align:	    bottom;
 }
 
 .syslog_Debug {
-  color:		green;
+  color:		        black;
+//  font-weight:          bold;
 }
 
 .syslog_Info {
-  color:		limegreen;
+  color:		        white;
+//  font-weight:          bold;
+  background-color:     green;
 }
 
 .syslog_Warning {
-  color:		orange;
+  color:		        white;
+  background-color:     orange;
 }
 
 .syslog_Error {
-  color:		red;
+  color:		        black;
+  background-color:     red;
 }
 
 .syslog_Critical {
-  color:		red;
+  color:		        black;
+  background-color:     red;
 }
 
 #adminmenu {
