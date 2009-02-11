@@ -229,6 +229,7 @@ function getepoch($stamp) {
 #   mac - mac address regexp
 #   date - date/time in the format of 22-08-98 21:45
 #   intcsv - Comma separated list of integers (1,23,5432,2)
+#   ascdesc - Accepts any of these values: ASC asc DESC desc
 # These checks should be prepended to the variable name separated by a _ character
 # Examples:
 # int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
@@ -341,6 +342,13 @@ function extractvars($source, $allowed) {
                 } elseif ($check == "intcsv") {
                   $intcsv_regexp = '/^([0-9]*,){1,}([0-9]){1,}$/';
                   if (preg_match($intcsv_regexp, $var)) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "ascdesc") {
+                  $ascdesc_regexp = '/(asc|ASC|desc|DESC)/';
+                  if (preg_match($ascdesc_regexp, $var)) {
                     $clean[$temp] = $var;
                   } else {
                     $tainted[$temp] = $var;
@@ -789,35 +797,22 @@ function delcookie($name) {
 
 # 3.23 sensorstatus
 # Function to calculate the actual sensor status
-function sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime, $perm = 0) {
+function sensorstatus($status, $lastupdate, $uptime, $perm = 0) {
   $diffupdate = 0;
   if ($lastupdate != "") {
-    $now = date("U");
-    $diffupdate = $now - $lastupdate;
-  } else {
-    $diffupdate = 0;
-    $lastupdate = 0;
+    $diffupdate = date("U") - $lastupdate;
   }
   if ($status == 3) {
+    # Disabled sensor
     $rtn = 3;
   } elseif ($perm == 1) {
+    # Permanent sensor
     $rtn = 2;
-  } elseif ($status == 1 && "$server_rev" != "$sensor_rev" && $server_rev_ts < $lastupdate) {
-    $rtn = 7;
-  } elseif ($status == 1 && $sensor_rev == 0 && $lastupdate != 0) {
-    $rtn = 7;
+  } elseif ($diffupdate > 360 && $status == 1) {
+    # Missing Keepalive
+    $rtn = 4;
   } else {
-    if (($netconf == "vlans" || $netconf == "static") && (empty($tapip) || $tapip == "")) {
-      $rtn = 5;
-    } elseif ($diffupdate <= 3600 && $status == 1 && !empty($tap)) {
-      $rtn = 1;
-    } elseif ($diffupdate > 3600 && $uptime > 3600 && $status == 1) {
-      $rtn = 4;
-    } elseif ($status == 1 && empty($tap)) {
-      $rtn = 6;
-    } else {
-      $rtn = $status;
-    }
+    $rtn = $status;
   }
   return $rtn;
 }
@@ -1093,21 +1088,11 @@ function printOption($value, $text, $val, $status = "") {
 
 # 5.13 show_log_message
 # Function to print out the sensor log message
-function show_log_message($ts, $log, $args) {
+function show_log_message($ts, $args) {
   if ("$ts" == "") {
     $ts = "00-00-0000 00:00:00";
   }
-  if ("$log" == "") {
-    $log = "Could not retrieve log message!";
-  }
-  if ($args != "") {
-    $args_ar = explode(",", $args);
-    foreach ($args_ar as $key => $val) {
-      $key += 1;
-      $log = str_replace("%$key", $val, $log);
-    }
-  }
-  $s = "[$ts] $log\n";
+  $s = "[$ts] $args\n";
   return $s;
 }
 

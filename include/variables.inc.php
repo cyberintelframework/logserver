@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFids 2.10                     #
-# Changeset 003                    #
+# Changeset 004                    #
 # 07-04-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Added Snort support
 # 003 Added new error message
 # 002 Added Last 24 Hours option for timeselector
 # 001 Added selview array
@@ -136,6 +137,7 @@ $v_severity_ar = array(
 $v_severity_atype_ar = array(
 		0 => "Nepenthes",
 		1 => "Argos",
+        2 => "Snort",
 		10 => "ARP Poisoning",
 		11 => "Rogue DHCP server"
 );
@@ -153,7 +155,8 @@ $v_attacktype_ar = array(
 		'20'	=> 'Module',
 		'22'	=> 'TCP Port',
 		'24'	=> 'UDP Port',
-		'30'	=> 'DHCP server identifier'
+		'30'	=> 'DHCP server identifier',
+        '40'    => 'Snort Message'
 );
 
 # Array with the different types of access for the search engine.
@@ -378,6 +381,10 @@ $v_help = array(
 		"arpcache" => "This is the ARP cache that the ARP module keeps track of. This ARP cache gets filled based on ARP queries and replies that are detected by the sensor.",
 		"arpmonitor" => "These are the MAC/IP pairs that are to be scanned by the ARP module. Whenever a change is detected that differs from these pairs, an alert is generated. Add the MAC/IP pair of your important servers in here. The scripts list is updated every $c_arp_static_refresh seconds."
 	),
+    binaryhist.php => array(
+        "upx" => "UPX is a well-known compression often used for malicious files. This shows the result of the UPX check.",
+        "fileinfo" => "The output of the linux program \\\"file\\\"."
+    ),
 	index.php => array(
 		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
 		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.",
@@ -456,11 +463,11 @@ $v_selector_period = array(
 
 # Array with the different types of logmessages
 $v_logmessages_type_ar = array(
-	10 => "Syslog",
-	20 => "Debug",
-	30 => "Info",
-	40 => "Warning",
-	50 => "Error"
+	0 => "Debug",
+	1 => "Info",
+	2 => "Warning",
+	3 => "Error",
+	4 => "Critical"
 );	
 
 # Array with the text messages and classes for the different status values of a sensor
@@ -501,6 +508,8 @@ $v_sensorstatus_ar = array(
 
 # Array with the textual representation of the different netconf values
 $v_sensornetconf_ar = array(
+    'vlan' => "VLAN",
+    'normal' => "Normal",
 	'dhcp' => "DHCP",
 	'vland' => "VLAN DHCP",
 	'static' => "Static",
