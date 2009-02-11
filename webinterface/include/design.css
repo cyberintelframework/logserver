@@ -671,6 +671,10 @@ body {
   z-index:		1;
 }
 
+.vtext {
+  margin-top:   3px;
+}
+
 /*
 .tabselect {
   float:		left;
