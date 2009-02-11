@@ -58,12 +58,20 @@ if ($selview == 9) {
   add_to_sql("deactivated_sensors", "table");
   add_to_sql("deactivated_sensors.*", "select");
 } else {
-  $or = "((netconf = 'vlans' OR netconf = 'static') AND tapip IS NULL AND NOT status = 3)";
-  add_to_sql("sensors.*", "select");
+  # Making sure no duplicate vlanids get selected
+  add_to_sql("DISTINCT vlanid", "select");
+  # Adding 1 of the keyname fields
+  add_to_sql("sensors.keyname as keyname", "select");
+  # Adding the sensor ID field
+  add_to_sql("sensors.id as sid", "select");
+  # Adding all necessary sensor_details fields
+  add_to_sql("remoteip, localip, sensortype, action, sensormac, lastupdate", "select");
+  # Adding all necessary sensors fields
+  add_to_sql("tap, tapip, mac, laststart, laststop, uptime, label, permanent, status, networkconfig", "select");
   if ($selview == "1") {
-    add_to_sql("(status = 0 OR $or)", "where");
+    add_to_sql("status = 0", "where");
   } elseif ($selview == "2") {
-    add_to_sql("(status = 1 OR $or)", "where");
+    add_to_sql("status > 0 AND NOT status = 3", "where");
   }
 
   if ($s_access_sensor < 9) {
@@ -84,6 +92,7 @@ prepare_sql();
 
 $sql_sensors = "SELECT $sql_select ";
 $sql_sensors .= " FROM $sql_from ";
+$sql_sensors .= " LEFT JOIN sensor_details ON sensors.keyname = sensor_details.keyname ";
 $sql_sensors .= " $sql_where ";
 $sql_sensors .= " ORDER BY $sql_order ";
 
@@ -214,12 +223,13 @@ echo "<div class='centerbig'>\n";
 
           while ($row = pg_fetch_assoc($result_sensors)) {
             $now = time();
-            $sid = $row['id'];
+            $sid = $row['sid'];
             $keyname = $row['keyname'];
             $label = $row['label'];
             $vlanid = $row['vlanid'];
             $sensor = sensorname($keyname, $vlanid);
-            $netconf = $row['netconf'];
+            $sensortype = $row['sensortype'];
+            $networkconfig = $row['networkconfig'];
 
             $tap = $row['tap'];
             $tapip = censorip($row['tapip']);
@@ -248,7 +258,7 @@ echo "<div class='centerbig'>\n";
             }
             $permanent = $row['permanent'];
 
-            $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $lastupdate, $netconf, $tap, $tapip, $uptime, $permanent);
+            $cstatus = sensorstatus($status, $lastupdate, $uptime, $permanent);
 
             echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview&md5_hash=$s_hash'>\n";
               echo "<tr>\n";
@@ -262,7 +272,7 @@ echo "<div class='centerbig'>\n";
                   echo "<td><a href='sensordetails.php?int_sid=$sid'>$label</a></td>\n";
                 }
                 if (array_key_exists("3", $pconf)) {
-                  echo "<td>" .$v_sensornetconf_ar["$netconf"]. "</td>\n";
+                  echo "<td>" .$v_sensornetconf_ar["$sensortype"]. "</td>\n";
                 }
                 if (array_key_exists("4", $pconf)) {
                   echo "<td>";
@@ -300,29 +310,21 @@ echo "<div class='centerbig'>\n";
                 }
                 # Tap IP address
                 if (array_key_exists("11", $pconf)) {
-                  if ($netconf == "dhcp" || $netconf == "" || $netconf == "vland") {
+#                  if ($networkconfig == "dhcp") {
                     if (empty($tapip)) {
                       echo "<td></td>\n";
                     } else {
                       echo "<td>$tapip</td>\n";
                     }
-                  } elseif ($netconf == "vlans") {
-                    echo "<td>";
-                      if ($s_access_sensor == 0) {
-                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
-                      } else {
-                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
-                      }
-                    echo "</td>\n";
-                  } else {
-                    echo "<td>";
-                      if ($s_access_sensor == 0) {
-                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
-                      } else {
-                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
-                      }
-                    echo "</td>\n";
-                  }
+#                  } else {
+#                    echo "<td>";
+#                      if ($s_access_sensor == 0) {
+#                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
+#                      } else {
+#                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
+#                      }
+#                    echo "</td>\n";
+#                  }
                 }
                 if ($s_access_sensor == 9) {
                   echo "<td><a onclick='arequest(\"xml_getcontact.php?int_orgid=$orgid&int_sid=$sid\", \"getcontact\");'>$org</a></td>\n";
