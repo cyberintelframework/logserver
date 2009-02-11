@@ -282,6 +282,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
 function insert_selector($o_show = 1, $t_show = 1) {
   global $s_org, $pgconn, $s_access_search, $s_access_sensor, $s_access_user, $v_selector_period, $c_startdayofweek, $_GET, $_POST;
   global $clean, $tainted, $to, $from, $to_date, $from_date, $q_org, $q_org_name, $c_debug_sql, $c_debug_input, $c_allow_global_debug, $l;
+  global $c_date_format_short;
   # Retrieving URL
   $url = $_SERVER['PHP_SELF'];
   $qs = urldecode($_SERVER['QUERY_STRING']);
@@ -361,8 +362,8 @@ function insert_selector($o_show = 1, $t_show = 1) {
   $_SESSION['s_to'] = $to;
   $_SESSION['s_from'] = $from;
   $_SESSION['q_org'] = $q_org;
-  $from_date = date("d-m-Y H:i", $from);
-  $to_date = date("d-m-Y H:i", $to);
+  $from_date = date($c_date_format_short, $from);
+  $to_date = date($c_date_format_short, $to);
 
   if ($o_show == 1 || $t_show == 1) {
   echo "<div id='selector'>\n";

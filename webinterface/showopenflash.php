@@ -326,8 +326,8 @@ if ($interval == 3600) {
 
 $from = $_SESSION['s_from'];
 $to = $_SESSION['s_to'];
-$textstart = date("d-m-Y H:i:s", $from);
-$textend = date("d-m-Y H:i:s", $to);
+$textstart = date($c_date_format, $from);
+$textend = date($c_date_format, $to);
 $tsstart = $from;
 $tsend = $to;
 $tsperiod = $tsend - $tsstart;
@@ -532,9 +532,9 @@ while ($i != $tssteps) {
   ###############################################
   $date = $tsstart + ($interval * $a);
   if ($interval == 3600) {
-    $datestring = date("d-m", $date) . " " . date("H", $date) . ":00";
+    $datestring = date($c_date_format_noyear, $date) . " " . date("H", $date) . ":00";
   } elseif ($interval == 86400) {
-    $datestring = date("d-m", $date);
+    $datestring = date($c_date_format_noyear, $date);
   } elseif ($interval == 604800) {
     $datestring = "Week " .date("W", $date);
   }

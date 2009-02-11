@@ -129,7 +129,7 @@ echo "<div class='centerbig'>\n";
             }
 
             if ( $lastlogin ) {
-              $lastlogin = date("d-m-Y H:i:s", $lastlogin);
+              $lastlogin = date($c_date_format, $lastlogin);
             } else {
               $lastlogin = "";
             }
