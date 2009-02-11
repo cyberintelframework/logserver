@@ -38,6 +38,7 @@
 # 4.05		printenv
 # 4.06		printattach
 # 4.07		utc
+# 4.08      prompt
 ###############################################
 
 # 2.01 getts
@@ -293,7 +294,7 @@ sub printenv() {
   close(ENVLOG);
 }
 
-# 4.07 printattach
+# 4.06 printattach
 # Function to print a line in a mail attachment
 sub printattach() {
   my ($msg, $attachfile);
@@ -306,7 +307,7 @@ sub printattach() {
   close(ATTACH);
 }
 
-# 4.08 utc
+# 4.07 utc
 # Function to modify a timestamp into a UTC timestamp
 # ie, it adds or substracts timezone difference and results in a UTC timestamp
 sub utc() {
@@ -321,6 +322,32 @@ sub utc() {
   }
 }
 
+# 4.08 prompt
+# Function to prompt the user for input
+sub prompt() {
+  my ($promptstring, $defaultvalue);
+  ($promptstring,$defaultvalue) = @_;
+  if ($defaultvalue) {
+    #print $promptstring, "[", $defaultvalue, "]: ";
+    print $promptstring;
+  } else {
+    $defaultvalue = "";
+    print $promptstring;
+  }
+  $| = 1;       # force a flush after our print
+  $_ = <STDIN>; # get the input from STDIN
 
+  chomp;
+
+  if ("$defaultvalue") {
+    if ($_ eq "") {
+      return $defaultvalue;
+    } else {
+      return $_;
+    }
+  } else {
+    return $_;
+  }
+}
 
 return "true";
