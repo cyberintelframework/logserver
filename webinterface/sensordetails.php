@@ -20,8 +20,7 @@
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_sid",
-		"int_logfilter",
+        "int_sid",
 		"strip_escape_html_label",
 		"int_m",
 		"int_dellabel",
@@ -38,17 +37,9 @@ if (isset($clean['sid'])) {
   $err = 1;
 }
 
-if (isset($clean['logfilter'])) {
-  $logfilter = $clean['logfilter'];
-} elseif (isset($c_logfilter)) {
-  $logfilter = $c_logfilter;
-} else {
-  $logfilter = 30;
-}
-
 if ($err == 0) {
   if ($s_access_sensor < 9) {
-    $sql = "SELECT id FROM sensors WHERE organisation = '$q_org'";
+    $sql = "SELECT id FROM sensors WHERE organisation = '$q_org' AND id = $sid ";
     $result = pg_query($pgconn, $sql);
     $num = pg_num_rows($result);
     if ($num == 0) {
@@ -81,9 +72,10 @@ if ($err == 0) {
       }
     }
   }
-  $sql_details = "SELECT keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
-  $sql_details .= " organisations.organisation, version, rev, sensormac, netconf, osv, permanent ";
-  $sql_details .= " FROM sensors, organisations WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
+  $sql_details = "SELECT sensors.keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
+  $sql_details .= " organisations.organisation, rev, sensormac, sensortype, mainconf, sensortype, permanent ";
+  $sql_details .= " FROM sensors, organisations, sensor_details WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
+  $sql_details .= " AND sensors.keyname = sensor_details.keyname ";
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
   $num = pg_num_rows($result_details);
@@ -98,57 +90,50 @@ if (isset($clean['m'])) {
 }
 
 if ($err != 1) {
-  $netconf_ar = array(
-	'dhcp' => "DHCP",
-	'static' => "Static",
-	'vland' => "VLAN DHCP",
-	'vlans' => "VLAN Static"
-  );
-
   $row = pg_fetch_assoc($result_details);
 
+  # Name
   $keyname = $row['keyname'];
   $vlanid = $row['vlanid'];
   $sensor = sensorname($keyname, $vlanid);
   $label = $row['label'];
+  $org = $row['organisation'];
+  $sensor_rev = $row['rev'];
+
+  # Sensor side
   $remote = $row['remoteip'];
   $local = $row['localip'];
-  $netconf = $row['netconf'];
-  $netconf_t = $netconf_ar[$netconf];
+  $sensormac = $row['sensormac'];
+  $sensortype = $row['sensortype'];
+  $mainconf = $row['mainconf'];
+  $configtype = "dhcp";
+  if ($mainconf != "dhcp") {
+    $configtype = "static";
+  }
+
+  # Server side
   $tap = $row['tap'];
   $tapip = $row['tapip'];
   $mac = $row['mac'];
+
+  # Status
   $start = $row['laststart'];
-  $start_text = date("d-m-Y H:i:s", $start);
+  $start_text = date($c_date_format, $start);
   $stop = $row['laststop'];
-  $stop_text = date("d-m-Y H:i:s", $stop);
+  $stop_text = date($c_date_format, $stop);
   $update = $row['lastupdate'];
-  $update_text = date("d-m-Y H:i:s", $update);
-  $totaltime_text = sec_to_string($totaltime);
+  $update_text = date($c_date_format, $update);
+  $status = $row['status'];
+  $permanent = $row['permanent'];
+  $cstatus = sensorstatus($status, $update, $uptime, $permanent);
+
+  # Uptime
   if ($start != "") {
     $uptime = date("U") - $start;
   } else {
     $uptime = 0;
   }
   $uptime_text = sec_to_string($uptime);
-  $status = $row['status'];
-  $org = $row['organisation'];
-  $sensor_rev = $row['rev'];
-  $version = $row['version'];
-  $sensormac = $row['sensormac'];
-  $osv = $row['osv'];
-
-  # Fetching server updates revision
-  $sql_rev = "SELECT value, timestamp FROM serverinfo WHERE name = 'updaterev'";
-  $debuginfo[] = $sql_rev;
-  $result_rev = pg_query($pgconn, $sql_rev);
-  $row_rev = pg_fetch_assoc($result_rev);
-  $server_rev = $row_rev['value'];
-  $server_rev_ts = $row_rev['timestamp'];
-
-  $permanent = $row['permanent'];
-
-  $cstatus = sensorstatus($server_rev, $sensor_rev, $status, $server_rev_ts, $update, $netconf, $tap, $tapip, $uptime, $permanent);
 
   $sql_attack = "SELECT timestamp FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
   $debuginfo[] = $sql_attack;
@@ -157,7 +142,7 @@ if ($err != 1) {
   if ($num_attack > 0) {
     $row_attack = pg_fetch_assoc($result_attack);
     $first_attack = $row_attack['timestamp'];
-    $first_attack = date("d-m-Y H:i:s", $first_attack);
+    $first_attack = date($c_date_format, $first_attack);
   } else {
     $first_attack = "";
   }
@@ -223,6 +208,20 @@ if ($err != 1) {
               echo "<td>" .$l['g_domain']. ":</td>\n";
               echo "<td colspan='3'>$org</td>\n";
             echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_sensortype']. ":</td>\n";
+              echo "<td colspan='3'>$sensortype</td>\n";
+            echo "</tr>\n";
+            echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
+            echo "<tr><th colspan='4'>" .$l['sd_networkconfig']. "</th></tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_networkrev']. ":</td>\n";
+              echo "<td colspan='3'>$sensor_rev</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_configtype']. ":</td>\n";
+              echo "<td colspan='3'>$configtype</td>\n";
+            echo "</tr>\n";
             echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='4'>" .$l['sd_sensorside']. "</th></tr>\n";
             echo "<tr>\n";
@@ -236,14 +235,6 @@ if ($err != 1) {
             echo "<tr>\n";
               echo "<td>" .$l['sd_sensormac']. ":</td>\n";
               echo "<td colspan='3'>$sensormac</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_netconf']. ":</td>\n";
-              echo "<td colspan='3'>$netconf_t</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_osv']. ":</td>\n";
-              echo "<td colspan='3'>$osv</td>\n";
             echo "</tr>\n";
             echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='4'>" .$l['sd_serverside']. "</th></tr>\n";
@@ -259,30 +250,6 @@ if ($err != 1) {
               echo "<td>" .$l['sd_devip']. ":</td>\n";
               echo "<td colspan='3'>$tapip</td>\n";
             echo "</tr>\n";
-            echo "<tr><td colspan='4'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='4'>" .$l['sd_status']. "</th></tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_started']. ":</td>\n";
-              echo "<td colspan='3'>$start_text</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_stopped']. ":</td>\n";
-              echo "<td colspan='3'>$stop_text</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_updated']. ":</td>\n";
-              echo "<td colspan='3'>$update_text</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_status']. ":</td>\n";
-              echo "<td colspan='3'>";
-                echo "<div class='sensorstatus'>";
-                  echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
-                    echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
-                  echo "</div>\n";
-                echo "</div>";
-              echo "</td>\n";
-            echo "</tr>\n";
           echo "</table>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
@@ -291,6 +258,78 @@ if ($err != 1) {
 #  echo "</div>\n"; #</leftmed>
 
 #  echo "<div class='leftmed'>\n";
+  echo "</div>\n"; #</leftmed>
+
+  if ($vlanid == 0) {
+    $sql_count = "SELECT COUNT(id) as total FROM syslog WHERE keyname = '$keyname' AND vlanid = 0";
+  } else {
+    $sql_count = "SELECT COUNT(id) as total FROM syslog WHERE keyname = '$keyname' AND (vlanid = 0 OR vlanid = $vlanid)";
+  }
+  $debuginfo[] = $sql_count;
+  $result_count = pg_query($pgconn, $sql_count);
+  $rowcount = pg_fetch_assoc($result_count);
+  $num_events = $rowcount['total'];
+
+  $sql_events = "SELECT timestamp, ts_to_epoch(timestamp) as ts, source, error, args, level, device, pid, vlanid ";
+  $sql_events .= " FROM syslog WHERE keyname = '$keyname' AND ";
+  if ($vlanid == 0) {
+    $sql_events .= " vlanid = 0 ";
+  } else {
+    $sql_events .= " (vlanid = 0 OR vlanid = $vlanid) ";
+  }
+  $sql_events .= " AND level >= 1 ";
+  $sql_events .= " ORDER BY timestamp DESC";
+  $debuginfo[] = $sql_events;
+  $result_events = pg_query($pgconn, $sql_events);
+
+  echo "<div class='rightmed'>\n";
+    echo "<div class='block'>\n";
+      echo "<div class='dataBlock'>\n";
+        echo "<div class='blockHeader'>" .$l['sd_sensorlog']. "</div>\n";
+        echo "<div class='blockContent'>\n";
+          echo "<table class='datatable'>\n";
+            echo "<tr>\n";
+              echo "<th colspan='2'>" .$l['sd_uptime']. "</th>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td width='150'>" .$l['sd_since']. ":</td>\n";
+              echo "<td width='320'>$first_attack</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_uptime']. ":</td>\n";
+              echo "<td><span id='js_uptime'>$uptime_text</span></td>\n";
+            echo "</tr>\n";
+            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
+            echo "<tr><th colspan='2'>" .$l['sd_status']. "</th></tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_started']. ":</td>\n";
+              echo "<td>$start_text</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_stopped']. ":</td>\n";
+              echo "<td>$stop_text</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_updated']. ":</td>\n";
+              echo "<td>$update_text</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_status']. ":</td>\n";
+              echo "<td>";
+                echo "<div class='sensorstatus'>";
+                  echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
+                    echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
+                  echo "</div>\n";
+                echo "</div>";
+              echo "</td>\n";
+            echo "</tr>\n";
+          echo "</table>\n";
+          echo "<input type='hidden' name='js_hiduptime' id='js_hiduptime' value='$uptime' />\n";
+        echo "</div>\n"; #</blockContent>
+        echo "<div class='blockFooter'></div>\n";
+      echo "</div>\n"; #</dataBlock>
+    echo "</div>\n"; #</block>
+
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>" .$l['sd_members']. "</div>\n";
@@ -318,24 +357,9 @@ if ($err != 1) {
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
-  echo "</div>\n"; #</leftmed>
+  echo "</div>\n"; #</rightmed>
 
-  $sql_count = "SELECT COUNT(id) as total FROM sensors_log WHERE sensorid = '$sid'";
-  $debuginfo[] = $sql_count;
-  $result_count = pg_query($pgconn, $sql_count);
-  $rowcount = pg_fetch_assoc($result_count);
-  $num_events = $rowcount['total'];
-
-  $sql_events = "SELECT logmessages.log, sensors_log.timestamp, sensors_log.args FROM sensors_log, logmessages WHERE sensors_log.sensorid = '$sid' ";
-  $sql_events .= " AND sensors_log.logid = logmessages.id ";
-  if ($logfilter != -1) {
-    $sql_events .= " AND logmessages.type >= $logfilter ";
-  }
-  $sql_events .= " ORDER BY sensors_log.timestamp DESC";
-  $debuginfo[] = $sql_events;
-  $result_events = pg_query($pgconn, $sql_events);
-
-  echo "<div class='rightmed'>\n";
+  echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>" .$l['sd_sensorlog']. "</div>\n";
@@ -343,50 +367,24 @@ if ($err != 1) {
           echo "<form name='sensorlog'>\n"; 
           echo "<input type='hidden' name='int_sid' value='$sid' />\n";
           echo "<table class='datatable'>\n";
-            echo "<tr>\n";
-              echo "<th colspan='2'>" .$l['sd_uptime']. "</th>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td width='150'>" .$l['sd_since']. ":</td>\n";
-              echo "<td width='320'>$first_attack</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_total']. ":</td>\n";
-              echo "<td><span id='js_total'>$totaltime_text</span></td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_uptime']. ":</td>\n";
-              echo "<td><span id='js_uptime'>$uptime_text</span></td>\n";
-            echo "</tr>\n";
-            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
-            echo "<tr><th colspan='2'>" .$l['sd_version']. "</th></tr>\n";
-            echo "<tr>\n";
-              echo "<td>" .$l['sd_revision']. ":</td>\n";
-              echo "<td>$sensor_rev</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-              echo "<td colspan='2'>\n";
-                $version_ar = split(",", $version);
-                echo "<textarea id='version'>";
-                  foreach ($version_ar as $key => $a_ver) {
-                    print "$a_ver\n";
-                  }
-                echo "</textarea>\n";
-              echo "</td>\n";
-            echo "</tr>\n";
-            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
             echo "<tr><th colspan='2'>" .$l['sd_events']. "</th></tr>\n";
             echo "<tr>\n";
-              echo "<td>" .$l['sd_totalevents']. ":</td>\n";
-              echo "<td>";
-                echo "<div class='fleft'><div class='text'>$num_events</div></div>\n";
+              echo "<td width='20%'>" .$l['sd_totalevents']. ":</td>\n";
+              echo "<td width='80%'>";
+#                echo "<div class='fleft'><div class='text'>$num_events</div></div>\n";
+                echo "<div class='fleft'><div class='vtext'>$num_events</div></div>\n";
                 echo "<div class='aright'>";
-                  echo "<select name='int_logfilter' class='smallselect' onchange='document.sensorlog.submit();'>";
-                    echo printOption(-1, $l['g_all'], $logfilter);
-                    foreach ($v_logmessages_type_ar as $key => $val) {
-                      echo printOption($key, "$val", $logfilter);
-                    }
-                  echo "</select>\n";
+                  echo "<input type='button' name='reloadlog' onclick='reload_sensor_log();' value='Reload' class='button' />\n";
+#                  echo "<select name='int_logfilter' class='smallselect' onchange='document.sensorlog.submit();' style='height: 16px;'>";
+#                    echo printOption(-1, $l['g_all'], $logfilter);
+#                    foreach ($v_logmessages_type_ar as $key => $val) {
+#                      if ($s_access_sensor < 9 && $key != 0) {
+#                        echo printOption($key, "$val", $logfilter);
+#                      } elseif ($s_access_sensor == 9) {
+#                        echo printOption($key, "$val", $logfilter);
+#                      }
+#                    }
+#                  echo "</select>\n";
                 echo "</div>\n";
               echo "</td>\n";
             echo "</tr>\n";
@@ -394,24 +392,21 @@ if ($err != 1) {
               echo "<td colspan='2'>\n";
                 echo "<textarea id='eventlog'>";
                   while ($row_events = pg_fetch_assoc($result_events)) {
-                    $ev_timestamp = $row_events['timestamp'];
-                    $ev_timestamp = date("d-m-Y H:i:s", $ev_timestamp);
-                    $ev_log = $row_events['log'];
+                    $ev_timestamp = $row_events['ts'];
+                    $ev_timestamp = date($c_date_format, $ev_timestamp);
                     $ev_args = $row_events['args'];
-                    echo show_log_message($ev_timestamp, $ev_log, $ev_args);
+                    echo show_log_message($ev_timestamp, $ev_args);
                   }
                 echo "</textarea>\n";
               echo "</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
           echo "</form>\n";
-          echo "<input type='hidden' name='js_hidtotal' id='js_hidtotal' value='$totaltime' />\n";
-          echo "<input type='hidden' name='js_hiduptime' id='js_hiduptime' value='$uptime' />\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
-  echo "</div>\n"; #</rightmed>
+  echo "</div>\n"; #</centerbig>
 
   echo "<script>\n";
   echo "startclock();\n";
