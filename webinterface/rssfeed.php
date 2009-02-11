@@ -58,7 +58,8 @@ $hour = (60 * $minute);
 $day = (24 * $hour);
 $week = (7 * $day);
 
-$sql_check = "SELECT id, organisation FROM login WHERE username = '$user'";
+$sql_check = "SELECT login.id as uid, organisations.id as oid, organisations.organisation FROM login, organisations ";
+$sql_check .= " WHERE login.organisation = organisations.id AND username = '$user'";
 $debuginfo[] = $sql_check;
 $result_check = pg_query($pgconn, $sql_check);
 $numrows_check = pg_numrows($result_check);
@@ -68,9 +69,10 @@ if ($numrows_check == 0) {
   $info = "Unauthorized to view this page!";
 } else {
   $row_check = pg_fetch_assoc($result_check);
-  $uid = $row_check['id'];
-  $org = $row_check['organisation'];
-  if ($org == "ADMIN") {
+  $uid = $row_check['uid'];
+  $org = $row_check['oid'];
+  $orgname = $row_check['organisation'];
+  if ($orgname == "ADMIN") {
     $s_admin = 1;
   } else {
     $s_admin = 0;
@@ -109,7 +111,7 @@ if ($err == 0) {
   ################################
   # General RSS stuff
   ################################
-  $time = date("d-m-Y H:i:s");
+  $time = date($c_date_format);
   $rss_channel = new rssGenerator_channel();
   $rss_channel->title = "SURF IDS RSS Feed";
   $rss_channel->link = "$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid";
@@ -167,7 +169,7 @@ if ($err == 0) {
     # IP Exclusion stuff
     $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
     # MAC Exclusion stuff
-    $sql .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))" ;
+    $sql .= " AND (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl))" ;
 
     $sql .= " $andorg $andsensor $andsev ";
     $sql .= " ORDER BY attacks.id DESC ";
@@ -360,7 +362,7 @@ if ($err == 0) {
   ################################
   # General RSS stuff
   ################################
-  $time = date("d-m-Y H:i:s");
+  $time = date($c_date_format);
   $rss_channel = new rssGenerator_channel();
   $rss_channel->title = "SURF IDS RSS Feed";
   $rss_channel->link = "$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid";
