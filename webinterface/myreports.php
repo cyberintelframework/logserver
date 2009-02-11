@@ -187,8 +187,8 @@ if ($s_access_user > 0) {
                 if ($int != -1) {
                   $freqstring = sec_to_string($int, 3);
                 } elseif ($from_ts != -1 && $to_ts != -1) {
-                  $from_date = date("d-m-Y", $from_ts);
-                  $to_date = date("d-m-Y", $to_ts);
+                  $from_date = date($c_date_format_notime, $from_ts);
+                  $to_date = date($c_date_format_notime, $to_ts);
                   $freqstring = "$from_date - $to_date";
                 } else {
                   $freqstring = "N/A";
@@ -205,7 +205,7 @@ if ($s_access_user > 0) {
               if ($last_sent == null) {
                 $last_sent = "<i>" .$l['mr_never']. "</i>";
               } else {
-                $last_sent = date("d-m-Y H:i", $last_sent);
+                $last_sent = date($c_date_format_short, $last_sent);
               }
 
               if ($detail > 9) {
