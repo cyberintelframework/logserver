@@ -150,12 +150,16 @@ if (isset($clean['sid'])) {
 }
 if ($err != 1) {
   $action_pattern = '/^(IGNORE|UNIGNORE)$/';
+  $active_pattern = '/^(ACTIVATE|DEACTIVATE)$/';
   if (!preg_match($action_pattern, $action)) {
     $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE keyname = '$keyname'";
     $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
     if ($m == "") {
       $m = 3;
     }
+  } elseif (preg_match($active_pattern, $action)) {
+    pg_close($pgconn);
+    header("location: movesensor.php?int_sid=$sid");
   } else {
     if ($action == "IGNORE") {
       if ($status != 1) {

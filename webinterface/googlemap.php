@@ -36,56 +36,53 @@ echo "<div class='blockHeader'>\n";
 echo "</div>\n";
 echo "<div class='blockContent'>\n";
 echo "<div id='map' style='width: 890px; height: 400px'></div>\n";
-echo "<script src='include/jquery.jmap2.js' type='text/javascript'></script>";
+echo "<script src='include/jquery.jmap.js' type='text/javascript'></script>";
 echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=$c_googlemap_key' type='text/javascript'></script>";
 ?>
 <script type="text/javascript">
 $('#search_wait').html("<?php echo "<center>" .$l['gm_setting']. "<br /><br />" .$l['gm_patient']. ".<br /></center>" ?>");
-var yellowicon = $.jmap.createIcon({
-        image: "http://labs.google.com/ridefinder/images/mm_20_yellow.png",
-        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
-        iconSize : new GSize(12, 20),
-        shadowSize : new GSize(22, 20),
-        iconAnchor : new GPoint(6, 20),
-        infoWindowAnchor : new GPoint(5, 1),
-        infoShadowAnchor : new GPoint(5, 1)
+
+$('#map').jmap('init', {
+        'mapZoom': 2,
+        'mapShowOverview': false,
+        'mapControlSize': 'large',
+        'mapDimensions': [900,400]
 });
 
-var orangeicon = $.jmap.createIcon({
-        image: "http://labs.google.com/ridefinder/images/mm_20_orange.png",
-        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+var yellowicon = Mapifies.createIcon ({
+        iconImage: "http://labs.google.com/ridefinder/images/mm_20_yellow.png",
+        iconShadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
         iconSize : new GSize(12, 20),
-        shadowSize : new GSize(22, 20),
+        iconShadowSize : new GSize(22, 20),
         iconAnchor : new GPoint(6, 20),
-        infoWindowAnchor : new GPoint(5, 1),
-        infoShadowAnchor : new GPoint(5, 1)
+        iconInfoWindowAnchor : new GPoint(5, 1)
 });
 
-var redicon = $.jmap.createIcon({
-        image: "http://labs.google.com/ridefinder/images/mm_20_red.png",
-        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+var orangeicon = Mapifies.createIcon ({
+        iconImage: "http://labs.google.com/ridefinder/images/mm_20_orange.png",
+        iconShadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
         iconSize : new GSize(12, 20),
-        shadowSize : new GSize(22, 20),
+        iconShadowSize : new GSize(22, 20),
         iconAnchor : new GPoint(6, 20),
-        infoWindowAnchor : new GPoint(5, 1),
-        infoShadowAnchor : new GPoint(5, 1)
+        iconInfoWindowAnchor : new GPoint(5, 1)
 });
 
-var blackicon = $.jmap.createIcon({
-        image: "http://labs.google.com/ridefinder/images/mm_20_black.png",
-        shadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+var redicon = Mapifies.createIcon ({
+        iconImage: "http://labs.google.com/ridefinder/images/mm_20_red.png",
+        iconShadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
         iconSize : new GSize(12, 20),
-        shadowSize : new GSize(22, 20),
+        iconShadowSize : new GSize(22, 20),
         iconAnchor : new GPoint(6, 20),
-        infoWindowAnchor : new GPoint(5, 1),
-        infoShadowAnchor : new GPoint(5, 1)
+        iconInfoWindowAnchor : new GPoint(5, 1)
 });
 
-$('#map').jmap({
-	mapZoom: 2,
-	mapShowOverview: false,
-	mapControlSize: "large",
-	mapDimensions: [900,400]
+var blackicon = Mapifies.createIcon ({
+        iconImage: "http://labs.google.com/ridefinder/images/mm_20_black.png",
+        iconShadow: "http://labs.google.com/ridefinder/images/mm_20_shadow.png",
+        iconSize : new GSize(12, 20),
+        iconShadowSize : new GSize(22, 20),
+        iconAnchor : new GPoint(6, 20),
+        iconInfoWindowAnchor : new GPoint(5, 1)
 });
 
 </script>
@@ -146,20 +143,19 @@ $.ajax({
       msg = msg+"</small>";
 
       if (count <= 5) {
-        var icon = yellowicon;
+        var picon = yellowicon;
       } else if (count <= 25) {
-        var icon = orangeicon;
+        var picon = orangeicon;
       } else if (count <= 250) {
-        var icon = redicon;
+        var picon = redicon;
       } else {
-        var icon = blackicon;
+        var picon = blackicon;
       }
 
-      $('#map').addMarker({
-        pointLat: lat,
-        pointLng: lng,
+      $('#map').jmap('AddMarker', {
+        pointLatLng: [lat, lng],
         pointHTML: msg,
-        icon: icon
+        pointIcon: picon
       });
     });
     $('#search_wait').toggle();

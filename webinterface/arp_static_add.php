@@ -40,8 +40,9 @@ $allowed_post = array(
                 "mac_macaddr",
                 "ip_ipaddr",
                 "int_sid",
-		"md5_hash",
-		"type"
+    	    	"md5_hash",
+	    	    "type",
+                "int_all"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -98,14 +99,14 @@ if ($err == 0) {
   } 
 }
 if ($q_org != 0) {
-$sql = "SELECT keyname FROM sensors WHERE id = $sid AND organisation = $q_org";
-$debuginfo[] = $sql;
-$result_user = pg_query($pgconn, $sql);
-$rows = pg_num_rows($result_user);
-if ($rows == 0) {
-  $err = 1;
-  $m = 101;
-} 
+  $sql = "SELECT keyname FROM sensors WHERE id = $sid AND organisation = $q_org";
+  $debuginfo[] = $sql;
+  $result_user = pg_query($pgconn, $sql);
+  $rows = pg_num_rows($result_user);
+  if ($rows == 0) {
+    $err = 1;
+    $m = 101;
+  }
 }
 if ($err != 1) {
   $sql_check = "SELECT mac FROM arp_static WHERE mac = '$mac' AND sensorid = '$sid' AND ip = '$ip' ";
@@ -118,27 +119,79 @@ if ($err != 1) {
   }
 }
 
+if (isset($clean['all'])) {
+  $all = $clean['all'];
+} else {
+  $all = 0;
+}
+
 if ($err != 1) {
-  # No errors found, insert record (including the host type)
-  $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
-  $sql .= "VALUES ('$ip', '$mac', '$sid')";
-  $debuginfo[] = $sql;
-  $execute = pg_query($pgconn, $sql);
-
-  if (isset($tainted['type'])) {
-    $type = $tainted['type'];
-    $sql = "SELECT id FROM arp_static WHERE ip = '$ip' AND mac = '$mac' AND sensorid = '$sid'";
+  if ($all == 0) {
+    # No errors found, insert record (including the host type)
+    $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
+    $sql .= "VALUES ('$ip', '$mac', '$sid')";
     $debuginfo[] = $sql;
-    $result = pg_query($pgconn, $sql);
-    $row = pg_fetch_assoc($result);
-    $id = $row['id'];
+    $execute = pg_query($pgconn, $sql);
 
-    foreach ($type as $key => $val) {
-      $pattern = '/^(1|2|3|4)$/';
-      if (preg_match($pattern, $val)) {
-        $sql = "INSERT INTO sniff_hosttypes (staticid, type) VALUES ('$id', '$val')";
+    if (isset($tainted['type'])) {
+      $type = $tainted['type'];
+      $sql = "SELECT id FROM arp_static WHERE ip = '$ip' AND mac = '$mac' AND sensorid = '$sid'";
+      $debuginfo[] = $sql;
+      $result = pg_query($pgconn, $sql);
+      $row = pg_fetch_assoc($result);
+      $id = $row['id'];
+
+      foreach ($type as $key => $val) {
+        $pattern = '/^(1|2|3|4)$/';
+        if (preg_match($pattern, $val)) {
+          $sql = "INSERT INTO sniff_hosttypes (staticid, type) VALUES ('$id', '$val')";
+          $debuginfo[] = $sql;
+          $execute = pg_query($pgconn, $sql);
+        }
+      }
+    }
+  } else {
+    $sql_getkey = "SELECT keyname FROM sensors WHERE id = '$sid'";
+    $debuginfo[] = $sql_getkey;
+    $result = pg_query($pgconn, $sql_getkey);
+    $row = pg_fetch_assoc($result);
+    $keyname = $row['keyname'];
+    if ($keyname != "") {
+      # Get all the VLAN's of the specific keyname
+      $sql_vlan = "SELECT id FROM sensors WHERE keyname = '$keyname'";
+      $debuginfo[] = $sql_getvlan;
+      $result_vlan = pg_query($pgconn, $sql_vlan);
+      while ($row_vlan = pg_fetch_assoc($result_vlan)) {
+        $mysid = $row_vlan['id'];
+
+        ###########################
+        # Do all the usual arp_static stuff
+        ###########################
+
+        # No errors found, insert record (including the host type)
+        $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
+        $sql .= "VALUES ('$ip', '$mac', '$mysid')";
         $debuginfo[] = $sql;
         $execute = pg_query($pgconn, $sql);
+
+        if (isset($tainted['type'])) {
+          $type = $tainted['type'];
+          $sql = "SELECT id FROM arp_static WHERE ip = '$ip' AND mac = '$mac' AND sensorid = '$mysid'";
+          $debuginfo[] = $sql;
+          $result = pg_query($pgconn, $sql);
+          $row = pg_fetch_assoc($result);
+          $id = $row['id'];
+
+          foreach ($type as $key => $val) {
+            $pattern = '/^(1|2|3|4)$/';
+            if (preg_match($pattern, $val)) {
+              $sql = "INSERT INTO sniff_hosttypes (staticid, type) VALUES ('$id', '$val')";
+              $debuginfo[] = $sql;
+              $execute = pg_query($pgconn, $sql);
+            }
+          }
+        }
+        ################ END #########
       }
     }
   }
@@ -148,6 +201,6 @@ if ($err != 1) {
 
 # Close connection and redirect
 pg_close($pgconn);
-#debug_sql();
+debug_sql();
 header("location: arp_static.php?int_m=$m&int_sid=$sid");
 ?>

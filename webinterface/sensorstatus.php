@@ -213,12 +213,9 @@ echo "<div class='centerbig'>\n";
               echo "<th>" .printsort($l['g_domain'], "org"). "</th>\n";
             }
             if ($s_access_sensor > 0) {
-              echo "<th>" .$l['g_action']. "</th>\n";
+              echo "<th>" .$l['g_action']. " " .printhelp(1, $sid). "</th>\n";
             }
             echo "<th></th>\n";
-            if ($s_admin == 1) {
-              echo "<th></th>\n";
-            }
           echo "</tr>\n";
 
           while ($row = pg_fetch_assoc($result_sensors)) {
@@ -310,41 +307,36 @@ echo "<div class='centerbig'>\n";
                 }
                 # Tap IP address
                 if (array_key_exists("11", $pconf)) {
-#                  if ($networkconfig == "dhcp") {
                     if (empty($tapip)) {
                       echo "<td></td>\n";
                     } else {
                       echo "<td>$tapip</td>\n";
                     }
-#                  } else {
-#                    echo "<td>";
-#                      if ($s_access_sensor == 0) {
-#                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' disabled />\n";
-#                      } else {
-#                        echo "<input type='text' name='ip_tapip' value='$tapip' size='14' class='sensorinput' />\n";
-#                      }
-#                    echo "</td>\n";
-#                  }
                 }
                 if ($s_access_sensor == 9) {
-                  echo "<td><a onclick='arequest(\"xml_getcontact.php?int_orgid=$orgid&int_sid=$sid\", \"getcontact\");'>$org</a></td>\n";
+                  echo "<td><a href='getcontact.php?int_sid=$sid&int_orgid=$orgid' class='jTip' name='$org' id='contact${sid}'>$org</a></td>\n";
                 }
                 if ($s_access_sensor > 0) {
                   echo "<td>\n";
                     echo "<input type='hidden' name='int_vlanid' value='$vlanid' />\n";
                     echo "<input type='hidden' name='int_sid' value='$sid' />\n";
                     echo "<select name='action'>\n";
-                      echo "" . printOption("NONE", $l['ss_none'], $action) . "\n";
-                      echo "" . printOption("REBOOT", $l['ss_reboot'], $action) . "\n";
-                      echo "" . printOption("SSHOFF", $l['ss_sshoff'], $action) . "\n";
-                      echo "" . printOption("SSHON", $l['ss_sshon'], $action) . "\n";
-                      echo "" . printOption("STOP", $l['ss_stop'], $action) . "\n";
-                      echo "" . printOption("START", $l['ss_start'], $action) . "\n";
-                      echo "" . printOption("DISABLE", $l['ss_disable'], $action) . "\n";
-                      echo "" . printOption("ENABLE", $l['ss_enable'], $action) . "\n";
-                      echo "" . printOption("IGNORE", $l['ss_ignore'], $action) . "\n";
-                      echo "" . printOption("UNIGNORE", $l['ss_unignore'], $action) . "\n";
-                      if ($arp == 1) {
+                      echo printOption("NONE", $l['ss_none'], $action);
+                      echo printOption("REBOOT", $l['ss_reboot'], $action);
+                      echo printOption("SSHOFF", $l['ss_sshoff'], $action);
+                      echo printOption("SSHON", $l['ss_sshon'], $action);
+                      echo printOption("STOP", $l['ss_stop'], $action);
+                      echo printOption("START", $l['ss_start'], $action);
+                      echo printOption("IGNORE", $l['ss_ignore'], $action);
+                      echo printOption("UNIGNORE", $l['ss_unignore'], $action);
+                      if ($s_access_sensor > 2) {
+                        if ($selview == 9) {
+                          echo printOption("ACTIVATE", $l['ss_activate'], $action);
+                        } else {
+                          echo printOption("DEACTIVATE", $l['ss_deactivate'], $action);
+                        }
+                      }
+                      if ($arp == 1 && $s_access_sensor > 1) {
                         echo "" . printOption("DISABLEARP", $l['ss_disable_arp'], $action) . "\n";
                       } else {
                         echo "" . printOption("ENABLEARP", $l['ss_enable_arp'], $action) . "\n";
@@ -353,9 +345,6 @@ echo "<div class='centerbig'>\n";
                     echo "<td>\n";
                       echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
                     echo "</td>\n";
-                    if ($s_admin == 1) {
-                      echo "<td><a onclick='adminmenu(this, \"$sid\", \"$sensor\");'>Admin</a></td>";
-                    }
                   echo "</td>\n";
                 }
               echo "</tr>\n";

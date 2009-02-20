@@ -337,7 +337,7 @@ $sql_topfiles = "SELECT DISTINCT sub.file, COUNT(sub.file) as total FROM ";
   # IP Exclusion stuff
   $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
   # MAC Exclusion stuff
-  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+  $sql_topfiles .= " AND (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
 
   $sql_topfiles .= ") as sub ";
 $sql_topfiles .= "GROUP BY sub.file ORDER BY total DESC LIMIT $c_topfilenames";
@@ -372,9 +372,9 @@ $sql_topproto = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM ";
   $sql_topproto .= "AND type = 4  AND details.attackid = attacks.id AND ";
 
   # IP Exclusion stuff
-  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
   # MAC Exclusion stuff
-  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+  $sql_topproto .= " AND (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
 
   $sql_topproto .= ") as sub ";
 $sql_topproto .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
@@ -395,9 +395,9 @@ $sql_topproto_org = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM "
   $sql_topproto_org .= " AND " .gen_org_sql();
 
   # IP Exclusion stuff
-  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  $sql_topproto_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org) ";
   # MAC Exclusion stuff
-  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+  $sql_topproto_org .= " AND (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
 
   $sql_topproto_org .= " ) as sub ";
 $sql_topproto_org .= "GROUP BY sub.proto ORDER BY total DESC LIMIT $c_topprotocols";
@@ -415,9 +415,9 @@ $sql_topos = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
   $sql_topos .= " AND attacks.source = system.ip_addr AND ";
 
   # IP Exclusion stuff
-  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  $sql_topos .= " NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
   # MAC Exclusion stuff
-  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+  $sql_topos .= " AND (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
 
   $sql_topos .= ") as sub ";
 $sql_topos .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
@@ -438,9 +438,9 @@ $sql_topos_org = "SELECT DISTINCT sub.os, COUNT(sub.os) as total FROM ";
   $sql_topos_org .= " AND " .gen_org_sql();
 
   # IP Exclusion stuff
-  $sql_topfiles .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+  $sql_topos_org .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
   # MAC Exclusion stuff
-  $sql_topfiles .= " (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
+  $sql_topos_org .= " AND (attacks.src_mac IS NULL OR NOT attacks.src_mac IN (SELECT mac FROM arp_excl)) ";
 
   $sql_topos_org .= " ) as sub ";
 $sql_topos_org .= "GROUP BY sub.os ORDER BY total DESC LIMIT $c_topos";
@@ -500,7 +500,7 @@ echo "<div class='all'>\n";
             $avg_perc = 0;
           }
           echo "<table class='datatable'>\n";
-            echo "<tr><td class='title' colspan='2'>" .$l['ra_totals']. "</td></tr>\n";
+#            echo "<tr><td class='title' colspan='2'>" .$l['ra_totals']. "</td></tr>\n";
             echo "<tr>\n";
               echo "<th width='80%'>" .$l['ra_totalmal_all']. "</th>\n";
               if ($s_access_search == 9) {
@@ -536,7 +536,7 @@ echo "<div class='all'>\n";
     echo "<div class='rightmed'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
-          echo "<div class='blockHeader'>" .$l['ra_owndomain']. "</div>\n";
+          echo "<div class='blockHeader'>$orgname</div>\n";
           echo "<div class='blockContent'>\n";
             $debuginfo[] = $sql_attacks_org;
             $result_attacks = pg_query($pgconn, $sql_attacks_org);
@@ -559,7 +559,7 @@ echo "<div class='all'>\n";
             }
 
             echo "<table class='datatable'>\n";
-              echo "<tr><td class='title' colspan='2'>" .$l['ra_totals']. "</td></tr>\n";
+#              echo "<tr><td class='title' colspan='2'>" .$l['ra_totals']. "</td></tr>\n";
               echo "<tr>\n";
                 echo "<th width='80%'>" .$l['ra_totalmal_org']. " $orgname</th>\n";
                 echo "<th width='20%'>" .downlink("logsearch.php?int_sev=1", nf($org_attacks)). "</th>\n";

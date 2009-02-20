@@ -72,7 +72,7 @@ echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
-        echo "<div class='blockHeaderLeft'>" .$l['ah_arp_cache']. "</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['ah_arp_cache']. " ". printhelp(5). "</div>\n";
         echo "<div class='blockHeaderRight'>";
           echo "<form method='get'>\n";
             if ($q_org == 0 || $s_access_search == 9) {

@@ -152,28 +152,28 @@ if ($err != 1) {
     $header = $sensor;
   }
 
-  echo "<div class='all'>\n";
-    echo "<div class='leftsmall'>\n";
-      echo "<div class='block'>\n";
-        echo "<div class='actionBlock'>\n";
-          echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
-          echo "<div class='blockContent'>\n";
-            echo "<form name='sensoractions' method='get' action='purge.php'>\n";
-              echo $l['sd_purge']. " ";
-              echo "<select name='int_time' onchange='this.form.submit();'>\n";
-                echo printOption(0, "", 0);
-                foreach ($v_sensor_purge_ar as $key => $val) {
-                  echo printOption($key, $val, -1);
-                }
-              echo "</select>\n";
-              echo "<input type='hidden' name='int_sid' value='$sid' />\n";
-            echo "</form>\n";
-          echo "</div>\n"; #</blockContent>
-          echo "<div class='blockFooter'></div>\n";
-        echo "</div>\n"; #</dataBlock>
-      echo "</div>\n"; #</block>
-    echo "</div>\n"; #</leftsmall>
-  echo "</div>\n"; #</all>
+#  echo "<div class='all'>\n";
+#    echo "<div class='leftsmall'>\n";
+#      echo "<div class='block'>\n";
+#        echo "<div class='actionBlock'>\n";
+#          echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
+#          echo "<div class='blockContent'>\n";
+#            echo "<form name='sensoractions' method='get' action='purge.php'>\n";
+#              echo $l['sd_purge']. " ";
+#              echo "<select name='int_time' onchange='this.form.submit();'>\n";
+#                echo printOption(0, "", 0);
+#                foreach ($v_sensor_purge_ar as $key => $val) {
+#                  echo printOption($key, $val, -1);
+#                }
+#              echo "</select>\n";
+#              echo "<input type='hidden' name='int_sid' value='$sid' />\n";
+#            echo "</form>\n";
+#          echo "</div>\n"; #</blockContent>
+#          echo "<div class='blockFooter'></div>\n";
+#        echo "</div>\n"; #</dataBlock>
+#      echo "</div>\n"; #</block>
+#    echo "</div>\n"; #</leftsmall>
+#  echo "</div>\n"; #</all>
 
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
@@ -250,44 +250,8 @@ if ($err != 1) {
               echo "<td>" .$l['sd_devip']. ":</td>\n";
               echo "<td colspan='3'>$tapip</td>\n";
             echo "</tr>\n";
-          echo "</table>\n";
-        echo "</div>\n"; #</blockContent>
-        echo "<div class='blockFooter'></div>\n";
-      echo "</div>\n"; #</dataBlock>
-    echo "</div>\n"; #</block>
-#  echo "</div>\n"; #</leftmed>
 
-#  echo "<div class='leftmed'>\n";
-  echo "</div>\n"; #</leftmed>
-
-  if ($vlanid == 0) {
-    $sql_count = "SELECT COUNT(id) as total FROM syslog WHERE keyname = '$keyname' AND vlanid = 0";
-  } else {
-    $sql_count = "SELECT COUNT(id) as total FROM syslog WHERE keyname = '$keyname' AND (vlanid = 0 OR vlanid = $vlanid)";
-  }
-  $debuginfo[] = $sql_count;
-  $result_count = pg_query($pgconn, $sql_count);
-  $rowcount = pg_fetch_assoc($result_count);
-  $num_events = $rowcount['total'];
-
-  $sql_events = "SELECT timestamp, ts_to_epoch(timestamp) as ts, source, error, args, level, device, pid, vlanid ";
-  $sql_events .= " FROM syslog WHERE keyname = '$keyname' AND ";
-  if ($vlanid == 0) {
-    $sql_events .= " vlanid = 0 ";
-  } else {
-    $sql_events .= " (vlanid = 0 OR vlanid = $vlanid) ";
-  }
-  $sql_events .= " AND level >= 1 ";
-  $sql_events .= " ORDER BY timestamp DESC";
-  $debuginfo[] = $sql_events;
-  $result_events = pg_query($pgconn, $sql_events);
-
-  echo "<div class='rightmed'>\n";
-    echo "<div class='block'>\n";
-      echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['sd_sensorlog']. "</div>\n";
-        echo "<div class='blockContent'>\n";
-          echo "<table class='datatable'>\n";
+            echo "<tr><td colspan='2'>&nbsp;</td></tr>\n";
             echo "<tr>\n";
               echo "<th colspan='2'>" .$l['sd_uptime']. "</th>\n";
             echo "</tr>\n";
@@ -323,13 +287,41 @@ if ($err != 1) {
                 echo "</div>";
               echo "</td>\n";
             echo "</tr>\n";
+
           echo "</table>\n";
           echo "<input type='hidden' name='js_hiduptime' id='js_hiduptime' value='$uptime' />\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
+#  echo "</div>\n"; #</leftmed>
 
+#  echo "<div class='leftmed'>\n";
+  echo "</div>\n"; #</leftmed>
+
+  if ($vlanid == 0) {
+    $sql_count = "SELECT COUNT(id) as total FROM syslog WHERE keyname = '$keyname' AND vlanid = 0";
+  } else {
+    $sql_count = "SELECT COUNT(id) as total FROM syslog WHERE keyname = '$keyname' AND (vlanid = 0 OR vlanid = $vlanid)";
+  }
+  $debuginfo[] = $sql_count;
+  $result_count = pg_query($pgconn, $sql_count);
+  $rowcount = pg_fetch_assoc($result_count);
+  $num_events = $rowcount['total'];
+
+  $sql_events = "SELECT timestamp, ts_to_epoch(timestamp) as ts, source, error, args, level, device, pid, vlanid ";
+  $sql_events .= " FROM syslog WHERE keyname = '$keyname' AND ";
+  if ($vlanid == 0) {
+    $sql_events .= " vlanid = 0 ";
+  } else {
+    $sql_events .= " (vlanid = 0 OR vlanid = $vlanid) ";
+  }
+  $sql_events .= " AND level >= 1 ";
+  $sql_events .= " ORDER BY timestamp DESC";
+  $debuginfo[] = $sql_events;
+  $result_events = pg_query($pgconn, $sql_events);
+
+  echo "<div class='rightmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>" .$l['sd_members']. "</div>\n";
@@ -362,8 +354,13 @@ if ($err != 1) {
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['sd_sensorlog']. "</div>\n";
+        echo "<div class='blockHeader'>";
+          echo "<div class='headerTab headerTabSel' id='headerTab1'><a onclick='showHeaderTab(1);'>" .$l['sd_sensorlog']. "</a></div>";
+          echo "<div class='headerTab' id='headerTab2'><a onclick='showHeaderTab(2);'>" .$l['sd_sensornotes']. "</a></div>";
+        echo "</div>\n";
         echo "<div class='blockContent'>\n";
+          echo "<div class='subContent' id='sub1'>\n";
+
           echo "<form name='sensorlog'>\n"; 
           echo "<input type='hidden' name='int_sid' value='$sid' />\n";
           echo "<table class='datatable'>\n";
@@ -371,20 +368,9 @@ if ($err != 1) {
             echo "<tr>\n";
               echo "<td width='20%'>" .$l['sd_totalevents']. ":</td>\n";
               echo "<td width='80%'>";
-#                echo "<div class='fleft'><div class='text'>$num_events</div></div>\n";
                 echo "<div class='fleft'><div class='vtext'>$num_events</div></div>\n";
                 echo "<div class='aright'>";
-                  echo "<input type='button' name='reloadlog' onclick='reload_sensor_log();' value='Reload' class='button' />\n";
-#                  echo "<select name='int_logfilter' class='smallselect' onchange='document.sensorlog.submit();' style='height: 16px;'>";
-#                    echo printOption(-1, $l['g_all'], $logfilter);
-#                    foreach ($v_logmessages_type_ar as $key => $val) {
-#                      if ($s_access_sensor < 9 && $key != 0) {
-#                        echo printOption($key, "$val", $logfilter);
-#                      } elseif ($s_access_sensor == 9) {
-#                        echo printOption($key, "$val", $logfilter);
-#                      }
-#                    }
-#                  echo "</select>\n";
+#                  echo "<input type='button' name='reloadlog' onclick='reload_sensor_log();' value='Reload' class='button' />\n";
                 echo "</div>\n";
               echo "</td>\n";
             echo "</tr>\n";
@@ -402,6 +388,72 @@ if ($err != 1) {
             echo "</tr>\n";
           echo "</table>\n";
           echo "</form>\n";
+          echo "</div>\n"; #</subContent1>
+          echo "<div class='subContent' id='sub2' style='display:none;'>";
+            echo "<form name='noteform' action='note_add.php' method='post'>\n";
+            echo "<table class='datatable'>\n";
+              echo "<tr>";
+                echo "<th width='130'>" .$l['ls_timestamp']. "</th>\n";
+                if ($sensortype == "vlan") {
+                  echo "<th width='520'>" .$l['sd_note']. "</th>\n";
+                  echo "<th width='120'>" .$l['g_vlan']. "</th>\n";
+                } else {
+                  echo "<th width='640' colspan=2>" .$l['sd_note']. "</th>\n";
+                }
+                echo "<th width='80'>" .$l['g_type']. "</th>\n";
+                echo "<th width='100'>" .$l['g_action']. "</th>\n";
+              echo "</tr>\n";
+
+              $sql = "SELECT id, ts, note, type FROM sensor_notes WHERE keyname = '$keyname' AND (vlanid IS NULL OR vlanid = '$vlanid')";
+              if ($s_access_sensor != 9) {
+                $sql .= " AND NOT admin = 1 ";
+              }
+              $sql .= " ORDER BY ts DESC ";
+              $result = pg_query($pgconn, $sql);
+              while ($row = pg_fetch_assoc($result)) {
+                $nid = $row['id'];
+                $ts = $row['ts'];
+                $date = date($c_date_format, $ts);
+                $note = $row['note'];
+                $type = $row['type'];
+
+                echo "<tr>\n";
+                  echo "<td>$date</td>\n";
+                  echo "<td colspan=2>$note</td>\n";
+                  echo "<td>$v_note_types_ar[$type]</td>\n";
+                  echo "<td><a href='note_del.php?int_sid=$sid&int_nid=$nid&md5_hash=$s_hash'>[" .$l['g_delete']. "]</a></td>\n";
+                echo "</tr>\n";
+              }
+
+              echo "<tr>\n";
+                echo "<td></td>\n";
+                if ($sensortype == "vlan") {
+                  echo "<td><input type='text' size=71 name='strip_html_escape_note' /></td>\n";
+                  echo "<td>";
+                    echo "<select name='int_all'>\n";
+                      foreach ($v_note_all_ar as $key => $val) {
+                        echo printOption($key, $val, $def);
+                      }
+                    echo "</select>\n";
+                  echo "</td>\n";                    
+                } else {
+                  echo "<td colspan=2><input type='text' size=89 name='strip_html_escape_note' /></td>\n";
+                  echo "<input type='hidden' name='int_all' value='0'>\n";
+                }
+                echo "<td>\n";
+                  echo "<select name='int_type'>\n";
+                    foreach ($v_note_types_ar as $key => $val) {
+                      echo printOption($key, $val, -1);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+                echo "<td><input type='submit' name='submit' class='button' value='" .$l['g_add']. "' /></td>\n";
+              echo "</tr>\n";
+            echo "</table>\n";
+            echo "<input type='hidden' name='int_sid' value='$sid' />\n";
+            echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+            echo "</form>\n";
+          echo "</div>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>

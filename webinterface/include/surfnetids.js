@@ -1,5 +1,4 @@
 /*
- * 003
  * ####################################
  * # SURFids 2.10                     #
  * # Changeset 006                    #
@@ -1118,23 +1117,13 @@ function getcontact(result) {
   $("#popup").show();
 }
 
-function adminmenu(obj, sid, sensor) {
-  if (obj) {
-    var chk = $("#adminmenu").css("display");
-    var chksensor = $("#sensort").html();
-    if ((chk == "inline" || chk == "block") && chksensor == sensor) {
-      $("#adminmenu").hide();
-    } else {
-      var offset = $(obj).offset();
-      var top = offset.top;
-      var left = offset.left - 0 + 35;
-      $("#activator").attr("href", "movesensor.php?int_sid="+sid);
-      $("#adminmenu").css("top", top);
-      $("#adminmenu").css("left", left);
-      $("#sensort").html(sensor);
-      $("#adminmenu").show();
-    }
-  } else {
-    $("#adminmenu").hide();
-  }
+
+/*      HeaderTabs        */
+/**************************/
+
+function showHeaderTab(nr) {
+    $(".headerTab").removeClass("headerTabSel");
+    $("#headerTab"+nr).addClass("headerTabSel");
+    $(".subContent").hide();
+    $("#sub"+nr).show();
 }

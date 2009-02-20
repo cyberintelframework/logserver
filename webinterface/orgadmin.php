@@ -18,7 +18,7 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
-		"sort"
+                "sort"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();

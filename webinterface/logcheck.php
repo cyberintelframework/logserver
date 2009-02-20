@@ -42,7 +42,7 @@ if (isset($clean['sort'])) {
 echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
-      echo "<div class='blockHeader'>" .$l['lc_cross']. "</div>\n";
+      echo "<div class='blockHeader'>" .$l['lc_cross']. " ". printhelp(6) ."</div>\n";
       echo "<div class='blockContent'>\n";
         if ($row['ranges'] == "") {
           echo "<h3>" .$l['lc_noranges']. "</h3>\n";

@@ -91,7 +91,7 @@ echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>\n";
-        echo "<div class='blockHeaderLeft'>" .$l['as_arp_mod']. "</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['as_arp_mod']. " " .printhelp(9,9). "</div>\n";
         echo "<div class='blockHeaderRight'>";
           echo "<form method='get'>\n";
             if ($q_org == 0 || $s_access_search == 9) {
@@ -109,7 +109,7 @@ echo "<div class='left'>\n";
                 $id = $row['id'];
                 $keyname = $row['keyname'];
                 $label = $row['label'];
-		$vlanid = $row['vlanid'];
+                $vlanid = $row['vlanid'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label;
                 $status = $row['status'];
@@ -126,7 +126,6 @@ echo "<div class='left'>\n";
       echo "</div>\n"; #</blockHeader>
       echo "<div class='blockContent'>\n";
         if ($s_access_sensor > 1 && $err == 0) {
-          echo "<form name='arp_static' action='arp_static_add.php' method='post'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
                 echo "<th width='100'>" .printsort($l['g_mac'], "mac"). "</th>\n";
@@ -187,6 +186,7 @@ echo "<div class='left'>\n";
                   echo "</td>\n";
                 echo "</tr>\n";
               }
+            echo "<form name='arp_static' action='arp_static_add.php' method='post'>\n";
               echo "<tr>\n";
                 echo "<td><input type='text' name='mac_macaddr' value='' size='15' /></td>\n";
                 echo "<td><input type='text' name='ip_ipaddr' value='' size='13' /></td>\n";
@@ -200,13 +200,33 @@ echo "<div class='left'>\n";
                 pg_result_seek($result_sensors, 0);
                 echo "<td>$selected</td>\n";
                 echo "<td align='right'>";
-                echo "<input type='hidden' name='int_sid' value='$sid' />\n";
-                  echo "<input type='submit' class='button' name='submit' value='" .$l['g_add']. "' size='15' />";
+                  echo "<input type='hidden' name='int_sid' value='$sid' />\n";
+                  echo "<input type='submit' class='button' name='submit' value='" .$l['g_add']. "' size='15' />&nbsp;";
+                  echo printhelp(10,10);
                 echo "</td>\n";
               echo "</tr>\n";
+              echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+            echo "</form>\n";
+            echo "<form name='arp_static2' action='arp_static_add.php' method='post'>\n";
+              echo "<tr>\n";
+                echo "<td><input type='text' name='mac_macaddr' value='' size='15' /></td>\n";
+                echo "<td><input type='text' name='ip_ipaddr' value='' size='13' /></td>\n";
+
+                echo "<td>";
+                    echo printCheckBox($v_host_types[2], "type[]", 2, 2) . "<br />\n";
+                echo "</td>\n";
+
+                echo "<td>${keyname}-all</td>\n";
+                echo "<td align='right'>";
+                  echo "<input type='hidden' name='int_sid' value='$sid' />\n";
+                  echo "<input type='hidden' name='int_all' value='1' />\n";
+                  echo "<input type='submit' class='button' name='submit' value='" .$l['g_add']. "' size='15' />&nbsp;";
+                  echo printhelp(8,8);
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+            echo "</form>\n";
             echo "</table>\n";
-            echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
-          echo "</form>\n";
         } else {
           echo "<form method='get'>\n";
           echo "<table>";

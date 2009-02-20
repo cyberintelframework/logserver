@@ -142,7 +142,7 @@ if ($err == 0) {
               echo "<td><b>" .$l['bh_size']. "</b></td><td>$filesize</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>" .$l['g_info']. "</b> " .printhelp("fileinfo"). "</td><td>$fileinfo</td>\n";
+              echo "<td><b>" .$l['g_info']. "</b> " .printhelp(3,3). "</td><td>$fileinfo</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td><b>" .$l['bh_first_seen']. "</b></td><td>$first_seen</td>\n";
@@ -154,7 +154,7 @@ if ($err == 0) {
               echo "<td><b>" .$l['bh_last_scanned']. "</b></td><td>$last_scanned</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td><b>" .$l['bh_upx']. "</b> " .printhelp("upx"). "</td><td>$upx</td>\n";
+              echo "<td><b>" .$l['bh_upx']. "</b> " .printhelp(2,2). "</td><td>$upx</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
         echo "</div>\n"; #</blockContent>

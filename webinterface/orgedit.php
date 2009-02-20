@@ -56,8 +56,7 @@ if ($err != 1) {
       echo "<div class='actionBlock'>\n";
         echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
-          echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>" .$l['oe_generate']. "</a>";
-          echo printhelp("ris") ."<br />\n";
+          echo "<a href='orgsave.php?savetype=md5&int_orgid=$orgid&md5_hash=$s_hash'>" .$l['oe_generate']. "</a> " .printhelp(7,0,1). " ";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>

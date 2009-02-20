@@ -61,7 +61,8 @@ if (isset($clean['to']) && isset($clean['from'])) {
  
 if ( $err == 0) {
   $query = "SELECT DISTINCT remoteip, COUNT(remoteip) as count FROM sensors ";
-  $query .= " WHERE status IN (0, 1) ";
+  $query .= " LEFT JOIN sensor_details ON sensors.keyname = sensor_details.keyname ";
+  $query .= " WHERE NOT status = 3 ";
   if ($q_org != 0) {
     $query .= "AND organisation = '$q_org' ";
   }

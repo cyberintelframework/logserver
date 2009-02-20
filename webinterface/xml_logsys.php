@@ -216,7 +216,7 @@ if ($err == 0) {
   $sql = "SELECT $sql_select FROM $sql_from ";
   $sql .= "LEFT JOIN sensors ";
   $sql .= " ON sensors.keyname = syslog.keyname AND sensors.vlanid = syslog.vlanid ";
-  $sql .= " $sql_where ORDER BY $sql_order LIMIT 20";
+  $sql .= " $sql_where ORDER BY $sql_order LIMIT $limit OFFSET $offset";
   $debuginfo[] = $sql;
   $result = pg_query($pgconn, $sql);
 
@@ -231,12 +231,12 @@ if ($err == 0) {
       echo "<total>$count</total>";
       while ($row = pg_fetch_assoc($result)) {
         $level = $v_syslog_levels_ar[$row['level']];
-        $ts = $row['timestamp'];
+        $ts = strtotime($row['timestamp']);
         $ts = date($c_date_format, $ts);
         $source = $row['source'];
         $pid = $row['pid'];
         $error = $row['error'];
-        $args = $row['args'];
+        $args = htmlentities($row['args']);
         $sid = $row['sid'];
         $tap = $row['device'];
         $vlanid = $row['vlanid'];

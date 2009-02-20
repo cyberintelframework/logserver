@@ -94,7 +94,7 @@ echo "<div class='centerbig'>\n";
             echo "<th width='150'>" .$l['g_actions']. "</th>\n";
           echo "</tr>\n";
           if ($s_access_user == 2) {
-            $sql_user = "SELECT login.id, login.username, login.lastlogin, login.access, organisations.organisationm, login.email ";
+            $sql_user = "SELECT login.id, login.username, login.lastlogin, login.access, organisations.organisation, login.email ";
             $sql_user .= "FROM login, organisations WHERE login.organisation = $q_org AND login.organisation = organisations.id ";
             $sql_user .= "AND NOT login.access LIKE '%9%' ";
             if ($sql_sort != "") {
