@@ -906,15 +906,15 @@ function debug_sql() {
 
 # 5.01 printhelp
 # Function to print a help link to the documentation
-function printhelp($id) {
-  global $v_help;
-  global $c_showhelp;
-  $e_file = $_SERVER['SCRIPT_NAME'];
-  $e_file = basename($e_file);
-  $e_file = str_replace(".", "", $e_file);
-  $m = $v_help[$e_file][$id];
+function printhelp($hid, $uid = 0, $link = 0) {
+  global $c_showhelp, $c_faq_url;
   if ($c_showhelp == 1) {
-    return "<a href='#' onmouseover='return overlib(\"$m\");' onmouseout='return nd();'>[?]</a>";
+    $a = "<a href='help.php?int_id=" .$hid. "&width=375";
+    if ($link != "") {
+        $a .= "&link=" . $c_faq_url;
+    }
+    $a .= "' class='jTip' id='help" .$uid. "' name='Help'>[?]</a>";
+    return $a;
   } else {
     return "";
   }
@@ -990,7 +990,7 @@ function printled($var) {
 
 # 5.06 downlink
 # Function to create a link with arrow
-function downlink($href, $text, $over = '') {
+function downlink($href, $text, $over = "", $uid = 0) {
   $a = "<a href='$href'";
   if ($over != "") {
     $a .= printover($over);

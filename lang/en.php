@@ -27,7 +27,7 @@ $l['g_delete']          = "Delete";
 $l['g_edit']            = "Edit";
 $l['g_insert']          = "Insert";
 $l['g_sensor']          = "Sensor";
-$l['g_sensors']          = "Sensors";
+$l['g_sensors']         = "Sensors";
 $l['g_select_sensor']   = "Select a sensor";
 $l['g_type']            = "Type";
 $l['g_mac']             = "MAC address";
@@ -50,10 +50,11 @@ $l['g_domain']          = "Domain";
 $l['g_status']          = "Status";
 $l['g_modify']          = "Modify";
 $l['g_total']           = "Total";
-$l['g_on']		= "On";
-$l['g_off']		= "Off";
-$l['g_addsensor']	= "Add sensor";
-$l['g_addorg']		= "Add all sensors";
+$l['g_on']              = "On";
+$l['g_off']             = "Off";
+$l['g_addsensor']       = "Add sensor";
+$l['g_addorg']          = "Add all sensors";
+$l['g_vlan']            = "VLAN";
 
 ##########################
 # Global (Lowercase first letter)
@@ -68,7 +69,7 @@ $l['g_edit_l']          = "edit";
 $l['g_exploits_l']      = "exploits";
 $l['g_ports_l']         = "ports";
 $l['g_files_l']         = "files";
-$l['g_sensors_l']	= "sensors";
+$l['g_sensors_l']       = "sensors";
 
 ##########################
 # argosadmin.php
@@ -370,7 +371,7 @@ $l['ma_modules']        = "Page configuration";
 $l['ma_pref']           = "My preferences";
 $l['ma_def_graph']      = "Default graph";
 $l['ma_def_graph_type'] = "Default graph type";
-$l['ma_def_utc']	= "Default report timestamp";
+$l['ma_def_utc']        = "Default report timestamp";
 
 ##########################
 # myreports.php
@@ -399,7 +400,7 @@ $l['oa_editdomain']     = "Edit this domain";
 ##########################
 # orgedit.php
 ##########################
-$l['oe_generate']       = "Generate Random Identifier String";
+$l['oe_generate']       = "Generate OID";
 $l['oe_editdomain']     = "Edit domain";
 $l['oe_idents']         = "identifiers";
 $l['oe_ranges']         = "Ranges";
@@ -506,7 +507,7 @@ $l['re_op']             = "Operator";
 $l['re_thresh_amount']  = "Threshold amount";
 $l['re_timespan']       = "Timespan";
 $l['re_always']         = "Always send report";
-$l['re_timeformat']	= "Timestamps format";
+$l['re_timeformat']	    = "Timestamps format";
 
 ##########################
 # rssfeed.php
@@ -537,6 +538,7 @@ $l['sd_status']         = "Status";
 $l['sd_started']        = "Last started";
 $l['sd_stopped']        = "Last stopped";
 $l['sd_updated']        = "Last updated";
+$l['sd_sensornotes']    = "Sensor notes";
 $l['sd_sensorlog']      = "Sensor log";
 $l['sd_uptime']         = "Uptime";
 $l['sd_since']          = "Logging since";
@@ -548,6 +550,7 @@ $l['sd_sensortype']	    = "Sensor type";
 $l['sd_networkconfig']  = "Network configuration";
 $l['sd_networkrev']     = "Revision";
 $l['sd_configtype']     = "Type";
+$l['sd_note']           = "Note";
 
 ##########################
 # sensorstatus.php
@@ -567,6 +570,8 @@ $l['ss_unignore']       = "Unignore";
 $l['ss_disable_arp']    = "Disable ARP";
 $l['ss_enable_arp']     = "Enable ARP";
 $l['ss_legend']         = "Legend";
+$l['ss_activate']       = "Activate";
+$l['ss_deactivate']     = "Deactivate";
 
 ##########################
 # serverconfig.php

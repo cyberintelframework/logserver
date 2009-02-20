@@ -258,7 +258,7 @@ $v_mail_timespan_ar = array(
 # Array with the organisation identifier types.
 $v_org_ident_type_ar = array(
 		0 => "IP address",
-		1 => "Organisation Identifier",
+		1 => "OID",
 		2 => "WHOIS netname",
 		3 => "Domain name",
 		4 => "SURFnet SOAP"
@@ -333,7 +333,10 @@ $v_errors = array(
 		154 => "Invalid or missing default graph type!",
 		155 => "Invalid IP address. Choose a different IP address!",
 		156 => "Invalid or missing page configuration array!",
-		157 => "Invalid or missing page ID!"
+		157 => "Invalid or missing page ID!",
+        158 => "Invalid or missing note!",
+        159 => "Invalid or missing VLAN specification!",
+        160 => "Invalid or missing note ID!"
 );
 
 # Array for the different types of plots available.
@@ -377,10 +380,6 @@ $v_phplot_data_colors = array(
 
 # Array with the different help messages for the webinterface.
 $v_help = array(
-	arpadmin.php => array(
-		"arpcache" => "This is the ARP cache that the ARP module keeps track of. This ARP cache gets filled based on ARP queries and replies that are detected by the sensor.",
-		"arpmonitor" => "These are the MAC/IP pairs that are to be scanned by the ARP module. Whenever a change is detected that differs from these pairs, an alert is generated. Add the MAC/IP pair of your important servers in here. The scripts list is updated every $c_arp_static_refresh seconds."
-	),
     binaryhist.php => array(
         "upx" => "UPX is a well-known compression often used for malicious files. This shows the result of the UPX check.",
         "fileinfo" => "The output of the linux program \\\"file\\\"."
@@ -404,23 +403,8 @@ $v_help = array(
 		"ris" => "This is a unique string to identify the organisation.<br /> This can be placed on the sensor to make sure it will be placed in the correct organisation.",
 	),
 	sensorstatus.php => array(
-		"sensor" => "The name of the sensor (VLAN number included if applicable).",
-		"remote" => "The sensor IP address that&#39;s connecting to the tunnel server.",
-		"local" => "The actual IP address of the sensor. This will differ from the remote IP address in case of NAT.",
-		"tapmac" => "The MAC address of the virtual device on the server.",
-		"tap" => "The virtual device on the tunnel server. This is in fact the tunnel endpoint on the server.",
-		"tapip" => "The IP address of the virtual device on the server.",
-		"status" => "The current status of the sensor.",
-		"action" => "Possible actions that can be given to the sensor. The action will be executed once an hour along with the sensor updates.",
-		"timestamps" => "Uptime and several other timestamps.",
-		"static" => "This is the IP address on the virtual interface on the server.<br />This IP needs to be an IP from the same network range as the sensor.<br /> It cannot be the same IP address as the local or remote address!",
-		"statusred" => "The sensor client was stopped by either a user or the server admin. The tunnel is not active at this moment.",
-		"statusgreen" => "The sensor is active and correctly running.",
-		"statusorange" => "The sensor missed a status update. These updates are used to synchronize data between the sensor and the server as well as to update the sensor scripts if needed.",
-		"statusyellow" => "The sensor is trying to start up. This status is set when the sensor is started but a tap interface and tap IP address have not yet been acquired.",
-		"statusblack" => "The sensor has been disabled by a server admin. This will mean the sensor cannot be started.",
-		"statusblue" => "The sensor needs configuration. This is a status particularly for statically configured sensors. Configure the tap IP address to fix this.",
-		"statusnone" => "The sensor is on ignore. This can be either because a different sensor of the same name is active or the sensor is manually ignored."
+        "action" => "Ignore: A sensor can be ignored when its currently not in use.
+<br><b>Deactivate</b>: A sensor can be deactivated when the sensor is never expected to be used again. Both the sensor and attached attack records are stored in an archive table."
 	),
 	argosconfig.php => array(
 		"sensor" => "The name of the sensor (VLAN number included if applicable).",
@@ -434,9 +418,7 @@ $v_help = array(
 # Array with the different host types.
 $v_host_types = array(
 	1 => "Router/Gateway",
-	2 => "DHCP Server",
-	3 => "Server",
-	4 => "Host"
+	2 => "DHCP Server"
 );
 
 # Array with the different protocols detected by the sniffer.
@@ -624,6 +606,17 @@ $v_syslog_level_colours_ar = array(
 	2 => "Orange",
 	3 => "Red",
 	4 => "Red"
+);
+
+$v_note_types_ar = array(
+    1 => "Status",
+    2 => "Other",
+    3 => "Contact"
+);
+
+$v_note_all_ar = array(
+    1 => "All Vlans",
+    2 => "Current VLAN only"
 );
 
 ?>

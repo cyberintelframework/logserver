@@ -49,7 +49,7 @@ echo "<div class='block'>\n";
       if ($num > 0) {
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
-            echo "<th width='80%'>" .$l['g_detconn']. "</td>\n";
+            echo "<th width='80%'>" .$l['g_detconn']. " ". printhelp(4). "</td>\n";
             echo "<th width='20%'>" .$l['g_stats']. "</td>\n";
           echo "</tr>\n";
 
@@ -65,12 +65,12 @@ echo "<div class='block'>\n";
             $description = $v_severity_ar[$severity];
             if ($severity == 0 || $severity == 16) {
               echo "<tr>\n";
-                echo "<td>$description " .printhelp($severity). "</td>\n";
+                echo "<td>$description</td>\n";
                 echo "<td>" .downlink("logsearch.php?int_sev=$severity", nf($count)). "</td>\n";
               echo "</tr>\n";
             } elseif ($severity == 1) {
               echo "<tr>\n";
-                echo "<td>$description " .printhelp($severity). "</td>\n";
+                echo "<td>$description</td>\n";
                 echo "<td>" .downlink("logsearch.php?int_sev=$severity", nf($count)). "</td>\n";
               echo "</tr>\n";
 
@@ -89,7 +89,7 @@ echo "<div class='block'>\n";
               }
             } elseif ($severity == 32) {
               echo "<tr>\n";
-                echo "<td>$description " .printhelp($severity). "</td>\n";
+                echo "<td>$description</td>\n";
                 echo "<td>" .downlink("logsearch.php?int_sev=$severity", nf($count)). "</td>\n";
               echo "</tr>\n";
             } else {
