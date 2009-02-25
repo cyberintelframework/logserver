@@ -87,11 +87,11 @@ if ($s_access_sensor > 1) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='20%'>" .$l['g_sensor']. " " .printhelp("sensor"). "</th>\n";
-              echo "<th width='15%'>" .$l['ac_deviceip']. " " .printhelp("deviceip"). "</th>\n";
-              echo "<th width='25%'>" .$l['ac_imagename']. " " .printhelp("imagename"). "</th>\n";
-              echo "<th width='20%'>" .$l['ac_template']. " " .printhelp("template"). "</th>\n";
-              echo "<th width='10%'>" .$l['ac_timespan']. " " .printhelp("timespan"). "</th>\n";
+              echo "<th width='20%'>" .$l['g_sensor']. "</th>\n";
+              echo "<th width='15%'>" .$l['ac_deviceip']. "</th>\n";
+              echo "<th width='25%'>" .$l['ac_imagename']. "</th>\n";
+              echo "<th width='20%'>" .$l['ac_template']. " " .printhelp(12,12). "</th>\n";
+              echo "<th width='10%'>" .$l['ac_timespan']. " " .printhelp(13,13). "</th>\n";
               echo "<th width='5%'></th>\n";
               echo "<th width='5%'></th>\n";
             echo "</tr>\n";
@@ -293,17 +293,16 @@ if ($s_access_sensor > 1) {
               echo "<form name='argosadmin_addrange' action='argosaddrange.php' method='post'>\n";
                 echo "<td class='bottom'>\n";
                   if ($s_admin == 1) {
-		        $where = " sensors.status != 3 ";
-		   } else {
-		        $where = " sensors.status != 3 AND sensors.organisation = '$q_org'";
-	           }
-	 
-	           $sql = "SELECT argos.sensorid, sensors.keyname, sensors.vlanid, organisations.organisation, sensors.tapip, sensors.label FROM sensors, organisations, argos ";
-	           $sql .= "WHERE organisations.id = sensors.organisation AND sensors.id = argos.sensorid AND $where ORDER BY sensors.keyname";
-	           $debuginfo[] = $sql;
-	           $query = pg_query($sql);
+                      $where = " sensors.status != 3 ";
+                  } else {
+                      $where = " sensors.status != 3 AND sensors.organisation = '$q_org'";
+                  }
+	              $sql = "SELECT argos.sensorid, sensors.keyname, sensors.vlanid, organisations.organisation, sensors.tapip, sensors.label FROM sensors, organisations, argos ";
+                  $sql .= "WHERE organisations.id = sensors.organisation AND sensors.id = argos.sensorid AND $where ORDER BY sensors.keyname";
+                  $debuginfo[] = $sql;
+                  $query = pg_query($sql);
 		  
-		  echo "<select name='int_sensorid'>\n";
+                  echo "<select name='int_sensorid'>\n";
                     while ($sensor_data = pg_fetch_assoc($query)) {
                       $sid = $sensor_data['id'];
                       $keyname = $sensor_data["keyname"];

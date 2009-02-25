@@ -155,6 +155,7 @@ if ($s_access_user > 0) {
             }
             $result_report_content = pg_query($sql);
             $debuginfo[] = $sql;
+            $rssfeed = array();
 
             while ($report_content = pg_fetch_assoc($result_report_content)) {
               $rcid = $report_content['id'];
@@ -208,8 +209,8 @@ if ($s_access_user > 0) {
                 $last_sent = date($c_date_format_short, $last_sent);
               }
 
-              if ($detail > 9) {
-                echo "<link rel='alternate' title='SURF IDS RSS: $subject' type='application/rss+xml' href='$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid'>\n";
+              if ($detail > 9 && $active == "t") {
+                $rssfeed[$rcid] = $subject;
               }
 
               if (strlen($subject) > 40) {
@@ -256,6 +257,9 @@ if ($s_access_user > 0) {
               echo "</tr>\n";
             }
           echo "</table>\n";
+          foreach ($rssfeed as $rcid => $sub) {
+            echo "<link rel='alternate' title='SURF IDS RSS: $sub' type='application/rss+xml' href='$c_webinterface_prefix/rssfeed.php?int_rcid=$rcid'>\n";
+          }
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</dataBlock>

@@ -94,7 +94,7 @@ if ($err == 0) {
   $sql = "DELETE FROM sensor_notes WHERE id = '$nid'";
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
-  $m = 1;
+  $m = 2;
 }
 
 # Close connection and redirect

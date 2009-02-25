@@ -99,13 +99,6 @@ $sql_sensors .= " ORDER BY $sql_order ";
 $debuginfo[] = $sql_sensors;
 $result_sensors = pg_query($pgconn, $sql_sensors);
 
-$sql_rev = "SELECT value, timestamp FROM serverinfo WHERE name = 'updaterev'";
-$debuginfo[] = $sql_rev;
-$result_rev = pg_query($pgconn, $sql_rev);
-$row_rev = pg_fetch_assoc($result_rev);
-$server_rev = $row_rev['value'];
-$server_rev_ts = $row_rev['timestamp'];
-
 $sql_conf = "SELECT config FROM pageconf WHERE pageid = 1 AND userid = '$s_userid'";
 $debuginfo[] = $sql_conf;
 $result_conf = pg_query($pgconn, $sql_conf);

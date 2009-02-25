@@ -290,15 +290,15 @@ function insert_selector($o_show = 1, $t_show = 1) {
   $qs = urldecode($_SERVER['QUERY_STRING']);
 
   # Retrieving posted variables from $_GET
-  $allowed_get = array(
+  $menu_allowed_get = array(
                 "int_selperiod",
                 "int_from",
                 "int_to",
-		"int_org",
+                "int_org",
                 "dir",
-		"int_debug"
+                "int_debug"
   );
-  $check = extractvars($_GET, $allowed_get);
+  $check = extractvars($_GET, $menu_allowed_get);
   debug_input();
 
   if ($c_allow_global_debug == 1) {

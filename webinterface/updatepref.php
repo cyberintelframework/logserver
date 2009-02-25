@@ -56,21 +56,21 @@ if ($clean['hash'] != $s_hash) {
 }
 
 if (isset($clean['plotter'])) {
-  $plotter = $clean['plotter'];
+  $d_plotter = $clean['plotter'];
 } else {
   $err = 1;
   $m = 153;
 }
 
 if (isset($clean['plottype'])) {
-  $plottype = $clean['plottype'];
+  $d_plottype = $clean['plottype'];
 } else {
   $err = 1;
   $m = 154;
 }
 
 if (isset($clean['utc'])) {
-  $utc = $clean['utc'];
+  $d_utc = $clean['utc'];
 } else {
   $utc = 0;
 }
@@ -100,7 +100,7 @@ if ($s_auser == 9) {
 
 if ($err != 1) {
   $m = 3;
-  $sql_save = "UPDATE login SET d_plotter = '$plotter', d_plottype = '$plottype', d_utc = '$utc' WHERE id = $uid";
+  $sql_save = "UPDATE login SET d_plotter = '$d_plotter', d_plottype = '$d_plottype', d_utc = '$d_utc' WHERE id = $uid";
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
 

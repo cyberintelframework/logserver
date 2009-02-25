@@ -55,7 +55,7 @@ if ($err == 0) {
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>";
-          echo "<div class='blockHeaderLeft'>" .$l['oi_ip_excl']. "</div>\n";
+          echo "<div class='blockHeaderLeft'>" .$l['oi_ip_excl']. " " .printhelp(11,11). "</div>\n";
           echo "<div class='blockHeaderRight'>\n";
             echo "<form name='viewform' action='$url' method='GET'>\n";
               if ($s_access_search == 9) {

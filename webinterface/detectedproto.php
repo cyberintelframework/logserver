@@ -62,7 +62,7 @@ echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
-        echo "<div class='blockHeaderLeft'>" .$l['dp_detected']. "</div>\n";
+        echo "<div class='blockHeaderLeft'>" .$l['dp_detected']. " " .printhelp(15). "</div>\n";
         echo "<div class='blockHeaderRight'>";
           echo "<form method='get'>\n";
             if ($q_org == 0) {
