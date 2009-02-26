@@ -2,24 +2,15 @@
 
 ####################################
 # Installation script              #
-# SURFnet IDS                      #
-# Version 2.00.02                  #
-# 25-09-2007                       #
+# SURFids 2.10                     #
+# Changeset 001                    #
+# 26-02-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ###############################################
 # Changelog:
-# 2.00.02 Removed single sensor setup stuff
-# 2.00.01 version 2.00
-# 1.04.08 Fixed a bug that prevented database upgrades
-# 1.04.07 Fixed some stuff with building the config
-# 1.04.06 Improved non-default support and support for remote database
-# 1.04.05 Improved non-default support and added support for remote database
-# 1.04.04 Fixed crontab stuff and typo.
-# 1.04.03 Added support for non-default webuser and unusual characters
-# 1.04.02 Added nepenthes sql functions option
-# 1.04.01 Initial release
+# 001 Initial release
 ###############################################
 
 ##########################
@@ -418,49 +409,6 @@ if ($confirm =~ /^(install)$/) {
   }
 
   print "\n";
-
-  # Setting server hostname and configuring config files.
-  $server = "";
-  while ($server eq "") {
-    $server = &prompt("Tunnel server FQDN or IP (example: tunnelserver.surfnet.nl): ");
-    if ($server ne "") {
-      $confirm = "a";
-      while ($confirm !~ /^(n|N|y|Y)$/) {
-        printmsg("Server hostname/IP address:", "$server");
-        $confirm = &prompt("Is this correct? [y/n]: ");
-      }
-      if ($confirm =~ /^(n|N)$/) {
-        $server = "";
-      }
-    }
-  }
-
-  open(SQL, ">>$targetdir/sql/postgres_insert.sql");
-  print SQL "INSERT INTO servers (server) VALUES ('$server')";
-  close(SQL);
-
-  print "\n";
-
-  $e = 1;
-  while ($e != 0) {
-    if ($dbhost != "localhost") {
-      `psql -h $dbhost -p $dbport -q -f $targetdir/sql/postgres_insert.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
-    } else {
-      `sudo -u postgres psql -q -f $targetdir/sql/postgres_insert.sql "$dbname" 2>>$logfile`;
-    }
-    printmsg("Adding necessary records to the database:", $?);
-    if ($? != 0) { $err++; }
-    $e = $?;
-    if ($? != 0) {
-      $confirm = "a";
-      while ($confirm !~ /^(n|N|y|Y)$/) {
-        $confirm = &prompt("Insert query failed. Try again? [y/n]: ");
-      }
-      if ($confirm =~ /^(n|N)$/) {
-        $e = 0;
-      }
-    }
-  }
 } elsif ($confirm =~ /^(upgrade)$/) {
   printmsg("Creating argos database user [argos]:", "info");
   $e = 1;
