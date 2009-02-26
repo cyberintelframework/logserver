@@ -60,6 +60,7 @@
 # 4.01		printer
 # 4.02		debug_input
 # 4.03		debug_sql
+# 4.04      sanitize_array
 #
 # 5 Print functions
 # 5.01		printhelp
@@ -240,6 +241,7 @@ function extractvars($source, $allowed) {
   } else {
     global $clean;
     global $tainted;
+    global $unallowed;
 
     # Setting up the regular expression for an IP address
     $ipregexp = '/^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
@@ -360,6 +362,8 @@ function extractvars($source, $allowed) {
             } else {
               $tainted[$temp] = $var;
             } // $count != 0
+          } else {
+            $unallowed[$key] = $var;
           } // in_array($key, $allowed)
         } // $var != ""
       } else {
@@ -835,19 +839,28 @@ function debug_input() {
   global $c_debug_input;
   global $clean;
   global $tainted;
+  global $unallowed;
+
+  $c = sanitize_array($clean);
+  $t = sanitize_array($tainted);
+  $u = sanitize_array($unallowed);
+
   if ($c_debug_input == 1) {
     echo "<div class='all'>\n";
       echo "<div class='centerbig'>\n";
         echo "<div class='block'>\n";
           echo "<div class='dataBlock'>\n";
-            echo "<div class='blockHeader'>Input Debugging</div>\n";
+            echo "<div class='blockHeader'>Input Debugging " .printhelp(14,999). "</div>\n";
             echo "<div class='blockContent'>\n";
               echo "<pre>";
                 echo "TAINTED:\n";
-                print_r($tainted);
+                print_r($t);
                 echo "\n";
                 echo "CLEAN:\n";
-                print_r($clean);
+                print_r($c);
+                echo "\n";
+                echo "UNALLOWED:\n";
+                print_r($u);
               echo "</pre>\n";
             echo "</div>\n"; #</blockContent>
             echo "<div class='blockFooter'></div>\n";
@@ -900,16 +913,29 @@ function debug_sql() {
   }
 }
 
+# 4.04 sanitize_array
+# Function to sanitize an array to safely show it as debug info in debug_input
+function sanitize_array($ar) {
+  if (is_array($ar)) {
+    foreach ($ar as $k => $v) {
+      $k = htmlentities($k);
+      $v = htmlentities($v);
+      $ar[$k] = $v;
+    }
+  }
+  return $ar;
+}
+
 ###############################
 # 5 Print functions
 ###############################
 
 # 5.01 printhelp
 # Function to print a help link to the documentation
-function printhelp($hid, $uid = 0, $link = 0) {
-  global $c_showhelp, $c_faq_url;
+function printhelp($hid, $uid = 0, $link = 0, $width = 375) {
+  global $c_showhelp, $c_faq_url, $c_language;
   if ($c_showhelp == 1) {
-    $a = "<a href='help.php?int_id=" .$hid. "&width=375";
+    $a = "<a href='help-" .$c_language. ".php?int_id=" .$hid. "&width=$width";
     if ($link != "") {
         $a .= "&link=" . $c_faq_url;
     }

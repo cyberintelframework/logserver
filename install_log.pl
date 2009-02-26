@@ -54,8 +54,8 @@ require "${installdir}functions_log.pl";
 
 $psqlcheck = `psql -V | head -n1 | awk '{print \$3}' 2>&1 2>/dev/null`;
 chomp($psqlcheck);
-if ($psqlcheck !~ /^8\.1.*$/) {
-  printmsg("Checking for PostgreSQL 8.1:", "false");
+if ($psqlcheck !~ /^8\..*$/) {
+  printmsg("Checking for PostgreSQL:", "false");
   exit;
 }
 

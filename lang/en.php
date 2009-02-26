@@ -582,7 +582,7 @@ $l['sc_webconfig']      = "Webinterface config options";
 $l['sc_session']        = "Login and session options";
 $l['sc_debug']          = "Debug options";
 $l['sc_search']         = "Search page options";
-$l['sc_perl']           = "Perl script options";
+$l['sc_logging']        = "Logging options";
 $l['sc_finger']         = "Fingerprinting options";
 $l['sc_geoip']          = "GeoIP options";
 $l['sc_rank']           = "Ranking page options";
@@ -590,7 +590,8 @@ $l['sc_maillog']        = "Maillogging script options";
 $l['sc_sandbox']        = "Sandbox script options";
 $l['sc_module']         = "Module options";
 $l['sc_virus']          = "Virus scanner info";
-$l['sc_cookie']		= "Cookie options";
+$l['sc_cookie']         = "Cookie options";
+$l['sc_date']           = "Date options";
 
 ##########################
 # serverstats.php

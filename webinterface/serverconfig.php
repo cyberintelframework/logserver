@@ -180,6 +180,28 @@ echo "<div class='leftmed'>\n";
           echo "</tr>\n";
         echo "</table>\n";
 
+        echo "<table class='multipletable'>\n";
+          echo "<tr>\n";
+            echo "<th colspan='2'>" .$l['sc_date']. "</th>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td width='30%'>c_date_format</td>\n";
+            echo "<td width='70%'>$c_date_format</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_date_format_short</td>\n";
+            echo "<td>$c_date_format_short</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_date_format_notime</td>\n";
+            echo "<td>$c_date_format_notime</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_date_format_noyear</td>\n";
+            echo "<td>$c_date_format_noyear</td>\n";
+          echo "</tr>\n";
+        echo "</table>\n";
+
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";
     echo "</div>\n"; #</dataBlock>
@@ -331,19 +353,27 @@ echo "<div class='rightmed'>\n";
             echo "<td>c_enable_argos</td>\n";
             echo "<td>" .printled($c_enable_argos). "</td>\n";
           echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_scan_upx</td>\n";
+            echo "<td>" .printled($c_scan_upx). "</td>\n";
+          echo "</tr>\n";
         echo "</table>\n";
 
         echo "<table class='multipletable'>\n";
           echo "<tr>\n";
-            echo "<th colspan='2'>" .$l['sc_perl']. "</th>\n";
+            echo "<th colspan='2'>" .$l['sc_logging']. "</th>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td width='30%'>c_logfile</td>\n";
-            echo "<td width='70%'>$c_logfile</td>\n";
+            echo "<td width='30%'>c_log_method</td>\n";
+            echo "<td width='70%'>$c_log_method</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>c_logstamp</td>\n";
-            echo "<td>" .printled($c_logstamp). "</td>\n";
+            echo "<td>c_log_level</td>\n";
+            echo "<td>" .$v_syslog_levels_ar[$c_log_level]. "</td>\n";
+          echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_logsys_flexi</td>\n";
+            echo "<td>" .printled($c_logsys_flexi). "</td>\n";
           echo "</tr>\n";
         echo "</table>\n";
 
@@ -353,31 +383,31 @@ echo "<div class='rightmed'>\n";
   echo "</div>\n"; #</block>
 echo "</div>\n"; #</rightmed>
 
-echo "<div class='all'>\n";
-  echo "<div class='centerbig'>\n";
-    echo "<div class='block'>\n";
-      echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['sc_virus']. "</div>\n";
-        echo "<div class='blockContent'>\n";
-          $sql = "SELECT name, version FROM scanners";
-          $result = pg_query($pgconn, $sql);
-          echo "<table class='datatable'>\n";
-            while ($row = pg_fetch_assoc($result)) {
-              $name = $row['name'];
-              $ver = $row['version'];
-              $ver = str_replace("Kaspersky Anti-Virus On-Demand Scanner for Linux. ", "", $ver);
-              echo "<tr>\n";
-                echo "<td><font class='btext'>$name</font></td>\n";
-                echo "<td>$ver</td>\n";
-              echo "</tr>\n";
-            }
-          echo "</table>\n";
-        echo "</div>\n";
-        echo "<div class='blockFooter'></div>\n";
-      echo "</div>\n"; #</dataBlock>
-    echo "</div>\n"; #</block>
-  echo "</div>\n"; #</centerbig>
-echo "</div>\n"; #</all>
+#echo "<div class='all'>\n";
+#  echo "<div class='centerbig'>\n";
+#    echo "<div class='block'>\n";
+#      echo "<div class='dataBlock'>\n";
+#        echo "<div class='blockHeader'>" .$l['sc_virus']. "</div>\n";
+#        echo "<div class='blockContent'>\n";
+#          $sql = "SELECT name, version FROM scanners";
+#          $result = pg_query($pgconn, $sql);
+#          echo "<table class='datatable'>\n";
+#            while ($row = pg_fetch_assoc($result)) {
+#              $name = $row['name'];
+#              $ver = $row['version'];
+#              $ver = str_replace("Kaspersky Anti-Virus On-Demand Scanner for Linux. ", "", $ver);
+#              echo "<tr>\n";
+#                echo "<td><font class='btext'>$name</font></td>\n";
+#                echo "<td>$ver</td>\n";
+#              echo "</tr>\n";
+#            }
+#          echo "</table>\n";
+#        echo "</div>\n";
+#        echo "<div class='blockFooter'></div>\n";
+#      echo "</div>\n"; #</dataBlock>
+#    echo "</div>\n"; #</block>
+#  echo "</div>\n"; #</centerbig>
+#echo "</div>\n"; #</all>
 
 pg_close($pgconn);
 debug_sql();
