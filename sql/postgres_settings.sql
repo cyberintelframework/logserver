@@ -108,6 +108,26 @@ GRANT SELECT,UPDATE ON SEQUENCE attacks_id_seq TO nepenthes;
 GRANT SELECT,UPDATE ON SEQUENCE attacks_id_seq TO argos;
 
 --
+-- ARGOS_CSI
+--
+
+CREATE TABLE argos_csi (
+    id integer NOT NULL,
+    attacks_id integer,
+    csi bit varying
+);
+
+CREATE SEQUENCE argos_csi_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE argos_csi_id_seq OWNED BY argos_csi.id;
+ALTER TABLE argos_csi ALTER COLUMN id SET DEFAULT nextval('argos_csi_id_seq'::regclass);
+
+--
 -- ARGOS 
 --
 
@@ -139,26 +159,6 @@ GRANT SELECT ON TABLE argos TO argos;
 
 GRANT SELECT,UPDATE ON SEQUENCE argos_id_seq TO idslog;
 GRANT SELECT,UPDATE ON SEQUENCE argos_id_seq TO argos;
-
---
--- ARGOS_CSI
---
-
-CREATE TABLE argos_csi (
-    id integer NOT NULL,
-    attacks_id integer,
-    csi bit varying
-);
-
-CREATE SEQUENCE argos_csi_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-ALTER SEQUENCE argos_csi_id_seq OWNED BY argos_csi.id;
-ALTER TABLE argos_csi ALTER COLUMN id SET DEFAULT nextval('argos_csi_id_seq'::regclass);
 
 --
 -- ARGOS_IMAGES 
@@ -631,19 +631,6 @@ INSERT INTO indexmods VALUES (10, 'mod_top10ports.php');
 INSERT INTO indexmods VALUES (11, 'mod_top10sensors.php');
 
 --
--- INDEXMODS_SELECTED 
---
-
-CREATE TABLE indexmods_selected (
-    login_id integer,
-    indexmod_id integer
-);
-ALTER TABLE ONLY indexmods_selected
-    ADD CONSTRAINT foreign_indexmods FOREIGN KEY (login_id) REFERENCES login(id) ON DELETE CASCADE;
-
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE indexmods_selected TO idslog;
-
---
 -- LOGIN 
 --
 
@@ -679,6 +666,19 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE login TO idslog;
 GRANT SELECT,UPDATE ON SEQUENCE login_id_seq TO idslog;
 
 INSERT INTO login (id, username, password, email, organisation, access) VALUES (nextval('login_id_seq'::regclass), 'admin',  '21232f297a57a5a743894a0e4a801fc3', 'root@localhost', 1, '999');
+
+--
+-- INDEXMODS_SELECTED 
+--
+
+CREATE TABLE indexmods_selected (
+    login_id integer,
+    indexmod_id integer
+);
+ALTER TABLE ONLY indexmods_selected
+    ADD CONSTRAINT foreign_indexmods FOREIGN KEY (login_id) REFERENCES login(id) ON DELETE CASCADE;
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE indexmods_selected TO idslog;
 
 --
 -- NORMAN 
@@ -771,37 +771,6 @@ ALTER TABLE ONLY organisations
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE organisations TO idslog;
 
 GRANT SELECT,UPDATE ON SEQUENCE organisations_id_seq TO idslog;
-
---
--- OSTYPES 
---
-
-CREATE TABLE ostypes (
-    id integer NOT NULL,
-    os character varying NOT NULL
-);
-
-
-CREATE SEQUENCE ostypes_id_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-ALTER SEQUENCE ostypes_id_seq OWNED BY ostypes.id;
-ALTER TABLE ostypes ALTER COLUMN id SET DEFAULT nextval('ostypes_id_seq'::regclass);
-ALTER TABLE ONLY ostypes
-    ADD CONSTRAINT ostypes_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY ostypes
-    ADD CONSTRAINT unique_os UNIQUE (os);
-
-CREATE RULE insert_name AS ON INSERT TO system WHERE (NOT (split_part((new.name)::text, ' '::text, 1) IN (SELECT ostypes.os FROM ostypes))) DO INSERT INTO ostypes (os) VALUES (split_part((new.name)::text, ' '::text, 1));
-
-GRANT SELECT,INSERT ON TABLE ostypes TO pofuser;
-GRANT SELECT ON TABLE ostypes TO idslog;
-
-GRANT SELECT ON SEQUENCE ostypes_id_seq TO idslog;
-GRANT SELECT,UPDATE ON SEQUENCE ostypes_id_seq TO pofuser;
 
 --
 -- PAGECONF 
@@ -928,8 +897,8 @@ INSERT INTO scanners VALUES (2, 'Antivir', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', NULL, NULL, NULL, NULL);
-INSERT INTO scanners VALUES (4, 'AVAST', 1, 'v1.0.8', '.*\\[infected by: *(.*) *\\[.*\\]\\]$', '.*\\[infected by:.*', '.*\\/([0-9A-Za-z]*).*\\[.*\\]$', '.*\\[OK\\]$');
-INSERT INTO scanners VALUES (5, 'F-Prot', 1, '6.2.1.4252', '.*\\[Found .*\\].*<(.*)> {1,}.*', '.*\\[Found .*\\].*', '.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', '.*\\[Clean\\].*');
+INSERT INTO scanners VALUES (4, 'AVAST', 1, '', '.*\\[infected by: *(.*) *\\[.*\\]\\]$', '.*\\[infected by:.*', '.*\\/([0-9A-Za-z]*).*\\[.*\\]$', '.*\\[OK\\]$');
+INSERT INTO scanners VALUES (5, 'F-Prot', 1, '', '.*\\[Found .*\\].*<(.*)> {1,}.*', '.*\\[Found .*\\].*', '.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', '.*\\[Clean\\].*');
 
 --
 -- SCHEME 
@@ -1269,6 +1238,37 @@ GRANT SELECT ON TABLE system TO idslog;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE system TO pofuser;
 
 GRANT SELECT,UPDATE ON SEQUENCE system_sid_seq TO pofuser;
+
+--
+-- OSTYPES 
+--
+
+CREATE TABLE ostypes (
+    id integer NOT NULL,
+    os character varying NOT NULL
+);
+
+
+CREATE SEQUENCE ostypes_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ostypes_id_seq OWNED BY ostypes.id;
+ALTER TABLE ostypes ALTER COLUMN id SET DEFAULT nextval('ostypes_id_seq'::regclass);
+ALTER TABLE ONLY ostypes
+    ADD CONSTRAINT ostypes_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY ostypes
+    ADD CONSTRAINT unique_os UNIQUE (os);
+
+CREATE RULE insert_name AS ON INSERT TO system WHERE (NOT (split_part((new.name)::text, ' '::text, 1) IN (SELECT ostypes.os FROM ostypes))) DO INSERT INTO ostypes (os) VALUES (split_part((new.name)::text, ' '::text, 1));
+
+GRANT SELECT,INSERT ON TABLE ostypes TO pofuser;
+GRANT SELECT ON TABLE ostypes TO idslog;
+
+GRANT SELECT ON SEQUENCE ostypes_id_seq TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ostypes_id_seq TO pofuser;
 
 --
 --  SYSTEM_DETAILS
