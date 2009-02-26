@@ -14,6 +14,9 @@
 -- 001 Initial release
 --
 
+CREATE PROCEDURAL LANGUAGE plpgsql;
+ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
+
 --
 -- SENSORS 
 --
