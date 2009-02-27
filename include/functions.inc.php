@@ -795,8 +795,7 @@ function addcookie($name, $value) {
 function delcookie($name) {
   global $c_cookie_name, $c_cookie_domain, $c_cookie_path, $c_cookie_expiry, $c_cookie_https;
   $expiry = time() - 3600;
-#  setcookie($c_cookie_name."[".$name."]", "", $expiry, $c_cookie_path, $c_cookie_domain, $c_cookie_https);
-  setcookie($c_cookie_name."[".$name."]");
+  setcookie($c_cookie_name."[".$name."]", "NULL", $expiry, $c_cookie_path);
 }
 
 # 3.23 sensorstatus
