@@ -4080,6 +4080,9 @@ function array_pad_array(&$arr, $size, $arr2=NULL)
     if (! is_array($arr2)) {
         $arr2 = $arr;                           // copy the original array
     }
+    if (! is_array($arr)) {
+        return;
+    }
     while (count($arr) < $size)
         $arr = array_merge($arr, $arr2);        // append until done
 }
