@@ -919,7 +919,11 @@ function sanitize_array($ar) {
   if (is_array($ar)) {
     foreach ($ar as $k => $v) {
       $k = htmlentities($k);
-      $v = htmlentities($v);
+      if (is_array($v)) {
+        $v = sanitize_array($v);
+      } else {
+        $v = htmlentities($v);
+      }
       $ar[$k] = $v;
     }
   }
