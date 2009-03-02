@@ -15,6 +15,9 @@
 # 001 Initial release
 #############################################
 
+ini_set("session.bug_compat_42", "off");
+ini_set("session.bug_compat_warn", "off");
+
 include '../include/config.inc.php';
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
