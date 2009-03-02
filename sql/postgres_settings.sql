@@ -1,12 +1,13 @@
 --
 -- SURFids 2.10
 -- Database structure
--- Changeset 005
+-- Changeset 006
 -- 25-02-2009
 --
 
 --
 -- Version history
+-- 006 Fixed plpgsql and escaping of virus definitions
 -- 005 A fresh schema of the development database
 -- 004 Modified report_content, added pageconf, indexmods
 -- 003 Added ostypes & modified system, login, report_content
@@ -666,6 +667,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE login TO idslog;
 GRANT SELECT,UPDATE ON SEQUENCE login_id_seq TO idslog;
 
 INSERT INTO login (id, username, password, email, organisation, access) VALUES (nextval('login_id_seq'::regclass), 'admin',  '21232f297a57a5a743894a0e4a801fc3', 'root@localhost', 1, '999');
+SELECT pg_catalog.setval('login_id_seq', 1, true);
 
 --
 -- INDEXMODS_SELECTED 
@@ -771,6 +773,9 @@ ALTER TABLE ONLY organisations
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE organisations TO idslog;
 
 GRANT SELECT,UPDATE ON SEQUENCE organisations_id_seq TO idslog;
+
+INSERT INTO organisations VALUES (1, 'ADMIN', '');
+SELECT pg_catalog.setval('organisations_id_seq', 1, true);
 
 --
 -- PAGECONF 
@@ -897,8 +902,8 @@ INSERT INTO scanners VALUES (2, 'Antivir', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', NULL, NULL, NULL, NULL);
-INSERT INTO scanners VALUES (4, 'AVAST', 1, '', '.*\\[infected by: *(.*) *\\[.*\\]\\]$', '.*\\[infected by:.*', '.*\\/([0-9A-Za-z]*).*\\[.*\\]$', '.*\\[OK\\]$');
-INSERT INTO scanners VALUES (5, 'F-Prot', 1, '', '.*\\[Found .*\\].*<(.*)> {1,}.*', '.*\\[Found .*\\].*', '.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', '.*\\[Clean\\].*');
+INSERT INTO scanners VALUES (4, 'AVAST', 1, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
+INSERT INTO scanners VALUES (5, 'F-Prot', 1, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
 
 --
 -- SCHEME 
