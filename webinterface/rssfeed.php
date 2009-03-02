@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 2.10                     #
-# Changeset 004                    #
-# 18-04-2008                       #
+# Changeset 005                    #
+# 02-03-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Changed Detail & Summary format
 # 004 Added ARP exclusion stuff
 # 003 Fixed sensorstatus RSS
 # 002 Added s_access_user check
@@ -190,7 +191,6 @@ if ($err == 0) {
       }
       $ts = $row['timestamp'];
       $att = strtolower($v_severity_ar[$sev]);
-      $title = "New $att detected (attack ID: $attackid)!";
 
       $pattern = '/^.*Dialogue$/';
       if (preg_match($pattern, $text)) {
@@ -207,9 +207,13 @@ if ($err == 0) {
       $link = "${c_webinterface_prefix}/logsearch.php${addurl}";
 
       $item = new rssGenerator_item();
-      $item->title = "$title";
       if ($detail == 11) {
+        $title = "New $att detected (attack ID: $attackid)!";
+        $item->title = "$title";
         $item->description = "$description";
+      } else {
+        $title = $description;
+        $item->title = "$title";
       }
       $item->link = $link;
       $item->pubDate = "$ts";
@@ -282,9 +286,13 @@ if ($err == 0) {
         $link = "${c_webinterface_prefix}/logsearch.php${addurl}";
 
         $item = new rssGenerator_item();
-        $item->title = "$title";
         if ($detail == 11) {
+          $title = "New $att detected (attack ID: $attackid)!";
+          $item->title = "$title";
           $item->description = "$description";
+        } else {
+          $title = $description;
+          $item->title = "$title";
         }
         $item->link = $link;
         $item->pubDate = "$ts";
