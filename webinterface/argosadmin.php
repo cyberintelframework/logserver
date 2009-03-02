@@ -64,7 +64,7 @@ if ($s_admin == 1) {
               $organisationid = $rowimage["organisationid"];
               echo "<tr>\n";
                 echo "<form name='argosadmin_updateimage' action='argosupdateimage.php' method='post'>\n";
-                  echo "<td><input type='text' name='strip_html_escape_name' size='30' value='$name' /></td>";
+                  echo "<td><input type='text' name='strip_html_escape_name' size='20' value='$name' /></td>";
                   echo "<td><input type='text' name='ip_serverip' size='13' value='$serverip' /></td>";
                   echo "<td><input type='text' name='strip_html_escape_imagename' size='20' value='$imagename' /></td>";
                   echo "<td>\n";
@@ -111,7 +111,7 @@ if ($s_admin == 1) {
             }
             echo "<form name='argosadmin_addimage' action='argosaddimage.php' method='post'>\n";
               echo "<tr class='bottom'>\n";
-                echo "<td><input type='text' name='strip_html_escape_name' size='30' /></td>";
+                echo "<td><input type='text' name='strip_html_escape_name' size='20' /></td>";
                 echo "<td><input type='text' name='ip_serverip' size='13' /></td>";
                 echo "<td><input type='text' name='strip_html_escape_imagename' size='20' /></td>";
                 echo "<td>\n";
