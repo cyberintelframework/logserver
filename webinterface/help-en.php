@@ -87,18 +87,18 @@ if ($id == 1) {
     echo " <b>FAQ - L08</b> (Click the help link to go to the SURFids FAQ page)";
 } elseif ($id == 8) {
     # arpadmin.php - DHCP add all
-    echo "This option will add a given IP address to all VLANs of the current sensor as a valid DHCP server.";
+    echo "This option will add a given IP address to all VLANs of the current sensor as a valid DHCP server. ";
     echo "This is useful, for example, when you want to add your IP helper addresses to the table for all your VLANs.";
 } elseif ($id == 9) {
     # arpadmin.php - ARP Poisoning configuration
-    echo "To enable ARP Poisoning detection you will need to add the MAC/IP address pair of the host you want to monitor to this table.";
+    echo "To enable ARP Poisoning detection you will need to add the MAC/IP address pair of the host you want to monitor to this table. ";
     echo "This is particularly useful for monitoring your gateways.";
 } elseif ($id == 10) {
     # arpadmin.php - Single pair add
     echo "To detect ARP poisoning, add the MAC/IP address pair for the host you want to monitor and tag it as a router/gateway.<br /><br />";
     echo "To detect Rogue DHCP servers, add the MAC/IP address pair for the DHCP server (or DHCP helper) and tag it as a DHCP server.<br /><br />";
     echo "The DHCP servers in this table don't need to have the correct MAC address as only the IP address is used in Rogue DHCP server ";
-    echo " detection.";
+    echo "detection.";
 } elseif ($id == 11) {
     # orgipadmin.php - IP exclusion
     echo "Here you can exclude certain IP and/or MAC addresses from being shown in the web interface. They will still be logged, but will ";
@@ -111,7 +111,7 @@ if ($id == 1) {
     echo "Possible Malicious attack that did not result in a known Malicious attack as detected by Nepenthes.";
 } elseif ($id == 13) {
     # argosconfig.php - Timespan
-    echo "The timespan determines the period of time over which a Top 100 list is generated. No timespan means it's generated over";
+    echo "The timespan determines the period of time over which a Top 100 list is generated. No timespan means it's generated over ";
     echo "all the data available.<br /><br />";
     echo "This option does not apply when redirecting All Traffic.";
 } elseif ($id == 14) {
