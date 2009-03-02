@@ -125,6 +125,9 @@ if ($err != 1) {
   $update_text = date($c_date_format, $update);
   $status = $row['status'];
   $permanent = $row['permanent'];
+  if ($permanent == 1) {
+    $sensortype = "Permanent";
+  }
   $cstatus = sensorstatus($status, $update, $uptime, $permanent);
 
   # Uptime
