@@ -45,26 +45,12 @@ use Data::Dumper;
 # Variables used
 ####################
 do '/etc/surfnetids/surfnetids-log.conf';
-
-$logfile = $c_logfile;
-$logfile =~ s|.*/||;
-if ($c_logstamp == 1) {
-  $day = localtime->mday();
-  if ($day < 10) {
-    $day = "0" . $day;
-  }
-  $month = localtime->mon() + 1;
-  if ($month < 10) {
-    $month = "0" . $month;
-  }
-  $year = localtime->year() + 1900;
-  if ( ! -d "$c_surfidsdir/log/$day$month$year" ) {
-    mkdir("$c_surfidsdir/log/$day$month$year");
-  }
-  $logfile = "$c_surfidsdir/log/$day$month$year/$logfile";
-} else {
-  $logfile = "$c_surfidsdir/log/$logfile";
-}
+our $source = 'mailreporter.pl';
+our $sensor = 'unkown';
+our $tap = 'unknown';;
+our $remoteip = '0.0.0.0';
+our $pid = $$;
+our $g_vlanid = 0;
 
 ##################
 # Functions
@@ -1184,7 +1170,7 @@ sub sendmail {
   $execute_result = $dbh->do($sql);
 
   # Print info to a log file
-  printlog("Mailed stats for $sub_date to: $email with organisation $org");
+  logsys($f_log_debug, "MAIL_SENT", "Mailed stats for $sub_date to: $email with organisation $org");
 
   # Delete the mail and signed mail
   if (-e "$mailfile") {

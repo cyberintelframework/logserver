@@ -15,6 +15,12 @@
 # 001 Added convert_to_utc
 #####################
 
+$f_log_debug = 0;
+$f_log_info = 1;
+$f_log_warn = 2;
+$f_log_error = 3;
+$f_log_crit = 4;
+
 ###############################################
 # INDEX
 ###############################################
@@ -32,7 +38,6 @@
 # 3.02      dbquery
 # 3.03      dbnumrows
 # 4		ALL misc functions
-# 4.01		printlog
 # 4.02		printmail
 # 4.03		printdebug
 # 4.05		printenv
@@ -185,21 +190,30 @@ sub dbconnect() {
 }
 
 # 3.02 dbquery
-# Performs a query to the database. If the query fails, return false. Otherwise, return the data.
-sub dbquery() {
-  my ($sql, $er, $sth);
-  $sql = $_[0];
+# Performs a query to the database. If the query fails, log the query to the database
+# and return false. Otherwise, return the data handle.
+sub dbquery {
+    my $sql = $_[0];
 
-  if (!$dbh) {
-    return 'false';
-  }
-  $sth = $dbh->prepare($sql);
-  $er = $sth->execute();
-  if (!$er) {
-    return 'false';
-  }
+    if (!$dbh) {
+        &logsys($f_log_error, "DB_ERROR", "No database handler!");
+        return 'false';
+    }
+    $sth = $dbh->prepare($sql);
+    $er = $sth->execute();
+    $errstr = $sth->errstr;
+    chomp($sql);
+    if (!$er) {
+        &logsys($f_log_error, "DB_QUERY_FAIL", $sql);
+        &logsys($f_log_error, "DB_QUERY_FAIL", $errstr);
+        return 'false';
+    } else {
+        if ($c_log_success_query == 1) {
+            &logsys($f_log_debug, "DB_QUERY_OK", $sql);
+        }
+    }
 
-  return $sth;
+    return $sth;
 }
 
 # 3.03 dbnumrows
@@ -219,32 +233,66 @@ sub dbnumrows() {
   return $sth->rows;
 }
 
-# 4.01 printlog
-# Function to print something to a logfile
-# Returns 0 on success
-# Returns 1 on failure
-sub printlog() {
-  my ($err, $ts, $msg, $logstring);
-  $msg = $_[0];
-  $err = $_[1];
-  $ts = getts();
-  $logstring = "[$ts";
-  if ($tap) {
-    if ($tap ne "") {
-      $logstring .= " - $tap";
+# 9.05 logsys
+# Function to log messages to the syslog table
+sub logsys() {
+  my ($ts, $level, $msg, $sql, $er, $tsensor);    # local variables
+  our $source;
+  our $sensor;
+  our $tap;
+  our $pid;
+  our $g_vlanid;
+
+  if (!$source) { $source = "unknown"; }
+  if (!$sensor) { $sensor = "unknown"; }
+  if (!$tap)    { $tap    = "unknown"; }
+  if (!$pid)    { $pid    = 0; }
+  if (!$g_vlanid) { $g_vlanid = 0; }
+
+  $level = $_[0];   # Loglegel (DEBUG, INFO, WARN, ERROR, CRIT)
+  $msg = $_[1];     # Message (START_SCRIPT, STOP_SCRIPT, etc )
+  chomp($msg);
+
+  if ($level >= $c_log_level) {
+    if (!$source) { $source = "unknown"; }
+    if (!$sensor) { $sensor = "unknown"; }
+    if (!$tap)    { $tap    = "unknown"; }
+    if (!$pid)  { $pid    = 0; }
+    if (!$g_vlanid) { $g_vlanid = 0; }
+
+    if ($_[2]) {
+      $args = $_[2];
+      chomp($args);
+    } else {
+      $args = "";
+    }
+
+#    $ts = time();
+    if ($c_log_method == 2 || $c_log_method == 3) {
+      # We need to cleanup the $args and escape all ' and " characters
+#      $args =~ s/\'/\\\'/g;
+#      $args =~ s/\"/\\\"/g;
+      $args =~ s/\'/\'\'/g;
+#      $args =~ s/\"/\"\"/g;
+
+      $sql = "INSERT INTO syslog (source, error, args, level, keyname, device, pid, vlanid) VALUES ";
+      $sql .= " ('$source', '$msg', '$args', $level, '$sensor', '$tap', $pid, $g_vlanid)";
+      if ($dbh) {
+       $er = $dbh->do($sql);
+      }
+    }
+    if ($c_log_method == 1 || $c_log_method == 3) {
+      $tsensor = $sensor;
+      if ($g_vlanid != 0) {
+        $tsensor = "$sensor-$g_vlanid";
+      }
+      $ts = &getts();
+      open LOG,  ">>/tmp/logsys" || die ("cant open log: $!");
+      print LOG "[$ts] $pid $source $tsensor $msg $args\n";
+      close LOG;
     }
   }
-  if ($err) {
-    if ($err ne "") {
-      $logstring .= " - $err";
-    }
-  }
-  $logstring .= "] $msg\n";
-  if ($logfile) {
-    open(LOG, ">> $logfile");
-    print LOG $logstring;
-    close(LOG);
-  }
+  return "true";
 }
 
 # 4.02 printmail
