@@ -3,13 +3,14 @@
 ####################################
 # Check settings script            #
 # SURFids 2.10                     #
-# Changeset 001                    #
-# 29-10-2007                       #
+# Changeset 002                    #
+# 02-03-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #####################
 # Changelog:
+# 002 Fixed references to tunnel scripts & config
 # 001 Initial version
 #####################
 
@@ -22,8 +23,8 @@ use Time::localtime qw(localtime);
 ##################
 # Variables used
 ##################
-do '/etc/surfnetids/surfnetids-tn.conf';
-require "$c_surfidsdir/scripts/tnfunctions.inc.pl";
+do '/etc/surfnetids/surfnetids-log.conf';
+require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 
 ##################
 # Main script
