@@ -281,8 +281,8 @@ echo "<div class='leftbig'>\n";
                   }
                 echo "</select>\n";
               echo "<input type='button' value='" .$l['re_filter']. "' class='pbutton fright' onclick='browsedata(\"filter\", \"syslogfilter\", \"xml_logsys.php\", \"logsys\");' />\n";
-#              echo "<input type='button' value='" .$l['ly_default']. "' class='pbutton fright' onclick='setdefault(\"syslogfilter\", \"def_logsys.php\", \"default_logsys\");' />\n";
-              echo "<input type='button' value='" .$l['ly_default']. "' class='pbutton fright' onclick='GB_show(\"test\",\"popup_login.php\",470,600);' />\n";
+              echo "<input type='button' value='" .$l['ly_default']. "' class='pbutton fright' onclick='setdefault(\"syslogfilter\", \"def_logsys.php\", \"default_logsys\");' />\n";
+#              echo "<input type='button' value='" .$l['ly_default']. "' class='pbutton fright' onclick='GB_show(\"test\",\"popup_login.php\",470,600);' />\n";
               echo "</td>\n";
             echo "</tr>\n";
 #            echo "<tr><td colspan='3'>\n";

@@ -26,9 +26,9 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 # Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
-#  $m = 100;
+  $m = 100;
   echo "<result>";
-    echo "<status>RELOG</status>";
+    echo "<status>FAILED</status>";
     echo "<error>" .$v_errors[$m]. "</error>";
   echo "</result>";
 
@@ -46,8 +46,14 @@ $err = 0;
 
 # Checking access
 if ($s_admin != 1) {
-  $err = 1;
   $m = 101;
+  echo "<result>";
+    echo "<status>FAILED</status>";
+    echo "<error>" .$v_errors[$m]. "</error>";
+  echo "</result>";
+
+  pg_close($pgconn);
+  exit;
 }
 
 # Defaults

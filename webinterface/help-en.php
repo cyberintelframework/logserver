@@ -84,7 +84,7 @@ if ($id == 1) {
     echo " in the configuration file of the sensor. This will make the sensor send the string to the server when it will ";
     echo " request it's certificates. This ensures that sensors you create with this string in the configuration file will ";
     echo " always be categorized under this organisation.<br /><br />";
-    echo " <b>FAQ - L08</b>";
+    echo " <b>FAQ - L08</b> (Click the help link to go to the SURFids FAQ page)";
 } elseif ($id == 8) {
     # arpadmin.php - DHCP add all
     echo "This option will add a given IP address to all VLANs of the current sensor as a valid DHCP server.";
