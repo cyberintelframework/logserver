@@ -173,7 +173,7 @@ printresult($?);
 if ($? != 0) { $err++; }
 
 printdelay("Enabling Auth_PGSQL for $apachev:");
-`a2enmod auth_pgsql 2>>$logfile`;
+`a2enmod 000_auth_pgsql 2>>$logfile`;
 printresult($?);
 if ($? != 0) { $err++; }
 
