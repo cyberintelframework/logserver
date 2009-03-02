@@ -3,8 +3,8 @@
 ####################################
 # SVN dir cleanup script           #
 # SURFids 2.10                     #
-# Changeset 001                    #
-# 19-11-2008                       #
+# Changeset 002                    #
+# 02-03-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
@@ -13,6 +13,7 @@
 
 #####################
 # Changelog:
+# 002 Fixed references to tunnel scripts
 # 001 Initial version
 #####################
 
@@ -23,8 +24,7 @@
 ##################
 # Variables used
 ##################
-do '/etc/surfnetids/surfnetids-tn.conf';
-require "$c_surfidsdir/scripts/tnfunctions.inc.pl";
+do '/etc/surfnetids/surfnetids-log.conf';
 
 ##################
 # Main script
