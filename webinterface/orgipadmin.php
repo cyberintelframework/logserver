@@ -1,4 +1,4 @@
-<?php $tab="4.3"; $pagetitle="Exclusions"; include("menu.php"); contentHeader(0,0); ?>
+<?php $tab="4.3"; $pagetitle="Exclusions"; include("menu.php"); contentHeader(1,0); ?>
 <?php
 
 ####################################
@@ -25,8 +25,8 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
-		"sort",
-		"int_orgid"
+		        "sort",
+        		"int_orgid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -57,21 +57,21 @@ if ($err == 0) {
         echo "<div class='blockHeader'>";
           echo "<div class='blockHeaderLeft'>" .$l['oi_ip_excl']. " " .printhelp(11,11). "</div>\n";
           echo "<div class='blockHeaderRight'>\n";
-            echo "<form name='viewform' action='$url' method='GET'>\n";
-              if ($s_access_search == 9) {
-                $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
-                $debuginfo[] = $sql_orgs;
-                $result_orgs = pg_query($pgconn, $sql_orgs);
-                $num = pg_num_rows($result_orgs);
-                echo "<select name='int_org' class='smallselect' onChange='javascript: this.form.submit();'>\n";
-                  while ($row = pg_fetch_assoc($result_orgs)) {
-                    $org_id = $row['id'];
-                    $organisation = $row['organisation'];
-                    echo printOption($org_id, $organisation, $q_org);
-                  }
-                echo "</select>\n";
-              }
-            echo "</form>\n";
+#            echo "<form name='viewform' action='$url' method='GET'>\n";
+#              if ($s_access_search == 9) {
+#                $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
+#                $debuginfo[] = $sql_orgs;
+#                $result_orgs = pg_query($pgconn, $sql_orgs);
+#                $num = pg_num_rows($result_orgs);
+#                echo "<select name='int_org' class='smallselect' onChange='javascript: this.form.submit();'>\n";
+#                  while ($row = pg_fetch_assoc($result_orgs)) {
+#                    $org_id = $row['id'];
+#                    $organisation = $row['organisation'];
+#                    echo printOption($org_id, $organisation, $q_org);
+#                  }
+#                echo "</select>\n";
+#              }
+#            echo "</form>\n";
           echo "</div>\n";
         echo "</div>\n";
         echo "<div class='blockContent'>\n";
@@ -123,21 +123,21 @@ if ($err == 0) {
           echo "<div class='blockHeader'>";
             echo "<div class='blockHeaderLeft'>" .$l['oi_mac_excl']. "</div>\n";
             echo "<div class='blockHeaderRight'>\n";
-              echo "<form name='viewform' action='$url' method='GET'>\n";
-                if ($s_access_search == 9) {
-                  $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
-                  $debuginfo[] = $sql_orgs;
-                  $result_orgs = pg_query($pgconn, $sql_orgs);
-                  $num = pg_num_rows($result_orgs);
-                  echo "<select name='int_org' class='smallselect' onChange='javascript: this.form.submit();'>\n";
-                    while ($row = pg_fetch_assoc($result_orgs)) {
-                      $org_id = $row['id'];
-                      $organisation = $row['organisation'];
-                      echo printOption($org_id, $organisation, $q_org);
-                    }
-                  echo "</select>\n";
-                }
-              echo "</form>\n";
+#              echo "<form name='viewform' action='$url' method='GET'>\n";
+#                if ($s_access_search == 9) {
+#                  $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
+#                  $debuginfo[] = $sql_orgs;
+#                  $result_orgs = pg_query($pgconn, $sql_orgs);
+#                  $num = pg_num_rows($result_orgs);
+#                  echo "<select name='int_org' class='smallselect' onChange='javascript: this.form.submit();'>\n";
+#                    while ($row = pg_fetch_assoc($result_orgs)) {
+#                      $org_id = $row['id'];
+#                      $organisation = $row['organisation'];
+#                      echo printOption($org_id, $organisation, $q_org);
+#                    }
+#                  echo "</select>\n";
+#                }
+#              echo "</form>\n";
             echo "</div>\n";
           echo "</div>\n";
           echo "<div class='blockContent'>\n";

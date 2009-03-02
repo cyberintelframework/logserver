@@ -39,9 +39,9 @@ $s_hash = md5($_SESSION['s_hash']);
 $allowed_post = array(
                 "int_orgid",
                 "ip_exclusion",
-		"mac_exclusion",
-		"md5_hash",
-		"int_type"
+                "mac_exclusion",
+                "md5_hash",
+                "int_type"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
