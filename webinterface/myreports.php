@@ -171,6 +171,7 @@ if ($s_access_user > 0) {
               $qs = $report_content['qs'];
               $from_ts = $report_content['from_ts'];
               $to_ts = $report_content['to_ts'];
+              $always = $report_content['always'];
               if ($freq == 1) {
                 $freqstring = "Hourly";
               } elseif ($freq == 2) {
@@ -230,7 +231,12 @@ if ($s_access_user > 0) {
                 echo "</td>\n";
                 echo "<td>" . $last_sent . "</td>\n";
                 echo "<td>" . $v_mail_template_ar[$template] . "</td>\n";
-                echo "<td>$freqstring</td>\n";
+                echo "<td>";
+                  echo $freqstring;
+                  if ($always == 1) {
+                    echo " (Always)";
+                  }
+                echo "</td>\n";
                 if ($template == 6) {
                   echo "<td class='norightb'>" .$l['mr_result']. "</td>\n";
                 } else {

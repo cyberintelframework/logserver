@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 2.10                     #
-# Changeset 004                    #
-# 10-04-2008                       #
+# Changeset 005                    #
+# 03-03-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Set default UTC to off
 # 004 Added cookie defaults
 # 003 Added UTC timestamp support
 # 002 Added option to always send the report
@@ -39,7 +40,7 @@ if (isset($clean['m'])) {
 if (isset($clean['dutc'])) {
   $d_utc = $clean['dutc'];
 } else {
-  $d_utc = 1;
+  $d_utc = 0;
 }
 
 # Make sure all access rights are correct
