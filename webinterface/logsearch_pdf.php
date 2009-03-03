@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 2.10                     #
-# Changeset 002                    #
-# 18-04-2008                       #
+# Changeset 003                    #
+# 03-03-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Added support for SNORT info
 # 002 Added ARP exclusion stuff
 # 001 Added language support
 #############################################
@@ -37,7 +38,7 @@ include "../lang/${c_language}.php";
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-	        "reptype",
+        "reptype",
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
@@ -60,8 +61,8 @@ $allowed_get = array(
 		"orderm",
 		"int_page",
 		"int_binid",
-	        "int_sourcechoice",
-        	"int_destchoice"
+        "int_sourcechoice",
+       	"int_destchoice"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -514,6 +515,10 @@ while ($row = pg_fetch_assoc($result)) {
       $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
       $text = $dia_result_ar[0]['text'];
       $malware = basename($text);
+    } elseif ( ( $sev == 1 || $sev == 0 ) && $sevtype == 2) {
+      $dia_ar = array('attackid' => $id, 'type' => 40);
+      $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+      $module = $dia_result_ar[0]['text'];
     }
   }
   //Timestamp 	Severity 	Source Port 	Destination Port 	Sensor 	Additional Info
@@ -533,6 +538,8 @@ while ($row = pg_fetch_assoc($result)) {
     $ar["Additional_Info"] = $attack;
   } elseif ($sev == 16 && $malware != "") {
     $ar["Additional_Info"] = $malware;
+  } elseif ( ( $sev == 1 || $sev == 0 ) && $sevtype == 2) {
+    $ar["Additional_Info"] = $module;
   } else {
     $ar["Additional_Info"] = "";
   }

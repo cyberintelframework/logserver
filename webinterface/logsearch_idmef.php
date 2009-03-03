@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFids 2.10                     #
-# Changeset 003                    #
-# 18-04-2008                       #
+# Changeset 004                    #
+# 03-03-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Added support for SNORT info
 # 003 Added ARP exclusion stuff
 # 002 IE bug "could not download" fixed 
 # 001 Added language support
@@ -38,7 +39,7 @@ header("Content-disposition: attachment; filename=$fn");
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "reptype",
+        "reptype",
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
@@ -60,9 +61,9 @@ $allowed_get = array(
 		"order",
 		"orderm",
 		"int_page",
-		"int_binid",
-                "int_sourcechoice",
-                "int_destchoice"
+    	"int_binid",
+        "int_sourcechoice",
+        "int_destchoice"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -372,6 +373,10 @@ while ($row = pg_fetch_assoc($result)) {
       $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
       $text = $dia_result_ar[0]['text'];
       $malware = basename($text);
+    } elseif ( ( $sev == 1 || $sev == 0 ) && $sevtype == 2) {
+      $dia_ar = array('attackid' => $id, 'type' => 40);
+      $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+      $module = $dia_result_ar[0]['text'];
     }
   }
   echo "<idmef:Alert messageid=\"$id\">\n";
@@ -415,10 +420,6 @@ while ($row = pg_fetch_assoc($result)) {
     echo "    <idmef:string>$malware</idmef:string>\n";
     echo "  </idmef:AdditionalData>\n";
   } elseif ( ( $sev == 1 || $sev == 0 ) && $sevtype == 2) {
-    $dia_ar = array('attackid' => $id, 'type' => 40);
-    $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-    $module = $dia_result_ar[0]['text'];
-
     echo "  <idmef:AdditionalData type=\"string\" meaning=\"snort-rule\">\n";
     echo "    <idmef:string>$module</idmef:string>\n";
     echo "  </idmef:AdditionalData>\n";
