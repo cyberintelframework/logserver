@@ -148,15 +148,17 @@ $v_attacktype_ar = array(
 		'2'	=> 'Shellcodehandler',
 		'4'	=> 'Download url',
 		'8'	=> 'Download hash',
-		'10'	=> 'Argos ID',
-		'12'	=> 'Process ID',
-		'14'	=> 'OS',
-		'16'	=> 'Imagename',
-		'20'	=> 'Module',
-		'22'	=> 'TCP Port',
-		'24'	=> 'UDP Port',
-		'30'	=> 'DHCP server identifier',
-        '40'    => 'Snort Message'
+		'10' => 'Argos ID',
+		'12' => 'Process ID',
+		'14' => 'OS',
+		'16' => 'Imagename',
+		'20' => 'Module',
+		'22' => 'TCP Port',
+		'24' => 'UDP Port',
+		'30' => 'DHCP server identifier',
+        '40' => 'Snort Message',
+        '41' => 'Snort Sig Class Name',
+        '42' => 'Snort Protocol'
 );
 
 # Array with the different types of access for the search engine.

@@ -512,34 +512,6 @@ if ($confirm =~ /^(install)$/) {
 
 print "\n";
 
-$confirm = "a";
-while ($confirm !~ /^(n|N|y|Y)$/) {
-  $confirm = &prompt("Do you want to install the nepenthes SQL functions? [Y/n]: ");
-}
-
-if ($confirm =~ /^(y|Y)$/) {
-  $e = 1;
-  while ($e != 0) {
-    if ($dbhost != "localhost") {
-      `psql -h $dbhost -p $dbport -q -f $targetdir/sql/nepenthes.sql -U "$dbuser" -W "$dbname" 2>>$logfile`;
-    } else {
-      `sudo -u postgres psql -q -f $targetdir/sql/nepenthes.sql "$dbname" 2>>$logfile`;
-    }
-    printmsg("Installing the nepenthes SQL functions:", $?);
-    if ($? != 0) { $err++; }
-    $e = $?;
-    if ($? != 0) {
-      $confirm = "a";
-      while ($confirm !~ /^(n|N|y|Y)$/) {
-        $confirm = &prompt("Installation nepenthes SQL functions failed. Try again? [Y/n]: ");
-      }
-      if ($confirm =~ /^(n|N)$/) {
-        $e = 0;
-      }
-    }
-  }
-}
-
 `wget -V >/dev/null 2>/dev/null`;
 if ($? == 0) {
   print "\n"; 
