@@ -73,6 +73,31 @@ GRANT SELECT,INSERT,UPDATE ON TABLE sensor_details TO idslog;
 GRANT SELECT,UPDATE ON SEQUENCE sensor_details_id_seq TO idslog;
 
 --
+-- SENSORS_LOG
+--
+DROP TABLE sensors_log;
+
+--
+-- SERVERS
+--
+DROP TABLE servers;
+
+--
+-- STATS_HISTORY
+--
+DROP TABLE stats_history;
+
+--
+-- STATS_HISTORY_DIALOGUE
+--
+DROP TABLE stats_history_dialogue;
+
+--
+-- STATS_HISTORY_VIRUS
+--
+DROP TABLE stats_history_virus;
+
+--
 -- ARP_EXCL
 --
 CREATE TABLE arp_excl (

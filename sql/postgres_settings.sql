@@ -647,8 +647,7 @@ CREATE TABLE login (
     gpg integer DEFAULT 0,
     d_plotter integer DEFAULT 0 NOT NULL,
     d_plottype integer DEFAULT 1 NOT NULL,
-    d_utc integer DEFAULT 0 NOT NULL,
-    d_sensorstatus character varying
+    d_utc integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE login_id_seq
@@ -896,14 +895,14 @@ GRANT SELECT,UPDATE ON TABLE scanners TO idslog;
 
 GRANT SELECT ON SEQUENCE scanners_id_seq TO idslog;
 
-SELECT pg_catalog.setval('scanners_id_seq', 1, false);
+SELECT pg_catalog.setval('scanners_id_seq', 6, true);
 
 INSERT INTO scanners VALUES (2, 'Antivir', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', NULL, NULL, NULL, NULL);
-INSERT INTO scanners VALUES (4, 'AVAST', 1, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
-INSERT INTO scanners VALUES (5, 'F-Prot', 1, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
+INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
+INSERT INTO scanners VALUES (5, 'F-Prot', 0, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
 
 --
 -- SCHEME 
