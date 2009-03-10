@@ -83,8 +83,8 @@
                 $label = $row['label'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label; 
-		$org = $row['organisation'];
-		if ($q_org == 0 ) {
+                $org = $row['organisation'];
+                if ($q_org == 0 ) {
                   echo printOption($id, "$sensor - $org", $sid);
                 } else {
                   echo printOption($id, $sensor, $sid);
@@ -154,7 +154,7 @@
                 $label = $sensord['label'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
+                $org = $sensord['organisation'];
                 if ($q_org == 0) {
                   echo printOption($id, "$sensor - $org", $sid);
                 } else {
@@ -230,7 +230,7 @@
                 $label = $sensord['label'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
+                $org = $sensord['organisation'];
                 if ($q_org == 0) {
                   echo printOption($id, "$sensor - $org", $sid);
                 } else {
@@ -307,7 +307,7 @@
                 $label = $sensord['label'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
+                $org = $sensord['organisation'];
                 if ($q_org == 0) {
                   echo printOption($id, "$sensor - $org", $sid);
                 } else {
@@ -396,7 +396,7 @@
                 $label = $sensord['label'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label; 
-		$org = $sensord['organisation'];
+                $org = $sensord['organisation'];
                 if ($q_org == 0) {
                   echo printOption($id, "$sensor - $org", $sid);
                 } else {
