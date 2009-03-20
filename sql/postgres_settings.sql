@@ -19,6 +19,15 @@ CREATE PROCEDURAL LANGUAGE plpgsql;
 ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
 
 --
+-- VERSION
+--
+
+CREATE TABLE version (
+    version character varying NOT NULL
+);
+INSERT INTO version VALUES ('3.00');
+
+--
 -- SENSORS 
 --
 

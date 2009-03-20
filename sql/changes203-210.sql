@@ -17,6 +17,15 @@
 --
 
 --
+-- VERSION
+--
+
+CREATE TABLE version (
+    version character varying NOT NULL
+);
+INSERT INTO version VALUES ('3.00');
+
+--
 -- SENSORS
 --
 ALTER TABLE sensors ADD COLUMN networkconfig character varying;

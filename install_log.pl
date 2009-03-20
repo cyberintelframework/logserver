@@ -2,7 +2,7 @@
 
 ####################################
 # Installation script              #
-# SURFids 2.10                     #
+# SURFids 3.00                     #
 # Changeset 001                    #
 # 26-02-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
@@ -54,16 +54,16 @@ if ($psqlcheck !~ /^8\..*$/) {
 # Main script
 ##########################
 
-if (-e "$targetdir/webinterface/") {
-  printmsg("SURFnet IDS logging server already installed:", "info");
-  $confirm = "none";
-  while ($confirm !~ /^(n|N|y|Y)$/) {
-    $confirm = &prompt("Overwrite old installation? [y/n]: ");
-  }
-  if ($confirm =~ /^(n|N)$/) {
-    exit;
-  }
-}
+#if (-e "$targetdir/webinterface/") {
+#  printmsg("SURFnet IDS logging server already installed:", "info");
+#  $confirm = "none";
+#  while ($confirm !~ /^(n|N|y|Y)$/) {
+#    $confirm = &prompt("Overwrite old installation? [y/n]: ");
+#  }
+#  if ($confirm =~ /^(n|N)$/) {
+#    exit;
+#  }
+#}
 
 if (-e "$logfile") {
   `rm -f $logfile 2>/dev/null`;
@@ -89,36 +89,36 @@ if (-e "$configdir/surfnetids-log.conf") {
   if ($? != 0) { $err++; }
 }
 
-`cp -r ./* $targetdir/ 2>>$logfile`;
-printmsg("Copying surfnetids files:", $?);
-if ($? != 0) { $err++; }
+#`cp -r ./* $targetdir/ 2>>$logfile`;
+#printmsg("Copying surfnetids files:", $?);
+#if ($? != 0) { $err++; }
 
 ####################
 # Setting up crontab
 ####################
 
-open(CRONTAB, ">> /etc/crontab");
-open(CRONLOG, "${installdir}crontab.log");
-while (<CRONLOG>) {
-  $line = $_;
-  chomp($line);
-  if ($line ne "") {
-    @ar_line = split(/ /, $line);
-    $check = $ar_line[6];
-    chomp($check);
-    $file = `cat ${installdir}crontab.log | grep -F "$line" | awk '{print \$7}' | awk -F"/" '{print \$NF}'`;
-    chomp($file);
-    if ("$file" ne "") {
-      $chk = checkcron($file);
-      if ($chk == 0) {
-        printmsg("Adding crontab rule for $file:", "info");
-        print CRONTAB $line ."\n";
-      }
-    }
-  }
-}
-close(CRONTAB);
-close(CRONLOG);
+#open(CRONTAB, ">> /etc/crontab");
+#open(CRONLOG, "${installdir}crontab.log");
+#while (<CRONLOG>) {
+#  $line = $_;
+#  chomp($line);
+#  if ($line ne "") {
+#    @ar_line = split(/ /, $line);
+#    $check = $ar_line[6];
+#    chomp($check);
+#    $file = `cat ${installdir}crontab.log | grep -F "$line" | awk '{print \$7}' | awk -F"/" '{print \$NF}'`;
+#    chomp($file);
+#    if ("$file" ne "") {
+#      $chk = checkcron($file);
+#      if ($chk == 0) {
+#        printmsg("Adding crontab rule for $file:", "info");
+#        print CRONTAB $line ."\n";
+#      }
+#    }
+#  }
+#}
+#close(CRONTAB);
+#close(CRONLOG);
 
 printdelay("Restarting cron:");
 `/etc/init.d/cron restart 2>>$logfile`;
@@ -158,22 +158,22 @@ while (! -d $apachedir) {
 
 if (-e "$apachesiteadir/surfnetids-log-apache.conf") {
   $ts = time();
-  `mv -f $apachesiteadir/surfnetids-log-apache.conf $targetdir/surfnetids-log-apache.conf-$ts 2>>$logfile`;
-  printmsg("Creating backup of surfnetids-log-apache.conf:", $?);
+  `mv -f $apachesiteadir/surfnetids-log-apache.conf $configdir/surfnetids-log-apache.conf 2>>$logfile`;
+  printmsg("Relocating surfnetids-log-apache.conf:", $?);
   if ($? != 0) { $err++; }
 }
 
-`cp $installdir/surfnetids-log-apache.conf $apachesiteadir 2>>$logfile`;
-printmsg("Setting up $apachev configuration:", $?);
-if ($? != 0) { $err++; }
-
 printdelay("Enabling SURFids site for $apachev:");
-`a2ensite surfnetids-log-apache.conf 2>>$logfile`;
+`ln -s $configdur/surfnetids-log-apache.conf $apachesiteadir/surfids-logserver.conf 2>>$logfile`;
 printresult($?);
 if ($? != 0) { $err++; }
 
 printdelay("Enabling Auth_PGSQL for $apachev:");
-`a2enmod 000_auth_pgsql 2>>$logfile`;
+if (-e "/etc/$apachev/mods-available/000_auth_pgsql") {
+    `a2enmod 000_auth_pgsql 2>>$logfile`;
+} elsif (-e "/etc/$apachev/mods-available/auth_pgsql") {
+    `a2enmod auth_pgsql 2>>$logfile`;
+}
 printresult($?);
 if ($? != 0) { $err++; }
 
@@ -200,7 +200,6 @@ while ($dbuser eq "") {
     $dbuser = "postgres";
   }
 }
-
 
 $dbhost = "";
 while ($dbhost eq "") {
