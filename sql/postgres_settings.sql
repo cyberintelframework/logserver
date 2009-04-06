@@ -25,7 +25,7 @@ ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
 CREATE TABLE version (
     version character varying NOT NULL
 );
-INSERT INTO version VALUES ('3.00');
+INSERT INTO version VALUES ('30000');
 
 --
 -- SENSORS 
