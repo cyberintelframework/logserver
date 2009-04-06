@@ -21,9 +21,9 @@
 --
 
 CREATE TABLE version (
-    version character varying NOT NULL
+    version integer NOT NULL
 );
-INSERT INTO version VALUES ('3.00');
+INSERT INTO version VALUES (30000);
 
 --
 -- SENSORS
