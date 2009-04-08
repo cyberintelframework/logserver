@@ -84,27 +84,27 @@ GRANT SELECT,UPDATE ON SEQUENCE sensor_details_id_seq TO idslog;
 --
 -- SENSORS_LOG
 --
-DROP TABLE sensors_log;
+DROP TABLE IF EXISTS sensors_log;
 
 --
 -- SERVERS
 --
-DROP TABLE servers;
+DROP TABLE IF EXISTS servers;
 
 --
 -- STATS_HISTORY
 --
-DROP TABLE stats_history;
+DROP TABLE IF EXISTS stats_history;
 
 --
 -- STATS_HISTORY_DIALOGUE
 --
-DROP TABLE stats_history_dialogue;
+DROP TABLE IF EXISTS stats_history_dialogue;
 
 --
 -- STATS_HISTORY_VIRUS
 --
-DROP TABLE stats_history_virus;
+DROP TABLE IF EXISTS stats_history_virus;
 
 --
 -- ARP_EXCL
