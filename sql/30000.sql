@@ -122,16 +122,6 @@ ALTER TABLE ONLY arp_excl
 
 GRANT INSERT,SELECT,UPDATE,DELETE ON TABLE arp_excl TO idslog;
 
-CREATE SEQUENCE arp_excl_id_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-ALTER SEQUENCE arp_excl_id_seq OWNED BY arp_excl.id;
-ALTER TABLE arp_excl ALTER COLUMN id SET DEFAULT nextval('arp_excl_id_seq'::regclass);
-GRANT SELECT,UPDATE ON SEQUENCE arp_excl_id_seq TO idslog;
-
 --
 -- INDEXMODS
 --
@@ -140,14 +130,6 @@ CREATE TABLE indexmods (
     phppage character varying
 );
 
-CREATE SEQUENCE indexmods_id_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-ALTER SEQUENCE indexmods_id_seq OWNED BY indexmods.id;
-ALTER TABLE indexmods ALTER COLUMN id SET DEFAULT nextval('indexmods_id_seq'::regclass);
 SELECT pg_catalog.setval(pg_catalog.pg_get_serial_sequence('indexmods', 'id'), 11, true);
 
 INSERT INTO indexmods VALUES (1, 'mod_attacks.php');
