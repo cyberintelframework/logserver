@@ -164,7 +164,7 @@ if (-e "$apachesiteadir/surfnetids-log-apache.conf") {
 }
 
 printdelay("Enabling SURFids site for $apachev:");
-`ln -s $configdur/surfnetids-log-apache.conf $apachesiteadir/surfids-logserver.conf 2>>$logfile`;
+`ln -s $configdir/surfnetids-log-apache.conf $apachesiteadir/surfids-logserver.conf 2>>$logfile`;
 printresult($?);
 if ($? != 0) { $err++; }
 
@@ -614,7 +614,6 @@ print "# ${g}SURFnet IDS installation complete${n} #\n";
 print "#####################################\n";
 print "\n";
 print "Interesting configuration files:\n";
-print "  ${g}/etc/crontab${n}\n";
 print "  ${g}$apachev config files${n}\n";
 print "\n";
 print "Still needs configuration:\n";
