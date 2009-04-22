@@ -1,7 +1,7 @@
 <?php
 
 ####################################
-# SURFids 2.10                     #
+# SURFids 3.00                     #
 # Changeset 001                    #
 # 18-11-2008                       #
 # Hiroshi Suzuki of NTT-CERT       #

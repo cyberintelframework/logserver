@@ -1,6 +1,6 @@
 /*
  * ####################################
- * # SURFids 2.10                     #
+ * # SURFids 3.00                     #
  * # Changeset 006                    #
  * # 10-11-2008                       #
  * # Jan van Lith & Kees Trippelvitz  #
@@ -13,7 +13,7 @@
  * # 004 Added support for Nepenthes mail markup
  * # 003 Added selector functions
  * # 002 Fixed bug with Critera field in logsearch
- * # 001 version 2.10
+ * # 001 version 3.00
  * #############################################
  */
 

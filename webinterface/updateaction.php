@@ -1,7 +1,7 @@
 <?php
 
 ####################################
-# SURFids 2.10                     #
+# SURFids 3.00                     #
 # Changeset 002                    #
 # 03-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
@@ -116,32 +116,6 @@ if (isset($clean['sid'])) {
       pg_close($pgconn);
       header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
       exit;
-    }
-  }
-
-  if (isset($clean['tapip'])) {
-    $tapip = $clean['tapip'];
-    $sql_checkip = "SELECT tapip FROM sensors WHERE tapip = '$tapip' AND NOT keyname = '$keyname'";
-    $result_checkip = pg_query($pgconn, $sql_checkip);
-    $checkip = pg_num_rows($result_checkip);
-    if ($checkip > 0) {
-      $m = 155;
-      $err = 1;
-    } else {
-      $sql_updatestatus = "UPDATE sensors SET tapip = '$tapip' WHERE id = '$sid' AND vlanid = '$vlanid'";
-      $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
-      $m = 3;
-    }
-  } else {
-    $sql_m = "SELECT netconf FROM sensors WHERE id = '$sid'";
-    $result_m = pg_query($pgconn, $sql_m);
-    $row_m = pg_fetch_assoc($result_m);
-    $netconf = $row_m['netconf'];
-
-    if ($netconf == "vlans" || $netconf == "static") {
-      $sql_updatestatus = "UPDATE sensors SET tapip = NULL WHERE id = '$sid' AND vlanid = '$vlanid'";
-      $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
-      $m = 3;
     }
   }
 } else {

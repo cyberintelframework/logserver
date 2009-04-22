@@ -1,7 +1,7 @@
 <?php $tab="2.8"; $pagetitle="Graphs"; include("menu.php"); contentHeader();
 
 ####################################
-# SURFids 2.10                     #
+# SURFids 3.00                     #
 # Changeset 001                    #
 # 18-11-2008                       #
 # Kees Trippelvitz & Jan van Lith  #
