@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 03-11-2008                       #
+# Changeset 003                    #
+# 23-04-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed action update
 # 002 Added md5_hash check
 # 001 version 2.10.00
 #############################################
@@ -126,7 +127,7 @@ if ($err != 1) {
   $action_pattern = '/^(IGNORE|UNIGNORE)$/';
   $active_pattern = '/^(ACTIVATE|DEACTIVATE)$/';
   if (!preg_match($action_pattern, $action)) {
-    $sql_updatestatus = "UPDATE sensors SET action = '" .$action. "' WHERE keyname = '$keyname'";
+    $sql_updatestatus = "UPDATE sensor_details SET action = '" .$action. "' WHERE keyname = '$keyname'";
     $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
     if ($m == "") {
       $m = 3;
