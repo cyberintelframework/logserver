@@ -1,11 +1,12 @@
 -- SURFids 2.10
--- Database conversion 2.03 -> 2.10
+-- Database conversion 2.03/2.04 -> 3.00
 -- Changeset 008
 -- 13-11-2008
 --
 
 --
 -- Changelog
+-- 009 Added upx support
 -- 008 Added scanner modifications
 -- 007 Added missing binaries_detail.bin conversion
 -- 006 Added type conversion of severity.val
@@ -24,6 +25,13 @@ CREATE TABLE version (
     version integer NOT NULL
 );
 INSERT INTO version VALUES (30000);
+
+--
+-- BINARIES_DETAIL
+--
+ALTER TABLE binaries_detail ADD COLUMN upx character varying;
+ALTER TABLE binaries_detail ADD COLUMN last_scanned integer;
+ALTER TABLE binaries_detail ALTER COLUMN bin TYPE integer USING binaries_detail.bin::integer;
 
 --
 -- SENSORS
