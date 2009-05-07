@@ -1,5 +1,5 @@
 --
--- SURFids 2.10
+-- SURFids 3.00
 -- Database structure
 -- Changeset 006
 -- 25-02-2009

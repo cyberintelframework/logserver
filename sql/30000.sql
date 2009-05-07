@@ -1,4 +1,4 @@
--- SURFids 2.10
+-- SURFids 3.00
 -- Database conversion 2.03/2.04 -> 3.00
 -- Changeset 008
 -- 13-11-2008

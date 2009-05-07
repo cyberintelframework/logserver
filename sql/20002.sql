@@ -1,9 +1,11 @@
--- SURFnet IDS SQL Version 2.00.02
--- Version: 2.00.05
+-- SURFids 3.00
+-- Database conversion 2.00.02 -> 2.00.03
+-- Changeset 001
 -- 01-02-2008
+--
 
 -- Changelog
--- 2.00.01 Initial release
+-- 001 Initial release
 
 --
 -- OSTYPES

@@ -1,13 +1,14 @@
--- SURFnet IDS SQL Version 2.00
--- Version: 2.00.05
+-- SURFids 3.00
+-- Database conversion 2.00.02 -> 2.00.03
+-- Changeset 005
 -- 25-09-2007
 
 -- Changelog
--- 2.00.05 Added some modifications to the attacks table options
--- 2.00.04 Added atype update for the attacks table
--- 2.00.03 Fixed typos
--- 2.00.02 Changed report_content sql
--- 2.00.01 Initial release
+-- 005 Added some modifications to the attacks table options
+-- 004 Added atype update for the attacks table
+-- 003 Fixed typos
+-- 002 Changed report_content sql
+-- 001 Initial release
 
 --
 -- ARGOS

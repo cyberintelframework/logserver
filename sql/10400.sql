@@ -1,16 +1,17 @@
--- SURFnet IDS SQL changes for 1.04
--- Version: 1.04.08
+-- SURFids 3.00
+-- Database conversion 2.00.02 -> 2.00.03
+-- Changeset 008
 -- 01-06-2007
 
 -- Changelog
--- 1.04.08 Fixed a bug with netconfdetail
--- 1.04.07 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
--- 1.04.06 Added default value for sensors.status
--- 1.04.05 Fixed binaries conversion, updated antivirus stuff
--- 1.04.04 Fixed transition from netconf to netconfdetail
--- 1.04.03 Added column subject to table report_content
--- 1.04.02 Added f-prot updater
--- 1.04.01 Initial release
+-- 008 Fixed a bug with netconfdetail
+-- 007 Added privileges for nepenthes user on stats_dialogue and uniq_binaries
+-- 006 Added default value for sensors.status
+-- 005 Fixed binaries conversion, updated antivirus stuff
+-- 004 Fixed transition from netconf to netconfdetail
+-- 003 Added column subject to table report_content
+-- 002 Added f-prot updater
+-- 001 Initial release
 
 --
 -- NORMAN
