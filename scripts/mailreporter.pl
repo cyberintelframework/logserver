@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ####################################
 # Mail reporter                    #
-# SURFids 2.10                     #
+# SURFids 3.00                     #
 # Changeset 010                    #
 # 10-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ####################################
 # CWSandbox retrieval script       #
-# SURFids 2.10                     #
+# SURFids 3.00                     #
 # Changeset 001                    #
 # 13-09-2007                       #
 # Jan van Lith & Kees Trippelvitz  #
@@ -10,7 +10,7 @@
 
 ###############################################
 # Changelog:
-# 001 version 2.10
+# 001 version 3.00
 ###############################################
 
 ####################
