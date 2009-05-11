@@ -45,6 +45,7 @@ $('#search_wait').html("<?php echo "<center>" .$l['gm_setting']. "<br /><br />" 
 $('#map').jmap('init', {
         'mapZoom': 8,
         'mapShowOverview': false,
+        'mapShowjMapsIcon': false,
         'mapControlSize': 'large',
         'mapDimensions': [900,400]
 });

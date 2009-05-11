@@ -46,6 +46,7 @@ $('#map').jmap('init', {
         'mapZoom': 2,
         'mapShowOverview': false,
         'mapControlSize': 'large',
+        'mapShowjMapsIcon': false,
         'mapDimensions': [900,400]
 });
 
