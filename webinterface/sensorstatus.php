@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 006                    #
-# 03-11-2008                       #
+# Changeset 007                    #
+# 29-05-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 007 Added default page configuration
 # 006 Added md5_hash to updateaction link
 # 005 Changed sensor $status stuff
 # 004 Added selector for org selection
@@ -104,7 +105,11 @@ $debuginfo[] = $sql_conf;
 $result_conf = pg_query($pgconn, $sql_conf);
 $row_conf = pg_fetch_assoc($result_conf);
 $pageconf = $row_conf['config'];
-$pageconf = split(",", $pageconf);
+if ($pageconf == "") {
+  $pageconf = "1,3,4,6,9,10,11";
+} else {
+  $pageconf = split(",", $pageconf);
+}
 
 foreach ($pageconf as $key => $val) {
   $pconf[$val] = 1;
