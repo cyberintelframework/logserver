@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 03-03-2008                       #
+# Changeset 003                    #
+# 04-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 003 Added ORDER BY to host types
 # 002 Fixed bug #68
 # 001 Added language support
 ####################################
@@ -156,7 +157,7 @@ echo "<div class='left'>\n";
                 $static_arp["$ip"] = $mac;
                 $typestring = "";
 
-                $sql_getht = "SELECT type FROM sniff_hosttypes WHERE staticid = '$id'";
+                $sql_getht = "SELECT type FROM sniff_hosttypes WHERE staticid = '$id' ORDER BY type";
                 $debuginfo[] = $sql_getht;
                 $result_getht = pg_query($pgconn, $sql_getht);
                 $types = array();
