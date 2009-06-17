@@ -231,6 +231,7 @@ function getepoch($stamp) {
 #   date - date/time in the format of 22-08-98 21:45
 #   intcsv - Comma separated list of integers (1,23,5432,2)
 #   ascdesc - Accepts any of these values: ASC asc DESC desc
+#   cc - 2 letter country code abbreviation
 # These checks should be prepended to the variable name separated by a _ character
 # Examples:
 # int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
@@ -283,7 +284,7 @@ function extractvars($source, $allowed) {
                   }
                 } elseif ($check == "bool") {
                   $var = strtolower($var);
-	          $pattern = '/^(t|true|f|false)$/';
+                  $pattern = '/^(t|true|f|false)$/';
                   if (!preg_match($pattern, $var)) {
                     $tainted[$temp] = $var;
                   } else {
@@ -351,6 +352,13 @@ function extractvars($source, $allowed) {
                 } elseif ($check == "ascdesc") {
                   $ascdesc_regexp = '/(asc|ASC|desc|DESC)/';
                   if (preg_match($ascdesc_regexp, $var)) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "cc") {
+                  $cc_regexp = '/[a-zA-Z]{2}/';
+                  if (preg_match($cc_regexp, $var)) {
                     $clean[$temp] = $var;
                   } else {
                     $tainted[$temp] = $var;
