@@ -155,29 +155,6 @@ if ($err != 1) {
     $header = $sensor;
   }
 
-#  echo "<div class='all'>\n";
-#    echo "<div class='leftsmall'>\n";
-#      echo "<div class='block'>\n";
-#        echo "<div class='actionBlock'>\n";
-#          echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
-#          echo "<div class='blockContent'>\n";
-#            echo "<form name='sensoractions' method='get' action='purge.php'>\n";
-#              echo $l['sd_purge']. " ";
-#              echo "<select name='int_time' onchange='this.form.submit();'>\n";
-#                echo printOption(0, "", 0);
-#                foreach ($v_sensor_purge_ar as $key => $val) {
-#                  echo printOption($key, $val, -1);
-#                }
-#              echo "</select>\n";
-#              echo "<input type='hidden' name='int_sid' value='$sid' />\n";
-#            echo "</form>\n";
-#          echo "</div>\n"; #</blockContent>
-#          echo "<div class='blockFooter'></div>\n";
-#        echo "</div>\n"; #</dataBlock>
-#      echo "</div>\n"; #</block>
-#    echo "</div>\n"; #</leftsmall>
-#  echo "</div>\n"; #</all>
-
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
