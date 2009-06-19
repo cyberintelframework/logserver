@@ -380,43 +380,6 @@ $v_phplot_data_colors = array(
 	"wheat", "yellow", "YellowGreen"
 );
 
-# Array with the different help messages for the webinterface.
-$v_help = array(
-    binaryhist.php => array(
-        "upx" => "UPX is a well-known compression often used for malicious files. This shows the result of the UPX check.",
-        "fileinfo" => "The output of the linux program \\\"file\\\"."
-    ),
-	index.php => array(
-		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
-		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.",
-		2 => "Argos detected a control flow diversion (e.g. caused by a buffer overflow or code injection).",
-		16 => "A piece of malware is offered to the honeypot. The honeypot will try to download it.",
-		32 => "The malware was succesfully downloaded to the honeypot."
-	),
-	logindex.php => array(
-		0 => "This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc).",
-		1 => "At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.",
-		2 => "Argos detected a control flow diversion (e.g. caused by a buffer overflow or code injection).",
-		16 => "A piece of malware is offered to the honeypot. The honeypot will try to download it.",
-		32 => "The malware was succesfully downloaded to the honeypot."
-	),
-	orgedit.php => array(
-		"ranges" => "The IP network ranges of the organisations networks. These ranges are used to check for attacks sourced from these ranges.",
-		"ris" => "This is a unique string to identify the organisation.<br /> This can be placed on the sensor to make sure it will be placed in the correct organisation.",
-	),
-	sensorstatus.php => array(
-        "action" => "Ignore: A sensor can be ignored when its currently not in use.
-<br><b>Deactivate</b>: A sensor can be deactivated when the sensor is never expected to be used again. Both the sensor and attached attack records are stored in an archive table."
-	),
-	argosconfig.php => array(
-		"sensor" => "The name of the sensor (VLAN number included if applicable).",
-		"deviceip" => "The virtual device on the tunnel server. This IP address will be configured on the argos image",
-		"imagename" => "The name of the Argos image.",
-		"template" => "The template to be used. This will redirect IP addresses to the argos image you selected.<br /> The redirection is done by getting the possible malicious attacks that where not malicious after that.",
-		"timespan" => "The timespan used to calculate the IP addresses that will be redirected.",
-	)
-);
-
 # Array with the different host types.
 $v_host_types = array(
 	1 => "Router/Gateway",
@@ -444,15 +407,6 @@ $v_selector_period = array(
 	7 => "Last Month",
 	8 => "This Year"
 );
-
-# Array with the different types of logmessages
-$v_logmessages_type_ar = array(
-	0 => "Debug",
-	1 => "Info",
-	2 => "Warning",
-	3 => "Error",
-	4 => "Critical"
-);	
 
 # Array with the text messages and classes for the different status values of a sensor
 $v_sensorstatus_ar = array(
@@ -525,18 +479,7 @@ $v_search_src_ar = array (
 	'3' => "Own Ranges"
 );
 
-# Array with the different logmessages purge timespans
-$v_sensor_purge_ar = array(
-	31536000 => "1 year",
-	2592000 => "1 month",
-	604800 => "1 week",
-	86400 => "1 day",
-	3600 => "1 hour"
-);
-
 $v_weekdays = array("", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
-
-$v_openflash_colors_ar = array("0x009900", "0xFF6600", "0xFFCC33", "0x0000FF", "0x66CCFF", "0xCC3399", "0x00FF00");
 
 $v_os_languages = array(
 	'nl' => "Dutch",
@@ -555,31 +498,9 @@ $v_group_type_ar = array(
 	1 => "Global"
 );
 
-$v_group_detail_ar = array(
-	0 => "Anonymize data",
-	1 => "Show all data"
-);
-
-$v_group_status_ar = array(
-	0 => "Pending admin approval",
-	1 => "Active",
-	2 => "Denied by admin"
-);
-
-$v_groupmember_status_ar = array(
-	0 => "Waiting for approval",
-	1 => "Member"
-);
-
 $v_plotters_ar = array(
 	0 => "Open Flash Chart",
 	1 => "PHPlot"
-);
-
-$v_sensor_system_detail_ar = array(
-	1 => "Main route",
-	3 => "Tap rule",
-	4 => "Tap route"
 );
 
 $v_timestamp_format_ar = array(
@@ -600,14 +521,6 @@ $v_syslog_levels_ar = array(
 	2 => "Warning",
 	3 => "Error",
 	4 => "Critical"
-);
-
-$v_syslog_level_colours_ar = array(
-	0 => "Green",
-	1 => "Yellow",
-	2 => "Orange",
-	3 => "Red",
-	4 => "Red"
 );
 
 $v_note_types_ar = array(
