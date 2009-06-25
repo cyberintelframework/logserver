@@ -278,6 +278,7 @@ $v_errors = array(
 		8 => "Successfully purged events!",
 		9 => "Successfully retrieved data!",
 		10 => "Successfully stored defaults!",
+        11 => "Successfully added %1% %2%",
 		100 => "Session expired, login again!",
 		101 => "You don't have sufficient rights to perform the requested action!",
 		102 => "Invalid or missing name!",
