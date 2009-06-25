@@ -291,7 +291,6 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         echo "<div id='popupcontent'>" .$l['me_loading']. "</div>\n";
       echo "</div>\n";
       echo "<div id='overlay' onclick='popout();'></div>\n";
-      echo "<div id='overlay_lock'></div>\n";
 
 
 function insert_selector($o_show = 1, $t_show = 1) {

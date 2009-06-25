@@ -222,7 +222,7 @@ function getScrollSize(){
   return yScroll;
 }
 
-function popit(url, lock ,h ,w) {
+function popit(url, h, w) {
   var wh = getScrollSize();
   $("#popupcontent").load(url);
 
@@ -231,13 +231,7 @@ function popit(url, lock ,h ,w) {
     $("#popup").width(w);
   }
   $("#popup").show();
-  if (lock == true) {
-    $("#overlay_lock").show();
-//    $("#overlay_lock").height(wh);
-  } else {
-    $("#overlay").show();
-//    $("#overlay").height(wh);
-  }
+  $("#overlay").show();
   return false;
 }
 
@@ -245,7 +239,6 @@ function popout() {
   $("#popup").hide();
   $("#error").hide();
   $("#overlay").hide();
-  $("#overlay_lock").hide();
   $("#popupcontent").html('Loading...');
 }
 
@@ -886,9 +879,6 @@ function process_aresult(data, type) {
     if (err != "") {
       $.jGrowl(err, { life: 500, header: "Success" });
     }
-  } else if (ec == "RELOG") {
-    GB_show("test","popup_login.php",470,600);
-//    popit("popup_login.php", true, 50);
   } else {
     var err = result.find("error").text();
     $.jGrowl(err, { sticky: true, header: "Error" });
