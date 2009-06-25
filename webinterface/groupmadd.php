@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 23-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Added check on organisation sensors add
 # 001 Initial release
 #############################################
 
@@ -155,13 +156,13 @@ if ($err != 1) {
     $m = 1;
     echo "<result>";
       echo "<status>OK</status>";
-      echo "<error>" .$v_errors[$m]. "</error>";
       echo "<data>";
 
         $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$org'";
         $debuginfo[] = $sql;
         $result = pg_query($pgconn, $sql);
  
+        $count = 0;
         while($row = pg_fetch_assoc($result)) {
           $sid = $row['id'];
           $keyname = $row['keyname'];
@@ -169,12 +170,19 @@ if ($err != 1) {
           $label = $row['label'];
           $sensor = sensorname($keyname, $vlanid, $label);
 
-          $sql_insert = "INSERT INTO groupmembers (groupid, sensorid) ";
-          $sql_insert .= "VALUES ('$gid', '$sid')";
-          $debuginfo[] = $sql_insert;
-          $ec = pg_query($pgconn, $sql_insert);
+          $sql_check = "SELECT sensorid FROM groupmembers WHERE groupid = $gid AND sensorid = $sid";
+          $debuginfo[] = $sql_check;
+          $c = pg_query($pgconn, $sql_check);
+          $chk = pg_num_rows($c);
+          if ($chk == 0) {
+            $count++;
+            $sql_insert = "INSERT INTO groupmembers (groupid, sensorid) ";
+            $sql_insert .= "VALUES ('$gid', '$sid')";
+            $debuginfo[] = $sql_insert;
+            $ec = pg_query($pgconn, $sql_insert);
 
-          echo "<sensor sid=\"$sid\" name=\"$sensor\" />";
+            echo "<sensor sid=\"$sid\" name=\"$sensor\" />";
+          }
         }
 
         # Getting group info
@@ -198,6 +206,13 @@ if ($err != 1) {
           echo "<members>$members</members>";
         echo "</group>";
       echo "</data>";
+      $error = str_replace("%1%", $count, $v_errors[11]);
+      if ($count == 1) {
+        $error = str_replace("%2%", "record", $error);
+      } else {
+        $error = str_replace("%2%", "records", $error);
+      }
+      echo "<error>" .$error. "</error>";
     echo "</result>";
   }
 } else {
