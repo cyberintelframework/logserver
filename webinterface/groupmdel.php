@@ -39,7 +39,7 @@ $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_sid",
+        "int_sid",
 		"int_gid",
 		"md5_hash",
 		"intcsv_members"
