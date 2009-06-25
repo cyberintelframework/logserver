@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-11-2008                       #
+# Changeset 002                    #
+# 23-06-2009                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 002 Fixed permission issue
 # 001 Initial release
 ####################################
 
@@ -28,11 +29,13 @@ if (!isset($_SESSION['s_admin'])) {
   exit;
 }
 
+$s_admin = intval($_SESSION['s_admin']);
+$s_hash = md5($_SESSION['s_hash']);
 $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_orgid",
+        "int_orgid",
 		"int_ident",
 		"md5_hash"
 );
