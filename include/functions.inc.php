@@ -1,8 +1,8 @@
 <?php
 ####################################
-# SURFids 2.10                     #
-# Changeset 007                    #
-# 18-08-2008                       #
+# SURFids 3.00                     #
+# Changeset 008                    #
+# 23-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 008 Fixed intcsv regexp
 # 007 Correctly chain checks in extractvars
 # 006 Several bugfixes sensorstatus
 # 005 Added sensorstatus
@@ -343,7 +344,7 @@ function extractvars($source, $allowed) {
                     $tainted[$temp] = $var;
                   }
                 } elseif ($check == "intcsv") {
-                  $intcsv_regexp = '/^([0-9]*,){1,}([0-9]){1,}$/';
+                  $intcsv_regexp = '/^([0-9]*,)?([0-9]){1,}$/';
                   if (preg_match($intcsv_regexp, $var)) {
                     $clean[$temp] = $var;
                   } else {
