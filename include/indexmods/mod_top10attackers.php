@@ -60,7 +60,16 @@ echo "<div class='block'>\n";
 
           $chk = date("w", $ls);
           $cur = date("w");
-          $dif = $cur - $chk;
+          $chk_u = date("U", $ls);
+          $cur_u = date("U");
+          if (($cur_u - $chk_u) > 604800) {
+            $dif = "NAN";
+          } else {
+            $dif = $cur - $chk;
+            if ($dif < 0) {
+              $dif = 7 + $dif;
+            }
+          }
           $ls = date($c_date_format, $ls);
 
           echo "<tr>\n";
@@ -120,7 +129,7 @@ echo "<div class='block'>\n";
               echo "<td style='background-color: $value; width: 10px;'>&nbsp;</td>\n";
             }
           }
-          echo "<td style='background-color: $v_indexcolors[$count]; text-align: center;' width='80'>" .$l['in_7']. "</td>\n";
+          echo "<td style='background-color: $v_indexcolors[$count]; text-align: center;' width='80'>" .$l['in_6']. "</td>\n";
         echo "</tr>\n";
       echo "</table>\n";
     echo "</div>\n"; #</blockContent>
