@@ -1,9 +1,9 @@
 <?php
 
 ####################################
-# SURFnet IDS 2.10.00              #
-# Changeset 004                    #
-# 09-04-2008                       #
+# SURFids 3.00                     #
+# Changeset 005                    #
+# 23-06-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #############################################
 # Changelog:
+# 005 Fixed typo
 # 004 Changed Server Info to Server Stats
 # 003 Added group pages
 # 002 Added missing timestamp text for search page
@@ -199,7 +200,7 @@ $l['in_attackers']      = "Attackers";
 $l['in_lastseen']       = "Last seen";
 $l['in_totalhits']      = "Total hits";
 $l['in_today']          = "Today";
-$l['in_7']              = "7 days ago";
+$l['in_6']              = "6 days ago";
 $l['in_ports']          = "Ports";
 $l['in_desc']           = "Description";
 $l['in_destports']      = "Destination ports";
