@@ -726,3 +726,8 @@ body {
 .draggable-normal {
   cursor:		default;
 }
+
+.subContent {
+  height:       255px;
+}
+
