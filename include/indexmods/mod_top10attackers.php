@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 18-04-2008                       #
+# Changeset 004                    #
+# 26-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Fixed bug #74 again
 # 003 Added ARP exclusion stuff
 # 002 Fixed bug #74
 # 001 Initial release
@@ -60,17 +61,23 @@ echo "<div class='block'>\n";
 
           $chk = date("w", $ls);
           $cur = date("w");
+          $chk_d = date("d", $ls);
+          $cur_d = date("d");
           $chk_u = date("U", $ls);
           $cur_u = date("U");
+          $ls = date($c_date_format, $ls);
           if (($cur_u - $chk_u) > 604800) {
             $dif = "NAN";
           } else {
             $dif = $cur - $chk;
             if ($dif < 0) {
               $dif = 7 + $dif;
+            } elseif ($dif == 0) {
+              if ($cur_d != $chk_d) {
+                $dif = "NAN";
+              }
             }
           }
-          $ls = date($c_date_format, $ls);
 
           echo "<tr>\n";
             echo "<td>";
