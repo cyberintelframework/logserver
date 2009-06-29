@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 008                    #
-# 23-06-2008                       #
+# Changeset 009                    #
+# 29-06-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 009 Fixed a bug in the printsort function
 # 008 Fixed intcsv regexp
 # 007 Correctly chain checks in extractvars
 # 006 Several bugfixes sensorstatus
@@ -966,21 +967,24 @@ function printsort($text, $sortitem) {
   if (!$sort_dir) {
     $sort_dir = "a";
   }
-  $url = str_replace("&sort=${sort}", "", $url);
-  $url = str_replace("sort=${sort}", "", $url);
-  $url = str_replace("?&", "?", $url);
-  $url = str_replace("&&", "&", $url);
+  $temp_url = rtrim($url, "&");
+  $temp_url = rtrim($url, "?");
+  $oper = strpos($temp_url, "?") ? "&" : "?";
+  $temp_url = str_replace("&sort=${sort}", "", $temp_url);
+  $temp_url = str_replace("sort=${sort}", "", $temp_url);
+  $temp_url = str_replace("?&", "?", $temp_url);
+  $temp_url = str_replace("&&", "&", $temp_url);
   $chk = substr($sort, 0, (strlen($sort) - 1));
   if ($sortitem == $chk) {
     if ($sort_dir == "a") {
-      $str = "<a href='${url}sort=${sortitem}d'>$text</a>";
+      $str = "<a href='${temp_url}${oper}sort=${sortitem}d'>$text</a>";
       $str .= "&nbsp;<img src='images/up.gif' />";
     } else {
-      $str = "<a href='${url}sort=${sortitem}a'>$text</a>";
+      $str = "<a href='${temp_url}${oper}sort=${sortitem}a'>$text</a>";
       $str .= "&nbsp;<img src='images/down.gif' />";
     }
   } else {
-    $str = "<a href='${url}sort=${sortitem}a'>$text</a>";
+    $str = "<a href='${temp_url}${oper}sort=${sortitem}a'>$text</a>";
   }
   return $str;
 }
