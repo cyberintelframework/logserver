@@ -1107,6 +1107,18 @@ function getcontact(result) {
   $("#popup").show();
 }
 
+function sensorlink(choice, sid) {
+  if (choice == "arpcache") {
+    var choice = "arp_cache.php?int_sid=" + sid;
+  } else if (choice == "arpstatic") {
+    var choice = "arp_static.php?int_sid=" + sid;
+  } else if (choice == "detproto") {
+    var choice = "detectedproto.php?int_sid=" + sid;
+  } else if (choice == "sdetails") {
+    var choice = "sensordetails.php?int_sid=" + sid;
+  }
+  window.location = choice;  
+}
 
 /*      HeaderTabs        */
 /**************************/
