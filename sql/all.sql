@@ -1,12 +1,13 @@
 --
 -- SURFids 3.00
 -- Database structure
--- Changeset 006
--- 25-02-2009
+-- Changeset 007
+-- 29-06-2009
 --
 
 --
 -- Version history
+-- 007 Added ClamAV virus regular expressions
 -- 006 Fixed plpgsql and escaping of virus definitions
 -- 005 A fresh schema of the development database
 -- 004 Modified report_content, added pageconf, indexmods
@@ -909,7 +910,7 @@ SELECT pg_catalog.setval('scanners_id_seq', 6, true);
 INSERT INTO scanners VALUES (2, 'Antivir', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
-INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', NULL, NULL, NULL, NULL);
+INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', E'.*: (.*) FOUND.*', E'.*FOUND.*', E'.*([a-zA-Z0-9]{32}):.*', E'.*OK.*');
 INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
 INSERT INTO scanners VALUES (5, 'F-Prot', 0, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
 

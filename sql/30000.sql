@@ -1,11 +1,12 @@
 -- SURFids 3.00
 -- Database conversion 2.03/2.04 -> 3.00
--- Changeset 008
--- 13-11-2008
+-- Changeset 010
+-- 29-06-2009
 --
 
 --
 -- Changelog
+-- 010 Added ClamAV virus regular expressions
 -- 009 Added upx support
 -- 008 Added scanner modifications
 -- 007 Added missing binaries_detail.bin conversion
@@ -225,7 +226,7 @@ INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
 INSERT INTO scanners VALUES (5, 'F-Prot', 0, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
-INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', NULL, NULL, NULL, NULL);
+INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', E'.*: (.*) FOUND.*', E'.*FOUND.*', E'.*([a-zA-Z0-9]{32}):.*', E'.*OK.*');
 
 --
 -- SEVERITY
