@@ -573,6 +573,11 @@ $l['ss_enable_arp']     = "Enable ARP";
 $l['ss_legend']         = "Legend";
 $l['ss_activate']       = "Activate";
 $l['ss_deactivate']     = "Deactivate";
+$l['ss_selectlink']     = "Select a page";
+$l['ss_arpcache']       = "ARP Cache";
+$l['ss_arpconf']        = "ARP Config";
+$l['ss_detprotos']      = "Detected Protocols";
+$l['ss_sdetails']       = "Sensor Details";
 
 ##########################
 # serverconfig.php
