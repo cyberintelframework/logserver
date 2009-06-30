@@ -196,7 +196,7 @@ echo "<div class='centerbig'>\n";
             if ($s_access_sensor > 0) {
               echo "<th>" .$l['g_action']. " " .printhelp(1, $sid). "</th>\n";
             }
-            echo "<th></th>\n";
+            echo "<th>" .$l['ss_quicknav']. "</th>\n";
           echo "</tr>\n";
 
           while ($row = pg_fetch_assoc($result_sensors)) {
