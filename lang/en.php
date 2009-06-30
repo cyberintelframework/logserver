@@ -578,6 +578,7 @@ $l['ss_arpcache']       = "ARP Cache";
 $l['ss_arpconf']        = "ARP Config";
 $l['ss_detprotos']      = "Detected Protocols";
 $l['ss_sdetails']       = "Sensor Details";
+$l['ss_quicknav']       = "Quick Nav";
 
 ##########################
 # serverconfig.php
