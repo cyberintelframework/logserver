@@ -128,23 +128,6 @@ foreach ($pageconf as $key => $val) {
 # 10: Tap MAC
 # 11: Tap IP
 
-if ($s_admin == 1) {
-  echo "<div id='adminmenu' onclick='adminmenu();'>\n";
-    echo "<div class='center'>\n";
-    echo "<table class='actiontable'>\n";
-      echo "<tr>\n";
-        echo "<th><span id='sensort'></span></th>\n";
-      echo "</tr>\n";
-    if ($selview != 9) {
-      echo "<tr><td><a id='activator' href=''>Deactivate</a></td></tr>\n";
-    } else {
-       echo "<tr><td><a id='activator' href=''>Activate</a></td></tr>\n";
-    }
-    echo "</table>\n";
-    echo "</div>\n";
-  echo "</div>\n";
-}
-
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
@@ -255,70 +238,70 @@ echo "<div class='centerbig'>\n";
 
             $cstatus = sensorstatus($status, $lastupdate, $uptime, $permanent);
 
-            echo "<form name='rebootform' method='post' action='updateaction.php?int_selview=$selview&md5_hash=$s_hash'>\n";
-              echo "<tr>\n";
-                ########################
-                # GENERAL
-                ########################
-                if (array_key_exists("1", $pconf)) {
-                  echo "<td><a href='sensordetails.php?int_sid=$sid' " .printover($label). ">$sensor</a></td>\n";
-                }
-                if (array_key_exists("2", $pconf)) {
-                  echo "<td><a href='sensordetails.php?int_sid=$sid'>$label</a></td>\n";
-                }
-                if (array_key_exists("3", $pconf)) {
-                  echo "<td>" .$v_sensornetconf_ar["$sensortype"]. "</td>\n";
-                }
-                if (array_key_exists("4", $pconf)) {
-                  echo "<td>";
-                    echo "<div class='sensorstatus'>";
-                      echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
-                        echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
-                      echo "</div>";
+            echo "<tr>\n";
+              ########################
+              # GENERAL
+              ########################
+              if (array_key_exists("1", $pconf)) {
+                echo "<td><a href='sensordetails.php?int_sid=$sid' " .printover($label). ">$sensor</a></td>\n";
+              }
+              if (array_key_exists("2", $pconf)) {
+                echo "<td><a href='sensordetails.php?int_sid=$sid'>$label</a></td>\n";
+              }
+              if (array_key_exists("3", $pconf)) {
+                echo "<td>" .$v_sensornetconf_ar["$sensortype"]. "</td>\n";
+              }
+              if (array_key_exists("4", $pconf)) {
+                echo "<td>";
+                  echo "<div class='sensorstatus'>";
+                    echo "<div class='" .$v_sensorstatus_ar[$cstatus]["class"]. "'>";
+                      echo "<div class='sensorstatustext'>" .$v_sensorstatus_ar[$cstatus]["text"]. "</div>";
                     echo "</div>";
-                  echo "</td>\n";
-                }
-                if (array_key_exists("5", $pconf)) {
-                  echo "<td>$uptime_text</td>\n";
-                }
-                ########################
-                # SENSOR SIDE
-                ########################
-                if (array_key_exists("6", $pconf)) {
-                  echo "<td>$remoteip</td>\n";
-                }
-                if (array_key_exists("7", $pconf)) {
-                  echo "<td>$localip</td>\n";
-                }
-                if (array_key_exists("8", $pconf)) {
-                  echo "<td>$sensormac</td>\n";
-                }
+                  echo "</div>";
+                echo "</td>\n";
+              }
+              if (array_key_exists("5", $pconf)) {
+                echo "<td>$uptime_text</td>\n";
+              }
+              ########################
+              # SENSOR SIDE
+              ########################
+              if (array_key_exists("6", $pconf)) {
+                echo "<td>$remoteip</td>\n";
+              }
+              if (array_key_exists("7", $pconf)) {
+                echo "<td>$localip</td>\n";
+              }
+              if (array_key_exists("8", $pconf)) {
+                echo "<td>$sensormac</td>\n";
+              }
 
-                ########################
-                # SERVER SIDE
-                ########################
-                if (array_key_exists("9", $pconf)) {
-                  echo "<td>$tap</td>\n";
+              ########################
+              # SERVER SIDE
+              ########################
+              if (array_key_exists("9", $pconf)) {
+                echo "<td>$tap</td>\n";
+              }
+              if (array_key_exists("10", $pconf)) {
+                echo "<td>$mac</td>\n";
+              }
+              # Tap IP address
+              if (array_key_exists("11", $pconf)) {
+                if (empty($tapip)) {
+                  echo "<td></td>\n";
+                } else {
+                  echo "<td>$tapip</td>\n";
                 }
-                if (array_key_exists("10", $pconf)) {
-                  echo "<td>$mac</td>\n";
-                }
-                # Tap IP address
-                if (array_key_exists("11", $pconf)) {
-                    if (empty($tapip)) {
-                      echo "<td></td>\n";
-                    } else {
-                      echo "<td>$tapip</td>\n";
-                    }
-                }
-                if ($s_access_sensor == 9) {
-                  echo "<td><a href='getcontact.php?int_sid=$sid&int_orgid=$orgid' class='jTip' name='$org' id='contact${sid}'>$org</a></td>\n";
-                }
-                if ($s_access_sensor > 0) {
-                  echo "<td>\n";
+              }
+              if ($s_access_sensor == 9) {
+                echo "<td><a href='getcontact.php?int_sid=$sid&int_orgid=$orgid' class='jTip' name='$org' id='contact${sid}'>$org</a></td>\n";
+              }
+              if ($s_access_sensor > 0) {
+                echo "<td>\n";
+                  echo "<form name='rebootform$sid' method='post' action='updateaction.php?int_selview=$selview&md5_hash=$s_hash'>\n";
                     echo "<input type='hidden' name='int_vlanid' value='$vlanid' />\n";
                     echo "<input type='hidden' name='int_sid' value='$sid' />\n";
-                    echo "<select name='action'>\n";
+                    echo "<select name='action' onchange='javascript: this.form.submit();'>\n";
                       echo printOption("NONE", $l['ss_none'], $action);
                       echo printOption("REBOOT", $l['ss_reboot'], $action);
                       echo printOption("SSHOFF", $l['ss_sshoff'], $action);
@@ -340,13 +323,20 @@ echo "<div class='centerbig'>\n";
                         echo "" . printOption("ENABLEARP", $l['ss_enable_arp'], $action) . "\n";
                       }
                     echo "</select>\n";
-                    echo "<td>\n";
-                      echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
-                    echo "</td>\n";
-                  echo "</td>\n";
-                }
-              echo "</tr>\n";
-            echo "</form>\n";
+                  echo "</form>\n";
+                echo "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='linker' id='linker' onchange='javascript: sensorlink(this.value, \"$sid\");'>\n";
+                    echo printOption("0", $l['ss_selectlink'], -1);
+                    echo printOption("arpcache", $l['ss_arpcache'], -1);
+                    echo printOption("arpstatic", $l['ss_arpconf'], -1);
+                    echo printOption("detproto", $l['ss_detprotos'], -1);
+                    echo printOption("sdetails", $l['ss_sdetails'], -1);
+                  echo "</select>\n";
+#                  echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
+                echo "</td>\n";
+              }
+            echo "</tr>\n";
           }
         echo "</table>\n";
       echo "</div>\n"; #</blockContent>
