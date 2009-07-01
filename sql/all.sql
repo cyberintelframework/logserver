@@ -1,12 +1,13 @@
 --
 -- SURFids 3.00
 -- Database structure
--- Changeset 007
--- 29-06-2009
+-- Changeset 008
+-- 01-07-2009
 --
 
 --
 -- Version history
+-- 008 Added support for networks bound to sensors (surfnet_sensorid_get)
 -- 007 Added ClamAV virus regular expressions
 -- 006 Fixed plpgsql and escaping of virus definitions
 -- 005 A fresh schema of the development database
@@ -1562,7 +1563,7 @@ CREATE FUNCTION surfnet_sensorid_get(inet) RETURNS integer
   p_localhost ALIAS FOR $1;
   m_sensorid  INTEGER;
 BEGIN
-        SELECT INTO m_sensorid id FROM sensors WHERE tapip = p_localhost;
+        SELECT INTO m_sensorid id FROM sensors WHERE tapip <<= p_localhost;
         return m_sensorid;
 END
 $_$
