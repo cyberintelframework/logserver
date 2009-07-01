@@ -665,7 +665,6 @@ function footer() {
   echo "</div>\n";
   echo "<div class='clearer'></div>\n";
   echo "</div>\n";
-  echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
 }
 
 # 3.15 sec_to_string
