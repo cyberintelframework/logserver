@@ -138,6 +138,10 @@ if ($id == 1) {
 } elseif ($id == 18) {
     # report_edit.php && report_new.php - Mail Priority
     echo "This option sets the X-Priority header of the mail.";
+} elseif ($id == 19) {
+    # useredit, myaccount, usernew - Page configuration
+    echo "These options will let you configure the way certain pages appear for you. <br />";
+    echo "To the right you can select which page to configure, below you can enable/disable options for the selected page";
 }
 
 ?>

@@ -273,7 +273,7 @@ if ($err == 0) {
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
         echo "<div class='blockHeader'>\n";
-          echo "<div class='blockHeaderLeft'>" .$l['ma_modules']. "</div>\n";
+          echo "<div class='blockHeaderLeft'>" .$l['ma_modules']. " " .printhelp(19). "</div>\n";
           echo "<div class='blockHeaderRight'>";
             echo "<select name='page_select' id='page_select' class='smallselect' onchange='switch_page_conf();'>";
               foreach ($v_page_select_ar as $key => $val) {
@@ -365,6 +365,7 @@ if ($err == 0) {
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</right>
   echo "</div>\n"; #</all>
+  echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
 }
 
 pg_close($pgconn);

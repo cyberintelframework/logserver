@@ -159,6 +159,7 @@ if ($err == 0) {
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</left>
+  echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
 }
 debug_sql();
 footer();
