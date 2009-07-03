@@ -339,7 +339,8 @@ $v_errors = array(
 		157 => "Invalid or missing page ID!",
         158 => "Invalid or missing note!",
         159 => "Invalid or missing VLAN specification!",
-        160 => "Invalid or missing note ID!"
+        160 => "Invalid or missing note ID!",
+        161 => "Invalid or missing sensor details record!<br /><br />More info in the <a href='$c_faq_url'>FAQ L13</a>."
 );
 
 # Array for the different types of plots available.

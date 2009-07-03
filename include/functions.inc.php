@@ -399,7 +399,7 @@ function geterror($m, $popup = 0) {
   }
 
   echo "<div class='all'>\n";
-  echo "<div class='leftsmall'>\n";
+  echo "<div class='left'>\n";
     echo "<div class='block'>\n";
       echo "<div class='${type}Block'>\n";
         if ($popup == 1) {
@@ -413,8 +413,8 @@ function geterror($m, $popup = 0) {
         echo "<div class='blockContent'>\n";
             echo "<table class='datatable'>\n";
               echo "<tr>\n";
-                echo "<td width='100'>" .ucfirst($type). " code:</td>\n";
-                echo "<td width='200'>$m</td>\n";
+                echo "<td width='50'>" .ucfirst($type). " code:</td>\n";
+                echo "<td width='250'>$m</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
                 echo "<td>" .ucfirst($type). " message:</td>\n";
