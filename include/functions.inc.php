@@ -238,7 +238,7 @@ function getepoch($stamp) {
 # Examples:
 # int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
 # ip_ip - Checks if the variable is a valid IP address, if so result will be put in $clean['ip'] else $tainted['ip']
-function extractvars($source, $allowed) {
+function extractvars($source, $allowed, $ignore_unallowed = 0) {
   if (!is_array($source)) {
     return 1;
   } else {
@@ -373,7 +373,9 @@ function extractvars($source, $allowed) {
               $tainted[$temp] = $var;
             } // $count != 0
           } else {
-            $unallowed[$key] = $var;
+            if ($ignore_unallowed == 0) {
+              $unallowed[$key] = $var;
+            }
           } // in_array($key, $allowed)
         } // $var != ""
       } else {
