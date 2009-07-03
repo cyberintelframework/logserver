@@ -82,6 +82,23 @@ if ($err == 0) {
   if ($num == 0) {
     $err = 1;
     $m = 110;
+
+    $sql_getkeyname = "SELECT keyname FROM sensors WHERE id = '$sid'";
+    $result = pg_query($pgconn, $sql_getkeyname);
+    $debuginfo[] = $sql_getkeyname;
+    $rows = pg_num_rows($result);
+    if ($rows != 0) {
+      $row = pg_fetch_assoc($result);
+      $keyname = $row['keyname'];
+
+      $sql_check = "SELECT keyname FROM sensor_details WHERE keyname = '$keyname'";
+      $result = pg_query($pgconn, $sql_check);
+      $rows = pg_num_rows($result);
+      if ($rows == 0) {
+        $err = 1;
+        $m = 161;
+      }
+    }
   }
 }
 
