@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 04-04-2008                       #
+# Changeset 003                    #
+# 03-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed redirection issue
 # 002 Added UTC support
 # 001 Added option to always send the report
 #############################################
@@ -267,7 +268,7 @@ if ($err == 0) {
 pg_close($pgconn);
 #debug_sql();
 if ($m == 3 || $m == 135) {
-  header("location: myreports.php?int_m=$m");
+  header("location: myreports.php?int_m=$m&int_userid=$user_id");
 } else {
   header("location: report_edit.php?int_m=$m&int_rcid=$reportid");
 }

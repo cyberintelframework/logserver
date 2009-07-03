@@ -148,9 +148,9 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
       echo "</ul>\n";
       echo "<h1><a href=''>SURFids</a></h1>\n";
       echo "<div class='infoBar'>\n";
-	if ($total_active != '') echo "<div id='headerSensors'>" .$l['me_active']. " $total_active " .$l['me_of']. " $total_sensors </div>";
+        if ($total_active != '') echo "<div id='headerSensors'>" .$l['me_active']. " $total_active " .$l['me_of']. " $total_sensors </div>";
         else echo "<div id='headerSensors'>&nbsp;</div>"; 
-	echo "<div id='headerTime'> <span id=\"tP\">&nbsp;</span></div>\n";
+	    echo "<div id='headerTime'> <span id=\"tP\">&nbsp;</span></div>\n";
           echo "<div id='headerUser'>\n";
             if ($file != "login.php") {
               echo $l['me_logged']. ": $s_user";

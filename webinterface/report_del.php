@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-11-2008                       #
+# Changeset 002                    #
+# 03-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Fixed redirection issue
 # 001 Initial release
 #############################################
 
@@ -46,6 +47,12 @@ $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
 $err = 0;
+
+if (isset($clean['userid'])) {
+  $user_id = $clean['userid'];
+} else {
+  $user_id = $s_userid;
+}
 
 if (!isset($clean['rcid'])) {
   $err = 1;
@@ -90,5 +97,5 @@ if ($err == 0) {
 # Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
-header("location: myreports.php?int_m=$m");
+header("location: myreports.php?int_m=$m&int_userid=$user_id");
 ?>
