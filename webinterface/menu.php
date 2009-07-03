@@ -310,7 +310,7 @@ function insert_selector($o_show = 1, $t_show = 1) {
                 "dir",
                 "int_debug"
   );
-  $check = extractvars($_GET, $menu_allowed_get);
+  $check = extractvars($_GET, $menu_allowed_get, 1);
   debug_input();
 
   if ($c_allow_global_debug == 1) {
