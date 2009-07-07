@@ -2,8 +2,8 @@
 ####################################
 # Mail reporter                    #
 # SURFids 3.00                     #
-# Changeset 010                    #
-# 10-11-2008                       #
+# Changeset 011                    #
+# 07-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 011 Added check for Net::Abuse::Utils
 # 010 Fixed own ranges nepenthes format
 # 009 Added timestamps to sensor status format
 # 008 Changed sensor status format
@@ -27,6 +28,16 @@
 # This script will send a mail clearsigned with gnupgp (if configured in webinterface) containing information
 # about the amount of attacks and all the attacks detailed with ip, time of attack and type of attack.  
 
+BEGIN {
+  $warn_cymru = 0;
+  unless (eval "require Net::Abuse::Utils") {
+    warn "Could not load module -> Net::Abuse::Utils\n";
+    $warn_cymru = 1;
+  } else {
+    Net::Abuse::Utils->import(qw(:all));
+  }
+}
+
 ####################
 # Modules used
 ####################
@@ -35,7 +46,6 @@ use Time::Local;
 use Time::localtime qw(localtime);
 use Net::SMTP;
 use MIME::Lite;
-use Net::Abuse::Utils qw( :all );
 use GnuPG qw( :algo );
 use POSIX qw(floor);
 use POSIX qw(ceil);
@@ -61,11 +71,14 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 # Main script
 ####################
 
-# Opening log file
-open(LOG, ">> $logfile");
-
 # Connect to the database (dbh = DatabaseHandler or linkserver)
 $check = dbconnect();
+
+# Check if we need to log failed modules
+if ($warn_cymru == 1) {
+    logsys($f_log_error, "MAIL_REPORT", "Could not load module required for Cymru reports. See FAQ L13.");
+    $c_enable_cymru = 0;
+}
 
 # ts_ means timestamp
 # dt_ means formatted datetime
@@ -423,7 +436,6 @@ while (@row = $email_query->fetchrow_array) {
         }
         printattach("</idmef:IDMEF-Message>");
       } elsif ($detail == 4) {
-        print "CYMRU: $subject\n";
         # CYMRU format
         ###############################################
         $sql = "SELECT attacks.source, attacks.timestamp, details.text ";
@@ -468,18 +480,18 @@ while (@row = $email_query->fetchrow_array) {
             $attacktype = "";
           }
 
-          @asninfo = get_asn_info($ip);
-          $asn = $asninfo[0];
-          if ("$asn" ne "") {
-            $desc = get_as_description($asn);
-          } else {
-            $desc = "";
+          $desc = "";
+          if ($c_enable_cymru == 1) {
+            @asninfo = get_asn_info($ip);
+            $asn = $asninfo[0];
+            if ("$asn" ne "") {
+              $desc = get_as_description($asn);
+            }
           }
 
           $totalcount++;
           printmail("$asn | $ip | $time $attacktype | $desc");
         }
-        print "TOTAL: $totalcount\n";
       } elsif ($detail == 5) {
         # Nepenthes format
         ###############################################
@@ -828,12 +840,13 @@ while (@row = $email_query->fetchrow_array) {
                 $attacktype = "";
               }
 
-              @asninfo = get_asn_info($ip);
-              $asn = $asninfo[0];
-              if ("$asn" ne "") {
-                $desc = get_as_description($asn);
-              } else {
-                $desc = "";
+              $desc = "";
+              if ($c_enable_cymru == 1) {
+                @asninfo = get_asn_info($ip);
+                $asn = $asninfo[0];
+                if ("$asn" ne "") {
+                  $desc = get_as_description($asn);
+                }
               }
 
               $totalcount++;
@@ -1067,6 +1080,10 @@ while (@row = $email_query->fetchrow_array) {
       $sendit = 0;
     }
 
+    if ($detail == 4 && $c_enable_cymru == 0) {
+      $sendit = 0;
+      $always = 0;
+    }
 
     if ($sendit == 1 || $always == 1) {
       &sendmail($email, $mid, $subject, $priority, $gpg_enabled, $attach);
@@ -1180,6 +1197,3 @@ sub sendmail {
     system("rm $attachfile");
   }
 }
-
-# Closing database connection.
-close(LOG);
