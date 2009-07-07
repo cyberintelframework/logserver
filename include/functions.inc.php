@@ -969,7 +969,7 @@ function printsort($text, $sortitem) {
     $sort_dir = "a";
   }
   $temp_url = rtrim($url, "&");
-  $temp_url = rtrim($url, "?");
+  $temp_url = rtrim($temp_url, "?");
   $oper = strpos($temp_url, "?") ? "&" : "?";
   $temp_url = str_replace("&sort=${sort}", "", $temp_url);
   $temp_url = str_replace("sort=${sort}", "", $temp_url);
