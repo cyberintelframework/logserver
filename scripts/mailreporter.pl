@@ -1169,9 +1169,6 @@ sub sendmail {
   $sql = "UPDATE report_content SET last_sent = '$last_sent' WHERE id = '$id'";
   $execute_result = $dbh->do($sql);
 
-  # Print info to a log file
-  logsys($f_log_debug, "MAIL_SENT", "Mailed stats for $sub_date to: $email with organisation $org");
-
   # Delete the mail and signed mail
   if (-e "$mailfile") {
     system("rm $mailfile");
