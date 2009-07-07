@@ -238,7 +238,7 @@ if ($err == 0) {
         $error = $row['error'];
         $args = htmlentities($row['args']);
         $sid = $row['sid'];
-        $tap = $row['device'];
+        $tap = $row['device'] ? $row['device'] : "unknown";
         $vlanid = $row['vlanid'];
         $keyname = $row['keyname'];
         $sensor = sensorname($keyname, $vlanid);

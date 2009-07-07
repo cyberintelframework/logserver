@@ -536,7 +536,7 @@ echo "<div class='leftmed'>";
                     $graph[] = "sensorid=$sensorstring";
                   }
                 }
-	        if (isset($destination_ip)) echo "$destination_ip";
+                if (isset($destination_ip)) echo "$destination_ip";
                 if (isset($dest_mac)) echo "$dest_mac";
                 if (isset($dport)) {
                   echo ":$dport";
@@ -684,9 +684,9 @@ echo "<div class='leftmed'>";
               if (isset($sport)) echo ":$sport";
             echo "</th>\n";
             echo "<td width='30%' class='aright'>$ip_excl<br />$mac_excl<br />";
-	    echo "<a onclick='\$(\"#search_source\").toggle();'>" .$l['ls_change']. "</a></td>\n";
+            echo "<a onclick='\$(\"#search_source\").toggle();'>" .$l['ls_change']. "</a></td>\n";
           echo "</tr>\n";
-	echo "</table>\n";
+        echo "</table>\n";
         echo "<table class='searchtable' id='search_source' style='display: none;'>";
           echo "<tr>\n";
             echo "<td>" .$l['ls_address']. ":</td>";
@@ -837,7 +837,7 @@ echo "<div class='leftmed'>";
               echo "<td>";
                 echo "<select id='int_sevtype' name='int_sevtype' onchange='javascript: sh_search_charac_sevtype(this.value);'>\n";
                   if(!isset($f_sevtype)) $f_sevtype=-1;
-		  if ($f_sev != 1) $f_sevtype=-1;
+                  if ($f_sev != 1) $f_sevtype=-1;
                   echo printOption(-1, $l['g_all'], $f_sevtype);
                   foreach ($v_severity_atype_ar as $index=>$sevtype) {
                     echo printOption($index, $sevtype, $f_sevtype);
@@ -854,7 +854,7 @@ echo "<div class='leftmed'>";
               echo "<td>";
                 echo "<select name='int_attack' id='int_attack'>";
                   if ($f_sevtype != 0) $f_attack=-1;
-		  echo printOption(-1, "All exploits", $f_attack);
+                  echo printOption(-1, "All exploits", $f_attack);
                   $sql = "SELECT * FROM stats_dialogue ORDER BY name";
                   $debuginfo[] = $sql;
                   $query = pg_query($sql);
