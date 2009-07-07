@@ -177,7 +177,9 @@ if ($numrows > 0) {
               echo "<td width='200'>";
                 echo "<select id='int_detail' name='int_detail' onchange='javascript: sh_mailreptype(this.value);'>\n";
                   foreach ($v_mail_detail_ar as $key=>$val) {
-                    echo printOption($key, $val, $detail);
+                    if (($key == 4 && $c_enable_cymru == 1) || $key != 4) {
+                      echo printOption($key, $val, $detail);
+                    }
                   }
                 echo "</select>\n";
               echo "</td>\n";

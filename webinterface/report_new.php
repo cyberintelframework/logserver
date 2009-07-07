@@ -148,7 +148,9 @@ echo "<div class='leftmed'>\n";
             echo "<td width='200'>";
               echo "<select name='int_detail' id='int_detail' onchange='javascript: sh_mailreptype(this.value);'>\n";
                 foreach ($v_mail_detail_ar as $key=>$val) {
-                  echo printOption($key, $val, -1);
+                  if (($key == 4 && $c_enable_cymru == 1) || $key != 4) {
+                    echo printOption($key, $val, -1);
+                  }
                 }
               echo "</select>\n";
             echo "</td>\n";
