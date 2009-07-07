@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 07-08-2008                       #
+# Changeset 004                    #
+# 07-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Added c_logsys_max
 # 003 Added jquery_version + cookie stuff
 # 002 Added utc_time
 # 001 Added debug_sql_analyze
@@ -388,8 +389,8 @@ echo "<div class='rightmed'>\n";
             echo "<td>" .$v_syslog_levels_ar[$c_log_level]. "</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
-            echo "<td>c_log_success_query</td>\n";
-            echo "<td>" .printled($c_log_success_query). "</td>\n";
+            echo "<td>c_logsys_max</td>\n";
+            echo "<td>" .$c_logsys_max. "</td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td>c_logsys_flexi</td>\n";
