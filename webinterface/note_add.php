@@ -2,16 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-11-2008                       #
-# Jan van Lith & Kees Trippelvitz  #
-####################################
-# Contributors:                    #
-# Peter Arts                       #
+# Changeset 002                    #
+# 08-07-2009                       #
+# Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Fixed bug #148
 # 001 Initial release
 #############################################
 
@@ -125,5 +123,5 @@ if ($err != 1) {
 # Close connection and redirect
 pg_close($pgconn);
 #debug_sql();
-header("location: sensordetails.php?int_sid=$sid&int_m=$m");
+header("location: sensordetails.php?int_sid=$sid&int_m=$m&int_notes=1");
 ?>

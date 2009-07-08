@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 006                    #
-# 03-09-2008                       #
+# Changeset 007                    #
+# 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 007 Fixed bug #148
 # 006 Fixed sensorstatus calc bug
 # 005 Added network config
 # 004 Changed sensor $status stuff
@@ -24,6 +25,7 @@ $allowed_get = array(
 		"strip_escape_html_label",
 		"int_m",
 		"int_dellabel",
+        "int_notes",
 		"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
@@ -462,6 +464,10 @@ if ($err != 1) {
   echo "</script>\n";
 } else {
   geterror($m);
+}
+
+if (isset($clean['notes'])) {
+  echo "<script>showHeaderTab(2);</script>";
 }
 
 pg_close($pgconn);
