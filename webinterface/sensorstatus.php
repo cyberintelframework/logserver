@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 008                    #
+# Changeset 009                    #
 # 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 009 Fixed issue #147
 # 008 Fixed issue #142 and #145
 # 007 Added default page configuration
 # 006 Added md5_hash to updateaction link
@@ -333,17 +334,18 @@ echo "<div class='centerbig'>\n";
                     echo "</select>\n";
                   echo "</form>\n";
                 echo "</td>\n";
-                echo "<td>\n";
-                  echo "<select name='linker' id='linker' onchange='javascript: sensorlink(this.value, \"$sid\");'>\n";
-                    echo printOption("0", $l['ss_selectlink'], -1);
+              }
+              echo "<td>\n";
+                echo "<select name='linker' id='linker' onchange='javascript: sensorlink(this.value, \"$sid\");'>\n";
+                  echo printOption("0", $l['ss_selectlink'], -1);
+                  if ($s_access_sensor > 1) {
                     echo printOption("arpcache", $l['ss_arpcache'], -1);
                     echo printOption("arpstatic", $l['ss_arpconf'], -1);
                     echo printOption("detproto", $l['ss_detprotos'], -1);
-                    echo printOption("sdetails", $l['ss_sdetails'], -1);
-                  echo "</select>\n";
-#                  echo "<input type='submit' name='submit' value='" .$l['g_update']. "' class='button' />";
-                echo "</td>\n";
-              }
+                  }
+                  echo printOption("sdetails", $l['ss_sdetails'], -1);
+                echo "</select>\n";
+              echo "</td>\n";
             echo "</tr>\n";
           }
         echo "</table>\n";
