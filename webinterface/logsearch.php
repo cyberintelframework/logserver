@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 009                    #
-# 13-08-2008                       #
+# Changeset 010                    #
+# 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 010 Fixed issue #140
 # 009 Added link to sensordetails
 # 008 Fixed a navigational bug
 # 007 Added MAC exclusion stuff
@@ -639,6 +640,7 @@ echo "<div class='leftmed'>";
         echo "</table>"; 
         echo "<hr>\n";
         echo "<table class='actiontable'>\n";
+          $orgipadmin_link = $s_access_user > 1 ? "orgipadmin.php" : "#";
           if ($filter_ip == 1) {
             $sql_exclusion = "SELECT exclusion FROM org_excl WHERE orgid = $q_org";
             $debuginfo[] = $sql_exclusion;
@@ -648,12 +650,12 @@ echo "<div class='leftmed'>";
               $ip_excl_text .= $row_ip['exclusion'] ."<br />";
             }
             if ($ip_exclusionrows > 0) {
-              $ip_excl = "<a href='orgipadmin.php' " .printover($ip_excl_text). ">" .$l['ls_ipex_on']. "</a>";
+              $ip_excl = "<a href='$orgipadmin_link' " .printover($ip_excl_text). ">" .$l['ls_ipex_on']. "</a>";
             } else { 
-              $ip_excl = "<a href='orgipadmin.php'>" .$l['ls_ipex_off']. "</a>"; 
+              $ip_excl = "<a href='$orgipadmin_link'>" .$l['ls_ipex_off']. "</a>"; 
             } 
           } else {
-            $ip_excl = "<a href='orgipadmin.php'>" .$l['ls_ipex_off']. "</a>"; 
+            $ip_excl = "<a href='$orgipadmin_link'>" .$l['ls_ipex_off']. "</a>"; 
           }
 
           if ($filter_mac == 1) {
