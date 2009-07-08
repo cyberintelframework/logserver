@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 04-04-2008                       #
+# Changeset 004                    #
+# 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 004 Fixed bug #144
 # 003 Fixed a sorting bug
 # 002 Added option to always send the report
 # 001 Added language support
@@ -18,8 +19,8 @@
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_userid",
-		"int_m",
-		"sort"
+                "int_m",
+                "sort"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -172,6 +173,7 @@ if ($s_access_user > 0) {
               $from_ts = $report_content['from_ts'];
               $to_ts = $report_content['to_ts'];
               $always = $report_content['always'];
+              $detail = $report_content['detail'];
               if ($freq == 1) {
                 $freqstring = "Hourly";
               } elseif ($freq == 2) {
@@ -184,6 +186,9 @@ if ($s_access_user > 0) {
                 } else {
                   $freqstring = "$v_severity_ar[$sev] $v_mail_operator_ar[$op] $threshold";
                 }
+              }
+              if ($detail == 10 || $detail == 11) {
+                $freqstring = "N/A";
               }
               if ($template == 6) {
                 if ($int != -1) {
@@ -198,7 +203,6 @@ if ($s_access_user > 0) {
               } elseif ($template == 5 || $template == 7) {
                 $freqstring = "Instant";
               }              
-              $detail = $report_content['detail'];
               if ($active == "t") {
                 $status = "<font style='color:green;'>" .$l['mr_active']. "</font";
               } else {
