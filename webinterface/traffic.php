@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-11-2008                       #
+# Changeset 002                    #
+# 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Fixed bug #143
 # 001 Added language support
 #############################################
 
@@ -25,12 +26,18 @@ if (isset($clean['selview'])) {
 } elseif (isset($c_selview)) {
   $selview = intval($c_selview);
 }
-
-add_to_sql("sensors.*", "select");
-if ($selview == "1") {
-  add_to_sql("status = 0", "where");
-} elseif ($selview == "2") {
-  add_to_sql("status = 1", "where");
+if ($selview == 9) {
+  add_to_sql("deactivated_sensors.*", "select");
+  add_to_sql("deactivated_sensors", "table");
+} else {
+  $sensors_table = "sensors";
+  add_to_sql("sensors.*", "select");
+  add_to_sql("sensors", "table");
+  if ($selview == "1") {
+    add_to_sql("status = 0", "where");
+  } elseif ($selview == "2") {
+    add_to_sql("status = 1", "where");
+  }
 }
 
 if ($s_admin == 1) {
@@ -63,7 +70,6 @@ echo "<div class='left'>\n";
       add_to_sql("organisation", "select");
       add_to_sql("keyname", "select");
       add_to_sql("vlanid", "select");
-      add_to_sql("sensors", "table");
       add_to_sql("keyname", "order");
 
       prepare_sql();
@@ -72,7 +78,7 @@ echo "<div class='left'>\n";
       $debuginfo[] = $sql_getactive;
       $result_getactive = pg_query($pgconn, $sql_getactive);
 
-      if ($s_admin == 1) {
+      if ($s_admin == 1 && $selview != 9) {
         # User is admin, show the graphs for all sensors
         $sql_allsensors = "SELECT id FROM rrd WHERE type = 'day' AND label = 'allsensors'";
         $result_allsensors = pg_query($pgconn, $sql_allsensors);
