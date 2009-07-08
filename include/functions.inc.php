@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 009                    #
-# 29-06-2008                       #
+# Changeset 010                    #
+# 08-07-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 010 Fixed another bug in the printsort function
 # 009 Fixed a bug in the printsort function
 # 008 Fixed intcsv regexp
 # 007 Correctly chain checks in extractvars
@@ -968,13 +969,13 @@ function printsort($text, $sortitem) {
   if (!$sort_dir) {
     $sort_dir = "a";
   }
-  $temp_url = rtrim($url, "&");
-  $temp_url = rtrim($temp_url, "?");
-  $oper = strpos($temp_url, "?") ? "&" : "?";
-  $temp_url = str_replace("&sort=${sort}", "", $temp_url);
+  $temp_url = str_replace("&sort=${sort}", "", $url);
   $temp_url = str_replace("sort=${sort}", "", $temp_url);
   $temp_url = str_replace("?&", "?", $temp_url);
   $temp_url = str_replace("&&", "&", $temp_url);
+  $temp_url = rtrim($temp_url, "&");
+  $temp_url = rtrim($temp_url, "?");
+  $oper = strpos($temp_url, "?") ? "&" : "?";
   $chk = substr($sort, 0, (strlen($sort) - 1));
   if ($sortitem == $chk) {
     if ($sort_dir == "a") {
