@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 03-03-2009                       #
+# Changeset 004                    #
+# 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Fixed typo
 # 003 Added support for SNORT info
 # 002 Added ARP exclusion stuff
 # 001 Added language support
@@ -353,8 +354,8 @@ $bigspace = '                                                                   
 $pdf =& new Cezpdf();
 $pdf->addPngFromFile("images/logo.png", 15, 755, 126, 80);
 $pdf->selectFont('../include/fonts/Helvetica.afm');
-$pdf->ezText($space . 'SURFnet IDS PDF results',20);
-$pdf->ezText($bigspace . 'Generated at ' . date($c_date_format) . ' by SURFnetIDS webinterface', 10);
+$pdf->ezText($space . 'SURFids PDF results',20);
+$pdf->ezText($bigspace . 'Generated at ' . date($c_date_format) . ' by SURFids webinterface', 10);
 $pdf->ezText('    ', 30);
 
 #####################
