@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 004                    #
+# Changeset 005                    #
 # 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Fixed bug #146
 # 004 Fixed typo
 # 003 Added support for SNORT info
 # 002 Added ARP exclusion stuff
@@ -93,7 +94,7 @@ if (@is_array($tainted["sensorid"])) {
 }
 $to = $_SESSION['s_to'];
 $from = $_SESSION['s_from'];
-$txt_to = date($c_date_from, $to);
+$txt_to = date($c_date_format, $to);
 $txt_from = date($c_date_format, $from);
 
 ####################
