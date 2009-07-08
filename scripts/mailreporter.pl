@@ -42,14 +42,13 @@ BEGIN {
 # Modules used
 ####################
 use DBI;
-use Time::Local;
+#use Time::Local;
 use Time::localtime qw(localtime);
 use Net::SMTP;
 use MIME::Lite;
 use GnuPG qw( :algo );
 use POSIX qw(floor);
 use POSIX qw(ceil);
-use Data::Dumper;
 
 ####################
 # Variables used
@@ -76,7 +75,7 @@ $check = dbconnect();
 
 # Check if we need to log failed modules
 if ($warn_cymru == 1) {
-    logsys($f_log_error, "MAIL_REPORT", "Could not load module required for Cymru reports. See FAQ L13.");
+    logsys($f_log_error, "PERL_MOD", "Could not load module required for Cymru reports. See FAQ L13.");
     $c_enable_cymru = 0;
 }
 
