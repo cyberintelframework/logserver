@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 007                    #
-# 29-05-2009                       #
+# Changeset 008                    #
+# 08-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 008 Fixed issue #142 and #145
 # 007 Added default page configuration
 # 006 Added md5_hash to updateaction link
 # 005 Changed sensor $status stuff
@@ -23,8 +24,8 @@
 $allowed_get = array(
                 "sort",
                 "int_selview",
-		"int_m",
-		"strip_html_key"
+                "int_m",
+                "strip_html_key"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -33,6 +34,10 @@ if (isset($clean['selview'])) {
   $selview = $clean['selview'];
 } elseif (isset($c_selview)) {
   $selview = intval($c_selview);
+}
+
+if ($s_access_sensor != 9 && $selview == 9) {
+  $selview = 2;
 }
 
 # Showing info/error messages if any
@@ -58,7 +63,10 @@ if (isset($tainted['sort'])) {
 if ($selview == 9) {
   add_to_sql("deactivated_sensors", "table");
   add_to_sql("deactivated_sensors.*", "select");
+  $sensors_table = "deactivated_sensors";
 } else {
+  $sensors_table = "sensors";
+
   # Making sure no duplicate vlanids get selected
   add_to_sql("DISTINCT vlanid", "select");
   # Adding 1 of the keyname fields
@@ -93,7 +101,7 @@ prepare_sql();
 
 $sql_sensors = "SELECT $sql_select ";
 $sql_sensors .= " FROM $sql_from ";
-$sql_sensors .= " LEFT JOIN sensor_details ON sensors.keyname = sensor_details.keyname ";
+$sql_sensors .= " LEFT JOIN sensor_details ON $sensors_table.keyname = sensor_details.keyname ";
 $sql_sensors .= " $sql_where ";
 $sql_sensors .= " ORDER BY $sql_order ";
 
@@ -106,7 +114,7 @@ $result_conf = pg_query($pgconn, $sql_conf);
 $row_conf = pg_fetch_assoc($result_conf);
 $pageconf = $row_conf['config'];
 if ($pageconf == "") {
-  $pageconf = "1,3,4,6,9,10,11";
+  $pageconf = array(1,3,4,6,9,10,11);
 } else {
   $pageconf = split(",", $pageconf);
 }
