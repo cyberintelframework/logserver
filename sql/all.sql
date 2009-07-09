@@ -1,12 +1,13 @@
 --
 -- SURFids 3.00
 -- Database structure
--- Changeset 009
+-- Changeset 010
 -- 09-07-2009
 --
 
 --
 -- Version history
+-- 010 Updated AVAST regexp
 -- 009 Added surfnet_attack_update_atype function
 -- 008 Added support for networks bound to sensors (surfnet_sensorid_get)
 -- 007 Added ClamAV virus regular expressions
@@ -913,7 +914,7 @@ INSERT INTO scanners VALUES (2, 'Antivir', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', E'.*: (.*) FOUND.*', E'.*FOUND.*', E'.*([a-zA-Z0-9]{32}):.*', E'.*OK.*');
-INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
+INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*)\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]{32}).*', E'.*\\[OK\\]$');
 INSERT INTO scanners VALUES (5, 'F-Prot', 0, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
 
 --

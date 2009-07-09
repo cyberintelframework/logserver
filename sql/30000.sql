@@ -1,11 +1,12 @@
 -- SURFids 3.00
 -- Database conversion 2.03/2.04 -> 3.00
--- Changeset 012
+-- Changeset 013
 -- 09-07-2009
 --
 
 --
 -- Changelog
+-- 013 Updated AVAST regexp
 -- 012 Added OR REPLACE to function creation
 -- 011 Added surfnet_attack_update_atype function
 -- 010 Added ClamAV virus regular expressions
@@ -226,7 +227,7 @@ SELECT pg_catalog.setval('scanners_id_seq', 6, true);
 INSERT INTO scanners VALUES (2, 'Antivir', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (3, 'BitDefender', 0, '', NULL, NULL, NULL, NULL);
 INSERT INTO scanners VALUES (6, 'Kaspersky', 0, '', NULL, NULL, NULL, NULL);
-INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*) *\\[.*\\]\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]*).*\\[.*\\]$', E'.*\\[OK\\]$');
+INSERT INTO scanners VALUES (4, 'AVAST', 0, '', E'.*\\[infected by: *(.*)\\]$', E'.*\\[infected by:.*', E'.*\\/([0-9A-Za-z]{32}).*', E'.*\\[OK\\]$');
 INSERT INTO scanners VALUES (5, 'F-Prot', 0, '', E'.*\\[Found .*\\].*<(.*)> {1,}.*', E'.*\\[Found .*\\].*', E'.*\\[.*\\] {1,}.*([a-zA-Z0-9]{32}).*', E'.*\\[Clean\\].*');
 INSERT INTO scanners VALUES (1, 'ClamAV', 0, '', E'.*: (.*) FOUND.*', E'.*FOUND.*', E'.*([a-zA-Z0-9]{32}):.*', E'.*OK.*');
 
