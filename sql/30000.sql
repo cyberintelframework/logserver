@@ -1,11 +1,12 @@
 -- SURFids 3.00
 -- Database conversion 2.03/2.04 -> 3.00
--- Changeset 011
+-- Changeset 012
 -- 09-07-2009
 --
 
 --
 -- Changelog
+-- 012 Added OR REPLACE to function creation
 -- 011 Added surfnet_attack_update_atype function
 -- 010 Added ClamAV virus regular expressions
 -- 009 Added upx support
@@ -434,7 +435,7 @@ GRANT SELECT,UPDATE ON SEQUENCE groups_id_seq TO idslog;
 --
 -- FUNCTION surfnet_attack_update_atype(attackid, newatype)
 --
-CREATE FUNCTION surfnet_attack_update_atype(integer, integer) RETURNS void
+CREATE OR REPLACE FUNCTION surfnet_attack_update_atype(integer, integer) RETURNS void
     AS $_$DECLARE
         p_attackid ALIAS FOR $1;
         p_atype    ALIAS FOR $2;
@@ -447,7 +448,7 @@ END$_$
 --
 -- FUNCTION first_attack(sensorid)
 --
-CREATE FUNCTION first_attack(integer) RETURNS timestamp without time zone
+CREATE OR REPLACE FUNCTION first_attack(integer) RETURNS timestamp without time zone
     AS $_$DECLARE
     i_sid ALIAS FOR $1;
     i_ts INTEGER;
@@ -462,7 +463,7 @@ END$_$
 --
 -- FUNCTION epoch_to_ts(epoch timestamp)
 --
-CREATE FUNCTION epoch_to_ts(integer) RETURNS timestamp without time zone
+CREATE OR REPLACE FUNCTION epoch_to_ts(integer) RETURNS timestamp without time zone
     AS $_$DECLARE
     i_epoch ALIAS FOR $1;
 BEGIN
@@ -473,7 +474,7 @@ END$_$
 --
 -- FUNCTION ts_to_epoch(timestamp)
 --
-CREATE FUNCTION ts_to_epoch(timestamp without time zone) RETURNS integer
+CREATE OR REPLACE FUNCTION ts_to_epoch(timestamp without time zone) RETURNS integer
     AS $_$DECLARE
     i_ts ALIAS FOR $1;
 BEGIN
