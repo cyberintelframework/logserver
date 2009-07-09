@@ -1,12 +1,13 @@
 --
 -- SURFids 3.00
 -- Database structure
--- Changeset 008
--- 01-07-2009
+-- Changeset 009
+-- 09-07-2009
 --
 
 --
 -- Version history
+-- 009 Added surfnet_attack_update_atype function
 -- 008 Added support for networks bound to sensors (surfnet_sensorid_get)
 -- 007 Added ClamAV virus regular expressions
 -- 006 Fixed plpgsql and escaping of virus definitions
@@ -1421,6 +1422,20 @@ BEGIN
 
         SELECT INTO m_attackid currval('attacks_id_seq');
         return m_attackid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- FUNCTION surfnet_attack_update_atype(attackid, newatype)
+--
+
+CREATE FUNCTION surfnet_attack_update_atype(integer, integer) RETURNS void
+    AS $_$DECLARE
+        p_attackid ALIAS FOR $1;
+        p_atype    ALIAS FOR $2;
+BEGIN
+        UPDATE attacks SET atype = p_atype WHERE id = p_attackid;
+        return;
 END$_$
     LANGUAGE plpgsql;
 

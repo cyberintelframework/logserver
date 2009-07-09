@@ -1,11 +1,12 @@
 -- SURFids 3.00
 -- Database conversion 2.03/2.04 -> 3.00
--- Changeset 010
--- 29-06-2009
+-- Changeset 011
+-- 09-07-2009
 --
 
 --
 -- Changelog
+-- 011 Added surfnet_attack_update_atype function
 -- 010 Added ClamAV virus regular expressions
 -- 009 Added upx support
 -- 008 Added scanner modifications
@@ -429,6 +430,19 @@ ALTER TABLE ONLY groups
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE groups TO idslog;
 
 GRANT SELECT,UPDATE ON SEQUENCE groups_id_seq TO idslog;
+
+--
+-- FUNCTION surfnet_attack_update_atype(attackid, newatype)
+--
+CREATE FUNCTION surfnet_attack_update_atype(integer, integer) RETURNS void
+    AS $_$DECLARE
+        p_attackid ALIAS FOR $1;
+        p_atype    ALIAS FOR $2;
+BEGIN
+        UPDATE attacks SET atype = p_atype WHERE id = p_attackid;
+        return;
+END$_$
+    LANGUAGE plpgsql;
 
 --
 -- FUNCTION first_attack(sensorid)
