@@ -2,8 +2,8 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 005                    #
-# 23-06-2009                       #
+# Changeset 006                    #
+# 09-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #############################################
 # Changelog:
+# 006 Changed updated to keepalive
 # 005 Fixed typo
 # 004 Changed Server Info to Server Stats
 # 003 Added group pages
@@ -538,7 +539,7 @@ $l['sd_devip']          = "Device IP";
 $l['sd_status']         = "Status";
 $l['sd_started']        = "Last started";
 $l['sd_stopped']        = "Last stopped";
-$l['sd_updated']        = "Last updated";
+$l['sd_updated']        = "Last keepalive";
 $l['sd_sensornotes']    = "Sensor notes";
 $l['sd_sensorlog']      = "Sensor log";
 $l['sd_uptime']         = "Uptime";
