@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 007                    #
-# 08-07-2009                       #
+# Changeset 008                    #
+# 10-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 008 Fixed bug #152
 # 007 Fixed bug #148
 # 006 Fixed sensorstatus calc bug
 # 005 Added network config
@@ -174,6 +175,7 @@ if ($err != 1) {
     $header = $sensor;
   }
 
+  echo "<input type='hidden' value='$status' id='sensor_status' />\n";
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";

@@ -1,13 +1,14 @@
 /*
  * ####################################
  * # SURFids 3.00                     #
- * # Changeset 006                    #
- * # 10-11-2008                       #
+ * # Changeset 007                    #
+ * # 10-07-2009                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 007 Fixed bug #152
  * # 006 Changed setperiod. Removed submit, added window.location
  * # 005 Added Last 24 Hours option for timeselector
  * # 004 Added support for Nepenthes mail markup
@@ -65,12 +66,15 @@ if (!document.all) {
 }
 
 function startclock() {
-  var uptime = $("#js_hiduptime").val() - 0;
-  uptime = uptime + 1;
-  $("#js_hiduptime").val(uptime);
-  uptime = sec_to_string(uptime);
-  $("#js_uptime").html(uptime);
-  setTimeout('startclock()',1000);
+  status = $('#sensor_status').val();
+  if (status != 0 && status != 3) {
+    var uptime = $("#js_hiduptime").val() - 0;
+    uptime = uptime + 1;
+    $("#js_hiduptime").val(uptime);
+    uptime = sec_to_string(uptime);
+    $("#js_uptime").html(uptime);
+    setTimeout('startclock()',1000);
+  }
 }
 
 /***********************************
