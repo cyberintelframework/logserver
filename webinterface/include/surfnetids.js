@@ -1,13 +1,14 @@
 /*
  * ####################################
  * # SURFids 3.00                     #
- * # Changeset 007                    #
+ * # Changeset 008                    #
  * # 10-07-2009                       #
  * # Jan van Lith & Kees Trippelvitz  #
  * ####################################
  *
  * #############################################
  * # Changelog:
+ * # 008 Fxied bug #155
  * # 007 Fixed bug #152
  * # 006 Changed setperiod. Removed submit, added window.location
  * # 005 Added Last 24 Hours option for timeselector
@@ -803,6 +804,7 @@ function expand_edit(id, title, divid_block, divid_title, url, type) {
       var titlecontent = $('#'+divid_title).text() + title;
       $('#'+divid_title).text(titlecontent);
       $('#'+divid_block).show();
+      alert(id+ ' ' +title+ ' ' +divid_block+ ' ' +divid_title+ ' ' +url+ ' ' +type);
       arequest(url, type);
     } else if (status == "block") {
       $('#'+divid_block).hide();
@@ -930,7 +932,7 @@ function groupmdel(result) {
     html += '<td>' +owner+ '</td>';
     html += '<td>' +members+ '</td>';
     html += '<td>';
-      html += '[<a onclick="javascript: expand_edit(\''+name+'\', \'edit_block\', \'edit_title\', \'groupmget.php?int_gid='+gid+'&md5_hash='+hash+'\', \'getgroupmembers\');">edit</a>]\n';
+      html += '[<a onclick="javascript: expand_edit(\''+gid+'\', \''+name+'\', \'edit_block\', \'edit_title\', \'groupmget.php?int_gid='+gid+'&md5_hash='+hash+'\', \'getgroupmembers\');">edit</a>]\n';
       html += '[<a onclick="javascript: db_del_record(\'groupdel.php?int_gid='+gid+'&md5_hash='+hash+'\', \'groupdel\');\">delete</a>]';
     html += '</td>\n';
   html += '</tr>\n';
