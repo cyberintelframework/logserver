@@ -144,14 +144,17 @@ echo "<div class='rightmed' style='display: none;' id='edit_block'>\n";
               echo "</td>\n";
             echo "</tr>\n";
           echo "</form>\n";
-          if ($s_access_sensor == 9) {
-            echo "<form name='addorg' id='addorg'>\n";
-              echo "<tr>\n";
-                echo "<td>\n";
-                  echo "<input type='hidden' name='int_gid' value='' class='edit_id' />\n";
+          echo "<form name='addorg' id='addorg'>\n";
+            echo "<tr>\n";
+              echo "<td>\n";
+                echo "<input type='hidden' name='int_gid' value='' class='edit_id' />\n";
+                if ($s_access_user < 9) {
+                  echo "<input class='button' type='button' onclick=\"db_add_record('groupmadd.php', 'groupaddorg', 'addorg');\" value='" .$l['g_addorg']. "' />&nbsp;&nbsp;";
+                  echo "<input type='hidden' name='int_org' value='$s_org' />\n";
+                } else {
                   echo "<input class='button' type='button' onclick=\"db_add_record('groupmadd.php', 'groupaddorg', 'addorg');\" value='" .$l['g_addorg']. "' />&nbsp;&nbsp;";
                   echo "<select name='int_org'>\n";
-                    $sql = "SELECT id, organisation ";
+                     $sql = "SELECT id, organisation ";
                     $sql .= " FROM organisations WHERE NOT organisation = 'ADMIN'";
                     $debuginfo[] = $sql;
                     $result = pg_query($pgconn, $sql);
@@ -161,11 +164,11 @@ echo "<div class='rightmed' style='display: none;' id='edit_block'>\n";
                       echo printoption($oid, $db_org, -1);
                     }
                   echo "</select>\n";
-                  echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
-                echo "</td>\n";
-              echo "</tr>\n";
-            echo "</form>\n";
-          }
+                }
+                echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
+              echo "</td>\n";
+            echo "</tr>\n";
+          echo "</form>\n";
         echo "</table>\n";
       echo "</div>\n"; #</blockContent>
       echo "<div class='blockFooter'></div>\n";

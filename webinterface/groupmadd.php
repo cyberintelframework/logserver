@@ -41,8 +41,8 @@ $s_hash = md5($_SESSION['s_hash']);
 $allowed_get = array(
                 "int_gid",
                 "int_sid",
-		"int_org",
-		"md5_hash"
+                "int_org",
+                "md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -64,7 +64,7 @@ if (isset($clean['gid'])) {
 if (isset($clean['sid'])) {
   $sid = $clean['sid'];
   $org = 0;
-} elseif (isset($clean['org']) && $s_access_user == 9) {
+} elseif (isset($clean['org']) && $s_access_user > 1) {
   $org = $clean['org'];
   $sid = 0;
 } else {
@@ -158,7 +158,11 @@ if ($err != 1) {
       echo "<status>OK</status>";
       echo "<data>";
 
-        $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$org'";
+        if ($s_access_user < 9) {
+          $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$org'";
+        } else {
+          $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$s_org'";
+        }
         $debuginfo[] = $sql;
         $result = pg_query($pgconn, $sql);
  

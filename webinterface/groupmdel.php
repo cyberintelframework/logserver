@@ -88,10 +88,10 @@ if ($s_access_user < 2) {
   $debuginfo[] = $sql_check_sensors;
 
   $result_check = pg_query($pgconn, $sql_check_groups);
-  $numrows_gid = pg_num_rows($result_check_groups);
+  $numrows_gid = pg_num_rows($result_check);
 
   $result_check = pg_query($pgconn, $sql_check_sensors);
-  $numrows_sid = pg_num_rows($result_check_sensors);
+  $numrows_sid = pg_num_rows($result_check);
 
   # Don't allow deletion if:
   # The sensor is not owned by the organisation of this user
