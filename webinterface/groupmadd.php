@@ -158,7 +158,7 @@ if ($err != 1) {
       echo "<status>OK</status>";
       echo "<data>";
 
-        if ($s_access_user < 9) {
+        if ($s_access_user == 9) {
           $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$org'";
         } else {
           $sql = "SELECT id, keyname, vlanid, label FROM sensors WHERE organisation = '$s_org'";
