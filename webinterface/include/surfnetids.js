@@ -804,7 +804,6 @@ function expand_edit(id, title, divid_block, divid_title, url, type) {
       var titlecontent = $('#'+divid_title).text() + title;
       $('#'+divid_title).text(titlecontent);
       $('#'+divid_block).show();
-      alert(id+ ' ' +title+ ' ' +divid_block+ ' ' +divid_title+ ' ' +url+ ' ' +type);
       arequest(url, type);
     } else if (status == "block") {
       $('#'+divid_block).hide();
