@@ -22,6 +22,12 @@ $allowed_get = array(
 $check = extractvars($_GET, $allowed_get);
 debug_input();
 
+if ($s_access_user < 2) {
+  geterror(101);
+  footer();
+  exit;
+}
+
 # Showing info/error messages if any
 if (isset($clean['m'])) {
   $m = $clean['m'];

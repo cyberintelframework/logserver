@@ -40,7 +40,7 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_gid",
-		"md5_hash"
+                "md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();

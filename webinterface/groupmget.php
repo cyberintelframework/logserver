@@ -33,7 +33,7 @@ if (!isset($_SESSION['s_admin'])) {
 # Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
-$s_access_sensor = intval($s_access{0});
+$s_access_user = intval($s_access{2});
 $s_hash = md5($_SESSION['s_hash']);
 
 # Retrieving posted variables from $_GET
@@ -58,7 +58,7 @@ if (isset($clean['gid'])) {
   $err = 1;
 }
 
-if ($s_access_sensor < 2) {
+if ($s_access_user < 2) {
   $m = 101;
   $err = 1;
 }
@@ -69,7 +69,7 @@ if ($err != 1) {
   $result_check = pg_query($pgconn, $sql);
   $row_check = pg_fetch_assoc($result_check);
   $owner = $row_check['owner'];
-  if ($owner != $s_org && $s_access_sensor != 9) {
+  if ($owner != $s_org && $s_access_user != 9) {
     $m = 101;
     $err = 1;
   }

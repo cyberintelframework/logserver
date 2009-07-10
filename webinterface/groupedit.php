@@ -17,8 +17,8 @@ $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_m",
-		"int_gid"
+        "int_m",
+        "int_gid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();

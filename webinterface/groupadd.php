@@ -39,8 +39,8 @@ $s_hash = md5($_SESSION['s_hash']);
 # Retrieving posted variables from $_POST
 $allowed_get = array(
                 "strip_html_escape_name",
-		"int_type",
-		"md5_hash"
+                "int_type",
+                "md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
