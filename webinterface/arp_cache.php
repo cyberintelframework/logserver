@@ -26,8 +26,8 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_sid",
-		"sort",
-		"int_m"
+                "sort",
+                "int_m"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -57,7 +57,7 @@ if ($err == 0) {
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>Actions</div>\n";
+        echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<a href='arp_cache_clr.php?int_org=$q_org&md5_hash=$s_hash&int_sid=$sid' onclick=\"javascript: return confirm('" .$l['ah_confirm']. "');\">";
           echo $l['ah_clear_arp']. "</a>\n";
@@ -90,7 +90,7 @@ echo "<div class='centerbig'>\n";
                 $id = $row['id'];
                 $keyname = $row['keyname'];
                 $label = $row['label'];
-		$vlanid = $row['vlanid'];
+                $vlanid = $row['vlanid'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label;
                 $status = $row['status'];

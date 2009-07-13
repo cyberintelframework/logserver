@@ -177,7 +177,7 @@ echo "<div class='left'>\n";
               echo "<td width='90'><b>" .$l['ls_chars']. "</b></td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<td>Severity:</td>\n";
+              echo "<td>" .$l['ls_sev']. ":</td>\n";
               echo "<td>\n";
                 echo "<select name='int_sev' onchange='javascript: sh_search_charac(this.value);'>\n";
                   $f_sev = -1;

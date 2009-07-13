@@ -72,7 +72,7 @@ if (isset($clean['sid'])) {
         echo "<div class='blockContent'>\n";
           echo "<form name='arpform' method='get' action='arp_static.php'>\n";
             echo "<input type='hidden' name='int_sid' value='$sid' />\n";
-            echo "The ARP module is ";
+            echo $l['as_arp_status']. " ";
             echo "<select name='int_arp' onchange='this.form.submit();'>\n";
               echo printOption(0, $l['as_disabled'], $db_arp);
               echo printOption(1, $l['as_enabled'], $db_arp);
