@@ -127,6 +127,7 @@ $l['as_del_router']     = "Del router";
 $l['as_add_router']     = "Add router";
 $l['as_del_dhcp']       = "Del DHCP";
 $l['as_add_dhcp']       = "Add DHCP";
+$l['as_arp_status']     = "The ARP module is ";
 
 ##########################
 # binaryhist.php
