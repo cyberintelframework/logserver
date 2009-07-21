@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-08-2008                       #
+# Changeset 002                    #
+# 21-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Fixed #156
 # 001 Initial release
 #############################################
 
@@ -45,7 +46,7 @@ $s_hash = md5($_SESSION['s_hash']);
 $s_admin = $_SESSION['s_admin'];
 $err = 0;
 
-# Retrieving posted variables from $_GET
+# Retrieving posted variables from $_POST
 $tainted_post['int_page'] = $_POST['page'];
 $tainted_post['int_rp'] = $_POST['rp'];
 $tainted_post['strip_html_escape_sortname'] = $_POST['sortname'];
@@ -108,6 +109,7 @@ if ($err == 0) {
   if (isset($clean['query'])) {
     $query = $clean['query'];
   }
+
   if (isset($clean['qtype'])) {
     $qtype = $clean['qtype'];
     $pattern = '/(level|source|pid|error|args|dev|sensor)/';
@@ -117,7 +119,15 @@ if ($err == 0) {
   }
 
   if ($query != "" && $qtype != "") {
-    add_to_sql("$qtype LIKE '$query'", "where");
+    if ($qtype == "level") {
+      $query = ucfirst($query);
+      $int_level = array_search($query, $v_syslog_levels_ar, TRUE);
+      if ($int_level != "") {
+        add_to_sql("level = $int_level", "where");
+      }
+    } else {
+      add_to_sql("$qtype LIKE '$query'", "where");
+    }
   }
 
   prepare_sql();
@@ -150,7 +160,7 @@ if ($err == 0) {
       $source = $row['source'];
       $pid = $row['pid'];
       $error = $row['error'];
-      $args = $row['args'];
+      $args = htmlentities($row['args']);
       $sid = $row['sid'];
       $tap = $row['device'] ? $row['device'] : "unknown";
       $vlanid = $row['vlanid'];
