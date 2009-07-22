@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 004                    #
-# 07-04-2008                       #
+# Changeset 005                    #
+# 22-07-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Added some comments about detail records
 # 004 Added Snort support
 # 003 Added new error message
 # 002 Added Last 24 Hours option for timeselector
@@ -127,22 +128,29 @@ $v_attacks_ar = array(
 
 # Array with the severity of the attack.
 $v_severity_ar = array(
-		'0'	=> 'Possible malicious attack',
-		'1'	=> 'Malicious attack',
-		'16'	=> 'Malware offered',
-		'32'	=> 'Malware downloaded'
+        '0'	=> 'Possible malicious attack',
+        '1'	=> 'Malicious attack',
+        '16'	=> 'Malware offered',
+        '32'	=> 'Malware downloaded'
 );
 
 # Array with the type of malicious attack.
 $v_severity_atype_ar = array(
-		0 => "Nepenthes",
-		1 => "Argos",
+        0 => "Nepenthes",
+        1 => "Argos",
         2 => "Snort",
-		10 => "ARP Poisoning",
-		11 => "Rogue DHCP server"
+        3 => "Glastopf",
+        10 => "ARP Poisoning",
+        11 => "Rogue DHCP server"
 );
 
 # Array with the type of detail info record.
+# These are the reserved numbers so far for the different detection methods
+# 1-9 -> Nepenthes
+# 10-29 -> Argos
+# 30-39 -> detectarp.pl
+# 40-59 -> Snort
+# 60-69 -> Glastopf
 $v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
 		'2'	=> 'Shellcodehandler',
@@ -158,7 +166,10 @@ $v_attacktype_ar = array(
 		'30' => 'DHCP server identifier',
         '40' => 'Snort Message',
         '41' => 'Snort Sig Class Name',
-        '42' => 'Snort Protocol'
+        '42' => 'Snort Protocol',
+        '60' => 'Request',
+        '61' => 'Referer',
+        '62' => 'User Agent',
 );
 
 # Array with the different types of access for the search engine.
