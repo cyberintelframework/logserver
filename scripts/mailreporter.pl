@@ -56,7 +56,7 @@ use POSIX qw(ceil);
 do '/etc/surfnetids/surfnetids-log.conf';
 our $source = 'mailreporter.pl';
 our $sensor = 'unkown';
-our $tap = 'unknown';;
+our $tap = 'unknown';
 our $remoteip = '0.0.0.0';
 our $pid = $$;
 our $g_vlanid = 0;
