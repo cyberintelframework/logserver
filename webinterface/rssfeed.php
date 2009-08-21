@@ -26,16 +26,6 @@ include_once '../include/rss_generator.inc.php';
 # Starting the session
 session_start();
 
-$s_access = $_SESSION['s_access'];
-$s_access_user = intval($s_access{2});
-
-# Redirect user if he doesn't have the right access
-if ($s_access_user < 1) {
-  header("location: index.php");
-  pg_close($pgconn);
-  exit;
-}
-
 # Including language file
 include "../lang/${c_language}.php";
 
