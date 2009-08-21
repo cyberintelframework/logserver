@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 005                    #
-# 02-03-2009                       #
+# Changeset 006                    #
+# 21-08-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 006 Fixed bug #168
 # 005 Changed Detail & Summary format
 # 004 Added ARP exclusion stuff
 # 003 Fixed sensorstatus RSS
