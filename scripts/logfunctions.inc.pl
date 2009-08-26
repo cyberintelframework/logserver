@@ -153,7 +153,7 @@ sub gettime {
 sub getifip() {
   my ($if, $ip);
   $if = $_[0];
-  $ip = `ifconfig $if | grep "inet addr" | awk '{print \$2}' | awk -F: '{print \$2}'`;
+  $ip = `ifconfig $if | head -n2 | tail -n1 | grep -v MTU | awk '{print \$2}' | awk -F: '{print \$2}'`;
   chomp($ip);
   if ("$ip" ne "") {
     return $ip;
@@ -170,7 +170,7 @@ sub getifip() {
 sub getifmac() {
   my ($if, $mac);
   $if = $_[0];
-  $mac = `ifconfig $if | head -n1 | awk -F" " '{print \$5}'`;
+  $mac = `ifconfig $if | head -n1 | awk '{print \$NF}'`;
   chomp($mac);
   if ($mac ne "") {
     return $mac;
