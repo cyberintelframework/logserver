@@ -1,0 +1,863 @@
+/*
+ * Visuals stylesheet
+ * SURFids 3.00
+ * Changeset 001
+ * 14-04-2009
+ * Kees Trippelvitz
+*/
+
+/*
+ * Changelog:
+ * 001 version 3.00
+*/
+
+/*
+ ********************
+ * HTML elements
+ ********************
+*/
+
+body, html {
+  background-color:	#EFEFEF;
+  font-family:		Arial, Verdana, sans-serif;
+  font-size:		10pt;
+}
+
+a {
+  color:		#333399;
+  text-decoration:	none;
+  cursor:		pointer;
+}
+
+a:hover {
+  text-decoration:	underline;
+}
+
+PRE {
+  background-color:     #eee;
+  border:	        1px solid #999;
+  color:                #000;
+  font-size:           	7pt;
+  font-family:         	monaco, courier, monospace;
+}
+
+input {
+  background-color:	#eee;
+}
+
+textarea {
+  background-color:	#eee;
+}
+
+select {
+  background-color:	#eee;
+}
+
+img {
+  border:       none;
+}
+
+/*
+ ********************
+ * Page
+ ********************
+*/
+
+#page {
+  background-color:	#FFFFFF;
+  border-left:		1px solid #2f2f2f;
+  border-right:		1px solid #2f2f2f;
+  border-bottom:	1px solid #2f2f2f;
+}
+
+
+
+#page #pageHeader {
+  background-image: 	url('../images/header_logo.gif');
+}
+#page #pageHeader ul#globalNav {
+  background-image:     url('../images/global_nav_black.gif');
+}
+
+#page #pageHeader ul#globalNav li {
+  background-image:     url('../images/arrow_ffffff.gif');
+}
+
+#page #pageHeader ul#globalNav a {
+  color:                #FFFFFF;
+  text-decoration:      none;
+}
+
+#page #pageHeader .infoBar #headerTime {
+  font-weight:          bold;
+  text-align:           right;
+}
+#page #pageHeader .infoBar #headerUser {
+  font-weight:          bold;
+}
+#page #pageFooter {
+  border-top:        #FF7800 1px solid;
+}
+
+#pageBody h2 {
+  text-align:           left;
+}
+
+/*
+ ********************
+ * Tab-menu
+ ********************
+*/
+
+#tab-menu {
+  background-color:     #FF7800;
+}
+
+#tab-menu ul{
+  font-weight:          bold;
+}
+
+#tab-menu a {
+  background-color:     #FF7800;
+}
+
+#tab-menu ul li {
+  border-top:           #fff 1px solid;
+  border-left:          #fff 1px solid;
+  border-right:         #fff 1px solid;
+}
+
+#tab-menu ul li.selected {
+}
+
+#tab-menu ul li ul {
+  background-color:     white;
+  border-bottom:        #FF7800 1px solid;
+}
+
+#tab-menu ul li a {
+  color:                white;
+  cursor:		pointer;
+}
+
+#tab-menu .home {
+  border:		0px;
+}
+
+#tab-menu ul li.selected a {
+  color:                black;
+  font-weight:          bold;
+  background-color:     white;
+}
+
+#tab-menu ul li.selected ul li a {
+  color:                black;
+  font-weight:          normal;
+  background-color:     white;
+}
+
+#tab-menu ul li.selected ul li.selected a {
+  color:                #FF7800;
+  font-weight:          bold;
+}
+
+/*
+ ********************
+ * Block
+ ********************
+*/
+
+.block .blockHeader {
+  text-align:           left;
+}
+
+.block .actionBlock {
+  border-right:         1px solid #808080;
+  border-left:          1px solid #808080;
+  border-bottom:        1px solid #808080;
+  background-color:     #DDDDDD;
+  font-size:            8pt;
+}
+.block .actionBlock .pbutton {
+  background-color:     #808080;
+  color:                #fff;
+  font-size:            10pt;
+  border:               1px solid #000;
+  font-weight:          bold;
+}
+.block .actionBlock .sbutton {
+  background-color:     #808080;
+  color:                #FFF;
+  border:               1px solid #808080;
+  font-weight:          bold;
+  cursor:		        pointer;
+}
+.block .actionBlock .sbuttonneg {
+  background-color:     #FFF;
+  color:                #000;
+  border:               1px solid #808080;
+  font-weight:          bold;
+  cursor:		        pointer;
+}
+
+.block .actionBlock .blockHeader {
+  color:                #FFFFFF;
+  background-color:     #808080;
+  font-weight:          bold;
+  font-size:            10pt;
+}
+
+.block .errorBlock {
+  border-right:         1px solid red;
+  border-left:          1px solid red;
+  border-bottom:        1px solid red;
+  background-color:     #DDDDDD;
+  font-size:            8pt;
+}
+.block .errorBlock .blockHeader {
+  color:                #FFFFFF;
+  background-color:     red;
+  font-weight:          bold;
+  font-size:            10pt;
+}
+
+.block .infoBlock {
+  border-right:         1px solid green;
+  border-left:          1px solid green;
+  border-bottom:        1px solid green;
+  background-color:     #DDDDDD;
+  font-size:            8pt;
+}
+.block .infoBlock .blockHeader {
+  color:                #FFFFFF;
+  background-color:     green;
+  font-weight:          bold;
+  font-size:            10pt;
+}
+
+.block .dataBlock {
+  border:               1px solid #FF7800;
+}
+
+.block .dataBlock .blockHeader {
+  color:                #FFFFFF;
+  background-color:     #ff7800;
+  font-size:            11pt;
+  font-weight:          bold;
+}
+
+.block .blockContent {
+
+}
+
+.block .blockContentSearch {
+  border-right:         1px solid #FF7800;
+  border-left:          1px solid #FF7800;
+  border-bottom:        1px solid #FF7800;
+}
+
+/*
+ ********************
+ * Buttons
+ ********************
+*/
+.button {
+  background-color:     #FF7800;
+  color:                #FFF;
+  font-size:            12pt;
+  border:               1px solid #FF7800;
+  font-weight:          bold;
+  cursor:		        pointer;
+}
+.buttonneg {
+  background-color:     #FFF;
+  color:                #000;
+  border:               1px solid #FF7800;
+  font-weight:          bold;
+  cursor:		        pointer;
+}
+
+/*
+ ********************
+ * Selector
+ ********************
+*/
+#selector {
+  background-color:     #FF7800;
+  color:                #FFF;
+}
+
+#selector #border {
+  border-left:          2px solid #FFF;
+}
+
+#selector #timesel #timesel_top {
+  text-align:           center;
+}
+
+#selector #timesel #timesel_bottom {
+  text-align:           center;
+}
+
+#selector #orgsel {
+  text-align:           center;
+}
+
+/*
+ ********************
+ * DataTable
+ ********************
+*/
+.datatable {
+  border:               1px solid #FF7800;
+  font-size:            8pt;
+  background:           #FFF;
+}
+
+.datatable .title {
+  background:           #FF7800;
+  font-size:            10pt;
+  font-weight:          bold;
+  text-align:           center;
+  color:                white;
+}
+
+.datatable td {
+  text-align:           left;
+  border:               1px solid #FF7800;
+}
+
+.datatable .noleftb {
+  border-left:		0px;
+}
+
+.datatable .norightb {
+  border-right:		0px;
+}
+
+.datatable tr {
+  border:               1px solid #FF7800;
+}
+
+.datatable th {
+  border-top:           1px solid #FF7800;
+  border-left:          1px solid #FF7800;
+  border-right:         1px solid #FF7800;
+  border-bottom:        2px solid black;
+  background:           #FFF;
+  font-weight:          bold;
+  text-align:           left;
+}
+
+.datatable .bottom {
+  background:           #FFF;
+  font-weight:          bold;
+  text-align:           left;
+  border-top:           2px solid black;
+  border-left:          1px solid #FF7800;
+  border-right:         1px solid #FF7800;
+  border-bottom:        1px solid #FF7800;
+}
+
+.datatable input {
+  font-size:            8pt;
+}
+
+.datatable select {
+  font-size:            8pt;
+}
+
+.datatable button {
+  background-color:     #FF7800;
+  color:                #FFF;
+  font-size:            8pt;
+  border:               1px solid #FF7800;
+  font-weight:          bold;
+}
+
+.datatable .acenter {
+  text-align:           center;
+}
+
+/*
+ ********************
+ * ActionTable
+ ********************
+*/
+
+.actiontable {
+  text-align:           left;
+}
+
+/*
+ ********************
+ * MultipleTable
+ ********************
+*/
+
+.multipletable {
+  border:               1px solid #FF7800;
+  font-size:            8pt;
+  background:           #FFF;
+  text-align:           left;
+}
+
+.multipletable .title {
+  background:           #FF7800;
+  font-size:            10pt;
+  font-weight:          bold;
+  text-align:           center;
+  color:                white;
+}
+
+.multipletable td {
+  text-align:           left;
+  border:               1px solid #FF7800;
+  overflow:             scroll;
+}
+
+.multipletable .noleftb {
+  border-left:          0px;
+}
+
+.multipletable .norightb {
+  border-right:         0px;
+}
+
+.multipletable tr {
+  border:               1px solid #FF7800;
+}
+
+.multipletable th {
+  border-top:           1px solid #FF7800;
+  border-left:          1px solid #FF7800;
+  border-right:         1px solid #FF7800;
+  border-bottom:        2px solid black;
+  background:           #FFF;
+  font-weight:          bold;
+  text-align:           left;
+}
+
+.multipletable .bottom {
+  background:           #FFF;
+  font-weight:          bold;
+  text-align:           left;
+  border-top:           2px solid black;
+  border-left:          1px solid #FF7800;
+  border-right:         1px solid #FF7800;
+  border-bottom:        1px solid #FF7800;
+}
+
+.multipletable input {
+  font-size:            8pt;
+}
+
+.multipletable select {
+  font-size:            8pt;
+}
+
+.multipletable button {
+  background-color:     #FF7800;
+  color:                #FFF;
+  font-size:            8pt;
+  border:               1px solid #FF7800;
+  font-weight:          bold;
+}
+
+/*
+ ********************
+ * Floating & Aligning
+ ********************
+*/
+
+.aright {
+  text-align:		right;
+}
+
+.aleft {
+  text-align:		left;
+}
+
+.acenter {
+  text-align:           center;
+}
+
+/*
+ ********************
+ * SearchTable
+ ********************
+*/
+
+.searchtable {
+  font-size:            8pt;
+}
+.searchtable td {
+  text-align:           left;
+}
+.searchtable input {
+  font-size:            8pt;
+}
+.searchtable select {
+  font-size:            8pt;
+}
+
+/*
+ ********************
+ * Sensorstatus
+ ********************
+*/
+.legend {
+  border:               1px solid #FF7800;
+}
+
+.legend .legendHeader {
+  font-weight:          bold;
+  font-size:            11pt;
+  background-color:     white;
+}
+
+.sensorstatus {
+  border:               1px solid black;
+  color:                white;
+  text-align:           center;
+}
+.sensorstatustd {
+  border:               1px solid #ff7800;
+  vertical-align:	top;
+}
+
+.sensorstatustext {
+  font-size:            9px;
+  font-weight:          bold;
+}
+
+.sensorstatus .offline {
+  background-color:     red;
+}
+.sensorstatus .online {
+  background-color:     green;
+}
+.sensorstatus .permanent {
+  background-color:     green;
+}
+.sensorstatus .ignored {
+  background-color:     #7FFFD4;
+  color:                black;
+}
+.sensorstatus .outdated {
+  background-color:     orange;
+}
+.sensorstatus .keepalive {
+  background-color:     lawngreen;
+  color:                black;
+}
+.sensorstatus .config {
+  background-color:     blue;
+}
+.sensorstatus .starting {
+  background-color:     yellow;
+  color:                black;
+}
+.sensorstatustd .offline {
+  background-color:     red;
+}
+.sensorstatustd .online {
+  background-color:     green;
+}
+.sensorstatustd .permanent {
+  background-color:     green;
+}
+.sensorstatustd .ignored {
+  background-color:     #7FFFD4;
+  color:                black;
+}
+.sensorstatustd .outdated {
+  background-color:     orange;
+}
+.sensorstatustd .config {
+  background-color:     blue;
+}
+.sensorstatustd .starting {
+  background-color:     yellow;
+  color:                black;
+}
+
+option.offline {
+  background-color:	red;
+}
+option.online {
+  background-color:	green;
+}
+option.permanent {
+  background-color:	green;
+}
+option.ignored {
+  background-color:	#7FFFD4;
+}
+option.outdated {
+  background-color:	orange;
+}
+option.config {
+  background-color:	blue;
+}
+option.starting {
+  background-color:	yellow;
+}
+/*
+ ********************
+ * Search 
+ ********************
+*/
+.details {
+  border:               1px solid #000;
+}
+
+.details .detailsHeader {
+  font-weight:          bold;
+  font-size:            11pt;
+  background-color:     #DDDDDD;
+}
+
+/*
+ ********************
+ * Calendar
+ ********************
+*/
+
+.calendar .nav {
+  background:		#FF7800;
+}
+
+.calendar table {
+  font-size: 		10px;
+}
+
+.calendar .button { /* "<<", "<", ">", ">>" buttons have this class */
+  background:		#FF7800;
+  font-size: 		10px;
+}
+
+.calendar thead .title { /* This holds the current "month, year" */
+  background:		#FF7800;
+}
+
+.calendar tbody td.selected { /* Cell showing selected date */
+  background:		#FF7800;
+}
+
+.calendar .combo .hilite {
+  background:		#FF7800;
+}
+
+/*
+ ********************
+ * Popup
+ ********************
+*/
+#popup {
+  border:		1px solid black;
+  background-color:	white;
+}
+
+#popupheader {
+  color:                white;
+  background-color:     #FF7800;
+  font-weight:          bold;
+  font-size:            10pt;
+}
+
+#popupheader #popupheaderleft {
+  background-color:     #FF7800;
+}
+#popupheader #popupheaderright {
+  background-color:     #FF7800;
+}
+
+#popup #popupheaderright {
+  text-align:           right;
+}
+
+#popupcontent {
+  background-color:	white;
+}
+
+/*
+ ********************
+ * Colored messages
+ ********************
+*/
+.warning {
+  color:		red;
+}
+
+.bwarning {
+  color:		red;
+  font-weight:		bold;
+}
+
+.ok {
+  color:		green;
+}
+
+.bok {
+  color:		green;
+  font-weight:		bold;
+}
+
+.notice {
+  color:		orange;
+}
+
+.bnotice {
+  color:		orange;
+  font-weight:		bold;
+}
+
+/*
+ ********************
+ * Miscellaneous
+ ********************
+*/
+.searchnav {
+  border:               1px solid black;
+  background-color:     #FFFFFF;
+  color:                #000000;
+  font-size:            10pt;
+  text-align:           center;
+}
+.searchheader a {
+  border:               1px solid white;
+  color:                #FFFFFF;
+  font-size:            8pt;
+  padding-left:		2px;
+  padding-right:	2px;
+  text-decoration:	none;
+}
+
+#search_wait {
+  border:               1px solid black;
+  background-color:     white;
+}
+
+#overDiv {
+  text-align:           center;
+}
+
+#pagetitle {
+  font-size:            16pt;
+  font-weight:          bold;
+}
+
+.smallselect {
+  font-size:            8pt;
+}
+.smallwidthselect {
+  font-size:            8pt;
+  width:                90px;
+}
+
+.smallinput {
+  font-size:            8pt;
+}
+
+.suggest_link {
+  background-color: 	#DDDDDD;
+  padding: 		2px 6px 2px 6px;
+}
+
+.suggest_link_over {
+  background-color: 	#3366CC;
+  padding: 		2px 6px 2px 6px;
+}
+
+.search_suggest {
+  background-color: 	#DDDDDD;
+  text-align: 		left; 
+  border: 		1px solid #000000;			
+  cursor: 		pointer;
+}
+
+.caltitle {
+  font-weight:		bold;
+  text-align:		center;
+}
+
+.btext {
+  font-weight:		bold;
+}
+
+#overlay {
+  display: none;
+  background-image: url(../images/overlay.png); 
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width:  100%;
+  height: 100%;
+}
+
+.textcenter {
+  text-align:           center;
+}
+
+#pagecounter {
+  vertical-align:	    bottom;
+}
+
+.syslog_Debug {
+  color:		        black;
+//  font-weight:          bold;
+}
+
+.syslog_Info {
+  color:		        white;
+//  font-weight:          bold;
+  background-color:     green;
+}
+
+.syslog_Warning {
+  color:		        white;
+  background-color:     orange;
+}
+
+.syslog_Error {
+  color:		        black;
+  background-color:     red;
+}
+
+.syslog_Critical {
+  color:		        black;
+  background-color:     red;
+}
+
+#adminmenu {
+  background-color:	lightgray;
+  border:		1px solid #FF7800;
+  width:                100px;
+  height:               30px;
+  position:		absolute;
+  display:		none;
+  padding:		5px;
+  font-size:		10px;
+}
+
+.headerTab {
+  float:                left;
+  font-size:            10pt;
+  border-top:           1px solid white;
+  border-left:          1px solid white;
+  border-right:         1px solid white;
+  margin-left:          5px;
+  padding:              0px 5px 4px 5px;
+}
+
+.headerTabSel {
+  background-color:     white;
+  color:                black;
+}
+
+.headerTab a {
+  color:                black;
+}

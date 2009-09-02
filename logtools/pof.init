@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+####################################
+# p0f-db init script               #
+# SURFids 3.00                     #
+# Changeset 001                    #
+# 14-11-2008                       #
+# Jan van Lith & Kees Trippelvitz  #
+####################################
+
+#####################
+# Changelog:
+# 001 Initial version
+#####################
+
+##################
+# Modules used
+##################
+use DBI;
+use Time::localtime qw(localtime);
+
+do '/etc/surfnetids/surfnetids-log.conf';
+require "$c_surfidsdir/scripts/logfunctions.inc.pl";
+
+##################
+# Main script
+##################
+
+$chk = dbconnect();
+
+# Get the IP address configuration for the tap device from the database.
+$sth = dbquery("SELECT tap FROM sensors WHERE permanent = 1");
+while (@row = $sth->fetchrow_array) {
+    $if = $row[0];
+
+    if (!$if) {
+        $if = "";
+    }
+    if ("$if" eq "") {
+        exit 1;
+    }
+    if ($c_enable_pof == 1) {
+        system "p0f -d -i $if -o /dev/null";
+    }
+}
