@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 010                    #
-# 08-07-2009                       #
+# Changeset 011                    #
+# 16-09-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 011 Fixed handling of Amun exploits
 # 010 Fixed issue #140
 # 009 Added link to sensordetails
 # 008 Fixed a navigational bug
@@ -1207,8 +1208,16 @@ while ($row = pg_fetch_assoc($result)) {
         $dia_ar = array('attackid' => $id, 'type' => 1);
         $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
         $text = $dia_result_ar[0]['text'];
-        $attack = $v_attacks_ar[$text]["Attack"];
-        $attack_url = $v_attacks_ar[$text]["URL"];
+        if (strpos($text, "Vulnerability") == False) {
+          # Handling Nepenthes detail records
+          $attack = $v_attacks_ar[$text]["Attack"];
+          $attack_url = $v_attacks_ar[$text]["URL"];
+        } else {
+          # Handling Amun detail records
+          $text = str_replace("Vulnerability", "", $text);
+          $attack = trim($text);
+          $attack_url = "";
+        }
         echo "<td>";
         if ($attack_url != "") {
           echo "<a href='$attack_url' target='new'>";
