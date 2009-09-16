@@ -142,6 +142,9 @@ if ($id == 1) {
     # useredit, myaccount, usernew - Page configuration
     echo "These options will let you configure the way certain pages appear for you. <br />";
     echo "To the right you can select which page to configure, below you can enable/disable options for the selected page";
+} elseif ($id == 20) {
+    # mod_topcountries.php
+    echo "These statistics are the amount of distinct attackers per country.";
 }
 
 ?>
