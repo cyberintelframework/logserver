@@ -68,7 +68,7 @@ echo "<div class='block'>\n";
         if ($num > 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='80%'>" .$l['g_country']. "</td>\n";
+              echo "<th width='80%'>" .$l['g_country']. " " .printhelp(20,20). "</td>\n";
               echo "<th width='20%'>" .$l['g_stats']. "</td>\n";
             echo "</tr>\n";
             $i = 0;
