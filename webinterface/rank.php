@@ -607,13 +607,21 @@ echo "<div class='all'>\n";
               $total = $row['total'];
               $exploit_ar[$exploit] = $total;
               $exploitid_ar[$exploit] = $exploitid;
-	      $grandtotal = $grandtotal + $total;
+              $grandtotal = $grandtotal + $total;
             }
             if ($exploit_ar != "") {
               foreach ($exploit_ar as $key => $val) {
-                $attack = $v_attacks_ar[$key]["Attack"];
-                $attack_url = $v_attacks_ar[$key]["URL"];
-	        $exploitid  = $exploitid_ar[$key];
+                if (strpos($key, "Vulnerability") == False) {
+                  # Handling Nepenthes detail records
+                  $attack = $v_attacks_ar[$key]["Attack"];
+                  $attack_url = $v_attacks_ar[$key]["URL"];
+                } else {
+                  # Handling Amun detail records
+                  $key = str_replace("Vulnerability", "", $key);
+                  $attack = trim($key);
+                  $attack_url = "";
+                }
+                $exploitid  = $exploitid_ar[$key];
                 echo "<tr>\n";
                   echo "<td>$i.</td>\n";
                   if ($attack_url != "") {
