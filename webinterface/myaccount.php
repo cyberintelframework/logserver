@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 04-04-2008                       #
+# Changeset 003                    #
+# 16-09-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Moved hardcoded indexmods to variables
 # 002 Added UTC support
 # 001 Added language support
 #############################################
@@ -299,17 +300,20 @@ if ($err == 0) {
             echo "<table class='datatable' id='page_indexmods' name='page_indexmods'>\n";
               echo "<tr>\n";
                 echo "<td>\n";
-                  echo printCheckBox($l['g_attacks'], "mods[]", 1, $mods[1]) . "<br />\n";
-                  echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
-                  echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
-                  echo printCheckBox($l['mo_top10']. " ".$l['in_attackers']."", "mods[]", 4, $mods[4]) . "<br />\n";
-                  echo printCheckBox($l['mo_top10']." ".$l['ra_proto_org']."", "mods[]", 5, $mods[5]) . "<br />\n";
-                  echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
-                  echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
-                  echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
-                  echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
-                  echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
-                  echo printCheckBox($l['mo_top10']." ".$l['pl_sensors']."", "mods[]", 11, $mods[11]) . "<br />\n";
+                  foreach ($v_indexmod_ar as $key => $mod) {
+                    echo printCheckBox($mod, "mods[]", $key, $mods[$key]) . "<br />\n";
+#                  echo printCheckBox($l['g_exploits'], "mods[]", 2, $mods[2]) . "<br />\n";
+#                  echo printCheckBox($l['me_search'], "mods[]", 3, $mods[3]) . "<br />\n";
+#                  echo printCheckBox($l['mo_top10']. " ".$l['in_attackers']."", "mods[]", 4, $mods[4]) . "<br />\n";
+#                  echo printCheckBox($l['mo_top10']." ".$l['ra_proto_org']."", "mods[]", 5, $mods[5]) . "<br />\n";
+#                  echo printCheckBox($l['mod_virusscanners'], "mods[]", 6, $mods[6]) . "<br />\n";
+#                  echo printCheckBox($l['lc_cross'], "mods[]", 7, $mods[7]) . "<br />\n";
+#                  echo printCheckBox($l['me_maloff'], "mods[]", 8, $mods[8]) . "<br />\n";
+#                  echo printCheckBox($l['me_sensorstatus'], "mods[]", 9, $mods[9]) . "<br />\n";
+#                  echo printCheckBox($l['in_ports'], "mods[]", 10, $mods[10]) . "<br />\n";
+#                  echo printCheckBox($l['mo_top10']." ".$l['pl_sensors']."", "mods[]", 11, $mods[11]) . "<br />\n";
+#                  echo printCheckBox("Top countries", "mods[]", 12, $mods[12]) . "<br />\n";
+                  }
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";

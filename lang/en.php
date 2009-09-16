@@ -57,6 +57,7 @@ $l['g_off']             = "Off";
 $l['g_addsensor']       = "Add sensor";
 $l['g_addorg']          = "Add all sensors";
 $l['g_vlan']            = "VLAN";
+$l['g_country']         = "Country";
 
 ##########################
 # Global (Lowercase first letter)
@@ -676,4 +677,5 @@ $l['wh_connclosed']     = "Connection closed";
 $l['mod_virusscanners'] = "Virus Scanners";
 $l['mod_virusscan']     = "Virus scanner";
 $l['mod_version']       = "Version";
+$l['mod_countries']     = "Top 10 malicious countries";
 ?>

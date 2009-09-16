@@ -140,6 +140,7 @@ $v_severity_atype_ar = array(
         1 => "Argos",
         2 => "Snort",
         3 => "Glastopf",
+        4 => "Amun",
         10 => "ARP Poisoning",
         11 => "Rogue DHCP server"
 );
@@ -545,6 +546,21 @@ $v_note_types_ar = array(
 $v_note_all_ar = array(
     1 => "All Vlans",
     2 => "Current VLAN only"
+);
+
+$v_indexmod_ar = array(
+    1 => "Attacks",
+    2 => "Exploits",
+    3 => "Search",
+    4 => "Top 10 attackers",
+    5 => "Top 10 protocols",
+    6 => "Top 5 virusses",
+    7 => "Cross domain",
+    8 => "Malware offered",
+    9 => "Sensor status",
+    10 => "Ports",
+    11 => "Top 10 sensors",
+    12 => "Top 10 malicious countries"
 );
 
 ?>
