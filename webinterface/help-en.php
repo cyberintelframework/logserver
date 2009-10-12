@@ -2,8 +2,8 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-11-2008                       #
+# Changeset 002                    #
+# 12-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #############################################
 # Changelog:
+# 002 Fixed bug #181
 # 001 Initial release
 #############################################
 
@@ -27,9 +28,10 @@ header("Cache-control: private");
 
 # Checking if the user is logged in
 if (!isset($_SESSION['s_admin'])) {
-  $address = getaddress();
-  pg_close($pgconn);
-  header("location: ${address}login.php");
+  #$address = getaddress();
+  #pg_close($pgconn);
+  #header("location: ${address}login.php");
+  echo "You are not logged in!";
   exit;
 }
 
