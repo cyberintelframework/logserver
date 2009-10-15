@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-08-2008                       #
+# Changeset 002                    #
+# 15-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Tuned SQL query (#185)
 # 001 Initial release
 #############################################
 
@@ -87,8 +88,8 @@ add_to_sql("syslog", "table");
 
 $from = $_SESSION['s_from'];
 $to = $_SESSION['s_to'];
-add_to_sql("timestamp >= epoch_to_ts($from)", "where");
-add_to_sql("timestamp <= epoch_to_ts($to)", "where");
+add_to_sql("ts_to_epoch(timestamp) >= $from", "where");
+add_to_sql("ts_to_epoch(timestamp) <= $to", "where");
 
 # Getting all operators
 if (isset($clean['levelop'])) {

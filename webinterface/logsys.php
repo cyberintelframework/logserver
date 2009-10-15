@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 20-08-2008                       #
+# Changeset 002                    #
+# 15-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Tuned SQL queries a bit (#185)
 # 001 Initial release
 #############################################
 
@@ -60,8 +61,8 @@ add_to_sql("syslog", "table");
 
 $from = $_SESSION['s_from'];
 $to = $_SESSION['s_to'];
-add_to_sql("timestamp >= epoch_to_ts($from)", "where");
-add_to_sql("timestamp <= epoch_to_ts($to)", "where");
+add_to_sql("ts_to_epoch(timestamp) >= $from", "where");
+add_to_sql("ts_to_epoch(timestamp) <= $to", "where");
 
 $operators_ar = array(
     	'' => "=",
@@ -157,22 +158,22 @@ $sql .= " $sql_where ORDER BY $sql_order LIMIT $c_logsys_max";
 $debuginfo[] = $sql;
 $result = pg_query($pgconn, $sql);
 
-$sql_prefix = "SELECT DISTINCT source FROM syslog WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to)";
+$sql_prefix = "SELECT DISTINCT source FROM syslog WHERE ts_to_epoch(timestamp) >= $from AND ts_to_epoch(timestamp) <= $to";
 $debuginfo[] = $sql_prefix;
 $result_prefix = pg_query($pgconn, $sql_prefix);
 
-$sql_error = "SELECT DISTINCT error FROM syslog WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to)";
+$sql_error = "SELECT DISTINCT error FROM syslog WHERE ts_to_epoch(timestamp) >= $from AND ts_to_epoch(timestamp) <= $to";
 $debuginfo[] = $sql_error;
 $result_error = pg_query($pgconn, $sql_error);
 
 $sql_sid = "SELECT DISTINCT syslog.vlanid, syslog.keyname, sensors.id as sid FROM syslog ";
 $sql_sid .= " LEFT JOIN sensors ";
 $sql_sid .= " ON sensors.keyname = syslog.keyname AND sensors.vlanid = syslog.vlanid ";
-$sql_sid .= " WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to) ";
+$sql_sid .= " WHERE ts_to_epoch(timestamp) >= $from AND ts_to_epoch(timestamp) <= $to ";
 $debuginfo[] = $sql_sid;
 $result_sid = pg_query($pgconn, $sql_sid);
 
-$sql_dev = "SELECT DISTINCT device FROM syslog WHERE timestamp >= epoch_to_ts($from) AND timestamp <= epoch_to_ts($to) ";
+$sql_dev = "SELECT DISTINCT device FROM syslog WHERE ts_to_epoch(timestamp) >= $from AND ts_to_epoch(timestamp) <= $to ";
 $debuginfo[] = $sql_dev;
 $result_dev = pg_query($pgconn, $sql_dev);
 

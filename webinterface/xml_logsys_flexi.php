@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 21-07-2009                       #
+# Changeset 003                    #
+# 15-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Tuned SQL query (#185)
 # 002 Fixed #156
 # 001 Initial release
 #############################################
@@ -73,8 +74,8 @@ add_to_sql("syslog", "table");
 
 $from = $_SESSION['s_from'];
 $to = $_SESSION['s_to'];
-add_to_sql("timestamp >= epoch_to_ts($from)", "where");
-add_to_sql("timestamp <= epoch_to_ts($to)", "where");
+add_to_sql("ts_to_epoch(timestamp) >= $from", "where");
+add_to_sql("ts_to_epoch(timestamp) <= $to", "where");
 
 if ($s_admin != 1) {
   $err = 1;
