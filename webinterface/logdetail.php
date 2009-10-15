@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 15-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Fixed bug with unescaped characters in download url
 # 001 Added language support
 #############################################
 
@@ -82,7 +83,7 @@ if ($err != 1) {
 
             while ($row = pg_fetch_assoc($result_details)) {
               $attackid = $row['attackid'];
-              $logging = $row['text'];
+              $logging = pg_escape_string($row['text']);
               $type = $row['type'];
               $typetext = $v_attacktype_ar[$type];
 
