@@ -606,29 +606,23 @@ echo "<div class='all'>\n";
               $exploitid = $row['id'];
               $total = $row['total'];
               $exploit_ar[$exploit] = $total;
-              $exploitid_ar[$exploit] = $exploitid;
               $grandtotal = $grandtotal + $total;
+              $exploitid_ar[$exploit] = $exploitid;
             }
             if ($exploit_ar != "") {
               foreach ($exploit_ar as $key => $val) {
                 if (strpos($key, "Vulnerability") == False) {
                   # Handling Nepenthes detail records
-                  $attack = $v_attacks_ar[$key]["Attack"];
-                  $attack_url = $v_attacks_ar[$key]["URL"];
+                  $attack = str_replace("Dialogue", "", $key);
                 } else {
                   # Handling Amun detail records
                   $key = str_replace("Vulnerability", "", $key);
                   $attack = trim($key);
-                  $attack_url = "";
                 }
-                $exploitid  = $exploitid_ar[$key];
+                $exploitid = $exploitid_ar[$key];
                 echo "<tr>\n";
                   echo "<td>$i.</td>\n";
-                  if ($attack_url != "") {
-                    echo "<td><a href='$attack_url' target='new'>$attack</a></td>\n";
-                  } else {
-                    echo "<td>$attack</td>\n";
-                  }
+                  echo "<td>$attack</td>\n";
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
                     echo "<td>" . downlink("logsearch.php?int_org=0&int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
@@ -667,22 +661,17 @@ echo "<div class='all'>\n";
                 $exploit = $row['text'];
                 $exploitid = $row['id'];
                 $total = $row['total'];
-		$exploit_ar[$exploit] = $total;
+                $exploit_ar[$exploit] = $total;
                 $exploitid_ar[$exploit] = $exploitid;
                 $grandtotal = $grandtotal + $total;
               }
               if ($exploit_ar != "") {
                 foreach ($exploit_ar as $key => $val) {
-                  $attack = $v_attacks_ar[$key]["Attack"];
-                  $attack_url = $v_attacks_ar[$key]["URL"];
-		  $exploitid  = $exploitid_ar[$key];
+                  $attack = str_replace("Dialogue", "", $key);
+                  $exploitid  = $exploitid_ar[$key];
                   echo "<tr>\n";
                     echo "<td>$i.</td>\n";
-                    if ($attack_url != "") {
-                      echo "<td><a href='$attack_url' target='new'>$attack</a></td>\n";
-                    } else {
-                      echo "<td>$attack</td>\n";
-                    }
+                    echo "<td>$attack</td>\n";
                     $perc = round($val / $grandtotal * 100);
                     echo "<td>" . downlink("logsearch.php?int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
                   echo "</tr>\n";

@@ -1070,6 +1070,8 @@ if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" 
 #flush();
 prepare_sql();
 
+$sql_sort .= ", severity ASC";
+
 $sql =  "SELECT $sql_select";
 $sql .= " FROM $sql_from ";
 $sql .= " $sql_where ";
@@ -1210,23 +1212,15 @@ while ($row = pg_fetch_assoc($result)) {
         $text = $dia_result_ar[0]['text'];
         if (strpos($text, "Vulnerability") == False) {
           # Handling Nepenthes detail records
-          $attack = $v_attacks_ar[$text]["Attack"];
-          $attack_url = $v_attacks_ar[$text]["URL"];
+          $attack = str_replace("Dialogue", "", $text);
         } else {
           # Handling Amun detail records
           $text = str_replace("Vulnerability", "", $text);
           $attack = trim($text);
-          $attack_url = "";
         }
         echo "<td>";
-        if ($attack_url != "") {
-          echo "<a href='$attack_url' target='new'>";
-        }
         if ($attack != "") {
           echo "$attack<br />";
-        }
-        if ($attack_url != "") {
-          echo "</a>";
         }
         if ($smac != "") {
           echo "$smac";

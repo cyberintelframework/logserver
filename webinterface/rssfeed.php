@@ -185,7 +185,7 @@ if ($err == 0) {
 
       $pattern = '/^.*Dialogue$/';
       if (preg_match($pattern, $text)) {
-        $text = $v_attacks_ar[$text]["Attack"];
+        $text = str_replace("Dialogue", "", $text);
       }
 
       if ($text != "") {

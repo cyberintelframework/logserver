@@ -367,7 +367,7 @@ while ($row = pg_fetch_assoc($result)) {
       $dia_ar = array('attackid' => $id, 'type' => 1);
       $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
       $text = $dia_result_ar[0]['text'];
-      $attack = $v_attacks_ar[$text]["Attack"];
+      $attack = str_replace("Dialogue", "", $text);
     } elseif ($sev == 16) {
       $dia_ar = array('attackid' => $id);
       $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);

@@ -379,27 +379,18 @@ if ($lname != "" && $rname != "") {
               $i=1;
               $grandtotal = 0;
               $exploit_ar = array();
-              $exploitid_ar = array();
               while ($row = pg_fetch_assoc($result_topexp)) {
                 $exploit = $row['text'];
-                $exploitid = $row['id'];
                 $total = $row['total'];
                 $exploit_ar[$exploit] = $total;
-                $exploitid_ar[$exploit] = $exploitid;
                 $grandtotal = $grandtotal + $total;
               }
               if ($exploit_ar != "") {
                 foreach ($exploit_ar as $key => $val) {
-                  $attack = $v_attacks_ar[$key]["Attack"];
-                  $attack_url = $v_attacks_ar[$key]["URL"];
-                  $exploitid  = $exploitid_ar[$key];
+                  $attack = str_replace("Dialogue", "", $key);
                   echo "<tr>\n";
                     echo "<td>$i.</td>\n";
-                    if ($attack_url != "") {
-                      echo "<td><a href='$attack_url' target='new'>$attack</a></td>\n";
-                    } else {
-                      echo "<td>$attack</td>\n";
-                    }
+                    echo "<td>$attack</td>\n";
                     $perc = round($val / $grandtotal * 100);
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   echo "</tr>\n";
@@ -428,27 +419,18 @@ if ($lname != "" && $rname != "") {
               $i=1;
               $grandtotal = 0;
               $exploit_ar = array();
-              $exploitid_ar = array();
               while ($row = pg_fetch_assoc($result_topexp)) {
                 $exploit = $row['text'];
-                $exploitid = $row['id'];
                 $total = $row['total'];
                 $exploit_ar[$exploit] = $total;
-                $exploitid_ar[$exploit] = $exploitid;
                 $grandtotal = $grandtotal + $total;
               }
               if ($exploit_ar != "") {
                 foreach ($exploit_ar as $key => $val) {
-                  $attack = $v_attacks_ar[$key]["Attack"];
-                  $attack_url = $v_attacks_ar[$key]["URL"];
-                  $exploitid  = $exploitid_ar[$key];
+                  $attack = str_replace("Dialogue", "", $key);
                   echo "<tr>\n";
                     echo "<td>$i.</td>\n";
-                    if ($attack_url != "") {
-                      echo "<td><a href='$attack_url' target='new'>$attack</a></td>\n";
-                    } else {
-                      echo "<td>$attack</td>\n";
-                    }
+                    echo "<td>$attack</td>\n";
                     $perc = round($val / $grandtotal * 100);
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   echo "</tr>\n";
