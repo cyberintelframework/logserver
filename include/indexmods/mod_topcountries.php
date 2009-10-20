@@ -3,17 +3,19 @@
 ####################################
 # SURFids 3.00                     #
 # Changeset 003                    #
-# 19-08-2008                       #
+# 20-10-2009                       #
 # Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed bug with multiple GeoIP includes
+# 002 Fixed arsort with empty array
 # 001 Initial release
 #############################################
 
 if ($c_geoip_enable == 1) {
-  include '../include/' .$c_geoip_module;
+  include_once '../include/' .$c_geoip_module;
   $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
   $geo_error = 0;
 
@@ -56,7 +58,9 @@ if ($c_geoip_enable == 1) {
 } else {
   $geo_error = 1;
 }
-arsort($country_array, SORT_NUMERIC);
+if (count($country_array) > 0) {
+    arsort($country_array, SORT_NUMERIC);
+}
 
 echo "<div class='block'>\n";
   echo "<div class='dataBlock'>\n";

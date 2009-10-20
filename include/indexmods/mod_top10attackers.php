@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 004                    #
-# 26-06-2008                       #
+# Changeset 005                    #
+# 20-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Fixed bug with multiple GeoIP includes
 # 004 Fixed bug #74 again
 # 003 Added ARP exclusion stuff
 # 002 Fixed bug #74
@@ -16,7 +17,7 @@
 #############################################
 
 if ($c_geoip_enable == 1) {
-  include '../include/' .$c_geoip_module;
+  include_once '../include/' .$c_geoip_module;
   $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
  
