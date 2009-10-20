@@ -17,7 +17,7 @@
 ##################
 do '/etc/surfnetids/surfnetids-log.conf';
 $geoiploc = "http://www.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
-$quiet = 0;
+$quiet = 1;
 
 ##################
 # Main script
