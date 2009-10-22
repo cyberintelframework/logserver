@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 21-10-2009                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 ####################################
 # Changelog:
+# 002 Fixed missing language definition
 # 001 Added language support
 ####################################
 
@@ -83,7 +84,7 @@ if ($s_access_sensor > 1) {
   echo "<div class='centerbig'>\n";
     echo "<div class='block'>\n";
       echo "<div class='dataBlock'>\n";
-        echo "<div class='blockHeader'>Sensor redirects</div>\n";
+        echo "<div class='blockHeader'>" .$l['ac_redir']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
