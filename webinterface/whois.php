@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 004                    #
-# 16-07-2008                       #
+# Changeset 005                    #
+# 21-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 005 Fixed checkSID call
 # 004 Added extra flush()
 # 003 Fixed bug #79
 # 002 Added JPNIC support and fixed KRNIC
@@ -28,7 +29,7 @@ session_start();
 
 if (isset($_SESSION['s_admin'])) {
   # Validate the session_id() against the SID in the database
-  $chk_sid = checkSID();
+  $chk_sid = checkSID($c_chksession_ip, $c_chksession_ua);
   if ($chk_sid == 1) {
     $absfile = $_SERVER['SCRIPT_NAME'];
     $file = basename($absfile);
@@ -66,7 +67,7 @@ debug_input();
 # Setting the whois server
 if (isset($clean['s'])) {
   $serv = $clean['s'];
-  $pattern = '/^(arin|lacnic|apnic|ripe|afrinic|krnic|jpnic)$/';
+  $pattern = '/^(arin|lacnic|apnic|ripe|afrinic|krnic|jpnic|cymru)$/';
   if (preg_match($pattern, $serv) != 1) {
     $server = "whois.ripe.net";
   } else {
@@ -74,6 +75,8 @@ if (isset($clean['s'])) {
       $server = "whois.nic.ad.jp";
     } elseif ($serv == "krnic") {
       $server = "whois.nida.or.kr";
+    } elseif ($serv == "cymru") {
+      $server = "whois.cymru.com";
     } else {
       $server = "whois." .$serv. ".net";
     }
@@ -136,6 +139,8 @@ if ($err == 0) {
               echo $l['wh_connected']. " $server:43, " .$l['wh_sending']. "<br>\n";
               if ($serv == "jpnic") {
                 fputs($fp, "$ip /e\r\n");
+              } elseif ($serv == "cymru") {
+                fputs($fp, "-v $ip\r\n");
               } else {
                 fputs($fp, "$ip\r\n");
               }
