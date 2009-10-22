@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 006                    #
-# 21-08-2009                       #
+# Changeset 007                    #
+# 20-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 007 Fixed pubDate bug
 # 006 Fixed bug #168
 # 005 Changed Detail & Summary format
 # 004 Added ARP exclusion stuff
@@ -207,7 +208,8 @@ if ($err == 0) {
         $item->title = "$title";
       }
       $item->link = $link;
-      $item->pubDate = "$ts";
+      $rss_ts = date("r", $ts);
+      $item->pubDate = "$rss_ts";
       $rss_channel->items[] = $item;
     }
   } elseif ($template == 2) {
@@ -286,13 +288,15 @@ if ($err == 0) {
           $item->title = "$title";
         }
         $item->link = $link;
-        $item->pubDate = "$ts";
+        $rss_ts = date("r", $ts);
+        $item->pubDate = "$rss_ts";
         $rss_channel->items[] = $item;
       }
     } else {
       $item = new rssGenerator_item();
       $item->title = $l['rf_noranges'];
-      $item->pubDate = "$ts";
+      $rss_ts = date("r", $ts);
+      $item->pubDate = "$rss_ts";
       $rss_channel->items[] = $item;
     }
   } elseif ($template == 4) {
@@ -336,7 +340,8 @@ if ($err == 0) {
       $item = new rssGenerator_item();
       $item->title = "$sensor is $statustext";
       $item->description = "Status code: $status";
-      $item->pubDate = "$ts";
+      $rss_ts = date("r", $ts);
+      $item->pubDate = "$rss_ts";
       $rss_channel->items[] = $item;
     }
   }
