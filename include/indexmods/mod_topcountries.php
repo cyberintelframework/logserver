@@ -55,11 +55,13 @@ if ($c_geoip_enable == 1) {
     $country_array[$countrycode]++;
     $name_array[$countrycode] = $record->country_name;
   }
-} else {
-  $geo_error = 1;
-}
-if (count($country_array) > 0) {
+  if (count($country_array) > 0) {
     arsort($country_array, SORT_NUMERIC);
+  } elseif (count($country_array == 0)) {
+    $geo_error = 1;
+  }
+} else {
+  $geo_error = 2;
 }
 
 echo "<div class='block'>\n";
@@ -68,6 +70,8 @@ echo "<div class='block'>\n";
     echo "<div class='blockContent'>\n";
       if ($geo_error == 1) {
         echo "<font class='warning'>" .$l['g_nofound']. "</font>\n";
+      } elseif ($geo_error == 2) {
+        echo "<font class='warning'>" .$l['mod_geo_dis']. "</font>\n";
       } else {
         if ($num > 0) {
           echo "<table class='datatable'>\n";
