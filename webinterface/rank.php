@@ -3,8 +3,8 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 004                    #
-# 18-04-2008                       #
+# Changeset 005                    #
+# 21-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -15,6 +15,7 @@
 
 ####################################
 # Changelog:
+# 005 Fixed include of GeoIP module
 # 004 Added ARP exclusion stuff
 # 003 Fixed debug_sql logging
 # 002 Removed unneeded extractvars
@@ -23,7 +24,7 @@
 
 ### GEOIP STUFF
 if ($c_geoip_enable == 1) {
-  include '../include/' .$c_geoip_module;
+  include_once '../include/' .$c_geoip_module;
   $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
 
