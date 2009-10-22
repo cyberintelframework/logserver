@@ -115,10 +115,10 @@ echo "<div class='block'>\n";
               $rowrange = pg_fetch_assoc($result_ranges);
               $ranges_ar = explode(";", $rowrange['ranges']);
               if (matchCIDR($source, $ranges_ar)) {
-                echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 500, 500);\" class='warning' />$source</a>&nbsp;&nbsp;";
+                echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" class='warning' />$source</a>&nbsp;&nbsp;";
                 echo "<img src='images/ownranges.jpg' ".printover("IP from your own ranges!") ."></td>\n";
               } else {
-                echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 500, 500);\" />$source</a>";
+                echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$source</a>";
               }
             echo "</td>\n";
             echo "<td style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
