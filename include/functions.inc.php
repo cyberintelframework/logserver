@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 010                    #
-# 08-07-2008                       #
+# Changeset 011                    #
+# 21-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 011 Fixed checkSID
 # 010 Fixed another bug in the printsort function
 # 009 Fixed a bug in the printsort function
 # 008 Fixed intcsv regexp
@@ -432,11 +433,9 @@ function geterror($m, $popup = 0) {
 
 # 3.03 checkSID
 # Function to compare the current session ID to the session ID in the database
-function checkSID(){
-  global $c_checksession_ua;
-  global $c_checksession_ip;
+function checkSID($chksession_ip, $chksession_ua){
   $err = 0;
-  if ($c_chksession_ip == 1) {
+  if ($chksession_ip == 1) {
     $sid = session_id();
     $sql_checksid = "SELECT ip, useragent FROM sessions WHERE sid = '$sid'";
     $result_check = pg_query($sql_checksid);
@@ -452,7 +451,7 @@ function checkSID(){
       $err = 1;
     }
   }
-  if ($c_chksession_ua == 1) {
+  if ($chksession_ua == 1) {
     $sid = session_id();
     $sql_checksid = "SELECT useragent FROM sessions WHERE sid = '$sid'";
     $result_check = pg_query($sql_checksid);
@@ -468,11 +467,7 @@ function checkSID(){
       $err = 1;
     }
   }
-  if ($err == 0) {
-    return 0;
-  } elseif ($err == 1) {
-    return 1;
-  }
+  return $err;
 }
 
 # 3.04 getaddress
