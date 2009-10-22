@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 009                    #
-# 02-03-2009                       #
+# Changeset 010                    #
+# 21-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 010 Fixed checkSID call
 # 009 Fixed session.bug_compat_42 warning
 # 008 Changed handling for the time selector
 # 007 Changed some $url handling for sort functions
@@ -70,7 +71,7 @@ if ($file != "login.php") {
     $s_access_search = intval($s_access{1});
 
     # Validate the session_id() against the SID in the database
-    $chk_sid = checkSID();
+    $chk_sid = checkSID($c_chksession_ip, $c_chksession_ua);
     if ($chk_sid == 1) {
       $url = basename($_SERVER['SCRIPT_NAME']);
       header("location: ${address}login.php");
