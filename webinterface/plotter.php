@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 18-11-2008                       #
+# Changeset 003                    #
+# 21-10-2009                       #
 # Kees Trippelvitz & Jan van Lith  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed a few missing language words
 # 002 Added default settings support, interval suggest
 # 001 Added language support
 #############################################
@@ -295,7 +296,7 @@ if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
         echo "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>" .$l['pl_dports']. "<br />" .$l['pl_example']. ":<br />80,100-1000,!445,!137-145 or " .$l['pl_all']. "</td>\n";
+        echo "<td>" .$l['pl_dports']. "<br />" .$l['pl_example']. ":<br />80,100-1000,!445,!137-145 " .$l['pl_or']. " " .$l['pl_all']. "</td>\n";
         echo "<td>\n";
           echo "<input type='text' name='strip_html_escape_ports' size='20' />\n";
         echo "</td>\n";
@@ -330,7 +331,7 @@ if (isset($_GET['int_type']) && !empty($_GET['int_type'])) {
         echo "<td>" .printCheckBox($l['pl_totalmal'], "int_totalmal2", 1, 1). "</td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
-        echo "<td>Interval</td>\n";
+        echo "<td>" .$l['pl_interval']. "</td>\n";
         echo "<td>\n";
           echo "<select name='int_interval'>\n";
             echo printOption(3600, $l['pl_hour'], $int_suggest);
