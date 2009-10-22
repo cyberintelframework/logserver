@@ -102,6 +102,7 @@ $l['ac_notime']         = "No timespan";
 $l['ac_confirm']        = "This will also delete your range redirections.\\nAre you sure?";
 $l['ac_redirectto']     = "Redirect to ranges";
 $l['ac_range_or_ip']    = "Range or IP";
+$l['ac_redir']          = "Sensor redirects";
 
 ##########################
 # arp_cache.php
@@ -291,7 +292,7 @@ $l['ls_graphit']        = "Graph it!";
 ##########################
 $l['ly_level']		= "Level";
 $l['ly_ts']		    = "Timestamp";
-$l['ly_source']		= "Source";
+$l['ly_source']		= "Source (PID)";
 $l['ly_error']		= "Class";
 $l['ly_sensorid']	= "Sensor ID";
 $l['ly_dev']		= "Device";
@@ -319,7 +320,7 @@ $l['mo_top10']          = "Top 10";
 $l['me_contact']        = "Contact";
 $l['me_logout']         = "Logout";
 $l['me_about']          = "About";
-$l['me_manual']		= "Manual";
+$l['me_manual']	        = "Manual";
 $l['me_active']         = "Active sensors";
 $l['me_of']             = "of";
 $l['me_logged']         = "Logged in as";
@@ -330,7 +331,7 @@ $l['me_cross']          = "Cross Domain";
 $l['me_google']         = "Maps";
 $l['me_traffic']        = "Traffic";
 $l['me_serverinfo']     = "Server Stats";
-$l['me_detprot']        = "Detected Protocols";
+$l['me_detprot']        = "Protocols";
 $l['me_graphs']         = "Graphs";
 $l['me_reports']        = "My Reports";
 $l['me_analyze']        = "Analyze";
@@ -354,7 +355,7 @@ $l['me_from']           = "From";
 $l['me_until']          = "Until";
 $l['me_groups']         = "Groups";
 $l['me_grouping']       = "Group compare";
-$l['me_syslog']		= "System logs";
+$l['me_syslog']	        = "System logs";
 
 ##########################
 # myaccount.php
@@ -448,6 +449,8 @@ $l['pl_allattacks']     = "All attacks";
 $l['pl_graph']          = "Graph";
 $l['pl_options']        = "Options";
 $l['pl_totalmal']       = "Show total malicious attacks";
+$l['pl_interval']       = "Interval";
+$l['pl_or']             = "or";
 
 ##########################
 # rank.php
@@ -678,4 +681,5 @@ $l['mod_virusscanners'] = "Virus Scanners";
 $l['mod_virusscan']     = "Virus scanner";
 $l['mod_version']       = "Version";
 $l['mod_countries']     = "Top 10 malicious countries";
+$l['mod_geo_dis']       = "GeoIP module is disabled!";
 ?>
