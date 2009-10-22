@@ -2,16 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 12-10-2009                       #
-# Jan van Lith & Kees Trippelvitz  #
-####################################
-# Contributors:                    #
-# Peter Arts                       #
+# Changeset 003                    #
+# 21-10-2009                       #
+# Kees Trippelvitz                 #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Added ranges help info, fixed domain strings
 # 002 Fixed bug #181
 # 001 Initial release
 #############################################
@@ -78,13 +76,13 @@ if ($id == 1) {
     echo " table that is present on the system, but the internal table of our detection script.";
 } elseif ($id == 6) {
     # logcheck.php - Cross Domain
-    echo "Cross domain attacks are attacks that have been detected by sensors that do not belong to your own organisation.";
+    echo "Cross domain attacks are attacks that have been detected by sensors that do not belong to your own domain.";
 } elseif ($id == 7) {
     # orgedit.php - Generate OID
     echo "An OID is a randomly generated string of 32 alphanumeric characters that is unique. You can supply this string ";
     echo " in the configuration file of the sensor. This will make the sensor send the string to the server when it will ";
     echo " request it's certificates. This ensures that sensors you create with this string in the configuration file will ";
-    echo " always be categorized under this organisation.<br /><br />";
+    echo " always be categorized under this domain.<br /><br />";
     echo " <b>FAQ - L08</b> (Click the help link to go to the SURFids FAQ page)";
 } elseif ($id == 8) {
     # arpadmin.php - DHCP add all
@@ -147,6 +145,9 @@ if ($id == 1) {
 } elseif ($id == 20) {
     # mod_topcountries.php
     echo "These statistics are the amount of distinct attackers per country.";
+} elseif ($id == 21) {
+    # orgedit.php - IP ranges
+    echo "These are the IP address ranges of your domain. They are used to determine which attacks are originating from your own domain.";
 }
 
 ?>
