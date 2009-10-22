@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
+# Changeset 003                    #
 # 10-11-2008                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 003 Fixed layout with IE8
 # 002 Fixed bug for non-admin users
 # 001 Initial release
 ####################################
@@ -322,6 +323,7 @@ if ($lname != "" && $rname != "") {
       echo "</div>\n"; #</block>
     echo "</div\n"; #</leftmed>
 
+    echo "<div>\n";
     echo "<div class='rightmed'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
@@ -361,6 +363,7 @@ if ($lname != "" && $rname != "") {
         echo "</div>\n"; #</dataBlock>
       echo "</div>\n"; #</block>
     echo "</div\n"; #</rightmed>
+    echo "</div>\n"; #</>
   echo "</div>\n"; #</all>
 
   echo "<div class='all'>\n";
@@ -404,6 +407,7 @@ if ($lname != "" && $rname != "") {
       echo "</div>\n"; #</block>
     echo "</div\n"; #</leftmed>
 
+    echo "<div>\n";
     echo "<div class='rightmed'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
@@ -443,6 +447,7 @@ if ($lname != "" && $rname != "") {
         echo "</div>\n"; #</dataBlock>
       echo "</div>\n"; #</block>
     echo "</div\n"; #</rightmed>
+    echo "</div>\n"; #</>
   echo "</div>\n"; #</all>
 
   echo "<div class='all'>\n";
@@ -487,6 +492,7 @@ if ($lname != "" && $rname != "") {
       echo "</div>\n"; #</block>
     echo "</div\n"; #</leftmed>
 
+    echo "<div>\n";
     echo "<div class='rightmed'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
@@ -527,6 +533,7 @@ if ($lname != "" && $rname != "") {
         echo "</div>\n"; #</dataBlock>
       echo "</div>\n"; #</block>
     echo "</div\n"; #</rightmed>
+    echo "</div>\n"; #</>
   echo "</div>\n"; #</all>
 
   echo "<div class='all'>\n";
@@ -575,6 +582,7 @@ if ($lname != "" && $rname != "") {
       echo "</div>\n"; #</block>
     echo "</div\n"; #</leftmed>
 
+    echo "<div>\n";
     echo "<div class='rightmed'>\n";
       echo "<div class='block'>\n";
         echo "<div class='dataBlock'>\n";
@@ -619,6 +627,7 @@ if ($lname != "" && $rname != "") {
         echo "</div>\n"; #</dataBlock>
       echo "</div>\n"; #</block>
     echo "</div\n"; #</rightmed>
+    echo "</div>\n"; #</>
   echo "</div>\n"; #</all>
 
 /*
