@@ -79,7 +79,7 @@ if ($err != 1) {
                 echo "<td><input type='text' name='strip_html_escape_orgname' value='$orgname' /></td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
-                echo "<td valign='top'>". $l['oe_ranges'] . printhelp("ranges"). "</td>\n";
+                echo "<td valign='top'>". $l['oe_ranges'] . " " . printhelp(21,21). "</td>\n";
                 echo "<td><textarea name='strip_html_escape_ranges' cols='40' rows='10'>$ranges</textarea></td>\n";
               echo "</tr>\n";
             echo "</table>\n";
