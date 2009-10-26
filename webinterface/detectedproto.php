@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 001                    #
-# 03-03-2008                       #
+# Changeset 002                    #
+# 26-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 002 Made page more user friendly
 # 001 Added language support
 #############################################
 
@@ -94,14 +95,16 @@ echo "<div class='left'>\n";
           echo "</form>\n";
         echo "</div>\n";
       echo "</div>\n";
-      echo "<div class='blockSubHeader'>\n";
-        echo "<div id='tabEthernet' class='selected' onClick='protoSwitch(\"Ethernet\");'>Ethernet</div>\n";
-        echo "<div id='tabIPv4' onClick='protoSwitch(\"IPv4\");'>IPv4</div>\n";
-        echo "<div id='tabICMP' onClick='protoSwitch(\"ICMP\");'>ICMP</div>\n";
-        echo "<div id='tabIGMP' onClick='protoSwitch(\"IGMP\");'>IGMP</div>\n";
-        echo "<div id='tabDHCP' onClick='protoSwitch(\"DHCP\");'>DHCP</div>\n";
-        echo "<div id='tabOther' onClick='protoSwitch(\"Other\");'>Other</div>\n";
-      echo "</div>\n";
+      if ($err == 0) {
+        echo "<div class='blockSubHeader'>\n";
+          echo "<div id='tabEthernet' class='selected' onClick='protoSwitch(\"Ethernet\");'>Ethernet</div>\n";
+          echo "<div id='tabIPv4' onClick='protoSwitch(\"IPv4\");'>IPv4</div>\n";
+          echo "<div id='tabICMP' onClick='protoSwitch(\"ICMP\");'>ICMP</div>\n";
+          echo "<div id='tabIGMP' onClick='protoSwitch(\"IGMP\");'>IGMP</div>\n";
+          echo "<div id='tabDHCP' onClick='protoSwitch(\"DHCP\");'>DHCP</div>\n";
+          echo "<div id='tabOther' onClick='protoSwitch(\"Other\");'>Other</div>\n";
+        echo "</div>\n";
+      }
       echo "<div class='blockContent'>\n";
         if ($err == 0) {
           echo "<table class='datatable'>\n";
