@@ -58,6 +58,7 @@ $l['g_addsensor']       = "Add sensor";
 $l['g_addorg']          = "Add all sensors";
 $l['g_vlan']            = "VLAN";
 $l['g_country']         = "Country";
+$l['g_host']            = "Host";
 
 ##########################
 # Global (Lowercase first letter)
@@ -157,6 +158,7 @@ $l['dp_clear_det_prot'] = "Clear detected protocols";
 $l['dp_detected']       = "Detected protocols";
 $l['dp_parent']         = "Parent protocol";
 $l['dp_type_number']    = "Type number";
+$l['dp_type']           = "Type";
 
 ##########################
 # exploits.php
@@ -356,6 +358,7 @@ $l['me_until']          = "Until";
 $l['me_groups']         = "Groups";
 $l['me_grouping']       = "Group compare";
 $l['me_syslog']	        = "System logs";
+$l['me_malhosts']       = "Malware Hosts";
 
 ##########################
 # myaccount.php
