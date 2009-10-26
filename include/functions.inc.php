@@ -236,10 +236,13 @@ function getepoch($stamp) {
 #   intcsv - Comma separated list of integers (1,23,5432,2)
 #   ascdesc - Accepts any of these values: ASC asc DESC desc
 #   cc - 2 letter country code abbreviation
+#   float - floatval()
+#   csv - Comma separated list
 # These checks should be prepended to the variable name separated by a _ character
 # Examples:
 # int_id - Will convert the variable to an integer and put the result in the cleaned array as $clean['id']
 # ip_ip - Checks if the variable is a valid IP address, if so result will be put in $clean['ip'] else $tainted['ip']
+
 function extractvars($source, $allowed, $ignore_unallowed = 0) {
   if (!is_array($source)) {
     return 1;
@@ -367,6 +370,16 @@ function extractvars($source, $allowed, $ignore_unallowed = 0) {
                   } else {
                     $tainted[$temp] = $var;
                   }
+                } elseif ($check == "csv") {
+                  $csv_regexp = '/^([0-9]{1,}\,{0,1})*$/';
+                  if (preg_match($csv_regexp, $var)) {
+                    $clean[$temp] = $var;
+                  } else {
+                    $tainted[$temp] = $var;
+                  }
+                } elseif ($check == "float") {
+                  $var = floatval($var);
+                  $clean[$temp] = $var;
                 } elseif (!in_array($temp, $clean)) {
                   $tainted[$temp] = $var;
                 }
@@ -1132,6 +1145,13 @@ function show_log_message($ts, $args) {
     $ts = "00-00-0000 00:00:00";
   }
   $s = "[$ts] $args\n";
+  return $s;
+}
+
+# 5.14 printMenumod
+# Function to print a menu item in the form of a module.php call
+function printMenumod($i, $mod, $text, $tab, $header) {
+  $s = printMenuitem($i, "module.php?int_mod=$mod&float_tab=$i&strip_html_title=$text&csv_cheader=$header", $text, $tab);
   return $s;
 }
 

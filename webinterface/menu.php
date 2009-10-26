@@ -104,6 +104,26 @@ if ($file != "login.php") {
   $total_sensors = $row['total'];
 }
 
+# Retrieving posted variables from $_GET
+$allowed_get = array(
+                "strip_html_title",
+                "float_tab",
+				"csv_cheader"
+);
+extractvars($_GET, $allowed_get);
+debug_input();
+if (isset($clean['title'])) {
+  $pagetitle = $clean['title'];
+}
+
+if (isset($clean['tab'])) {
+  $tab = $clean['tab'];
+}
+
+if (isset($clean['cheader'])) {
+  $cheader = $clean['cheader'];
+}
+
 if (!$tab) {
   $tab = "0.0";
 }
@@ -206,14 +226,15 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                 echo "<div id='tab3' class='tab' style='display: none;'>\n";
               }            
                   echo "<ul>\n";
-                    echo printMenuitem(3.1, "logindex.php", $l['g_attacks'], $tab);	
-                    echo printMenuitem(3.2, "exploits.php", $l['g_exploits'], $tab);	
-                    echo printMenuitem(3.3, "maloffered.php", $l['me_maloff'], $tab);	
-                    echo printMenuitem(3.4, "maldownloaded.php", $l['me_maldown'], $tab);
+                    echo printMenumod(3.1, 1, $l['g_attacks'], $tab, "1,1");
+                    echo printMenumod(3.2, 2, $l['g_exploits'], $tab, "1,1");	
+                    echo printMenumod(3.3, 8, $l['me_maloff'], $tab, "1,1");	
+                    echo printMenumod(3.4, 13, $l['me_malhosts'], $tab, "1,1");	
+                    echo printMenuitem(3.5, "maldownloaded.php", $l['me_maldown'], $tab);
                     if ($c_enable_arp == 1 && $s_access_sensor > 1) {
                       echo printMenuitem(3.6, "arp_cache.php", $l['ah_arp_cache'], $tab);
                     }
-                    echo printMenuitem(3.5, "search.php", $l['me_search'], $tab);
+                    echo printMenuitem(3.7, "search.php", $l['me_search'], $tab);
                   echo "</ul>\n";
                 echo "</div>\n";
               echo "</li>";
@@ -389,7 +410,7 @@ function insert_selector($o_show = 1, $t_show = 1) {
             $sql_orgs = "SELECT id, organisation FROM organisations WHERE NOT organisation = 'ADMIN' ORDER BY organisation";
             $debuginfo[] = $sql_orgs;
             $result_orgs = pg_query($pgconn, $sql_orgs);
-            echo "<select name='int_org' class='smallwidthselect' onChange='javascript: this.form.submit();'>\n";
+            echo "<select name='int_org' class='smallwidthselect' onChange='subOrg()'>\n";
               echo printOption(0, "All", $q_org) . "\n";
               while ($row = pg_fetch_assoc($result_orgs)) {
                 $org_id = $row['id'];
