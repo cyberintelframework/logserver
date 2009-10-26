@@ -79,7 +79,7 @@ echo "<div class='left'>\n";
                 $id = $row['id'];
                 $keyname = $row['keyname'];
                 $label = $row['label'];
-		$vlanid = $row['vlanid'];
+                $vlanid = $row['vlanid'];
                 $sensor = sensorname($keyname, $vlanid);
                 if ($label != "") $sensor = $label;
                 $status = $row['status'];
@@ -93,6 +93,14 @@ echo "<div class='left'>\n";
             echo "</select>\n";
           echo "</form>\n";
         echo "</div>\n";
+      echo "</div>\n";
+      echo "<div class='blockSubHeader'>\n";
+        echo "<div id='tabEthernet' class='selected' onClick='protoSwitch(\"Ethernet\");'>Ethernet</div>\n";
+        echo "<div id='tabIPv4' onClick='protoSwitch(\"IPv4\");'>IPv4</div>\n";
+        echo "<div id='tabICMP' onClick='protoSwitch(\"ICMP\");'>ICMP</div>\n";
+        echo "<div id='tabIGMP' onClick='protoSwitch(\"IGMP\");'>IGMP</div>\n";
+        echo "<div id='tabDHCP' onClick='protoSwitch(\"DHCP\");'>DHCP</div>\n";
+        echo "<div id='tabOther' onClick='protoSwitch(\"Other\");'>Other</div>\n";
       echo "</div>\n";
       echo "<div class='blockContent'>\n";
         if ($err == 0) {
@@ -112,7 +120,16 @@ echo "<div class='left'>\n";
               $number = $row_protos['number'];
               $proto = $row_protos['protocol'];
 
-              echo "<tr>\n";
+              if ($head != 0) {
+                $visi = " style='display: none;'";
+              }
+              if (array_key_exists($head, $v_proto_types)) {
+                $class = $v_proto_types[$head];
+              } else {
+                $class = "Other";
+              }
+
+              echo "<tr class='protos " .$class. "' $visi >\n";
                 echo "<td>" .$v_proto_types[$head]. "</td>\n";
                 echo "<td>$number</td>\n";
                 echo "<td>$proto</td>\n";

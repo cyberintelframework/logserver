@@ -308,6 +308,12 @@ function generatep() {
  * Selector functions
  ***********************************/
 
+function subOrg() {
+  $(".pers*").appendTo("#fselector");
+  $("#fselector .pers*").hide();
+  $("#fselector").submit();
+}
+
 function browse(dir) {
   $("#selector_dir").val(dir);
   submitPeriod();
@@ -400,12 +406,15 @@ function setperiod(startofweek) {
 }
 
 function submitPeriod() {
+  var newreq = "";
   url = window.location + "";
   url = url.split("?", 1);
   qs = window.location.search.substring(1);
-  tmp = qs.replace(/(int_selperiod|int_org|int_to|int_from)=[0-9]*&?/g, "");
+  tmp = qs.replace(/int_selperiod=-1/g, "");
+  tmp = tmp.replace(/(int_selperiod|int_org|int_to|int_from)=[0-9]*&?/g, "");
   tmp = tmp.replace(/(dir=.*)&/, "");
   tmp = tmp.replace(/(dir=.*)$/, "");
+  tmp = tmp.replace(/&&/, "&");
   tmp = tmp.replace(/&$/, "");
   periodqs = $("#fselector").serialize();
   if (tmp != "") {
@@ -418,7 +427,7 @@ function submitPeriod() {
     if (periodqs != "") {
       newreq = newreq + "?" + periodqs;
     }
-  } 
+  }
   window.location = newreq;
 }
 
@@ -1123,6 +1132,16 @@ function sensorlink(choice, sid) {
     var choice = "sensordetails.php?int_sid=" + sid;
   }
   window.location = choice;  
+}
+
+/* Detected protocols */
+/**********************/
+
+function protoSwitch(proto) {
+  $(".blockSubHeader div").removeClass("selected");
+  $("#tab"+proto).addClass("selected");
+  $(".protos").hide();
+  $("."+proto).show();
 }
 
 /*      HeaderTabs        */

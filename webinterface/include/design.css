@@ -229,6 +229,31 @@ body {
 .block .blockHeader .blockHeaderRight {
   float:		right;
 }
+.block .blockSubHeader {
+  float:        left;
+  width:        100%;
+  background-color: #FF7800;
+  margin-bottom: 5px;
+}
+.block .blockSubHeader div {
+  float:        left;
+  height:       100%;
+  border-top:   1px solid white;
+  border-left:   1px solid white;
+  border-right:   1px solid white;
+  margin:       2px 2px 0px;
+  padding:      2px;
+  width:        15%;
+  text-align:   center;
+  color:        white;
+  background-color: #FF7800;
+  cursor:       pointer;
+}
+.block .blockSubHeader .selected {
+  color:        black;
+  background-color: white;
+}
+
 .block .blockContent {
   border-collapse:	collapse;
   padding:		5px 5px 5px 5px;
