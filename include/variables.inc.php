@@ -30,6 +30,7 @@ $v_severity_atype_ar = array(
         2 => "Snort",
         3 => "Glastopf",
         4 => "Amun",
+        5 => "Dionaea",
         10 => "ARP Poisoning",
         11 => "Rogue DHCP server"
 );
@@ -41,6 +42,7 @@ $v_severity_atype_ar = array(
 # 30-39 -> detectarp.pl
 # 40-59 -> Snort
 # 60-69 -> Glastopf
+# 100-140 -> Dionaea
 $v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
 		'2'	=> 'Shellcodehandler',
@@ -60,6 +62,8 @@ $v_attacktype_ar = array(
         '60' => 'Request',
         '61' => 'Referer',
         '62' => 'User Agent',
+        '80' => 'Dialogue',
+        '81' => 'Emulation Profile',
 );
 
 # Array with the different types of access for the search engine.
@@ -241,7 +245,9 @@ $v_errors = array(
         158 => "Invalid or missing note!",
         159 => "Invalid or missing VLAN specification!",
         160 => "Invalid or missing note ID!",
-        161 => "Invalid or missing sensor details record!<br /><br />More info in the <a href='$c_faq_url'>FAQ L13</a>."
+        161 => "Invalid or missing sensor details record!<br /><br />More info in the <a href='$c_faq_url'>FAQ L13</a>.",
+        162 => "Invalid or missing module ID!",
+        163 => "Invalid or missing module page!"
 );
 
 # Array for the different types of plots available.
@@ -292,7 +298,7 @@ $v_host_types = array(
 # Array with the different protocols detected by the sniffer.
 $v_proto_types = array(
 	0 => "Ethernet",
-	1 => "Internet IP (IPv4)",
+	1 => "IPv4",
 	11 => "ICMP",
 	12 => "IGMP",
 	11768 => "DHCP"
