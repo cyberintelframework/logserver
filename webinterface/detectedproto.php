@@ -14,6 +14,8 @@
 # 001 Added language support
 #############################################
 
+include '../include/protos.inc.php';
+
 # Checking access
 if ($s_access_sensor < 2) {
   $m = 101;
@@ -114,14 +116,38 @@ echo "<div class='left'>\n";
               echo "<th width='300'>" .$l['dp_type']. "</th>\n";
             echo "</tr>\n";
 
-            $sql_protos = "SELECT parent, number, protocol FROM sniff_protos WHERE sensorid = '$sid' ORDER BY parent, number";
+            $sql_protos = "SELECT parent, number, protocol, subtype, version FROM sniff_protos WHERE sensorid = '$sid' ORDER BY parent, number";
             $debuginfo[] = $sql_protos;
             $result_protos = pg_query($pgconn, $sql_protos);
 
             while ($row_protos = pg_fetch_assoc($result_protos)) {
               $head = $row_protos['parent'];
               $number = $row_protos['number'];
-              $proto = $row_protos['protocol'];
+              $subtype = $row_protos['subtype'];
+              $version = $row_protos['version'];
+              if ($head == 0) {
+                # These are dirty fixes to avoid letting the v_protos_ethernet_ar array grow too big.
+                if ($number >= 33452 && $number <= 34451) {
+                  $proto = "Walker Richer & Quinn";
+                } elseif ($number >= 0 && $number <= 1500) {
+                  $proto = "IEEE802.3 Length Field";
+                } else {
+                  $proto = $v_protos_ethernet_ar[$number];
+                }
+              } elseif ($head == 1) {
+                $proto = $v_protos_ipv4_ar[$number];
+              } elseif ($head == 11) {
+                $proto = $v_protos_icmp_ar[$number];
+              } elseif ($head == 12) {
+                $proto = $v_protos_igmp_ar[$version][$number];
+              } elseif ($head == 11768) {
+                $proto = $v_protos_dhcp_ar[$number];
+              } else {
+                $proto = "Unknown";
+              }
+              if ($proto == "") {
+                $proto = "Unknown";
+              }
 
               if ($head != 0) {
                 $visi = " style='display: none;'";
@@ -133,7 +159,11 @@ echo "<div class='left'>\n";
               }
 
               echo "<tr class='protos " .$class. "' $visi >\n";
-                echo "<td>" .$v_proto_types[$head]. "</td>\n";
+                if ($head == 12) {
+                  echo "<td>" .$v_protos_main_ar[$head]. "v$version</td>\n";
+                } else {
+                  echo "<td>" .$v_protos_main_ar[$head]. "</td>\n";
+                }
                 echo "<td>$number</td>\n";
                 echo "<td>$proto</td>\n";
               echo "</tr>\n";
