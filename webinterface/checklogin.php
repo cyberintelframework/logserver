@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 14-08-2008                       #
+# Changeset 004                    #
+# 30-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Fixed login problem due to changes in extractvars
 # 003 Added pageconfs to cookie
 # 002 Removed URL redirect option
 # 001 Admin users always have 999 access
@@ -27,15 +28,15 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
+$f_user = $clean['user'];
+$f_pass = $clean['pass'];
+
 # Retrieving posted variables from $_GET
 $allowed_get = array(
 		"strip_html_url"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
-
-$f_user = $clean['user'];
-$f_pass = $clean['pass'];
 
 $sql_user = "SELECT id, access, password, serverhash, organisation, d_plotter, d_plottype, d_utc FROM login WHERE username = '" .$f_user. "'";
 $result_user = pg_query($pgconn, $sql_user);
