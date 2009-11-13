@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 012                    #
-# 22-10-2009                       #
+# Changeset 013                    #
+# 29-10-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 013 Removed unnecessary sql clause for f_attack
 # 012 Changed default sorting order to timestampd
 # 011 Fixed handling of Amun exploits
 # 010 Fixed issue #140
@@ -93,7 +94,8 @@ $allowed_get = array(
 		"int_interval",
 		"int_gid",
 		"int_macfilter",
-		"int_ipfilter"
+		"int_ipfilter",
+        "int_allexploits"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -338,13 +340,22 @@ if (isset($f_sevtype)) {
 }
 
 ####################
+# All exploits
+####################
+if (isset($clean['allexploits'])) {
+  add_to_sql("attacks", "table");
+  add_to_sql("details", "table");
+  add_to_sql("attacks.id = details.attackid", "where");
+  add_to_sql("details.type IN (1, 80)", "where");
+}
+
+####################
 # Type of attack
 ####################
 if ($f_attack > 0) {
   add_to_sql("details", "table");
   add_to_sql("stats_dialogue", "table");
   add_to_sql("attacks.id = details.attackid", "where");
-  add_to_sql("details.type = 1", "where");
   add_to_sql("details.text = stats_dialogue.name", "where");
   add_to_sql("stats_dialogue.id = '$f_attack'", "where");
 }
@@ -1208,9 +1219,15 @@ while ($row = pg_fetch_assoc($result)) {
 
     if ($numrows_details != 0) {
       if ($sev == 1 && ($sevtype == 0 || $sevtype == 5)) {
-        $dia_ar = array('attackid' => $id, 'type' => 1);
-        $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
-        $text = $dia_result_ar[0]['text'];
+        if ($sevtype == 5) {
+          $dia_ar = array('attackid' => $id, 'type' => 80);
+          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+          $text = $dia_result_ar[0]['text'];
+        } else {
+          $dia_ar = array('attackid' => $id, 'type' => 1);
+          $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
+          $text = $dia_result_ar[0]['text'];
+        }
         if (strpos($text, "Vulnerability") == False) {
           # Handling Nepenthes detail records
           $attack = str_replace("Dialogue", "", $text);
