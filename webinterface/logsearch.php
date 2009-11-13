@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 013                    #
-# 29-10-2009                       #
+# Changeset 014                    #
+# 13-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #########################################################################
 # Changelog:
+# 014 Fixed sorting of attacks with the same timestmap (#178)
 # 013 Removed unnecessary sql clause for f_attack
 # 012 Changed default sorting order to timestampd
 # 011 Fixed handling of Amun exploits
@@ -1082,6 +1083,7 @@ if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" 
 #flush();
 prepare_sql();
 
+# Bugfix #178
 $sql_sort .= ", severity ASC";
 
 $sql =  "SELECT $sql_select";
