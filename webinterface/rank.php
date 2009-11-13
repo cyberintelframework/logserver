@@ -161,15 +161,18 @@ reset_sql();
 add_to_sql("attacks", "table");
 add_to_sql("details", "table");
 add_to_sql("stats_dialogue", "table");
-add_to_sql("details.type = 1", "where");
+add_to_sql("details.type IN (1, 80)", "where");
 add_to_sql("details.attackid = attacks.id", "where");
 add_to_sql("details.text = stats_dialogue.name", "where");
+add_to_sql("attacks.severity = 1", "where");
 add_to_sql("$tsquery", "where");
 add_to_sql("DISTINCT details.text", "select");
 add_to_sql("stats_dialogue.id", "select");
+add_to_sql("attacks.atype", "select");
 add_to_sql("COUNT(details.id) as total", "select");
 add_to_sql("stats_dialogue.id", "group");
 add_to_sql("details.text", "group");
+add_to_sql("attacks.atype", "group");
 add_to_sql("total DESC LIMIT $c_topexploits OFFSET 0", "order");
 
 # IP Exclusion stuff
@@ -606,9 +609,11 @@ echo "<div class='all'>\n";
               $exploit = $row['text'];
               $exploitid = $row['id'];
               $total = $row['total'];
+              $sevtype = $row['atype'];
               $exploit_ar[$exploit] = $total;
               $grandtotal = $grandtotal + $total;
               $exploitid_ar[$exploit] = $exploitid;
+              $sevtypeid_ar[$exploit] = $sevtype;
             }
             if ($exploit_ar != "") {
               foreach ($exploit_ar as $key => $val) {
@@ -621,12 +626,13 @@ echo "<div class='all'>\n";
                   $attack = trim($key);
                 }
                 $exploitid = $exploitid_ar[$key];
+                $sevtype = $sevtypeid_ar[$key];
                 echo "<tr>\n";
                   echo "<td>$i.</td>\n";
                   echo "<td>$attack</td>\n";
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
-                    echo "<td>" . downlink("logsearch.php?int_org=0&int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_org=0&int_sev=1&int_sevtype=$sevtype&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>" . nf($val) . " (${perc}%)</td>\n";
                   }
@@ -662,19 +668,22 @@ echo "<div class='all'>\n";
                 $exploit = $row['text'];
                 $exploitid = $row['id'];
                 $total = $row['total'];
+                $sevtype = $row['sevtype'];
                 $exploit_ar[$exploit] = $total;
                 $exploitid_ar[$exploit] = $exploitid;
                 $grandtotal = $grandtotal + $total;
+                $sevtypeid_ar[$exploit] = $sevtype;
               }
               if ($exploit_ar != "") {
                 foreach ($exploit_ar as $key => $val) {
                   $attack = str_replace("Dialogue", "", $key);
                   $exploitid  = $exploitid_ar[$key];
+                  $sevtype  = $sevtypeid_ar[$key];
                   echo "<tr>\n";
                     echo "<td>$i.</td>\n";
                     echo "<td>$attack</td>\n";
                     $perc = round($val / $grandtotal * 100);
-                    echo "<td>" . downlink("logsearch.php?int_sev=1&int_sevtype=0&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
+                    echo "<td>" . downlink("logsearch.php?int_sev=1&int_sevtype=$sevtype&int_attack=$exploitid", nf($val)). " (${perc}%)</td>\n";
                   echo "</tr>\n";
                   $i++;
                 }
@@ -1083,11 +1092,13 @@ echo "<div class='all'>\n";
             if ($file_ar != "") {
               foreach ($file_ar as $key => $val) {
                 $i++;
+                $key = htmlentities($key);
                 echo "<tr>\n";
                   echo "<td>$i</td>\n";
                   echo "<td>$key</td>\n";
                   $perc = round($val / $grandtotal * 100);
                   if ($s_access_search == 9) {
+                    $key = urlencode($key);
                     echo "<td>" .downlink("logsearch.php?int_sev=16&strip_html_escape_filename=$key&int_org=0", $val). " (${perc}%)</td>\n";
                   } else {
                     echo "<td>$val (${perc}%)</td>\n";
