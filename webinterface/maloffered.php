@@ -34,6 +34,7 @@ if (isset($tainted['show'])) {
 if ($show == 'all') $showtext = $l['g_all'];
 if ($show == 'top') $showtext = $l['mo_top10'];
 
+echo "<input type='hidden' name='show' value='$show' class='pers' />\n";
 echo "<div class='left'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
