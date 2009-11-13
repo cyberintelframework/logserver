@@ -64,6 +64,7 @@ $v_attacktype_ar = array(
         '62' => 'User Agent',
         '80' => 'Dialogue',
         '81' => 'Emulation Profile',
+        '82' => 'Connectback',
 );
 
 # Array with the different types of access for the search engine.
