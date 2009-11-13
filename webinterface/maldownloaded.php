@@ -1,4 +1,4 @@
-<?php $tab="3.4"; $pagetitle="Malware Downloaded"; include("menu.php"); contentHeader(); ?>
+<?php $tab="3.5"; $pagetitle="Malware Downloaded"; include("menu.php"); contentHeader(); ?>
 <?php
 
 ####################################
