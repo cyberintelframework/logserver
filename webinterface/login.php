@@ -19,9 +19,14 @@ include "../lang/${c_language}.php";
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_m",
-		"strip_html_url"
+                "strip_html_url"
 );
 $check = extractvars($_GET, $allowed_get);
+
+if (isset($clean['m'])) {
+  $m = $clean['m'];
+  geterror($m, 0, "centersmall");
+}
 
 # Checking $_POST'ed variables
 $allowed_post = array(
@@ -34,11 +39,6 @@ if (isset($clean['url'])) {
   $url = "?strip_html_url=" .$clean['url'];
 } else {
   $url = "";
-}
-
-if (isset($clean['m'])) {
-  $m = $clean['m'];
-  geterror($m);
 }
 
 # Loading the md5.js script needed for logging in.
