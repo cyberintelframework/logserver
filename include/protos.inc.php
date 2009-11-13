@@ -81,36 +81,19 @@ $v_protos_icmp_ar = array(
 );
 
 $v_protos_igmp_ar = array(
-        0 => array(
-            1 => "Create Group Request",
-            2 => "Create Group Reply",
-            3 => "Join Group Request",
-            4 => "Join Group Reply",
-            5 => "Leave Group Request",
-            6 => "Leave Group Reply",
-            7 => "Confirm Group Request",
-            8 => "Confirm Group Reply",
-        ),
-        1 => array(
-            1 => "Host Membership Query",
-            2 => "Host Membership Report",
-            3 => "DVMRP"
-        ),
-        2 => array(
-            17 => "Group Membership Query",
-            18 => "IGMPv1 Membership Report",
-            19 => "DVMRP",
-            20 => "PIMv1",
-            21 => "Cisco Trace Messages",
-            22 => "IGMPv2 Membership Report",
-            23 => "IGMPv2 Leave Group",
-            30 => "Multicast Traceroute Response",
-            31 => "Multicast Traceroute",
-            34 => "IGMPv3 Membership Report",
-            48 => "MRD, Multicast Router Advertisement",
-            49 => "MRD, Multicast Router Solicitation",
-            50 => "MRD, Multicast Router Termination" 
-        ),
+    "11" => "IGMP Membership Query",
+    "12" => "IGMPv1 Membership Report",
+    "13" => "DVMRP",
+    "14" => "PIM version 1",
+    "15" => "Cisco Trace Messages",
+    "16" => "IGMPv2 Membership Report",
+    "17" => "IGMPv2 Leave Group",
+    "1e" => "Multicast Traceroute Response",
+    "1f" => "Multicast Traceroute",
+    "22" => "IGMPv3 Membership Report",
+    "30" => "Multicast Router Advertisement",
+    "31" => "Multicast Router Solicitation",
+    "32" => "Multicast Router Termination",
 );
 
 $v_protos_ipv4_ar = array(
