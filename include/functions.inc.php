@@ -251,6 +251,11 @@ function extractvars($source, $allowed, $ignore_unallowed = 0) {
     global $tainted;
     global $unallowed;
 
+    $clean = "";
+    $tainted = "";
+    $unallowed = "";
+    array_push($allowed, "int_debug");
+
     # Setting up the regular expression for an IP address
     $ipregexp = '/^([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
     $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
@@ -403,7 +408,7 @@ function extractvars($source, $allowed, $ignore_unallowed = 0) {
 
 # 3.02 geterror
 # Function to retrieve the error message given the error number
-function geterror($m, $popup = 0) {
+function geterror($m, $popup = 0, $class = "leftsmall") {
   global $v_errors;
   $e = $v_errors[$m];
 
@@ -414,7 +419,7 @@ function geterror($m, $popup = 0) {
   }
 
   echo "<div class='all'>\n";
-  echo "<div class='leftsmall'>\n";
+  echo "<div class='$class'>\n";
     echo "<div class='block'>\n";
       echo "<div class='${type}Block'>\n";
         if ($popup == 1) {
