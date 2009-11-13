@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 23-04-2009                       #
+# Changeset 004                    #
+# 13-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Fixed deactivate/activate actions
 # 003 Fixed action update
 # 002 Added md5_hash check
 # 001 version 2.10.00
@@ -86,55 +87,57 @@ if (isset($clean['vlanid'])) {
 }
 
 $action = $tainted['action'];
-$action_pattern = '/^(NONE|REBOOT|SSHOFF|SSHON|RESTART|DISABLE|ENABLE|START|STOP|IGNORE|UNIGNORE|ENABLEARP|DISABLEARP)$/';
+$action_pattern = '/^(NONE|REBOOT|SSHOFF|SSHON|RESTART|DISABLE|ENABLE|START|STOP|IGNORE|UNIGNORE|ENABLEARP|DISABLEARP|ACTIVATE|DEACTIVATE)$/';
 if (preg_match($action_pattern, $action) != 1) {
-  $m = 128;
+  $m = 119;
   $err = 1;
 }
 
-if (isset($clean['sid'])) {
-  $sql_sid = "SELECT keyname, status, arp FROM sensors WHERE id = '$sid'";
-  $result_sid = pg_query($pgconn, $sql_sid);
-  $row_sid = pg_fetch_assoc($result_sid);
-  $keyname = $row_sid['keyname'];
-  $status = $row_sid['status'];
-  $arp = $row_sid['arp'];
-  if ($keyname == "") {
+$active_pattern = '/^(ACTIVATE|DEACTIVATE)$/';
+if (preg_match($active_pattern, $action)) {
+  pg_close($pgconn);
+  header("location: movesensor.php?int_sid=$sid");
+} else {
+  if (isset($clean['sid'])) {
+    $sql_sid = "SELECT keyname, status, arp FROM sensors WHERE id = '$sid'";
+    $result_sid = pg_query($pgconn, $sql_sid);
+    $row_sid = pg_fetch_assoc($result_sid);
+    $keyname = $row_sid['keyname'];
+    $status = $row_sid['status'];
+    $arp = $row_sid['arp'];
+    if ($keyname == "") {
+      $m = 110;
+      $err = 1;
+    } else {
+      if ($action == "ENABLEARP" && $arp == 0) {
+        $sql_updatearp = "UPDATE sensors SET arp = 1 WHERE id = '$sid' AND vlanid = '$vlanid'";
+        $result_updatearp = pg_query($pgconn, $sql_updatearp);
+        $m = 3;
+        pg_close($pgconn);
+        header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
+        exit;
+      } elseif ($action == "DISABLEARP" && $arp == 1) {
+        $sql_updatearp = "UPDATE sensors SET arp = 0 WHERE id = '$sid' AND vlanid = '$vlanid'";
+        $result_updatearp = pg_query($pgconn, $sql_updatearp);
+        $m = 3;
+        pg_close($pgconn);
+        header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
+        exit;
+      }
+    }
+  } else {
     $m = 110;
     $err = 1;
-  } else {
-    if ($action == "ENABLEARP" && $arp == 0) {
-      $sql_updatearp = "UPDATE sensors SET arp = 1 WHERE id = '$sid' AND vlanid = '$vlanid'";
-      $result_updatearp = pg_query($pgconn, $sql_updatearp);
-      $m = 3;
-      pg_close($pgconn);
-      header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
-      exit;
-    } elseif ($action == "DISABLEARP" && $arp == 1) {
-      $sql_updatearp = "UPDATE sensors SET arp = 0 WHERE id = '$sid' AND vlanid = '$vlanid'";
-      $result_updatearp = pg_query($pgconn, $sql_updatearp);
-      $m = 3;
-      pg_close($pgconn);
-      header("location: sensorstatus.php?int_selview=$selview&int_m=$m");
-      exit;
-    }
   }
-} else {
-  $m = 110;
-  $err = 1;
 }
 if ($err != 1) {
   $action_pattern = '/^(IGNORE|UNIGNORE)$/';
-  $active_pattern = '/^(ACTIVATE|DEACTIVATE)$/';
   if (!preg_match($action_pattern, $action)) {
     $sql_updatestatus = "UPDATE sensor_details SET action = '" .$action. "' WHERE keyname = '$keyname'";
     $result_updatestatus = pg_query($pgconn, $sql_updatestatus);
     if ($m == "") {
       $m = 3;
     }
-  } elseif (preg_match($active_pattern, $action)) {
-    pg_close($pgconn);
-    header("location: movesensor.php?int_sid=$sid");
   } else {
     if ($action == "IGNORE") {
       if ($status != 1) {

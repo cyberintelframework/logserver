@@ -37,6 +37,7 @@ if (isset($clean['selview'])) {
   $selview = intval($c_selview);
 }
 
+# Handling deactivated sensors access
 if ($s_access_sensor != 9 && $selview == 9) {
   $selview = 2;
 }
@@ -63,7 +64,8 @@ if (isset($tainted['sort'])) {
 
 if ($selview == 9) {
   add_to_sql("deactivated_sensors", "table");
-  add_to_sql("deactivated_sensors.*", "select");
+  add_to_sql("deactivated_sensors.keyname, deactivated_sensors.id as sid, remoteip, localip, sensortype, action, sensormac, lastupdate", "select");
+  add_to_sql("tap, tapip, mac, laststart, laststop, uptime, label, permanent, status, networkconfig", "select");
   $sensors_table = "deactivated_sensors";
 } else {
   $sensors_table = "sensors";
