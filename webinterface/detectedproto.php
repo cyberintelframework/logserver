@@ -116,7 +116,7 @@ echo "<div class='left'>\n";
               echo "<th width='300'>" .$l['dp_type']. "</th>\n";
             echo "</tr>\n";
 
-            $sql_protos = "SELECT parent, number, protocol, subtype, version FROM sniff_protos WHERE sensorid = '$sid' ORDER BY parent, number";
+            $sql_protos = "SELECT parent, number, subtype FROM sniff_protos WHERE sensorid = '$sid' ORDER BY parent, number";
             $debuginfo[] = $sql_protos;
             $result_protos = pg_query($pgconn, $sql_protos);
 
@@ -124,7 +124,6 @@ echo "<div class='left'>\n";
               $head = $row_protos['parent'];
               $number = $row_protos['number'];
               $subtype = $row_protos['subtype'];
-              $version = $row_protos['version'];
               if ($head == 0) {
                 # These are dirty fixes to avoid letting the v_protos_ethernet_ar array grow too big.
                 if ($number >= 33452 && $number <= 34451) {
@@ -139,7 +138,7 @@ echo "<div class='left'>\n";
               } elseif ($head == 11) {
                 $proto = $v_protos_icmp_ar[$number];
               } elseif ($head == 12) {
-                $proto = $v_protos_igmp_ar[$version][$number];
+                $proto = $v_protos_igmp_ar[$number];
               } elseif ($head == 11768) {
                 $proto = $v_protos_dhcp_ar[$number];
               } else {
@@ -159,11 +158,7 @@ echo "<div class='left'>\n";
               }
 
               echo "<tr class='protos " .$class. "' $visi >\n";
-                if ($head == 12) {
-                  echo "<td>" .$v_protos_main_ar[$head]. "v$version</td>\n";
-                } else {
-                  echo "<td>" .$v_protos_main_ar[$head]. "</td>\n";
-                }
+                echo "<td>" .$v_protos_main_ar[$head]. "</td>\n";
                 echo "<td>$number</td>\n";
                 echo "<td>$proto</td>\n";
               echo "</tr>\n";
