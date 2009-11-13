@@ -53,11 +53,6 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
-$allowed_get = array(
-		"int_my"
-);
-$check = extractvars($_GET, $allowed_get);
-
 # Checking if the logged in user actually requested this action.                                    
 if ($clean['hash'] != $s_hash) {
   $err = 1;
@@ -163,6 +158,11 @@ if ($err != 1) {
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
 }
+
+$allowed_get = array(
+		"int_my"
+);
+$check = extractvars($_GET, $allowed_get);
 
 # Close connection and redirect
 pg_close($pgconn);
