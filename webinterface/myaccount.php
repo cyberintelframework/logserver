@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 16-09-2009                       #
+# Changeset 004                    #
+# 17-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 004 Fixed bug #196
 # 003 Moved hardcoded indexmods to variables
 # 002 Added UTC support
 # 001 Added language support
@@ -32,9 +33,11 @@ if ($s_access_user == 0) {
 $userid = $s_userid;
 
 if ($s_access_user == 9) {
-  $sql_user = "SELECT * FROM login WHERE id = $userid";
+  $sql_user = "SELECT username, organisation, email, maillog, access, gpg, d_plotter, d_plottype, d_utc ";
+  $sql_user .= " FROM login WHERE id = $userid";
 } else {
-  $sql_user = "SELECT * FROM login WHERE id = $userid AND organisation = $q_org";
+  $sql_user = "SELECT username, organisation, email, maillog, access, gpg, d_plotter, d_plottype, d_utc ";
+  $sql_user .= " FROM login WHERE id = $userid AND organisation = $s_org";
 }
 $debuginfo[] = $sql_user;
 $result_user = pg_query($pgconn, $sql_user);
