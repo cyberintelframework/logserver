@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 005                    #
-# 20-10-2009                       #
+# Changeset 006                    #
+# 17-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 006 Fixed bug with wrong access check (s_admin instead of s_access_search)
 # 005 Fixed bug with multiple GeoIP includes
 # 004 Fixed bug #74 again
 # 003 Added ARP exclusion stuff
@@ -51,7 +52,7 @@ echo "<div class='block'>\n";
         while ($row = pg_fetch_assoc($result_countqry)) {
           $source = $row['source'];
           $sql_attack_ls = "SELECT timestamp FROM attacks, sensors WHERE source = '$source' AND attacks.sensorid = sensors.id ";
-          if ($s_admin != 1) {
+          if ($s_access_search < 9) {
             $sql_attack_ls .= " AND sensors.organisation = '$q_org' ";
           }
           $sql_attack_ls .= " ORDER BY timestamp DESC LIMIT 1";
