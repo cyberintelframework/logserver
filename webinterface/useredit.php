@@ -3,7 +3,7 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 004                    #
+# Changeset 005                    #
 # 17-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
@@ -13,6 +13,7 @@
 
 #############################################
 # Changelog:
+# 005 Removed obsolete maillog reference
 # 004 Fixed bug #196
 # 003 Moved hardcoded indexmods to variables
 # 002 Added UTC support
@@ -41,10 +42,10 @@ if ($s_access_user < 2) {
 }
 
 if ($s_access_user == 9) {
-  $sql_user = "SELECT username, organisation, email, maillog, access, gpg, d_plotter, d_plottype, d_utc ";
+  $sql_user = "SELECT username, organisation, email, access, gpg, d_plotter, d_plottype, d_utc ";
   $sql_user .= " FROM login WHERE id = $userid";
 } else {
-  $sql_user = "SELECT username, organisation, email, maillog, access, gpg, d_plotter, d_plottype, d_utc ";
+  $sql_user = "SELECT username, organisation, email, access, gpg, d_plotter, d_plottype, d_utc ";
   $sql_user .= " FROM login WHERE id = $userid AND organisation = $s_org";
 }
 $debuginfo[] = $sql_user;
@@ -78,7 +79,6 @@ if ($err == 0) {
   $username = $row['username'];
   $org = $row['organisation'];
   $email = $row['email'];
-  $maillog = $row['maillog'];
   $access = $row['access'];
   $gpg = $row['gpg'];
   $access_sensor = $access{0};
