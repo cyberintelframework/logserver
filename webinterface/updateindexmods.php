@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 03-06-2008                       #
+# Changeset 003                    #
+# 17-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed bug #196
 # 002 Fixed an authorization issue
 # 001 version 2.10
 #############################################
@@ -28,7 +29,7 @@ if (!isset($_SESSION['s_admin'])) {
 }
 
 $s_userid = intval($_SESSION['s_userid']);
-$q_org = intval($_SESSION['q_org']);
+$s_org = intval($_SESSION['s_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_access = $_SESSION['s_access'];
 $s_access_user = intval($s_access{2});
@@ -36,8 +37,8 @@ $s_hash = md5($_SESSION['s_hash']);
 
 $allowed_post = array(
                 "mods",
-		"md5_hash",
-		"int_userid",
+                "md5_hash",
+                "int_userid"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -75,7 +76,7 @@ if (@is_array($tainted["mods"])) {
 if ($s_access_user == 9) {
   $sql_user = "SELECT id FROM login WHERE id = $userid";
 } else {
-  $sql_user = "SELECT id FROM login WHERE id = $userid AND organisation = $q_org";
+  $sql_user = "SELECT id FROM login WHERE id = $userid AND organisation = $s_org";
 }
 $debuginfo[] = $sql_user;
 $result_user = pg_query($pgconn, $sql_user);
