@@ -23,7 +23,7 @@ include '../include/functions.inc.php';
 $allowed_post = array(
                 "strip_html_escape_user",
                 "md5_pass",
-		"strip_html_url"
+                "strip_html_url"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -33,7 +33,7 @@ $f_pass = $clean['pass'];
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-		"strip_html_url"
+                "strip_html_url"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();

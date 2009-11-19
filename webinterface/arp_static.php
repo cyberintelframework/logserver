@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 003                    #
-# 04-06-2008                       #
+# Changeset 004                    #
+# 19-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 004 Fixed sorting order
 # 003 Added ORDER BY to host types
 # 002 Fixed bug #68
 # 001 Added language support

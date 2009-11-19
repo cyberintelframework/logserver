@@ -3,13 +3,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 26-10-2009                       #
+# Changeset 003                    #
+# 19-11-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed sorting order
 # 002 Made page more user friendly
 # 001 Added language support
 #############################################
