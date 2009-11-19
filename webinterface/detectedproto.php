@@ -173,9 +173,11 @@ echo "<div class='left'>\n";
                 $select_size = 8;
                 if ($q_org == 0) {
                   $sql_sensors = "SELECT sensors.id, keyname, vlanid, arp, status, label, organisations.organisation ";
-                  $sql_sensors .= " FROM sensors, organisations WHERE sensors.organisation = organisations.id ORDER BY tapip, keyname";
+                  $sql_sensors .= " FROM sensors, organisations ";
+                  $sql_sensors .= " WHERE sensors.organisation = organisations.id AND NOT status = 3 ORDER BY status DESC, keyname";
                 } else {
-                  $sql_sensors = "SELECT id, keyname, vlanid, arp, status, label FROM sensors WHERE organisation = $q_org ORDER BY tapip, keyname";
+                  $sql_sensors = "SELECT id, keyname, vlanid, arp, status, label FROM sensors ";
+                  $sql_sensors .= " WHERE organisation = $q_org AND NOT status = 3 ORDER BY status DESC, keyname";
                 }
                 $debuginfo[] = $sql_sensors;
                 $result_sensors = pg_query($pgconn, $sql_sensors);

@@ -163,6 +163,12 @@ echo "<div class='centerbig'>\n";
                 $sensor = "$sensor-$vlanid";
               }
 
+              $multicast = 0;
+              $pattern = '/^01.*/';
+              if (preg_match($pattern, $mac)) {
+                $multicast = 1;
+              }
+
               $poisoned = 0;
               if (!empty($static_arp["$ip"])) {
                 if ($static_arp["$ip"] != $mac) {
@@ -186,6 +192,8 @@ echo "<div class='centerbig'>\n";
                       echo "<input type='hidden' name='type[]' value='$val' />\n";
                     }
                     echo "<td>$flagstring</td>\n";
+                  } elseif ($multicast == 1) {
+                    echo "<td><img src='images/multicast.png' height=18 " .printover("Multicast"). " /></td>\n";
                   } else {
                     echo "<td></td>\n";
                   }
@@ -210,33 +218,35 @@ echo "<div class='centerbig'>\n";
           echo "<table>";
             echo "<tr>";
               echo "<td><span class='warning'>" .$l['g_select_sensor']. "</span></td>\n";
-               echo "<td>\n";
-                 $select_size = 8;
-                 if ($q_org == 0) {
-                   $sql_sensors = "SELECT sensors.id, keyname, vlanid, arp, status, label, organisations.organisation ";
-                   $sql_sensors .= " FROM sensors, organisations WHERE sensors.organisation = organisations.id ORDER BY tapip, keyname";
-                 } else {
-                   $sql_sensors = "SELECT id, keyname, vlanid, arp, status, label FROM sensors WHERE organisation = $q_org ORDER BY tapip, keyname";
-                 }
-                 $debuginfo[] = $sql_sensors;
-                 $result_sensors = pg_query($pgconn, $sql_sensors);
-                 echo "<select name='int_sid' size='$select_size' class='smallselect' onChange='javascript: this.form.submit();'>\n";
-                   while ($row = pg_fetch_assoc($result_sensors)) {
-                     $id = $row['id'];
-                     $keyname = $row['keyname'];
-                     $label = $row['label'];
-                     $vlanid = $row['vlanid'];
-                     $sensor = sensorname($keyname, $vlanid);
-                     if ($label != "") $sensor = $label;
-                     $status = $row['status'];
-                     $org = $row['organisation'];
-                     if ($org != "") {
-                       echo printOption($id, "$sensor - $org", $sid, $status);
-                     } else {
-                       echo printOption($id, $sensor, $sid, $status);
-                     }
-                   }
-                 echo "</select>\n";
+              echo "<td>\n";
+                $select_size = 8;
+                if ($q_org == 0) {
+                  $sql_sensors = "SELECT sensors.id, keyname, vlanid, arp, status, label, organisations.organisation ";
+                  $sql_sensors .= " FROM sensors, organisations ";
+                  $sql_sensors .= " WHERE sensors.organisation = organisations.id AND NOT status = 3 ORDER BY status DESC, keyname";
+                } else {
+                  $sql_sensors = "SELECT id, keyname, vlanid, arp, status, label FROM sensors ";
+                  $sql_sensors .= " WHERE organisation = $q_org AND NOT status = 3 ORDER BY status DESC, keyname";
+                }
+                $debuginfo[] = $sql_sensors;
+                $result_sensors = pg_query($pgconn, $sql_sensors);
+                echo "<select name='int_sid' size='$select_size' class='smallselect' onChange='javascript: this.form.submit();'>\n";
+                  while ($row = pg_fetch_assoc($result_sensors)) {
+                    $id = $row['id'];
+                    $keyname = $row['keyname'];
+                    $label = $row['label'];
+                    $vlanid = $row['vlanid'];
+                    $sensor = sensorname($keyname, $vlanid);
+                    if ($label != "") $sensor = $label;
+                    $status = $row['status'];
+                    $org = $row['organisation'];
+                    if ($org != "") {
+                      echo printOption($id, "$sensor - $org", $sid, $status);
+                    } else {
+                      echo printOption($id, $sensor, $sid, $status);
+                    }
+                  }
+                echo "</select>\n";
               echo "</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
