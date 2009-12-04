@@ -41,26 +41,27 @@ $err = 0;
 
 # Retrieving posted variables from $_POST
 $allowed_post = array(
-		"int_userid",
-		"strip_html_escape_subject",
-		"int_priority",
-		"int_freqattack",
-		"int_freqsensor",
-		"int_intervalday",
-		"int_intervalweek",
-		"int_intervalthresh",
-		"int_operator",
-		"int_threshold",
-		"int_sensorid",
-		"int_template",
-		"int_sevattack",
-		"int_sevsensor",
-		"int_detail",
-		"int_sdetail",
-		"int_filter",
-		"md5_hash",
-	        "int_always",
-		"int_utc"
+        "int_userid",
+        "strip_html_escape_subject",
+        "int_priority",
+        "int_freqattack",
+        "int_freqsensor",
+        "int_intervalday",
+        "int_intervalweek",
+        "int_intervalthresh",
+        "int_operator",
+        "int_threshold",
+        "int_sensorid",
+        "int_template",
+        "int_sevattack",
+        "int_sevsensor",
+        "int_detail",
+        "int_sdetail",
+        "int_filter",
+        "md5_hash",
+        "int_always",
+        "int_utc",
+        "bool_public"
 );
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
@@ -75,6 +76,7 @@ if (isset($clean['userid'])) {
     exit;
   } elseif ($s_access_user < 2) {
     $user_id = $s_userid;
+    $sel_org = $s_org;
   } elseif ($s_access_user < 9) {
     $sql_login = "SELECT id FROM login WHERE organisation = $s_org AND id = $user_id";
     $debuginfo[] = $sql_login;
@@ -86,16 +88,26 @@ if (isset($clean['userid'])) {
     } else {
       $user_id = $clean['userid'];
     }
+    $sel_org = $s_org;
   } else {
+    # s_access_user == 9
+    $sel_org = 0;
     $user_id = $clean['userid'];
   }
 } else {
   $user_id = $s_userid;
+  $sel_org = $s_org;
 }
 
 if ($clean['hash'] != $s_hash) {
   $err = 1;
   $m = 116;
+}
+
+if (isset($clean['public'])) {
+  $public = "t";
+} else {
+  $public = "f";
 }
 
 # Checking $_POST'ed variables
@@ -215,8 +227,8 @@ if ("$sev" == "") {
 }
 
 if ($err == 0) {
-  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity, detail, always, utc) ";
-  $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev', '$detail', '$always', '$utc')";
+  $sql = "INSERT INTO report_content (user_id, template, sensor_id, frequency, interval, priority, subject, operator, threshold, severity, detail, always, utc, public, orgid) ";
+  $sql .= " VALUES ('$user_id', '$template', '$sensorid', '$freq', '$interval', '$prio', '$subject', '$operator', '$threshold', '$sev', '$detail', '$always', '$utc', '$public', '$sel_org')";
   $debuginfo[] = $sql;
   $ec = pg_query($pgconn, $sql);
   $m = 1;

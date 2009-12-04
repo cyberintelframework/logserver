@@ -41,30 +41,32 @@ $err = 0;
 
 # Retrieving posted variables from $_POST
 $allowed_post = array(
-		"int_rcid",
-		"int_userid",
-		"strip_html_escape_subject",
-		"int_priority",
-		"int_freqattack",
-		"int_freqsensor",
-		"int_intervalday",
-		"int_intervalweek",
-		"int_intervalthresh",
-		"int_operator",
-		"int_threshold",
-		"int_sensorid",
-		"int_template",
-		"int_sevattack",
-		"int_sevsensor",
-		"int_detail",
-		"int_sdetail",
-		"int_filter",
-		"bool_active",
-		"md5_hash",
-	        "int_always",
-		"int_utc"
+        "int_rcid",
+        "int_userid",
+        "strip_html_escape_subject",
+        "int_priority",
+        "int_freqattack",
+        "int_freqsensor",
+        "int_intervalday",
+        "int_intervalweek",
+        "int_intervalthresh",
+        "int_operator",
+        "int_threshold",
+        "int_sensorid",
+        "int_template",
+        "int_sevattack",
+        "int_sevsensor",
+        "int_detail",
+        "int_sdetail",
+        "int_filter",
+        "bool_active",
+        "md5_hash",
+        "int_always",
+        "int_utc",
+        "bool_public"
 );
 $check = extractvars($_POST, $allowed_post);
+#$c_debug_input = 1;
 #debug_input();
 $err = 0;
 
@@ -80,6 +82,7 @@ if (isset($clean['userid'])) {
   $user_id = $clean['userid'];
   if ($s_access_user < 2) {
     $user_id = $s_userid;
+    $sel_org = $s_org;
   } elseif ($s_access_user < 9) {
     $sql_login = "SELECT id FROM login WHERE organisation = $s_org AND id = $user_id";
     $debuginfo[] = $sql_login;
@@ -93,11 +96,21 @@ if (isset($clean['userid'])) {
     } else {
       $user_id = $clean['userid'];
     }
+    $sel_org = $s_org;
   } else {
+    # s_access_user == 9
     $user_id = $clean['userid'];
+    $sel_org = 0;
   }
 } else {
   $user_id = $s_userid;
+  $sel_org = $s_org;
+}
+
+if (isset($clean['public'])) {
+  $public = "t";
+} else {
+  $public = "f";
 }
 
 if (!isset($clean['detail']) || !isset($clean['sdetail'])) {
@@ -258,7 +271,7 @@ if ($err == 0) {
   # Adding new report
   $sql = "UPDATE report_content SET user_id = '$user_id', template = '$template', sensor_id = '$sensorid', frequency = '$freq', ";
   $sql .= " interval = '$interval', priority = '$prio', subject = '$subject', operator = '$operator', threshold = '$threshold', ";
-  $sql .= " severity = '$sev', active = '$active', detail = '$detail', always = '$always', utc = '$utc' WHERE id = '$reportid'";
+  $sql .= " severity = '$sev', active = '$active', detail = '$detail', always = '$always', utc = '$utc', public = '$public', orgid = '$orgid' WHERE id = '$reportid'";
   $debuginfo[] = $sql;
   $ec = pg_query($pgconn, $sql);
   $m = 3;

@@ -18,8 +18,8 @@
 # Retrieving posted variables from $_GET
 $allowed_get = array(
 	        "int_userid",
-		"int_rcid",
-		"int_m"
+            "int_rcid",
+            "int_m"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -89,6 +89,7 @@ if ($numrows > 0) {
   $detail = $row['detail'];
   $always = $row['always'];
   $utc = $row['utc'];
+  $public = $row['public'];
 
   echo "<div class='leftmed'>\n";
   echo "<form id='reportform' name='reportform' action='report_save.php' method='post'>\n";
@@ -102,8 +103,8 @@ if ($numrows > 0) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<td width='154'>" .$l['re_subject']. "</td>\n";
-              echo "<td width='200'><input type='text' size='41' name='strip_html_escape_subject' value='$subject' /></td>\n";
+              echo "<td width='130'>" .$l['re_subject']. "</td>\n";
+              echo "<td><input type='text' size='45' name='strip_html_escape_subject' value='$subject' /></td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['re_mailprio']. " " .printhelp(18,18). "</td>\n";
@@ -127,8 +128,8 @@ if ($numrows > 0) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<td width='100'>" .$l['g_status']. "</td>\n";
-              echo "<td width='200'>\n";
+              echo "<td width='130'>" .$l['g_status']. "</td>\n";
+              echo "<td>\n";
                 echo "<select name='bool_active'>\n";
                   echo printOption("t", $l['mr_active'], $active);
                   echo printOption("f", $l['mr_inactive'], $active);
@@ -157,8 +158,8 @@ if ($numrows > 0) {
               echo "</td>\n";
             echo "</tr>\n";
             echo "<tr>";
-              echo "<td width='100'>" .$l['re_reptemp']. "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['re_reptemp']. "</td>\n";
+              echo "<td>";
                 echo "<select id='int_template' name='int_template' onchange='javascript: sh_mailtemp(this.value);'>\n";
                   foreach ($v_mail_template_ar as $key=>$val) { 
                     if ($key != 6) {
@@ -173,8 +174,8 @@ if ($numrows > 0) {
             } else {
               echo "<tr id='repdetail' name='repdetail' style='display:;'>";
             }
-              echo "<td width='100'>" .$l['re_reptype']. " " .printhelp(17,17,0,800). "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['re_reptype']. " " .printhelp(17,17,0,800). "</td>\n";
+              echo "<td>";
                 echo "<select id='int_detail' name='int_detail' onchange='javascript: sh_mailreptype(this.value);'>\n";
                   foreach ($v_mail_detail_ar as $key=>$val) {
                     if (($key == 4 && $c_enable_cymru == 1) || $key != 4) {
@@ -190,8 +191,8 @@ if ($numrows > 0) {
             } else {
               echo "<tr style='display: none;' id='filter' name='filter'>";
             }
-              echo "<td width='100'>" .$l['re_filter']. "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['re_filter']. "</td>\n";
+              echo "<td>";
                 echo "<select name='int_filter' id='int_filter'>\n";
                   echo printOption(0, $l['re_exown'], $sev);
                   echo printOption(1, $l['re_incown'], $sev);
@@ -203,8 +204,8 @@ if ($numrows > 0) {
             } else {
               echo "<tr style='display:none;' id='srepdetail' name='srepdetail'>";
             }
-              echo "<td width='100'>" .$l['re_reptype']. " " .printhelp(17,17-2,0,800). "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['re_reptype']. " " .printhelp(17,17-2,0,800). "</td>\n";
+              echo "<td>";
                 echo "<select id='int_sdetail' name='int_sdetail'>\n";
                   foreach ($v_mail_sdetail_ar as $key=>$val) {
                     echo printOption($key, $val, $detail);
@@ -221,8 +222,8 @@ if ($numrows > 0) {
             } else {
               echo "<tr style='display: none;' id='attack_sev' name='attack_sev'>";
             }
-              echo "<td width='100'>" .$l['ls_sev']. "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['ls_sev']. "</td>\n";
+              echo "<td>";
                 echo "<select name='int_sevattack'>\n";
                   echo printOption(-1, $l['re_allsev'], $sev);
                   foreach ($v_severity_ar as $key=>$val) {
@@ -236,8 +237,8 @@ if ($numrows > 0) {
             } else {
               echo "<tr style='display: none;' id='timestamps' name='timestamps'>";
             }
-              echo "<td width='100'>" .$l['re_timeformat']. "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['re_timeformat']. "</td>\n";
+              echo "<td>";
                 echo "<select name='int_utc'>\n";
                   foreach ($v_timestamp_format_ar as $key=>$val) {
                     echo printOption($key, $val, $utc);
@@ -250,14 +251,30 @@ if ($numrows > 0) {
             } else {
               echo "<tr style='display: none;' id='sensor_sev' name='sensor_sev'>";
             }
-              echo "<td width='100'>" .$l['ls_sev']. "</td>\n";
-              echo "<td width='200'>";
+              echo "<td>" .$l['ls_sev']. "</td>\n";
+              echo "<td>";
                 echo "<select name='int_sevsensor'>\n";
                   echo printOption(-1, $l['re_allsev'], $sev);
                   foreach ($v_sensor_sev_ar as $key=>$val) {
                     echo printOption($key, $val, $sev);
                   }
                 echo "</select>\n";
+              echo "</td>\n";
+            echo "</tr>\n";
+            if ($detail == 10 || $detail == 11) {
+              echo "<tr style='display: ;' id='rss_pub' name='rss_pub'>";
+            } else {
+              echo "<tr style='display: none;' id='rss_pub' name='rss_pub'>";
+            }
+              echo "<td>" .$l['re_public']. " " .printhelp(22,22). "</td>\n";
+              echo "<td>";
+                if ($public == "t") {
+                  echo "<input id='int_public' type='checkbox' style='cursor: pointer;' checked='yes' value='t' name='bool_public' onclick='pubwarn();' />";
+                  echo "<span style='display: ;' id='pub_warn'>&nbsp;" .$l['re_pub_warn']. "</span>";
+                } else {
+                  echo "<input id='int_public' type='checkbox' style='cursor: pointer;' value='t' name='bool_public' onclick='pubwarn();'/>";
+                  echo "<span style='display: none;' id='pub_warn'>&nbsp;" .$l['re_pub_warn']. "</span>";
+                }
               echo "</td>\n";
             echo "</tr>\n";
           echo "</table>\n";
@@ -282,8 +299,8 @@ if ($numrows > 0) {
                 } else {
                   echo "<tr id='attack_time' name='attack_time' style='display: none;'>";
                 }
-                  echo "<td width='100'>" .$l['re_freq']. "</td>\n";
-                  echo "<td width='200'>";
+                  echo "<td width='130'>" .$l['re_freq']. "</td>\n";
+                  echo "<td>";
                     echo "<select name='int_freqattack' onchange='javascript: sh_mailfreq(this.value);'>\n";
                       foreach ($v_mail_frequency_attacks_ar as $key=>$val) {
                         echo printOption($key, $val, $freq);
