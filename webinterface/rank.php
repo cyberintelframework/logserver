@@ -3,8 +3,8 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 005                    #
-# 21-10-2009                       #
+# Changeset 006                    #
+# 21-12-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -15,6 +15,7 @@
 
 ####################################
 # Changelog:
+# 006 Fixed bug #207
 # 005 Fixed include of GeoIP module
 # 004 Added ARP exclusion stuff
 # 003 Fixed debug_sql logging
@@ -1369,12 +1370,14 @@ echo "<div class='all'>\n";
                 echo "<td>$i</td>\n";
                 if ($s_access_search == 9) {
                   echo "<td>$db_org_name</td>\n";
+                  echo "<td>" .downlink("logsearch.php?int_org=$id&int_sev=1", nf($count)). "</td>\n";
                 } elseif ($q_org == $id) {
                   echo "<td>$db_org_name</td>\n";
+                  echo "<td>" .downlink("logsearch.php?int_org=$id&int_sev=1", nf($count)). "</td>\n";
                 } else {
                   echo "<td></td>\n";
+                  echo "<td>" .nf($count). "</td>\n";
                 }            
-                echo "<td>" .downlink("logsearch.php?int_org=$id", nf($count)). "</td>\n";
               echo "</tr>\n";
             }
           echo "</table>\n";
