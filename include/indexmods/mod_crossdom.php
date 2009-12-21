@@ -2,13 +2,14 @@
 
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 18-04-2008                       #
+# Changeset 003                    #
+# 21-12-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed bug when no results were shown (#205)
 # 002 Added ARP exclusion stuff
 # 001 Initial release
 #############################################
@@ -96,25 +97,25 @@ echo "<div class='block'>\n";
 
               reset_sql();
 
-              if ($count_total1 > 0 || $count_total0 > 0) {
+              #if ($count_total1 > 0 || $count_total0 > 0) {
                 echo "<tr>\n";
                   echo "<td>$range</td>\n";
                   if ($count_total1 > 0 ) {
                     echo "<td>" .downlink("logsearch.php?inet_source=$range&amp;int_sev=1", nf($count_total1)). "</td>\n";
                     echo "<td><a href='loglist.php?inet_source=$range&int_sev=1'>" . nf($count_uniq1) . "</a></td>\n";
                   } else {
-                    echo "<td>&nbsp;</td>\n";
-                    echo "<td>&nbsp;</td>\n";
+                    echo "<td>0</td>\n";
+                    echo "<td>0</td>\n";
                   }
                   if ($count_total0 > 0) {
                     echo "<td>" .downlink("logsearch.php?inet_source=$range&amp;int_sev=0", nf($count_total0)). "</td>\n";
                     echo "<td><a href='loglist.php?inet_source=$range&int_sev=0'>" . nf($count_uniq0) . "</a></td>\n";
                   } else {
-                    echo "<td>&nbsp;</td>\n";
-                    echo "<td>&nbsp;</td>\n";
+                    echo "<td>0</td>\n";
+                    echo "<td>0</td>\n";
                   }
                 echo "</tr>\n";
-              }
+              #}
             }
           }
         echo "</table>\n";
