@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 02-04-2008                       #
+# Changeset 003                    #
+# 21-12-2009                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed bug #206 (empty result set)
 # 002 Removed the need for a file in /tmp
 # 001 version 2.00
 #############################################
@@ -45,8 +46,8 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "q_org",
-		"int_to",
-		"int_from"
+                "int_to",
+                "int_from"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -69,9 +70,9 @@ if ( $err == 0) {
   $query .= "WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1' ";
   $query .= "AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC";
   $r_hit = pg_query($pgconn, $query);
+  echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
+  echo "<markers>";
   if (pg_num_rows($r_hit)) {
-    echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
-    echo "<markers>";
     $ar_latlng = array();
     while ($hit = pg_fetch_assoc($r_hit)) {
       $source = $hit['source'];
@@ -106,9 +107,10 @@ if ( $err == 0) {
       echo $line;
       flush();
     }		
-    echo "</markers>";
   }
+  echo "</markers>";
 } else {
+  echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
   echo "<markers>";
   echo "</markers>";
 }
