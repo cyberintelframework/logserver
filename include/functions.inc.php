@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 011                    #
-# 21-10-2009                       #
+# Changeset 012                    #
+# 07-01-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 012 Added formatEmu
 # 011 Fixed checkSID
 # 010 Fixed another bug in the printsort function
 # 009 Fixed a bug in the printsort function
@@ -28,66 +29,67 @@
 # INDEX
 #
 # 1 SQL Functions
-# 1.01		reset_sql
-# 1.02		add_to_sql
-# 1.03		prepare_sql
+# 1.01	    reset_sql
+# 1.02	    add_to_sql
+# 1.03	    prepare_sql
 #
 # 2 Date & Time Functions
-# 2.01		getepoch
+# 2.01	    getepoch
 #
 # 3 Miscellaneous
-# 3.01		extractvars
-# 3.02		geterror
-# 3.03		checkSID
-# 3.04		getaddress
-# 3.05		genpass
-# 3.06		pgboolval
-# 3.07		validate_email
-# 3.08		nf
-# 3.09		size_hum_read
-# 3.10		microtime_float
-# 3.11		matchCIDR
-# 3.12		getportdescr
-# 3.13		censorip
-# 3.14		footer
-# 3.15		sec_to_string
-# 3.16		sensorname
-# 3.17		sorter
-# 3.18		gen_org_sql
-# 3.19		cleanfooter
-# 3.20		roundup
-# 3.21		addcookie
-# 3.22		delcookie
-# 3.23		sensorstatus
+# 3.01	    extractvars
+# 3.02	    geterror
+# 3.03	    checkSID
+# 3.04	    getaddress
+# 3.05	    genpass
+# 3.06	    pgboolval
+# 3.07	    validate_email
+# 3.08	    nf
+# 3.09	    size_hum_read
+# 3.10	    microtime_float
+# 3.11	    matchCIDR
+# 3.12	    getportdescr
+# 3.13	    censorip
+# 3.14	    footer
+# 3.15	    sec_to_string
+# 3.16	    sensorname
+# 3.17	    sorter
+# 3.18	    gen_org_sql
+# 3.19	    cleanfooter
+# 3.20	    roundup
+# 3.21	    addcookie
+# 3.22	    delcookie
+# 3.23	    sensorstatus
 #
 # 4 Debug Functions
-# 4.01		printer
-# 4.02		debug_input
-# 4.03		debug_sql
+# 4.01	    printer
+# 4.02	    debug_input
+# 4.03	    debug_sql
 # 4.04      sanitize_array
 #
 # 5 Print functions
-# 5.01		printhelp
-# 5.02		printsort
-# 5.03		printMenuitem
-# 5.04		printTabItem
-# 5.05		printled
-# 5.06		downlink
-# 5.07		printover
-# 5.08		printosimg
-# 5.09		printflagimg
-# 5.10		printradio
-# 5.11		printcheckbox
-# 5.12		printoption
-# 5.13		show_log_message
+# 5.01	    printhelp
+# 5.02	    printsort
+# 5.03	    printMenuitem
+# 5.04	    printTabItem
+# 5.05	    printled
+# 5.06	    downlink
+# 5.07	    printover
+# 5.08	    printosimg
+# 5.09	    printflagimg
+# 5.10	    printradio
+# 5.11	    printcheckbox
+# 5.12	    printoption
+# 5.13	    show_log_message
+# 5.14      printMenumod
 #
 # 6 Open Flash chart functions
-# 6.01		of_legend
-# 6.02		of_link
-# 6.03		of_title
-# 6.04		of_set_legend
-# 6.05		of_set_links
-# 6.06		of_set_title
+# 6.01	    of_legend
+# 6.02	    of_link
+# 6.03	    of_title
+# 6.04	    of_set_legend
+# 6.05	    of_set_links
+# 6.06	    of_set_title
 #############################################
 
 ###############################
@@ -843,6 +845,33 @@ function sensorstatus($status, $lastupdate, $uptime, $perm = 0) {
     $rtn = $status;
   }
   return $rtn;
+}
+
+# 3.24 formatEmu
+# Function to format the emulation profiles of Dionaea
+# properly
+function formatEmu($emuProfile) {
+    $emuProfile = json_decode($emuProfile, TRUE);
+#    printer($emuProfile);
+    foreach ($emuProfile as $key => $val) {
+        $args = "";
+        $line = $val["call"] ."(";
+        foreach ($val["args"] as $argkey => $argval) {
+            $argval = array_shift($val["args"]);
+            if (is_array($argval)) {
+                $escaped = str_replace("\n", "<br />", print_r($argval, TRUE));
+                $args .= "<a href='#' " .printOver($escaped). ">Array</a>";
+            } else {
+                $args .= $argval;
+            }
+            if (count($val["args"]) > 0) {
+                $args .= ", ";
+            }
+        }
+        $line .= $args . ") returns " .$val["return"] . "<br />\n";
+        $all .= $line;
+    }
+    return $all;
 }
 
 ###############################

@@ -67,7 +67,7 @@ if ($err != 1) {
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
 
-  echo "<div class='leftmed'>\n";
+  echo "<div class='centerbig'>\n";
 #    echo "<div class='block'>\n";
 #      echo "<div class='dataBlock'>\n";
 #        echo "<div class='blockHeader'>Details of attack ID: $id</div>\n";
@@ -77,8 +77,8 @@ if ($err != 1) {
               echo "<td colspan='2' class='title'>" .$l['ld_aid_details']. ": $id</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-              echo "<th width='30%'>" .$l['g_type']. "</th>\n";
-              echo "<th width='70%'>" .$l['g_info']. "</th>\n";
+              echo "<th width='20%'>" .$l['g_type']. "</th>\n";
+              echo "<th width='80%'>" .$l['g_info']. "</th>\n";
             echo "</tr>\n";
 
             while ($row = pg_fetch_assoc($result_details)) {
@@ -98,7 +98,14 @@ if ($err != 1) {
                 if ($count != 0) {
                   echo "<td><a href='binaryhist.php?md5_binname=$logging'>$logging<a/></td>\n";
                 } else {
-                  echo "<td>$logging</td>\n";
+                  if ($type == 81) {
+                    echo "<td>\n";
+                    $logging = formatEmu($logging);
+                    echo "$logging";
+                    echo "</td>\n";
+                  } else {
+                    echo "<td>$logging</td>\n";
+                  }
                 }
               echo "</tr>\n";
             }
