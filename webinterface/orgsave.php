@@ -38,12 +38,13 @@ $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "savetype",
-		"int_orgid",
-		"md5_hash"
+        "savetype",
+        "int_orgid"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
+
+$type = $tainted['savetype'];
 
 # Retrieving posted variables from $_POST
 $allowed_post = array(
@@ -59,21 +60,20 @@ $check = extractvars($_POST, $allowed_post);
 
 if ($clean['hash'] != $s_hash) {
   $err = 1;
-  $m = 89;
+  $m = 116;
 }
 
 # Get the type of update
-$type = $tainted['savetype'];
 $pattern = '/^(org|ident|md5)$/';
 if (!preg_match($pattern, $type)) {
   $err = 1;
-  $m = 95;
+  $m = 164;
 }
 
 # Checking access
 if ($s_admin != 1) {
   $err = 1;
-  $m = 91;
+  $m = 101;
 }
 
 if ($type == "ident") {
@@ -86,12 +86,12 @@ if ($type == "ident") {
 
   if (empty($orgid)) {
     $err = 1;
-    $m = 92;
+    $m = 107;
   }
 
   if (empty($orgname)) {
     $err = 1;
-    $m = 96;
+    $m = 165;
   }
 
   $ranges = str_replace("\r", ";", $ranges);
@@ -114,7 +114,7 @@ if ($type == "ident") {
     $pattern .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))(\/([1-9]|[1-2][0-9]|3[0-2]))?;{1})*$/';
     if (!preg_match($pattern, $ranges)) {
       $err = 1;
-      $m = 90;
+      $m = 166;
     }
   }
 } elseif ($type == "org") {
@@ -128,11 +128,11 @@ if ($type == "ident") {
     $result_org = pg_query($pgconn, $sql_org);
     $rows = pg_num_rows($result_org);
     if ($rows > 0) {
-      $m = 99;
+      $m = 101;
       $err = 1;
     }
   } else {
-    $m = 96;
+    $m = 165;
     $err = 1;
   }
 } elseif ($type == "md5") {
@@ -144,7 +144,7 @@ if ($type == "ident") {
     $identtype = 1;
   } else {
     $err = 1;
-    $m = 92;
+    $m = 107;
   }
 }
 
