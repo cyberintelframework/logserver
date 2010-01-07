@@ -1168,7 +1168,7 @@ while ($row = pg_fetch_assoc($result)) {
   echo "<tr>\n";
     echo "<td>$ts</td>\n";
     if ($numrows_details != 0) {
-    	echo "<td><a onclick=\"popit('" ."logdetail.php?int_id=$id". "', 209, 500);\">$sevtext</a></td>\n";
+    	echo "<td><a onclick=\"popit('" ."logdetail.php?int_id=$id". "', 409, 700);\">$sevtext</a></td>\n";
     } else {
       echo "<td>$sevtext</td>\n";
     }
