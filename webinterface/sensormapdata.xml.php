@@ -1,13 +1,14 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 002                    #
-# 02-04-2008                       #
+# Changeset 003                    #
+# 07-01-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 #############################################
 # Changelog:
+# 003 Fixed same bug as in #206
 # 002 Removed the need for a file in /tmp
 # 001 version 2.00
 #############################################
@@ -60,6 +61,9 @@ if (isset($clean['to']) && isset($clean['from'])) {
 }
  
 if ( $err == 0) {
+  echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
+  echo "<markers>";
+
   $query = "SELECT DISTINCT remoteip, COUNT(remoteip) as count FROM sensors ";
   $query .= " LEFT JOIN sensor_details ON sensors.keyname = sensor_details.keyname ";
   $query .= " WHERE NOT status = 3 ";
@@ -69,8 +73,6 @@ if ( $err == 0) {
   $query .= "GROUP BY remoteip ORDER BY count DESC";
   $r_hit = pg_query($pgconn, $query);
   if (pg_num_rows($r_hit)) {
-    echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
-    echo "<markers>";
     $ar_latlng = array();
     while ($hit = pg_fetch_assoc($r_hit)) {
       $rip = $hit['remoteip'];
@@ -108,6 +110,7 @@ if ( $err == 0) {
     echo "</markers>";
   }
 } else {
+  echo "<?xml version='1.0' encoding='ISO-8859-1'?>";
   echo "<markers>";
   echo "</markers>";
 }
