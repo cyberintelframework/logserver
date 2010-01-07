@@ -32,6 +32,7 @@ if (!isset($_SESSION['s_admin'])) {
 
 # Retrieving some session variables
 $s_org = intval($_SESSION['s_org']);
+$q_org = intval($_SESSION['q_org']);
 $s_admin = intval($_SESSION['s_admin']);
 $s_userid = intval($_SESSION['s_userid']);
 $s_hash = md5($_SESSION['s_hash']);
@@ -66,7 +67,6 @@ $allowed_post = array(
         "bool_public"
 );
 $check = extractvars($_POST, $allowed_post);
-#$c_debug_input = 1;
 #debug_input();
 $err = 0;
 
@@ -106,6 +106,8 @@ if (isset($clean['userid'])) {
   $user_id = $s_userid;
   $sel_org = $s_org;
 }
+
+
 
 if (isset($clean['public'])) {
   $public = "t";
@@ -271,7 +273,7 @@ if ($err == 0) {
   # Adding new report
   $sql = "UPDATE report_content SET user_id = '$user_id', template = '$template', sensor_id = '$sensorid', frequency = '$freq', ";
   $sql .= " interval = '$interval', priority = '$prio', subject = '$subject', operator = '$operator', threshold = '$threshold', ";
-  $sql .= " severity = '$sev', active = '$active', detail = '$detail', always = '$always', utc = '$utc', public = '$public', orgid = '$orgid' WHERE id = '$reportid'";
+  $sql .= " severity = '$sev', active = '$active', detail = '$detail', always = '$always', utc = '$utc', public = '$public', orgid = '$q_org' WHERE id = '$reportid'";
   $debuginfo[] = $sql;
   $ec = pg_query($pgconn, $sql);
   $m = 3;

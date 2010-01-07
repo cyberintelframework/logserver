@@ -149,6 +149,7 @@ function sh_mailtemp(si) {
 
 function sh_mailreptype(si) {
   if (si < 10) {
+    $('#rss_pub').hide();
     if (si < 4) {
       $('#filter').hide();
       $('#timestamps').hide();
@@ -170,6 +171,7 @@ function sh_mailreptype(si) {
     $('#timeandthresh').hide();
     $('#filter').hide();
     $('#timestamps').hide();
+    $('#rss_pub').show();
     $('#attack_sev').show();
   }
 }
@@ -196,6 +198,10 @@ function sh_mailfreq(si) {
     $('#always').hide();
     $('#thresh_freq').show();
   } 
+}
+
+function pubwarn() {
+  $('#pub_warn').toggle();
 }
 
 /***********************************

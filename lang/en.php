@@ -59,6 +59,7 @@ $l['g_addorg']          = "Add all sensors";
 $l['g_vlan']            = "VLAN";
 $l['g_country']         = "Country";
 $l['g_host']            = "Host";
+$l['g_hourly']          = "Hourly";
 
 ##########################
 # Global (Lowercase first letter)
@@ -74,6 +75,8 @@ $l['g_exploits_l']      = "exploits";
 $l['g_ports_l']         = "ports";
 $l['g_files_l']         = "files";
 $l['g_sensors_l']       = "sensors";
+$l['g_on_l']            = "on";
+$l['g_at_l']            = "at";
 
 ##########################
 # argosadmin.php
@@ -398,6 +401,9 @@ $l['mr_inactive']       = "Inactive";
 $l['mr_never']          = "never";
 $l['mr_result']         = "Search result";
 $l['mr_confirmdel']     = "Are you sure you want to delete this report";
+$l['mr_instant']        = "Instant";
+$l['mr_always']         = "Always";
+$l['mr_public']         = "Public";
 
 ##########################
 # orgadmin.php
@@ -518,6 +524,8 @@ $l['re_thresh_amount']  = "Threshold amount";
 $l['re_timespan']       = "Timespan";
 $l['re_always']         = "Always send report";
 $l['re_timeformat']	    = "Timestamps format";
+$l['re_public']         = "Public";
+$l['re_pub_warn']       = "This feed will not require authentication. <b>Be careful</b>!";
 
 ##########################
 # rssfeed.php

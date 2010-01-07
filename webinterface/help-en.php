@@ -148,6 +148,10 @@ if ($id == 1) {
 } elseif ($id == 21) {
     # orgedit.php - IP ranges
     echo "These are the IP address ranges of your domain. They are used to determine which attacks are originating from your own domain.";
+} elseif ($id == 22) {
+    # report_edit.php, report_new.php
+    echo "A public RSS feed means it will not require any form of authentication to access this feed. <b>Be careful</b>!<br /><br />";
+    echo "Destination IP addresses can be optionally censored.";
 }
 
 ?>

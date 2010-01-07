@@ -576,7 +576,7 @@ body {
   top:			15%;
   width:		500px;
   height:		300px;
-  z-index:		5001;
+  z-index:		999;
   display:		none;
   padding-bottom:	30px;
 }

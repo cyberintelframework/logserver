@@ -137,8 +137,8 @@ if ($s_access_user > 0) {
               echo "<th width='250'>" .printsort($l['mr_title'], "subject"). "</th>\n";
               echo "<th width='120'>" .printsort($l['mr_lastsent'], "last_sent"). "</th>\n";
               echo "<th width='100'>" .printsort($l['mr_temp'], "template"). "</th>\n";
-              echo "<th width='200'>" .$l['mr_timeopts']. "</th>\n";
-              echo "<th width='140' class='norightb'>" .printsort($l['g_type'], "detail"). "</th>\n";
+              echo "<th width='170'>" .$l['mr_timeopts']. "</th>\n";
+              echo "<th width='170' class='norightb'>" .printsort($l['g_type'], "detail"). "</th>\n";
               echo "<th width='16' class='noleftb'></th>\n";
               echo "<th width='60'>" .printsort($l['g_status'], "status"). "</th>\n";
               echo "<th>" .$l['g_delete']. "</th>\n";
@@ -174,15 +174,16 @@ if ($s_access_user > 0) {
               $to_ts = $report_content['to_ts'];
               $always = $report_content['always'];
               $detail = $report_content['detail'];
+              $public = $report_content['public'];
               if ($freq == 1) {
-                $freqstring = "Hourly";
+                $freqstring = $l['g_hourly'];
               } elseif ($freq == 2) {
-                $freqstring = "Daily at ${int}:00";
+                $freqstring = $l['sv_daily'] . " " .$l['g_at_l']. " ${int}:00";
               } elseif ($freq == 3) {
-                $freqstring = "Weekly on $v_weekdays[$int]";
+                $freqstring = $l['sv_weekly'] . " " .$l['g_on_l']. " $v_weekdays[$int]";
               } elseif ($freq == 4) {
                 if ($sev == -1) {
-                  $freqstring = "All $v_mail_operator_ar[$op] $threshold";
+                  $freqstring = $l['g_all'] ." $v_mail_operator_ar[$op] $threshold";
                 } else {
                   $freqstring = "$v_severity_ar[$sev] $v_mail_operator_ar[$op] $threshold";
                 }
@@ -201,7 +202,7 @@ if ($s_access_user > 0) {
                   $freqstring = "N/A";
                 }
               } elseif ($template == 5 || $template == 7) {
-                $freqstring = "Instant";
+                $freqstring = $l['mr_instant'];
               }              
               if ($active == "t") {
                 $status = "<font style='color:green;'>" .$l['mr_active']. "</font";
@@ -238,17 +239,25 @@ if ($s_access_user > 0) {
                 echo "<td>";
                   echo $freqstring;
                   if ($always == 1) {
-                    echo " (Always)";
+                    echo " (" .$l['mr_always']. ")";
                   }
                 echo "</td>\n";
                 if ($template == 6) {
                   echo "<td class='norightb'>" .$l['mr_result']. "</td>\n";
                 } else {
-                  echo "<td class='norightb'>" . $v_mail_detail_ar[$detail] . "</td>\n";
+                  if ($public == "t") {
+                    echo "<td class='norightb'>(<b>" .$l['mr_public']. "</b>) " . $v_mail_detail_ar[$detail] . "</td>\n";
+                  } else {
+                    echo "<td class='norightb'>" . $v_mail_detail_ar[$detail] . "</td>\n";
+                  }
                 }
                 if ($detail == 10 || $detail == 11) {
                   if ($active == "t") {
-                    echo "<td class='noleftb'><a href='rssfeed.php?int_rcid=$rcid'><img src='images/rss.gif' height='16' width='16' /></a></td>\n";
+                    if ($public == "t") {
+                      echo "<td class='noleftb'><a href='pubfeed.php?int_rcid=$rcid'><img src='images/rss.gif' height='16' width='16' /></a></td>\n";
+                    } else {
+                      echo "<td class='noleftb'><a href='rssfeed.php?int_rcid=$rcid'><img src='images/rss.gif' height='16' width='16' /></a></td>\n";
+                    }
                   } else {
                     echo "<td class='noleftb'></td>\n";
                   }
