@@ -31,6 +31,7 @@ $v_severity_atype_ar = array(
         3 => "Glastopf",
         4 => "Amun",
         5 => "Dionaea",
+        6 => "SMTP",
         10 => "ARP Poisoning",
         11 => "Rogue DHCP server"
 );
@@ -42,6 +43,7 @@ $v_severity_atype_ar = array(
 # 30-39 -> detectarp.pl
 # 40-59 -> Snort
 # 60-69 -> Glastopf
+# 70-79 -> SMTP
 # 100-140 -> Dionaea
 $v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
@@ -62,6 +64,12 @@ $v_attacktype_ar = array(
         '60' => 'Request',
         '61' => 'Referer',
         '62' => 'User Agent',
+        '70' => 'Sender address',
+        '71' => 'Recipient address',
+        '72' => 'Attachment filename',
+        '73' => 'Attachment MD5',
+        '74' => 'URL',
+        '75' => 'Subject',
         '80' => 'Dialogue',
         '81' => 'Emulation Profile',
         '82' => 'Connectback',
@@ -94,12 +102,12 @@ $v_access_ar_user = array(
 $v_mail_detail_ar = array(
 		0 => "Mail - Summary", 
 		1 => "Mail - Detail", 
-		2 => "Mail - Summary + Detail",
+		2 => "Mail - Summary/Detail",
 		3 => "Mail - IDMEF Detail",
 		4 => "Mail - Cymru markup",			# <ASN>  | <IP>  | <time> <info> | <ASN description>
 		5 => "Mail - Nepenthes markup",			# [<time>] <source> -> <url> <md5>
 		10 => "RSS - Summary",
-		11 => "RSS - Summary + Detail"
+		11 => "RSS - Summary/Detail"
 );
 
 # Array with the kind of report for sensor status.
@@ -248,7 +256,10 @@ $v_errors = array(
         160 => "Invalid or missing note ID!",
         161 => "Invalid or missing sensor details record!<br /><br />More info in the <a href='$c_faq_url'>FAQ L13</a>.",
         162 => "Invalid or missing module ID!",
-        163 => "Invalid or missing module page!"
+        163 => "Invalid or missing module page!",
+        164 => "Invalid or missing orgsavetype!",
+        165 => "Invalid or missing organisation name!",
+        166 => "Invalid or missing IP ranges!"
 );
 
 # Array for the different types of plots available.
