@@ -2,8 +2,8 @@
 ####################################
 # Mail reporter                    #
 # SURFids 3.00                     #
-# Changeset 011                    #
-# 07-07-2009                       #
+# Changeset 012                    #
+# 12-01-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 012 Ignoring search templates (#210)
 # 011 Added check for Net::Abuse::Utils
 # 010 Fixed own ranges nepenthes format
 # 009 Added timestamps to sensor status format
@@ -112,6 +113,8 @@ $sql_email .= " report_content.severity, report_content.detail, login.gpg, repor
 $sql_email .= " FROM login, report_content ";
 $sql_email .= " WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
 $sql_email .= " AND report_content.detail < 10 ";
+# ignore search templates
+$sql_email .= " AND NOT report_content.templates = 6 ";
 
 $email_query = $dbh->prepare($sql_email);
 $ec = $email_query->execute();
