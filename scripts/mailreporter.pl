@@ -120,7 +120,7 @@ $sql_email .= " FROM login, report_content ";
 $sql_email .= " WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
 $sql_email .= " AND report_content.detail < 10 ";
 # ignore search templates
-$sql_email .= " AND NOT report_content.templates = 6 ";
+$sql_email .= " AND NOT report_content.template = 6 ";
 
 $email_query = $dbh->prepare($sql_email);
 $ec = $email_query->execute();
@@ -1187,7 +1187,7 @@ sub sendmail {
 
   ### Send the Message
   # MIME::Lite->send('smtp', $mail_host, Timeout=>60, Hello=>"$mail_hello", From=>"$c_from_address");
-  MIME::Lite->send('sendmail');
+  #MIME::Lite->send('sendmail');
   $chk = $msg->send;
 
   # Update last_sent
