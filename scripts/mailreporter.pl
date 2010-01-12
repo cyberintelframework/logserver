@@ -2,7 +2,7 @@
 ####################################
 # Mail reporter                    #
 # SURFids 3.00                     #
-# Changeset 012                    #
+# Changeset 013                    #
 # 12-01-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 013 Added check before cymru error (#211)
 # 012 Ignoring search templates (#210)
 # 011 Added check for Net::Abuse::Utils
 # 010 Fixed own ranges nepenthes format
@@ -75,9 +76,11 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 $check = dbconnect();
 
 # Check if we need to log failed modules
-if ($warn_cymru == 1) {
-    logsys($f_log_error, "PERL_MOD", "Could not load module required for Cymru reports. See FAQ L13.");
-    $c_enable_cymru = 0;
+if ($c_enable_cymru == 1) {
+    if ($warn_cymru == 1) {
+        logsys($f_log_error, "PERL_MOD", "Could not load module required for Cymru reports. See FAQ L13.");
+        $c_enable_cymru = 0;
+    }
 }
 
 # ts_ means timestamp
