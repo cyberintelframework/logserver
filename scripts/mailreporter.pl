@@ -2,7 +2,7 @@
 ####################################
 # Mail reporter                    #
 # SURFids 3.00                     #
-# Changeset 013                    #
+# Changeset 014                    #
 # 12-01-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
@@ -12,6 +12,7 @@
 
 #########################################################################################
 # Changelog:
+# 014 Added more logging
 # 013 Added check before cymru error (#211)
 # 012 Ignoring search templates (#210)
 # 011 Added check for Net::Abuse::Utils
@@ -74,6 +75,8 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 
 # Connect to the database (dbh = DatabaseHandler or linkserver)
 $check = dbconnect();
+
+logsys($f_log_info, "MAIL", "Starting mailreporter");
 
 # Check if we need to log failed modules
 if ($c_enable_cymru == 1) {
@@ -1116,6 +1119,7 @@ sub sendmail {
   $attach = $_[5];
 
   print "Sending mailreport($id) to $email\n";
+  logsys($f_log_info, "MAIL", "Sending mailreport($id) to $email");
 
   $mailfile = "/tmp/" .$id. ".mail";
   $maildata = `cat $mailfile`;
