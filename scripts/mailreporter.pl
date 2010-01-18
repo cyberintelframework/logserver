@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 ####################################
 # Mail reporter                    #
 # SURFids 3.00                     #
@@ -394,7 +394,7 @@ while (@row = $email_query->fetchrow_array) {
           $timestamp = utc($row[3]);
           $sev = $row[4];
           $sev_text = $row[5];
-          $source = $row[6];
+          $src = $row[6];
           $sport = $row[7];
           $dest = $row[8];
           $dport = $row[9];
@@ -408,7 +408,7 @@ while (@row = $email_query->fetchrow_array) {
           printattach("<idmef:Source>");
           printattach("  <idmef:Node>");
           printattach("    <idmef:Address category=\"ipv4-addr\">");
-          printattach("      <idmef:address>$source</idmef:address>");
+          printattach("      <idmef:address>$src</idmef:address>");
           printattach("    </idmef:Address>");
           printattach("  </idmef:Node>");
           printattach("  <idmef:Service>");
@@ -593,17 +593,19 @@ while (@row = $email_query->fetchrow_array) {
             }
           }
         }
-        if ($buffer{"id"} != "") {
-          # After the while loop there could still be 1 attack left in the buffer
-          # If so, print it here
-          $log_url = $buffer{"url"};
-          $log_md5 = $buffer{"md5"};
-          $log_source = $buffer{"source"};
-          $log_time = $buffer{"time"};
-          $log_sev = $buffer{"sev"};
-          $log_id = $buffer{"id"};
-          printmail("[$log_time] $log_source -> $log_url $log_md5");
-          $totalcount++;
+        if (exists $buffer{"id"}) {
+          if ($buffer{"id"} != "") {
+            # After the while loop there could still be 1 attack left in the buffer
+            # If so, print it here
+            $log_url = $buffer{"url"};
+            $log_md5 = $buffer{"md5"};
+            $log_source = $buffer{"source"};
+            $log_time = $buffer{"time"};
+            $log_sev = $buffer{"sev"};
+            $log_id = $buffer{"id"};
+            printmail("[$log_time] $log_source -> $log_url $log_md5");
+            $totalcount++;
+          }
         }
       }
 
@@ -766,7 +768,7 @@ while (@row = $email_query->fetchrow_array) {
               $timestamp = utc($row[3]);
               $sev = $row[4];
               $sev_text = $row[5];
-              $source = $row[6];
+              $src = $row[6];
               $sport = $row[7];
               $dest = $row[8];
               $dport = $row[9];
@@ -780,7 +782,7 @@ while (@row = $email_query->fetchrow_array) {
               printattach("<idmef:Source>");
               printattach("  <idmef:Node>");
               printattach("    <idmef:Address category=\"ipv4-addr\">");
-              printattach("      <idmef:address>$source</idmef:address>");
+              printattach("      <idmef:address>$src</idmef:address>");
               printattach("    </idmef:Address>");
               printattach("  </idmef:Node>");
               printattach("  <idmef:Service>");
@@ -1146,7 +1148,12 @@ sub sendmail {
   if ($gpg_enabled == 1) {
     # Encrypt the mail with gnupg 
     $gpg = new GnuPG();
-    $gpg->clearsign(plaintext => "$mailfile", output => "$sigfile", armor => 1, passphrase => $c_passphrase);
+    eval { $gpg->clearsign(plaintext => "$mailfile", output => "$sigfile", armor => 1, passphrase => $c_passphrase); }
+    or do {
+      logsys($f_log_error, "MAIL", "Failed to sign the mail with GPG: $@");
+      &cleanup($mailfile, $sigfile, $attachfile);
+      return;
+    };
     $sigdata = `cat $sigfile`;
     chomp($sigdata);
   }
@@ -1173,7 +1180,10 @@ sub sendmail {
       Type => 'text/plain; charset=ISO-8859-1',
       Data => $maildata
       # Filename => $final_maildata,
-  ) or die "Error adding $maildata: $!\n";
+  ) or do {
+    logsys($f_log_error, "MAIL", "Error attaching mail data: $@");
+    return;
+  };
 
   if ($attach == 1) {
     ### Add binary file as attachement
@@ -1182,13 +1192,20 @@ sub sendmail {
         Path => $attachfile,
         Filename => "IDMEF-$id-$ts_now.xml",
         Disposition => 'attachment'
-    ) or die "Error adding $attachfile: $!\n";
+    ) or do {
+      logsys($f_log_error, "MAIL", "Error attachin XML data: $@");
+      return;
+    }
   }
 
   ### Send the Message
   # MIME::Lite->send('smtp', $mail_host, Timeout=>60, Hello=>"$mail_hello", From=>"$c_from_address");
   #MIME::Lite->send('sendmail');
-  $chk = $msg->send;
+  eval { $chk = $msg->send }
+  or do {
+    logsys($f_log_error, "MAIL", "Failed to send mail: $@");
+    return;
+  };
 
   # Update last_sent
   $last_sent = time;
@@ -1196,6 +1213,21 @@ sub sendmail {
   $execute_result = $dbh->do($sql);
 
   # Delete the mail and signed mail
+  if (-e "$mailfile") {
+    system("rm $mailfile");
+  }
+  if (-e "$sigfile") {
+    system("rm $sigfile");
+  }
+  if (-e "$attachfile") {
+    system("rm $attachfile");
+  }
+}
+
+sub cleanup {
+  $mailfile = $_[0];
+  $sigfile = $_[1];
+  $attachfile = $_[2];
   if (-e "$mailfile") {
     system("rm $mailfile");
   }
