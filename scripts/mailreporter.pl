@@ -76,7 +76,7 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 # Connect to the database (dbh = DatabaseHandler or linkserver)
 $check = dbconnect();
 
-logsys($f_log_info, "MAIL", "Starting mailreporter");
+#logsys($f_log_info, "MAIL", "Starting mailreporter");
 
 # Check if we need to log failed modules
 if ($c_enable_cymru == 1) {
