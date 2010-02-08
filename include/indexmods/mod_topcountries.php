@@ -7,7 +7,7 @@
 # Kees Trippelvitz                 #
 ####################################
 # Contributors:                    #
-# Alberto Fontanello (Unisa.it)    #
+# Alberto Fontanella (Unisa.it)    #
 ####################################
 
 #############################################
