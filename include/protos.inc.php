@@ -37,47 +37,162 @@ $v_protos_dhcp_ar = array(
 );
 
 $v_protos_icmp_ar = array(
-	"0" => "Echo Reply",
-	"1" => "Unassigned",
-	"2" => "Unassigned",
-	"3" => "Destination Unreachable",
-	"4" => "Source Quench",
-	"5" => "Redirect",
-	"6" => "Alternate Host Address",
-	"7" => "Unassigned",
-	"8" => "Echo",
-	"9" => "Router Advertisement",
-	"10" => "Router Solicitation",
-	"11" => "Time Exceeded",
-	"12" => "Parameter Problem",
-	"13" => "Timestamp",
-	"14" => "Timestamp Reply",
-	"15" => "Information Request",
-	"16" => "Information Reply",
-	"17" => "Address Mask Request",
-	"18" => "Address Mask Reply",
-	"19" => "Reserved (for Security)",
-	"20" => "Reserved (for Robustness Experiment)",
-	"21" => "Reserved (for Robustness Experiment)",
-	"22" => "Reserved (for Robustness Experiment)",
-	"23" => "Reserved (for Robustness Experiment)",
-	"24" => "Reserved (for Robustness Experiment)",
-	"25" => "Reserved (for Robustness Experiment)",
-	"26" => "Reserved (for Robustness Experiment)",
-	"27" => "Reserved (for Robustness Experiment)",
-	"28" => "Reserved (for Robustness Experiment)",
-	"29" => "Reserved (for Robustness Experiment)",
-	"30" => "Traceroute",
-	"31" => "Datagram Conversion Error",
-	"32" => "Mobile Host Redirect",
-	"33" => "IPv6 Where-Are-You",
-	"34" => "IPv6 I-Am-Here",
-	"35" => "Mobile Registration Request",
-	"36" => "Mobile Registration Reply",
-	"37" => "Domain Name Request",
-	"38" => "Domain Name Reply",
-	"39" => "SKIP",
-	"40" => "Photuris",
+	"0" => array(
+            "desc" => "Echo Reply",
+    ),
+	"1" => array(
+            "desc" => "Unassigned",
+    ),
+	"2" => array(
+            "desc" => "Unassigned",
+    ),
+	"3" => array(
+            "desc" => "Destination Unreachable",
+            "0" => "Net Unreachable",
+            "1" => "Host Unreachable",
+            "2" => "Protocol Unreachable",
+            "3" => "Port Unreachable",
+            "4" => "Fragmentation Needed and Don't Fragment was Set",
+            "5" => "Source Route Failed",
+            "6" => "Destination Network Unknown",
+            "7" => "Destination Host Unknown",
+            "8" => "Source Host Isolated",
+            "9" => "Communication with Destination Network is Administratively Prohibited",    
+            "10" => "Communication with Destination Host is Administratively Prohibited",
+            "11" => "Destination Network Unreachable for Type of Service",
+            "12" => "Destination Host Unreachable for Type of Service",
+            "13" => "Communication Administratively Prohibited",
+            "14" => "Host Precedence Violation",
+            "15" => "Precedence cutoff in effect"
+    ),
+	"4" => array(
+            "desc" => "Source Quench",
+    ),
+	"5" => array(
+            "desc" => "Redirect",
+            "0" => "Redirect Datagram for the Network (or subnet)",
+            "1" => "Redirect Datagram for the Host",
+            "2" => "Redirect Datagram for the Type of Service and Network",
+            "3" => "Redirect Datagram for the Type of Service and Host",
+    ),
+	"6" => array(
+            "desc" => "Alternate Host Address",
+    ),
+	"7" => array(
+            "desc" => "Unassigned",
+    ),
+	"8" => array(
+            "desc" => "Echo",
+    ),
+	"9" => array(
+            "desc" => "Router Advertisement",
+            "0" => "Normal router advertisement",
+            "16" => "Does not route common traffic"
+    ),
+	"10" => array(
+            "desc" => "Router Solicitation",
+    ),
+	"11" => array(
+            "desc" => "Time Exceeded",
+            "0" => "Time to Live exceeded in Transit",
+            "1" => "Fragment Reassembly Time Exceeded"
+    ),
+	"12" => array(
+            "desc" => "Parameter Problem",
+            "0" => "Pointer indicates the error",
+            "1" => "Missing a Required Option",
+            "2" => "Bad Length"
+    ),
+	"13" => array(
+            "desc" => "Timestamp",
+    ),
+	"14" => array(
+            "desc" => "Timestamp Reply",
+    ),
+	"15" => array(
+            "desc" => "Information Request",
+    ),
+	"16" => array(
+            "desc" => "Information Reply",
+    ),
+	"17" => array(
+            "desc" => "Address Mask Request",
+    ),
+	"18" => array(
+            "desc" => "Address Mask Reply",
+    ),
+	"19" => array(
+            "desc" => "Reserved (for Security)",
+    ),
+	"20" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"21" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"22" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"23" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"24" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"25" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"26" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"27" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"28" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"29" => array(
+            "desc" => "Reserved (for Robustness Experiment)",
+    ),
+	"30" => array(
+            "desc" => "Traceroute",
+    ),
+	"31" => array(
+            "desc" => "Datagram Conversion Error",
+    ),
+	"32" => array(
+            "desc" => "Mobile Host Redirect",
+    ),
+	"33" => array(
+            "desc" => "IPv6 Where-Are-You",
+    ),
+	"34" => array(
+            "desc" => "IPv6 I-Am-Here",
+    ),
+	"35" => array(
+            "desc" => "Mobile Registration Request",
+    ),
+	"36" => array(
+            "desc" => "Mobile Registration Reply",
+    ),
+	"37" => array(
+            "desc" => "Domain Name Request",
+    ),
+	"38" => array(
+            "desc" => "Domain Name Reply",
+    ),
+	"39" => array(
+            "desc" => "SKIP",
+    ),
+	"40" => array(
+            "desc" => "Photuris",
+            "0" => "Bad SPI",
+            "1" => "Authentication Failed",
+            "2" => "Decompression Failed",
+            "3" => "Decryption Failed",
+            "4" => "Need Authentication",
+            "5" => "Need Authorization"
+    )
 );
 
 $v_protos_igmp_ar = array(
