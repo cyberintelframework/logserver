@@ -62,7 +62,7 @@ if ($err == 0) {
 }
 
 echo "<div class='all'>\n";
-echo "<div class='left'>\n";
+echo "<div class='leftbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
@@ -112,9 +112,9 @@ echo "<div class='left'>\n";
         if ($err == 0) {
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='150'>" .$l['dp_parent']. "</th>\n";
-              echo "<th width='150'>" .$l['dp_type_number']. "</th>\n";
-              echo "<th width='300'>" .$l['dp_type']. "</th>\n";
+              echo "<th width='100'>" .$l['dp_parent']. "</th>\n";
+              echo "<th width='50'>" .$l['dp_type']. "</th>\n";
+              echo "<th width='450'>" .$l['dp_desc']. "</th>\n";
             echo "</tr>\n";
 
             $sql_protos = "SELECT parent, number, subtype FROM sniff_protos WHERE sensorid = '$sid' ORDER BY parent, number";
@@ -137,7 +137,16 @@ echo "<div class='left'>\n";
               } elseif ($head == 1) {
                 $proto = $v_protos_ipv4_ar[$number];
               } elseif ($head == 11) {
-                $proto = $v_protos_icmp_ar[$number];
+                $proto = $v_protos_icmp_ar[$number]["desc"];
+                if ($subtype != -1) {
+                  if (array_key_exists($subtype, $v_protos_icmp_ar[$number])) {
+                    $subdesc = $v_protos_icmp_ar[$number][$subtype];
+                  } else {
+                    $subdesc = "";
+                  }
+                } else {
+                  $subdesc = "";
+                }
               } elseif ($head == 12) {
                 $proto = $v_protos_igmp_ar[$number];
               } elseif ($head == 11768) {
@@ -161,7 +170,12 @@ echo "<div class='left'>\n";
               echo "<tr class='protos " .$class. "' $visi >\n";
                 echo "<td>" .$v_protos_main_ar[$head]. "</td>\n";
                 echo "<td>$number</td>\n";
-                echo "<td>$proto</td>\n";
+                echo "<td>";
+                  echo "$proto";
+                  if ($subdesc != "") {
+                    echo " - $subdesc";
+                  }
+                echo "</td>\n";
               echo "</tr>\n";
             }
           echo "</table>\n";
