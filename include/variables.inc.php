@@ -468,7 +468,8 @@ $v_indexmod_ar = array(
     9 => "Sensor status",
     10 => "Ports",
     11 => "Top 10 sensors",
-    12 => "Top 10 malicious countries"
+    12 => "Top 10 malicious countries",
+    13 => "Malware hosts"
 );
 
 ?>

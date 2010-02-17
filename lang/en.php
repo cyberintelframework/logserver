@@ -160,7 +160,7 @@ $l['dp_confirm_del']    = "Are you sure you want to clear the Detected Protocols
 $l['dp_clear_det_prot'] = "Clear detected protocols";
 $l['dp_detected']       = "Detected protocols";
 $l['dp_parent']         = "Parent protocol";
-$l['dp_type_number']    = "Type number";
+$l['dp_desc']           = "Description";
 $l['dp_type']           = "Type";
 
 ##########################
