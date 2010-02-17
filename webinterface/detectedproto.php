@@ -167,6 +167,11 @@ echo "<div class='leftbig'>\n";
                 $class = "Other";
               }
 
+              # Handle $number below zero (IEEE 802.3)
+              if ($number < 0) {
+                $number = "N/A";
+              }
+
               echo "<tr class='protos " .$class. "' $visi >\n";
                 echo "<td>" .$v_protos_main_ar[$head]. "</td>\n";
                 echo "<td>$number</td>\n";

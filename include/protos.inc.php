@@ -351,9 +351,7 @@ $v_protos_ipv4_ar = array(
 );
 
 $v_protos_ethernet_ar = array(
-    "512" => "XEROX PUP",
-    "513" => "PUP Addr Trans",
-    "1024" => "Nixdorf",
+    "-1" => "Spanning Tree Protocol",
     "1536" => "XEROX NS IDP",
     "1632" => "DLOG",
     "1633" => "DLOG",
