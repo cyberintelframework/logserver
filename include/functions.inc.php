@@ -82,6 +82,7 @@
 # 5.12	    printoption
 # 5.13	    show_log_message
 # 5.14      printMenumod
+# 5.15      printNav
 #
 # 6 Open Flash chart functions
 # 6.01	    of_legend
@@ -1187,6 +1188,48 @@ function show_log_message($ts, $args) {
 function printMenumod($i, $mod, $text, $tab, $header) {
   $s = printMenuitem($i, "module.php?int_mod=$mod&float_tab=$i&strip_html_title=$text&csv_cheader=$header", $text, $tab);
   return $s;
+}
+
+# 5.15 printNav
+# Function to return the code for a navigation bar
+# used for pagination.
+function printNav($page_nr, $last_page, $url) {
+  $count = substr_count($url, "?");
+  $oper = ($count == 0) ? "?" : "&";
+
+  # Handling left arrow and first page number
+  if ($page_nr == 1) $nav .= "<img src='images/selector_arrow_left.gif'>&nbsp;<font class='btext'><font size=3>1</font></font>\n";
+  else $nav .= "<a href=\"${url}${oper}int_page=" . ($page_nr - 1) . "\"><img src='images/selector_arrow_left.gif'></a>&nbsp;<a href='${url}${oper}int_page=1'>1</a>\n";
+
+  # Handling 2 dots at the start
+  if ($page_nr > 4) {
+    $nav .= "..&nbsp;";
+  }
+
+  # Generating page numbers
+  for ($i = ($page_nr - 2); $i <= ($page_nr + 2); $i++) {
+    # Making sure we don't have negative numbers or
+    # numbers higher than the amount of pages
+    if ($i > 1 && $i < $last_page) {
+      # If this is the current page, don't add link, make it bold and size 3
+      if ($page_nr == 2 && ($i == 2)) { $nav .= "<font class='btext'><font size='3'>$i</font></font>\n"; }
+      elseif ($i == $page_nr) { $nav .= "&nbsp;<font class='btext'><font size='3'>$i</font></font>\n"; }
+      # else add <a>
+      elseif ($i == ($page_nr - 1)) { $nav .= "<a href=\"${url}${oper}int_page=$i\">$i</a>"; }
+      else { $nav .= "<a href=\"${url}${oper}int_page=$i\">$i</a>&nbsp;"; }
+    }
+  }
+
+  # Handling 2 dots at the end
+  if ($page_nr <= ($last_page - 4)) {
+    $nav .= "..&nbsp;";
+  }
+
+  # Handling last page number
+  if ($page_nr < $last_page) $nav .= "<a href='${url}${oper}int_page=$last_page'>$last_page</a>&nbsp;<a href=\"${url}${oper}int_page=" . ($page_nr + 1) . "\"><img src='images/selector_arrow_right.gif'></a>\n";
+  else $nav .= "<img src='images/selector_arrow_right.gif'>\n";
+
+  return $nav;
 }
 
 # 6.01 of_legend
