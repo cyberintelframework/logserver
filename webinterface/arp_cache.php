@@ -28,15 +28,32 @@ $err = 0;
 $allowed_get = array(
                 "int_sid",
                 "sort",
-                "int_m"
+                "int_m",
+                "int_page",
+                "int_all"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
+
+# Define how many results per page
+$per_page = 20;
 
 if (!isset($clean['sid'])) {
   $err = 1;
 } else {
   $sid = $clean['sid'];
+}
+
+if (isset($clean['page'])) {
+  $page = $clean['page'];
+} else {
+  $page = 1;
+}
+
+if (isset($clean['all'])) {
+  $all = 1;
+} else {
+  $all = 0;
 }
 
 # Setting up sorting stuff
@@ -58,10 +75,66 @@ if ($err == 0) {
   echo "<div class='leftsmall'>\n";
     echo "<div class='block'>\n";
       echo "<div class='actionBlock'>\n";
-        echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
+        echo "<div class='blockHeader'>\n";
+          echo "<div class='blockHeaderLeft'>" .$l['g_actions']. "</div>\n";
+          echo "<div class='blockHeaderRight'>";
+            echo "<form method='get'>\n";
+              if ($q_org == 0 || $s_access_search == 9) {
+                $sql_sensors = "SELECT sensors.id, keyname, vlanid, arp, status, label, organisations.organisation ";
+                $sql_sensors .= " FROM sensors, organisations WHERE sensors.organisation = organisations.id AND status < 2 ORDER BY status DESC, keyname";
+                $sql_sensors2 = "SELECT sensors.id, keyname, vlanid, arp, status, label, organisations.organisation ";
+                $sql_sensors2 .= " FROM sensors, organisations WHERE sensors.organisation = organisations.id AND status > 1 ORDER BY status DESC, keyname";
+              } else {
+                $sql_sensors = "SELECT id, keyname, vlanid, arp, status, label FROM sensors WHERE organisation = $q_org ";
+                $sql_sensors .= " AND status < 2 ORDER BY status DESC, keyname";
+                $sql_sensors2 = "SELECT id, keyname, vlanid, arp, status, label FROM sensors WHERE organisation = $q_org ";
+                $sql_sensors2 .= " AND status > 1 ORDER BY status DESC, keyname";
+              }
+              $debuginfo[] = $sql_sensors;
+              $debuginfo[] = $sql_sensors2;
+              $result_sensors = pg_query($pgconn, $sql_sensors);
+              $result_sensors2 = pg_query($pgconn, $sql_sensors2);
+
+              echo "<select class='smallselect' name='int_sid' onChange='javascript: this.form.submit();'>\n";
+                echo printOption("", "", $sid);
+                while ($row = pg_fetch_assoc($result_sensors)) {
+                  $id = $row['id'];
+                  $keyname = $row['keyname'];
+                  $label = $row['label'];
+                  $vlanid = $row['vlanid'];
+                  $sensor = sensorname($keyname, $vlanid);
+                  if ($label != "") $sensor = $label;
+                  $status = $row['status'];
+                  $org = $row['organisation'];
+                  if ($org != "") {
+                    echo printOption($id, "$sensor - $org", $sid, $status);
+                  } else {
+                    echo printOption($id, $sensor, $sid, $status);
+                  }
+                }
+                while ($row = pg_fetch_assoc($result_sensors2)) {
+                  $id = $row['id'];
+                  $keyname = $row['keyname'];
+                  $label = $row['label'];
+                  $vlanid = $row['vlanid'];
+                  $sensor = sensorname($keyname, $vlanid);
+                  if ($label != "") $sensor = $label;
+                  $status = $row['status'];
+                  $org = $row['organisation'];
+                  if ($org != "") {
+                    echo printOption($id, "$sensor - $org", $sid, $status);
+                  } else {
+                    echo printOption($id, $sensor, $sid, $status);
+                  }
+                }
+              echo "</select>\n";
+            echo "</form>\n";
+          echo "</div>\n";
+        echo "</div>\n";
+        #echo "<div class='blockHeader'>" .$l['g_actions']. "</div>\n";
         echo "<div class='blockContent'>\n";
           echo "<a href='arp_cache_clr.php?int_org=$q_org&md5_hash=$s_hash&int_sid=$sid' onclick=\"javascript: return confirm('" .$l['ah_confirm']. "');\">";
-          echo $l['ah_clear_arp']. "</a>\n";
+          echo $l['ah_clear_arp']. "</a><br />\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</actionBlock>
@@ -69,41 +142,53 @@ if ($err == 0) {
   echo "</div>\n"; #</leftsmall>
 }
 
+# Handle the navigation stuff here
+$sql_cache_count = "SELECT COUNT(arp_cache.id) as total ";
+$sql_cache_count .= " FROM arp_cache, sensors WHERE arp_cache.sensorid = sensors.id ";
+if ($q_org != 0) {
+  $sql_cache_count .= " AND sensors.organisation = $q_org ";
+}
+if ($sid != 0) {
+  $sql_cache_count .= " AND sensors.id = $sid ";
+}
+$debuginfo[] = $sql_cache_count;
+$result_cache_count = pg_query($pgconn, $sql_cache_count);
+$row = pg_fetch_assoc($result_cache_count);
+$total = $row['total'];
+# Calculate last page
+$last_page = ceil($total / $per_page);
+if ($page <= $last_page) {
+  $offset = ($page - 1) * $per_page;
+} else {
+  $page = 1;
+  $offset = 0;
+}
+
+$url = $_SERVER['PHP_SELF'];
+$qs = urldecode($_SERVER['QUERY_STRING']);
+$url = $url . "?" . $qs;
+$url = preg_replace('/&$/', '', $url);
+$url = str_replace("&int_page=" . $clean["page"], "", $url);
+$url = str_replace("?int_page=" . $clean["page"], "", $url);
+$url = str_replace("&int_all=1", "", $url);
+$url = str_replace("?int_all=1", "", $url);
+$url = trim($url, "?");
+
+# ? or & needed
+$count = substr_count($url, "?");
+$oper = ($count == 0) ? "?" : "&";
+
+$nav = printNav($page, $last_page, $url);
+if ($all == 1) $nav .= "&nbsp;<a href='${url}'>" .$l['ls_multi']. "</a>&nbsp;\n";
+if ($all == 0) $nav .= "&nbsp;<a href='${url}${oper}int_all=1'>" .$l['g_all']. "</a>&nbsp;\n";
+
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
         echo "<div class='blockHeaderLeft'>" .$l['ah_arp_cache']. " ". printhelp(5). "</div>\n";
         echo "<div class='blockHeaderRight'>";
-          echo "<form method='get'>\n";
-            if ($q_org == 0 || $s_access_search == 9) {
-              $sql_sensors = "SELECT sensors.id, keyname, vlanid, arp, status, label, organisations.organisation ";
-              $sql_sensors .= " FROM sensors, organisations WHERE sensors.organisation = organisations.id ORDER BY tapip, keyname";
-            } else {
-              $sql_sensors = "SELECT id, keyname, vlanid, arp, status, label FROM sensors WHERE organisation = $q_org ORDER BY tapip, keyname";
-            }
-            $debuginfo[] = $sql_sensors;
-            $result_sensors = pg_query($pgconn, $sql_sensors);
-
-            echo "<select class='smallselect' name='int_sid' onChange='javascript: this.form.submit();'>\n";
-              echo printOption("", "", $sid);
-              while ($row = pg_fetch_assoc($result_sensors)) {
-                $id = $row['id'];
-                $keyname = $row['keyname'];
-                $label = $row['label'];
-                $vlanid = $row['vlanid'];
-                $sensor = sensorname($keyname, $vlanid);
-                if ($label != "") $sensor = $label;
-                $status = $row['status'];
-                $org = $row['organisation'];
-                if ($org != "") {
-                  echo printOption($id, "$sensor - $org", $sid, $status);
-                } else {
-                  echo printOption($id, $sensor, $sid, $status);
-                }
-              }
-            echo "</select>\n";
-          echo "</form>\n";
+          echo "<div class='searchnav'>$nav</div>";
         echo "</div>\n";
       echo "</div>\n";
       echo "<div class='blockContent'>\n";
@@ -135,17 +220,21 @@ echo "<div class='centerbig'>\n";
               $static_arp["$ip"] = $mac;
             }
 
+            # Getting the data
             $sql_arp_cache = "SELECT arp_cache.id, arp_cache.mac, ip, arp_cache.flags, sensors.keyname, ";
             $sql_arp_cache .= " sensors.vlanid, sensors.id as sid, arp_cache.last_seen, manufacturer ";
             $sql_arp_cache .= " FROM arp_cache, sensors WHERE arp_cache.sensorid = sensors.id ";
             if ($q_org != 0) {
-              $sql_arp_cahce .= " AND sensors.organisation = $q_org ";
+              $sql_arp_cache .= " AND sensors.organisation = $q_org ";
             }
             if ($sid != 0) {
               $sql_arp_cache .= " AND sensors.id = $sid ";
             }
             if ($sql_sort != "") {
               $sql_arp_cache .= " ORDER BY $sql_sort ";
+            }
+            if ($all == 0) {
+              $sql_arp_cache .= " LIMIT 20 OFFSET $offset ";
             }
             $debuginfo[] = $sql_arp_cache;
             $result_arp_cache = pg_query($pgconn, $sql_arp_cache);

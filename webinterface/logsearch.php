@@ -1046,7 +1046,6 @@ if ($num_rows == 0) {
 ####################
 # NAVIGATION
 ####################
-$nav = "";
 $url = $_SERVER['PHP_SELF'];
 $qs = urldecode($_SERVER['QUERY_STRING']);
 $url = $url . "?" . $qs;
@@ -1054,26 +1053,10 @@ $url = preg_replace('/&$/', '', $url);
 $url = str_replace("&int_page=" . $clean["page"], "", $url);
 $url = str_replace("?int_page=" . $clean["page"], "", $url);
 $url = trim($url, "?");
-$count = substr_count($url, "?");
-if ($count == 0) {
-  $oper = "?";
-} else {
-  $oper = "&";
-}
-if ($page_nr == 1) $nav .= "<img src='images/selector_arrow_left.gif'>\n";
-else $nav .= "<a href=\"${url}${oper}int_page=" . ($page_nr - 1) . "\"><img src='images/selector_arrow_left.gif'></a>&nbsp;<a href='${url}${oper}int_page=1'>1</a>&nbsp;..\n";
-for ($i = ($page_nr - 2); $i <= ($page_nr + 2); $i++) {
-  if (($i > 0) && ($i <= $last_page)) {
-    if (($i == $page_nr) && ($i == ($last_page - 1)))  $nav .= "<font class='btext'><font size='3'>$i</font></font>\n"; 
-    elseif ($i == $page_nr)  $nav .= "<font class='btext'><font size='3'>$i</font></font>&nbsp;"; 
-    elseif ($i == 1) $nav .= "\n";
-    elseif ($i == $last_page) $nav .= "\n";
-    elseif ($i == ($last_page - 1)) $nav .= "<a href=\"${url}${oper}int_page=$i\">$i</a>\n";
-    else  $nav .= "<a href=\"${url}${oper}int_page=$i\">$i</a>&nbsp;";
-  }
-}
-if ($page_nr < $last_page) $nav .= "..&nbsp;<a href='${url}${oper}int_page=$last_page'>$last_page</a>&nbsp;<a href=\"${url}${oper}int_page=" . ($page_nr + 1) . "\"><img src='images/selector_arrow_right.gif'></a>\n";
-else $nav .= "<img src='images/selector_arrow_right.gif'>\n";
+
+$nav = printNav($page_nr, $last_page, $url);
+
+# Handling report types
 if ($rapport == "single") $nav .= "&nbsp;<a href='${url}${oper}reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
 if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
 
