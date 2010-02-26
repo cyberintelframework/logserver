@@ -149,6 +149,7 @@ echo "<div class='leftbig'>\n";
                 }
               } elseif ($head == 12) {
                 $proto = $v_protos_igmp_ar[$number];
+                $subdesc = "";
               } elseif ($head == 11768) {
                 $proto = $v_protos_dhcp_ar[$number];
               } else {
