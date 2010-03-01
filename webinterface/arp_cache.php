@@ -283,7 +283,7 @@ echo "<div class='centerbig'>\n";
                     }
                     echo "<td>$flagstring</td>\n";
                   } elseif ($multicast == 1) {
-                    echo "<td><img src='images/multicast.png' height=18 " .printover("Multicast"). " /></td>\n";
+                    echo "<td><img src='images/multicast.png' height=18 " .printover($l['ac_multicast_mac']). " /></td>\n";
                   } else {
                     echo "<td></td>\n";
                   }
