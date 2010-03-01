@@ -107,6 +107,7 @@ $l['ac_confirm']        = "This will also delete your range redirections.\\nAre 
 $l['ac_redirectto']     = "Redirect to ranges";
 $l['ac_range_or_ip']    = "Range or IP";
 $l['ac_redir']          = "Sensor redirects";
+$l['ac_multicast_mac']  = "Multicast MAC address";
 
 ##########################
 # arp_cache.php
