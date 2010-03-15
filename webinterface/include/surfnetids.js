@@ -407,7 +407,6 @@ function setperiod(startofweek) {
   $("#int_to").val(end.print("%s"));
   $("#showdate_start").html(start.print("%d-%m-%Y %H:%M"));
   $("#showdate_end").html(end.print("%d-%m-%Y %H:%M"));
-
   submitPeriod();
 }
 
@@ -422,6 +421,11 @@ function submitPeriod() {
   tmp = tmp.replace(/(dir=.*)$/, "");
   tmp = tmp.replace(/&&/, "&");
   tmp = tmp.replace(/&$/, "");
+  tmp = tmp.replace(/\?&/, "?");
+
+  $(".pers*").appendTo("#fselector");
+  $("#fselector .pers*").hide();
+
   periodqs = $("#fselector").serialize();
   if (tmp != "") {
     newreq = url + "?" + tmp;
@@ -434,6 +438,8 @@ function submitPeriod() {
       newreq = newreq + "?" + periodqs;
     }
   }
+  newreq = newreq.replace(/\?&/, "?");
+  alert('NEWREQ2: ' + newreq);
   window.location = newreq;
 }
 
