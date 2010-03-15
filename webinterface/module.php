@@ -43,9 +43,9 @@ if (isset($clean['mod'])) {
 
 # The hidden fields with the module parameters. Used for persistent browsing via the selector.
 # The modules themselves will need to take care of their own parameters they want to pass on.
-echo "<input type='hidden' class='pers' name='tab' value='$tab' />\n";
-echo "<input type='hidden' class='pers' name='header' value='$cHeader' />\n";
-echo "<input type='hidden' class='pers' name='title' value='$pagetitle' />\n";
+echo "<input type='hidden' class='pers' name='int_tab' value='$tab' />\n";
+echo "<input type='hidden' class='pers' name='csv_cheader' value='$cheader' />\n";
+echo "<input type='hidden' class='pers' name='strip_html_title' value='$pagetitle' />\n";
 echo "<input type='hidden' class='pers' name='int_mod' value='$mod' />\n";
 
 echo "<div class='leftmed'>\n";
