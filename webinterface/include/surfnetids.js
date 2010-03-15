@@ -439,7 +439,6 @@ function submitPeriod() {
     }
   }
   newreq = newreq.replace(/\?&/, "?");
-  alert('NEWREQ2: ' + newreq);
   window.location = newreq;
 }
 
