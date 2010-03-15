@@ -1,4 +1,4 @@
-<?php include("menu.php"); contentHeader($cHeader); ?>
+<?php include("menu.php"); contentHeader($o_show, $t_show); ?>
 <?php
 ####################################
 # SURFids 3.00                     #

@@ -122,6 +122,9 @@ if (isset($clean['tab'])) {
 
 if (isset($clean['cheader'])) {
   $cheader = $clean['cheader'];
+  $ar_ch = preg_split('/,/', $cheader);
+  $o_show = $ar_ch[0];
+  $t_show = $ar_ch[1];
 }
 
 if (!$tab) {
