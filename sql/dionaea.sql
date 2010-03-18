@@ -229,7 +229,7 @@ END$_$
 -- TABLE honeypots
 --
 
-DROP IF EXISTS TABLE honeypots;
+DROP TABLE IF EXISTS honeypots;
 CREATE TABLE honeypots (
     id integer NOT NULL,
     name character varying NOT NULL,
