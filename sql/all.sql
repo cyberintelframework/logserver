@@ -1,12 +1,13 @@
 --
--- SURFids 3.00
+-- SURFids 3.10
 -- Database structure
 -- Changeset 010
--- 09-07-2009
+-- 19-03-2010
 --
 
 --
 -- Version history
+-- 011 Update report_content, sniff_protos & indexmods
 -- 010 Updated AVAST regexp
 -- 009 Added surfnet_attack_update_atype function
 -- 008 Added support for networks bound to sensors (surfnet_sensorid_get)
@@ -29,7 +30,7 @@ ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
 CREATE TABLE version (
     version integer NOT NULL
 );
-INSERT INTO version VALUES (30000);
+INSERT INTO version VALUES (31000);
 
 --
 -- SENSORS 
@@ -630,7 +631,7 @@ ALTER TABLE ONLY indexmods
 
 GRANT SELECT ON TABLE indexmods TO idslog;
 
-SELECT pg_catalog.setval('indexmods_id_seq', 11, true);
+SELECT pg_catalog.setval('indexmods_id_seq', 13, true);
 
 INSERT INTO indexmods VALUES (1, 'mod_attacks.php');
 INSERT INTO indexmods VALUES (2, 'mod_exploits.php');
@@ -643,6 +644,8 @@ INSERT INTO indexmods VALUES (8, 'mod_maloffered.php');
 INSERT INTO indexmods VALUES (9, 'mod_sensorstatus.php');
 INSERT INTO indexmods VALUES (10, 'mod_top10ports.php');
 INSERT INTO indexmods VALUES (11, 'mod_top10sensors.php');
+INSERT INTO indexmods VALUES (12, 'mod_topcountries.php');
+INSERT INTO indexmods VALUES (13, 'mod_malhosts.php');
 
 --
 -- LOGIN 
@@ -829,7 +832,9 @@ CREATE TABLE report_content (
     from_ts integer DEFAULT (-1) NOT NULL,
     to_ts integer DEFAULT (-1) NOT NULL,
     always integer DEFAULT 0 NOT NULL,
-    utc integer DEFAULT 0 NOT NULL
+    utc integer DEFAULT 0 NOT NULL,
+    public boolean DEFAULT false NOT NULL,
+    orgid integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE report_content_id_seq
@@ -1117,7 +1122,7 @@ CREATE TABLE sniff_protos (
     sensorid integer NOT NULL,
     parent integer NOT NULL,
     number integer NOT NULL,
-    protocol character varying NOT NULL
+    subtype integer
 );
 
 CREATE SEQUENCE sniff_protos_id_seq
