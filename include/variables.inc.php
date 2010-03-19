@@ -44,7 +44,7 @@ $v_severity_atype_ar = array(
 # 40-59 -> Snort
 # 60-69 -> Glastopf
 # 70-79 -> SMTP
-# 100-140 -> Dionaea
+# 80-100 -> Dionaea
 $v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
 		'2'	=> 'Shellcodehandler',
