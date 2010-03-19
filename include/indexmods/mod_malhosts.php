@@ -17,6 +17,11 @@ if ($s_access_search == 0) {
   exit;
 }
 
+if ($c_geoip_enable == 1) {
+  include_once '../include/' .$c_geoip_module;
+  $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
+}
+
 echo "<div class='block'>\n";
   echo "<div class='dataBlock'>\n";
     echo "<div class='blockHeader'>\n";
@@ -69,8 +74,21 @@ echo "<div class='block'>\n";
             if ($i == 10) {
               break;
             }
+
+            # GEO IP stuff
+            $record = geoip_record_by_addr($gi, $host);
+            $countrycode = strtolower($record->country_code);
+            $country = $record->country_name;
+            $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+
             echo "<tr>\n";
-              echo "<td>$host</td>\n";
+              echo "<td>\n";
+                if (file_exists($cimg)) {
+                  echo printflagimg($country, $countrycode). " $host";
+                } else {
+                  echo printflagimg("none", $countrycode). " $host";
+                }
+              echo "</td>\n";
               echo "<td>$count</td>\n";
             echo "</tr>\n";
             $total = $total + $count;
