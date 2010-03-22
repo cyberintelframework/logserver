@@ -129,27 +129,72 @@ if ($err == 0) {
         echo "<div class='blockContent'>\n";
           echo "<pre id='whois'>\n";
             flush();
-            echo $l['wh_connect']. " $server:43...<br>\n";
+            echo "<b>". $l['wh_connect']. " $server:43...</b>\n";
             flush();
             $fp = @fsockopen($server,43,&$errno,&$errstr,15);
             if(!$fp || $err != 0) {
-              echo $l['wh_connto']. " $server:43 " .$l['wh_couldnot']. ".<br>\n";
+              echo "<b>". $l['wh_connto']. " $server:43 " .$l['wh_couldnot']. ".</b>\n\n";
               return false;
             } else {
-              echo $l['wh_connected']. " $server:43, " .$l['wh_sending']. "<br>\n";
+              echo "<b>". $l['wh_connected']. " $server:43, " .$l['wh_sending']. "</b>\n\n";
               if ($serv == "jpnic") {
                 fputs($fp, "$ip /e\r\n");
               } elseif ($serv == "cymru") {
-                fputs($fp, "-v $ip\r\n");
+                echo "AS      | IP               | BGP Prefix          | CC | Registry | Allocated  | AS Name\n";
+                fputs($fp, "-v -f $ip\r\n");
               } else {
                 fputs($fp, "$ip\r\n");
               }
               while(!feof($fp)) {
-                echo fgets($fp, 256);
+                $line = fgets($fp, 256);
+                if ($serv == "cymru") {
+                  $temp_ar = preg_split('/\|/', $line);
+                  $newserv = trim($temp_ar[4]);
+                }
+                echo $line;
                 flush();
               }
               fclose($fp);
-              echo $l['wh_connclosed']. ".<br>\n";
+              echo "\n<b>". $l['wh_connclosed']. "...</b>\n";
+            }
+            if ($serv == "cymru" && $newserv != "") {
+
+              $pattern = '/^(arin|lacnic|apnic|ripe|afrinic|krnic|jpnic)$/';
+              if (preg_match($pattern, $newserv) != 1) {
+                $server = "whois.ripe.net";
+              } else {
+                if ($newserv == "jpnic") {
+                  $server = "whois.nic.ad.jp";
+                } elseif ($newserv == "krnic") {
+                  $server = "whois.nida.or.kr";
+                } elseif ($newserv == "cymru") {
+                  $server = "whois.cymru.com";
+                } else {
+                  $server = "whois." .$newserv. ".net";
+                }
+              }
+
+              echo "<b>". $l['wh_connect']. " $server:43...</b>\n";
+              flush();
+              $fp = @fsockopen($server,43,&$errno,&$errstr,15);
+              if(!$fp || $err != 0) {
+                echo "<b>". $l['wh_connto']. " $server:43 " .$l['wh_couldnot']. "</b>\n\n";
+                return false;
+              } else {
+                echo "<b>". $l['wh_connected']. " $server:43, " .$l['wh_sending']. "</b>\n\n";
+                if ($serv == "jpnic") {
+                  fputs($fp, "$ip /e\r\n");
+                } else {
+                  fputs($fp, "$ip\r\n");
+                }
+              }
+              while(!feof($fp)) {
+                $line = fgets($fp, 256);
+                echo $line;
+                flush();
+              }
+              fclose($fp);
+              echo "<b>". $l['wh_connclosed']. "...</b>\n";
             }
           echo "</pre>\n";
         echo "</div>\n"; #</blockContent>
