@@ -65,9 +65,11 @@ if ($id == 1) {
     # Attack stages
     echo "<b>Possible Malicious Attack</b>: This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc). <br />";
     echo "<b>Malicious Attack</b>: At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.<br />";
-    echo "<b>Malicious Attack - Argos</b>: Argos detected a control flow diversion (e.g. caused by a buffer overflow or code injection).<br />";
-    echo "<b>Malicious Attack - ARP Poisoning</b>: ARP poisoning is an ethernet layer attack where the attacker changes the ARP tables, which in effect redirects all traffic through his computer. He can use this attack to sniff traffic.<br />";
-    echo "<b>Malicious Attack - Rogue DHCP server</b>: A Rogue DHCP server is an unauthorized DHCP server. This can cause serious network disruption.<br />";
+    echo "&nbsp;&nbsp;&nbsp;<b>Nepenthes</b>: A low interaction honeypot detecting attacks using signatures.<br />";
+    echo "&nbsp;&nbsp;&nbsp;<b>Dionaea</b>: A low interaction honeypot detecting attacks on the SMB protocol using emulation.<br />";
+    echo "&nbsp;&nbsp;&nbsp;<b>Argos</b>: A high interaction honeypot detecting control flow diversions or buffer overflows.<br />";
+    echo "&nbsp;&nbsp;&nbsp;<b>ARP Poisoning</b>: ARP poisoning is an ethernet layer man-in-the-middle attack.<br />";
+    echo "&nbsp;&nbsp;&nbsp;<b>Rogue DHCP server</b>: A Rogue DHCP server is an unauthorized DHCP server.<br />";
     echo "<b>Malware Offered</b>: A piece of malware is offered to the honeypot. The honeypot will try to download it.<br />";
     echo "<b>Malware Downloaded</b>: The malware was succesfully downloaded to the honeypot.";
 } elseif ($id == 5) {
