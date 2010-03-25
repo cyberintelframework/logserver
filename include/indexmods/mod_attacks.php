@@ -49,7 +49,7 @@ echo "<div class='block'>\n";
       if ($num > 0) {
         echo "<table class='datatable'>\n";
           echo "<tr>\n";
-            echo "<th width='80%'>" .$l['g_detconn']. " ". printhelp(4). "</td>\n";
+            echo "<th width='80%'>" .$l['g_detconn']. " ". printhelp(4, 4, 0, 800). "</td>\n";
             echo "<th width='20%'>" .$l['g_stats']. "</td>\n";
           echo "</tr>\n";
 

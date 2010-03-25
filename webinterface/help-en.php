@@ -63,7 +63,7 @@ if ($id == 1) {
     echo 'The output of the linux program "file".';
 } elseif ($id == 4) {
     # Attack stages
-    echo "<b>Possible Malicious Attack</b>: This is a possible attack. This can be in fact any connection that is made to the sensor (portscans, random network traffic, etc). <br />";
+    echo "<b>Possible Malicious Attack</b>: This is a possible attack. Example: Port scans, random network traffic or unidentified attacks.<br />";
     echo "<b>Malicious Attack</b>: At this point it&#39;s certain that the connection that was made to the sensor was a malicious connection.<br />";
     echo "&nbsp;&nbsp;&nbsp;<b>Nepenthes</b>: A low interaction honeypot detecting attacks using signatures.<br />";
     echo "&nbsp;&nbsp;&nbsp;<b>Dionaea</b>: A low interaction honeypot detecting attacks on the SMB protocol using emulation.<br />";
