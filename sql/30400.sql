@@ -34,4 +34,4 @@ INSERT INTO indexmods ('phppage') VALUES ('mod_malhosts.php');
 --
 -- VERSION
 --
-UPDATE version SET version = '31000';
+UPDATE version SET version = '30400';
