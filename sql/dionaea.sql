@@ -1,13 +1,42 @@
 --
 -- SURFids 3.10
 -- Dionaea SQL functions
--- Changeset 001
--- 12-03-2010
+-- Changeset 002
+-- 07-05-2010
 --
 
 --
 -- Version history
+-- 002 Moved honeypots table creation up
 -- 001 Initial release
+--
+
+--
+-- TABLE honeypots
+--
+
+DROP TABLE IF EXISTS honeypots;
+CREATE TABLE honeypots (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    "desc" character varying
+);
+
+INSERT INTO honeypots VALUES (0, 'nepenthes', '');
+INSERT INTO honeypots VALUES (1, 'argos', '');
+INSERT INTO honeypots VALUES (2, 'snort', '');
+INSERT INTO honeypots VALUES (3, 'glastopf', '');
+INSERT INTO honeypots VALUES (4, 'amun', '');
+INSERT INTO honeypots VALUES (5, 'dionaea', '');
+
+ALTER TABLE ONLY honeypots
+    ADD CONSTRAINT honeypots_pkey PRIMARY KEY (id);
+
+GRANT SELECT ON TABLE honeypots TO idslog;
+GRANT SELECT ON TABLE honeypots TO nepenthes;
+
+--
+-- FUNCTIONS
 --
 
 CREATE OR REPLACE FUNCTION surfids3_attack_add(integer, inet, integer, inet, integer, macaddr, integer) RETURNS integer
@@ -224,27 +253,26 @@ BEGIN
 END$_$
     LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION surfids3_type_from_name(character varying) RETURNS integer
+    AS $_$DECLARE
+        p_sensorid      ALIAS FOR $1;
+        p_sourcemac     ALIAS FOR $2;
+        p_sourceip      ALIAS FOR $3;
+        p_severity      ALIAS FOR $4;
+        p_atype         ALIAS FOR $5;
+        m_attackid      INTEGER;
+BEGIN
+        INSERT INTO attacks (sensorid, timestamp, src_mac, source, severity, atype) 
+        VALUES
+                (p_sensorid,
+                 extract(epoch from current_timestamp(0))::integer,
+                 p_sourcemac,
+                 p_sourceip,
+                 p_severity,
+                 p_atype
+        );
 
---
--- TABLE honeypots
---
-
-DROP TABLE IF EXISTS honeypots;
-CREATE TABLE honeypots (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    "desc" character varying
-);
-
-INSERT INTO honeypots VALUES (0, 'nepenthes', '');
-INSERT INTO honeypots VALUES (1, 'argos', '');
-INSERT INTO honeypots VALUES (2, 'snort', '');
-INSERT INTO honeypots VALUES (3, 'glastopf', '');
-INSERT INTO honeypots VALUES (4, 'amun', '');
-INSERT INTO honeypots VALUES (5, 'dionaea', '');
-
-ALTER TABLE ONLY honeypots
-    ADD CONSTRAINT honeypots_pkey PRIMARY KEY (id);
-
-GRANT SELECT ON TABLE honeypots TO idslog;
-GRANT SELECT ON TABLE honeypots TO nepenthes;
+        SELECT INTO m_attackid currval('attacks_id_seq');
+        return m_attackid;
+END$_$
+    LANGUAGE plpgsql;
