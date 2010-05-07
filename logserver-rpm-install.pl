@@ -12,7 +12,7 @@ $dbport = "5432";
 
 # This is the info needed to login to the database 
 # with admin privileges. Password will be prompted.
-$adminuser = "postgresql";
+$adminuser = "postgres";
 
 # Usernames and passwords
 $webuser = "idslog";
@@ -82,13 +82,13 @@ if ("$dbport" ne "5432") {
 
 # Creating all the database stuff
 print "Creating database user: $webuser!\n";
-`createuser -h $dbhost -p $dbport -q -S -D -E -R -U "$adminuser" "$webuser"`;
+`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" "$webuser"`;
 print "Creating database user: nepenthes!\n";
-`createuser -h $dbhost -p $dbport -q -S -D -E -R -U "$adminuser" nepenthes`;
+`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" nepenthes`;
 print "Creating database user: pofuser!\n";
-`createuser -h $dbhost -p $dbport -q -S -D -E -R -U "$adminuser" pofuser`;
+`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" pofuser`;
 print "Creating database user: argos!\n";
-`createuser -h $dbhost -p $dbport -q -S -D -E -R -U "$adminuser" argos`;
+`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" argos`;
 
 # Setting up passwords for created users
 open(PASS, "> $targetdir/.pass.sql");
