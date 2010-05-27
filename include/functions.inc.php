@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 012                    #
-# 07-01-2010                       #
+# Changeset 013                    #
+# 27-05-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 013 Fixed bug in formatEmu
 # 012 Added formatEmu
 # 011 Fixed checkSID
 # 010 Fixed another bug in the printsort function
@@ -60,6 +61,7 @@
 # 3.21	    addcookie
 # 3.22	    delcookie
 # 3.23	    sensorstatus
+# 3.24      formatEmu
 #
 # 4 Debug Functions
 # 4.01	    printer
@@ -853,7 +855,6 @@ function sensorstatus($status, $lastupdate, $uptime, $perm = 0) {
 # properly
 function formatEmu($emuProfile) {
     $emuProfile = json_decode($emuProfile, TRUE);
-#    printer($emuProfile);
     foreach ($emuProfile as $key => $val) {
         $args = "";
         $line = $val["call"] ."(";
@@ -862,6 +863,10 @@ function formatEmu($emuProfile) {
             if (is_array($argval)) {
                 $escaped = str_replace("\n", "<br />", print_r($argval, TRUE));
                 $args .= "<a href='#' " .printOver($escaped). ">Array</a>";
+            } elseif (preg_match('/^http:/', $argval)) {
+                $unescaped = str_replace("\\/", "\\", $argval);
+                $unescaped = str_replace("http", "hxxp", $unescaped);
+                $args .= $unescaped;
             } else {
                 $args .= $argval;
             }
