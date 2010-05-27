@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add(integer, inet, integer, character
 BEGIN
     SELECT INTO m_sensorid surfids3_sensorid_get(p_localhost);
 
-        IF p_type = 1 THEN
+        IF p_type = 1 OR p_type = 80 THEN
           SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = p_data;
           IF m_check = 0 THEN
             INSERT INTO stats_dialogue (name) VALUES (p_data);
@@ -165,7 +165,7 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add_by_id(integer, integer, integer, 
     m_check INTEGER;
     m_detailid INTEGER;
 BEGIN
-        IF p_type = 1 THEN
+        IF p_type = 1 OR p_type = 80 THEN
           SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = p_data;
           IF m_check = 0 THEN
             INSERT INTO stats_dialogue (name) VALUES (p_data);
