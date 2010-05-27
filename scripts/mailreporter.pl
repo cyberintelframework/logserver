@@ -31,10 +31,26 @@
 # This script will send a mail clearsigned with gnupgp (if configured in webinterface) containing information
 # about the amount of attacks and all the attacks detailed with ip, time of attack and type of attack.  
 
+####################
+# Variables used
+####################
+do '/etc/surfnetids/surfnetids-log.conf';
+our $source = 'mailreporter.pl';
+our $sensor = 'unkown';
+our $tap = 'unknown';
+our $remoteip = '0.0.0.0';
+our $pid = $$;
+our $g_vlanid = 0;
+
+####################
+# Modules check
+####################
 BEGIN {
   $warn_cymru = 0;
   unless (eval "require Net::Abuse::Utils") {
-    warn "Could not load module -> Net::Abuse::Utils\n";
+    if ($c_enable_cymru == 1) {
+      warn "Could not load module -> Net::Abuse::Utils\n";
+    }
     $warn_cymru = 1;
   } else {
     Net::Abuse::Utils->import(qw(:all));
@@ -52,17 +68,6 @@ use MIME::Lite;
 use GnuPG qw( :algo );
 use POSIX qw(floor);
 use POSIX qw(ceil);
-
-####################
-# Variables used
-####################
-do '/etc/surfnetids/surfnetids-log.conf';
-our $source = 'mailreporter.pl';
-our $sensor = 'unkown';
-our $tap = 'unknown';
-our $remoteip = '0.0.0.0';
-our $pid = $$;
-our $g_vlanid = 0;
 
 ##################
 # Functions
