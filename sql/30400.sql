@@ -28,8 +28,8 @@ ALTER TABLE report_content ADD COLUMN orgid integer DEFAULT 0 NOT NULL;
 --
 -- INDEXMODS
 --
-INSERT INTO indexmods ('phppage') VALUES ('mod_topcountries.php');
-INSERT INTO indexmods ('phppage') VALUES ('mod_malhosts.php');
+INSERT INTO indexmods (phppage) VALUES ('mod_topcountries.php');
+INSERT INTO indexmods (phppage) VALUES ('mod_malhosts.php');
 
 --
 -- VERSION
