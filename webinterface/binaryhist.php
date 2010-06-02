@@ -1,4 +1,4 @@
-<?php $tab="3.4"; $pagetitle="Binary Info"; include("menu.php"); contentHeader(); ?>
+<?php $tab="3.5"; $pagetitle="Binary Info"; include("menu.php"); contentHeader(); ?>
 <?php
 
 ####################################
