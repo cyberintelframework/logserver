@@ -384,6 +384,7 @@ $l['ma_pref']           = "My preferences";
 $l['ma_def_graph']      = "Default graph";
 $l['ma_def_graph_type'] = "Default graph type";
 $l['ma_def_utc']        = "Default report timestamp";
+$l['ma_def_censor']     = "Default censoring";
 
 ##########################
 # myreports.php
