@@ -76,7 +76,7 @@ if ($err == 0) {
     }
   }
   $sql_details = "SELECT sensors.keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
-  $sql_details .= " organisations.organisation, rev, sensormac, sensortype, mainconf, sensortype, permanent ";
+  $sql_details .= " organisations.organisation, rev, sensormac, sensortype, mainconf, sensortype, permanent, firstattack ";
   $sql_details .= " FROM sensors, organisations, sensor_details WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
   $sql_details .= " AND sensors.keyname = sensor_details.keyname ";
   $result_details = pg_query($pgconn, $sql_details);
@@ -159,12 +159,8 @@ if ($err != 1) {
   $uptime_text = sec_to_string($uptime);
 
   # Find first attack
-  $sql_attack = "SELECT firstattack FROM sensor_stats WHERE sensorid = '$sid'";
-  $debuginfo[] = $sql_attack;
-  $result_attack = pg_query($pgconn, $sql_attack);
-  $num_attack = pg_num_rows($result_attack);
-  if ($num_attack > 0) {
-    $row_attack = pg_fetch_assoc($result_attack);
+  $first_attack = $row['firstattack'];
+  if ($first_attack > 0) {
     $first_attack = date($c_date_format, $row_attack["firstattack"]);
   } else {
     # Cast timestamp to BIGINT to force postgresql to use the sensorid index instead of the timestamp index
@@ -177,7 +173,8 @@ if ($err != 1) {
       $first_attack = $row_attack['timestamp'];
 
       # Insert it into the sensor_stats table for speed up on future requests
-      $sql_insert = "INSERT INTO sensor_stats (sensorid, firstattack) VALUES ('$sid', '$first_attack')";
+      $sql_insert = "UPDATE sensor_details SET firstattack = '$first_attack' WHERE keyname = '$keyname'";
+      $debuginfo[] = $sql_insert;
       $ec = pg_query($sql_insert);
 
       $first_attack = date($c_date_format, $first_attack);
