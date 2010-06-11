@@ -2,14 +2,15 @@
 <?php
 
 ####################################
-# SURFids 3.00                     #
-# Changeset 004                    #
-# 19-11-2009                       #
+# SURFids 3.04                     #
+# Changeset 005                    #
+# 11-06-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 
 ####################################
 # Changelog:
+# 005 Fixed bug #223
 # 004 Fixed sorting order
 # 003 Added ORDER BY to host types
 # 002 Fixed bug #68
@@ -62,6 +63,7 @@ if (isset($clean['sid'])) {
   $result = pg_query($pgconn, $sql);
   $row = pg_fetch_assoc($result);
   $keyname = $row['keyname'];
+  $cur_keyname = $keyname;
   $vlanid = $row['vlanid'];
   $db_arp = $row['arp'];
   $selected = sensorname($keyname, $vlanid);
@@ -218,7 +220,7 @@ echo "<div class='left'>\n";
                     echo printCheckBox($v_host_types[2], "type[]", 2, 2) . "<br />\n";
                 echo "</td>\n";
 
-                echo "<td>${keyname}-all</td>\n";
+                echo "<td>${cur_keyname}-all</td>\n";
                 echo "<td align='right'>";
                   echo "<input type='hidden' name='int_sid' value='$sid' />\n";
                   echo "<input type='hidden' name='int_all' value='1' />\n";
