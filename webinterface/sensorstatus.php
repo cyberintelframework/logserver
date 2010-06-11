@@ -21,6 +21,24 @@
 # 001 Added language support
 #############################################
 
+####################
+# Default censor value
+####################
+# Retrieving cookie variables from $_COOKIE[SURFids]
+$allowed_cookie = array(
+            "int_dcensor"
+);
+$check = extractvars($_COOKIE[SURFids], $allowed_cookie);
+
+if (isset($clean['dcensor'])) {
+    $d_censor = $clean['dcensor'];
+} else {
+    $sql = "SELECT d_censor FROM login WHERE id = '$s_userid'";
+    $res = pg_query($pgconn, $sql);
+    $row = pg_fetch_assoc($res);
+    $d_censor = $row['d_censor'];
+}
+
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "sort",
@@ -30,6 +48,8 @@ $allowed_get = array(
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
+
+######################
 
 if (isset($clean['selview'])) {
   $selview = $clean['selview'];
@@ -221,12 +241,12 @@ echo "<div class='centerbig'>\n";
             $networkconfig = $row['networkconfig'];
 
             $tap = $row['tap'];
-            $tapip = censorip($row['tapip']);
+            $tapip = censorip($row['tapip'], $d_censor);
             $mac = $row['mac'];
 
             $sensormac = $row['sensormac'];
             $localip = $row['localip'];
-            $remoteip = $row['remoteip'];
+            $remoteip = censorip($row['remoteip'], $d_censor);
 
             $start = $row['laststart'];
             $action = $row['action'];

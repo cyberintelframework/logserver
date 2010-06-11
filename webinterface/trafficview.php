@@ -73,7 +73,7 @@ if (isset($clean['imgid'])) {
   geterror($m);
 }
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

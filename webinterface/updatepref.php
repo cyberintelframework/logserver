@@ -44,7 +44,8 @@ $allowed_get = array(
 		"int_userid",
 		"md5_hash",
 		"int_my",
-		"int_utc"
+		"int_utc",
+        "int_censor"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -72,7 +73,13 @@ if (isset($clean['plottype'])) {
 if (isset($clean['utc'])) {
   $d_utc = $clean['utc'];
 } else {
-  $utc = 0;
+  $d_utc = 0;
+}
+
+if (isset($clean['censor'])) {
+  $d_censor = $clean['censor'];
+} else {
+  $d_censor = 0;
 }
 
 if ($s_auser == 9) {
@@ -100,7 +107,7 @@ if ($s_auser == 9) {
 
 if ($err != 1) {
   $m = 3;
-  $sql_save = "UPDATE login SET d_plotter = '$d_plotter', d_plottype = '$d_plottype', d_utc = '$d_utc' WHERE id = $uid";
+  $sql_save = "UPDATE login SET d_plotter = '$d_plotter', d_plottype = '$d_plottype', d_utc = '$d_utc', d_censor = '$d_censor' WHERE id = $uid";
   $debuginfo[] = $sql_save;
   $execute_save = pg_query($pgconn, $sql_save);
 
@@ -108,11 +115,13 @@ if ($err != 1) {
     delcookie("int_dplotter");
     delcookie("int_dplottype");
     delcookie("int_dutc");
+    delcookie("int_dcensor");
   }
 
   addcookie("int_dplotter", $d_plotter);
   addcookie("int_dplottype", $d_plottype);
   addcookie("int_dutc", $d_utc);
+  addcookie("int_dcensor", $d_censor);
 }
 
 # Close connection and redirect

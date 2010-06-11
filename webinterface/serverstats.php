@@ -93,7 +93,7 @@ echo "<div class='left'>\n";
   echo "</div>\n"; #</block>
 echo "</div>\n"; #</left>
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

@@ -42,10 +42,10 @@ if ($s_access_user < 2) {
 }
 
 if ($s_access_user == 9) {
-  $sql_user = "SELECT username, organisation, email, access, gpg, d_plotter, d_plottype, d_utc ";
+  $sql_user = "SELECT username, organisation, email, access, gpg, d_plotter, d_plottype, d_utc, d_censor ";
   $sql_user .= " FROM login WHERE id = $userid";
 } else {
-  $sql_user = "SELECT username, organisation, email, access, gpg, d_plotter, d_plottype, d_utc ";
+  $sql_user = "SELECT username, organisation, email, access, gpg, d_plotter, d_plottype, d_utc, d_censor ";
   $sql_user .= " FROM login WHERE id = $userid AND organisation = $s_org";
 }
 $debuginfo[] = $sql_user;
@@ -87,6 +87,7 @@ if ($err == 0) {
   $d_plotter = $row['d_plotter'];
   $d_plottype = $row['d_plottype'];
   $d_utc = $row['d_utc'];
+  $d_censor = $row['d_censor'];
 
   echo "<script type='text/javascript' src='${address}include/md5.js'></script>\n";
 ?>
@@ -269,6 +270,16 @@ echo "<div class='all'>\n";
                 echo "</td>\n";
               echo "</tr>\n";
               echo "<tr>\n";
+                echo "<td width='150'>" .$l['ma_def_censor']. "</td>\n";
+                echo "<td>\n";
+                  echo "<select name='int_censor'>\n";
+                    foreach ($v_userpref_censor_ar as $key => $val) {
+                      echo printOption($key, $val, $d_censor);
+                    }
+                  echo "</select>\n";
+                echo "</td>\n";
+              echo "</tr>\n";
+              echo "<tr>\n";
                 echo "<td colspan='2'><input class='button aright' type='submit' name='submit' value='" .$l['g_update']. "' /></td>\n";
                 echo "<input type='hidden' name='md5_hash' value='$s_hash' />\n";
                 echo "<input type='hidden' name='int_userid' value='$s_userid' />\n";
@@ -373,7 +384,7 @@ echo "</div>\n"; #</all>
 echo "<script type='text/javascript' src='${address}include/jquery.pstrength-min.1.2.js'></script>\n";
 }
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 footer();
 ?>

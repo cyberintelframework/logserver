@@ -92,6 +92,24 @@ $to = $_SESSION['s_to'];
 $from = $_SESSION['s_from'];
 
 ####################
+# Default censor value
+####################
+# Retrieving cookie variables from $_COOKIE[SURFids]
+$allowed_cookie = array(
+            "int_dcensor"
+);
+$check = extractvars($_COOKIE[SURFids], $allowed_cookie);
+
+if (isset($clean['dcensor'])) {
+    $d_censor = $clean['dcensor'];
+} else {
+    $sql = "SELECT d_censor FROM login WHERE id = '$s_userid'";
+    $res = pg_query($pgconn, $sql);
+    $row = pg_fetch_assoc($res);
+    $d_censor = $row['d_censor'];
+}
+
+####################
 # Severity
 ####################
 if (isset($clean['sev'])) {
@@ -352,6 +370,7 @@ while ($row = pg_fetch_assoc($result)) {
   $srcmac = $row['src_mac'];
   $sport = intval($row['sport']);
   $dest = $row['dest'];
+  $dest = censorip($dest, $d_censor);
   $destmac = $row['dst_mac'];
   $dport = intval($row['dport']);
   $sev = intval($row['severity']);

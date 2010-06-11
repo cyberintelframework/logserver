@@ -564,7 +564,7 @@ while ($i != $tssteps) {
         if (isset($tainted['severity'])) {
           if ($sev == 1) {
             $sevtotal += $count;
-            echo "SEVTOTAL: $sevtotal<br />\n";
+            #echo "SEVTOTAL: $sevtotal<br />\n";
           }
         }
       }

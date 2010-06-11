@@ -324,7 +324,8 @@ if ($err == 0) {
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</leftsmall>
 }
-pg_close($pgconn);
+
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

@@ -158,16 +158,32 @@ if ($err != 1) {
   }
   $uptime_text = sec_to_string($uptime);
 
-  $sql_attack = "SELECT timestamp FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
+  # Find first attack
+  $sql_attack = "SELECT firstattack FROM sensor_stats WHERE sensorid = '$sid'";
   $debuginfo[] = $sql_attack;
   $result_attack = pg_query($pgconn, $sql_attack);
   $num_attack = pg_num_rows($result_attack);
   if ($num_attack > 0) {
     $row_attack = pg_fetch_assoc($result_attack);
-    $first_attack = $row_attack['timestamp'];
-    $first_attack = date($c_date_format, $first_attack);
+    $first_attack = date($c_date_format, $row_attack["firstattack"]);
   } else {
-    $first_attack = "";
+    # Cast timestamp to BIGINT to force postgresql to use the sensorid index instead of the timestamp index
+    $sql_attack = "SELECT timestamp::BIGINT FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
+    $debuginfo[] = $sql_attack;
+    $result_attack = pg_query($pgconn, $sql_attack);
+    $num_attack = pg_num_rows($result_attack);
+    if ($num_attack > 0) {
+      $row_attack = pg_fetch_assoc($result_attack);
+      $first_attack = $row_attack['timestamp'];
+
+      # Insert it into the sensor_stats table for speed up on future requests
+      $sql_insert = "INSERT INTO sensor_stats (sensorid, firstattack) VALUES ('$sid', '$first_attack')";
+      $ec = pg_query($sql_insert);
+
+      $first_attack = date($c_date_format, $first_attack);
+    } else {
+      $first_attack = "";
+    }
   }
   if ($label != "") {
     $header = $label;
@@ -472,7 +488,7 @@ if (isset($clean['notes'])) {
   echo "<script>showHeaderTab(2);</script>";
 }
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

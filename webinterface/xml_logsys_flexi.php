@@ -182,6 +182,6 @@ if ($err == 0) {
   echo "</rows>";
 }
 
-#pg_close($pgconn);
 debug_sql();
+#pg_close($pgconn);
 ?>

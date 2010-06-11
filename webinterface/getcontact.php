@@ -92,10 +92,8 @@ if ($err == 0) {
 } else {
   echo "An error occurred: <br />\n";
   echo $v_errors[$m];
-
-  pg_close($pgconn);
 }
 
-#pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>

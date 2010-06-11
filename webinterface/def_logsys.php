@@ -164,6 +164,6 @@ echo "<result>";
   echo "</logs>";
 echo "</result>";
 
+#debug_sql();
 #pg_close($pgconn);
-debug_sql();
 ?>

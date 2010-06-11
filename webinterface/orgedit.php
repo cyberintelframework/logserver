@@ -149,7 +149,7 @@ if ($err != 1) {
     echo "</form>\n";
   echo "</div>\n"; #</left>
 }
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

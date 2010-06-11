@@ -365,7 +365,7 @@ echo "<div class='centerbig'>\n";
   echo "</div>\n"; #</block>
 echo "</div>\n"; #</leftmed>
 
-#pg_close($pgconn);
 debug_sql();
+#pg_close($pgconn);
 ?>
 <?php footer(); ?>

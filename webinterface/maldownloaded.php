@@ -70,7 +70,7 @@ echo "<div class='centerbig'>\n";
           $virus_count_ar = array();
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='5%'>" .$l['md_malware']. "</th>\n";
+              echo "<th width='10%'>" .$l['md_malware']. "</th>\n";
               while ($scanners = pg_fetch_assoc($result_scanners)) {
                 $name = $scanners['name'];
                 echo "<th width='15%'>$name</th>\n";
@@ -81,7 +81,7 @@ echo "<div class='centerbig'>\n";
 
             while ($row = pg_fetch_assoc($result_down)) {
               $malware = $row['text'];
-              $malstring = substr($malware, 0, 4) . "..";
+              $malstring = substr($malware, 0, 6) . "..";
               $count = $row['total'];
 
               echo "<tr>\n";

@@ -64,6 +64,24 @@ if ($c_geoip_enable == 1) {
 }
 
 ####################
+# Default censor value
+####################
+# Retrieving cookie variables from $_COOKIE[SURFids]
+$allowed_cookie = array(
+            "int_dcensor" 
+);
+$check = extractvars($_COOKIE[SURFids], $allowed_cookie);
+
+if (isset($clean['dcensor'])) {
+    $d_censor = $clean['dcensor'];
+} else {
+    $sql = "SELECT d_censor FROM login WHERE id = '$s_userid'";
+    $res = pg_query($pgconn, $sql);
+    $row = pg_fetch_assoc($res);
+    $d_censor = $row['d_censor'];
+}
+
+####################
 # DATA INPUT
 ####################
 # Retrieving posted variables from $_GET
@@ -1181,15 +1199,25 @@ while ($row = pg_fetch_assoc($result)) {
       echo "$smac</td>\n";
       echo "<td>$sport</td>\n";
     } else {
-     if (matchCIDR($source, $ranges_ar)) {
-      echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" class='warning' />$source</a>&nbsp;&nbsp;";
-      echo "<img src='images/ownranges.jpg' ".printover("IP from your own ranges!") ."></td>\n";
-     } else {
-      echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$source</a>&nbsp;&nbsp;";
-     }
+      if (matchCIDR($source, $ranges_ar)) {
+        if ($d_censor == 2) {
+          $t_source = censorip($source, $d_censor);
+        } else {
+          $t_source = $source;
+        }
+        echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" class='warning' />$t_source</a>&nbsp;&nbsp;";
+        echo "<img src='images/ownranges.jpg' ".printover("IP from your own ranges!") ."></td>\n";
+      } else {
+        if ($d_censor == 2) {
+          $t_source = censorip($source, $d_censor);
+        } else {
+          $t_source = $source;
+        }
+        echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$t_source</a>&nbsp;&nbsp;";
+      }
       echo "<td>$sport</td>\n";
     }
-    $dest = censorip($dest, $orgranges_ar);
+    $dest = censorip($dest, $d_censor);
     if ($dport == 0) {
       echo "<td>$dest</td><td></td>\n";
     } else {
@@ -1321,8 +1349,8 @@ if ($c_searchtime == 1) {
   echo "</div>\n";
 }
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <script language="javascript" type="text/javascript">
 document.getElementById('search_wait').style.display='none';

@@ -200,7 +200,7 @@ if ($err != 1) {
 }
 
 # Close connection and redirect
+#debug_sql();
 pg_close($pgconn);
-debug_sql();
 header("location: arp_static.php?int_m=$m&int_sid=$sid");
 ?>

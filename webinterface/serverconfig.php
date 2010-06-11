@@ -430,7 +430,7 @@ echo "</div>\n"; #</rightmed>
 #  echo "</div>\n"; #</centerbig>
 #echo "</div>\n"; #</all>
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

@@ -153,7 +153,7 @@ echo "<div class='centerbig'>\n";
   echo "</div>\n"; #</block>
 echo "</div>\n"; #</centerbig>
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 footer();
 ?>

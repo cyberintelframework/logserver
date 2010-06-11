@@ -231,7 +231,7 @@ echo "<div class='leftbig'>\n";
 echo "</div>\n"; #</left>
 echo "</div>\n"; #</all>
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

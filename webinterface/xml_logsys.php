@@ -265,6 +265,6 @@ if ($err == 0) {
   echo "</result>";
 }
 
-#pg_close($pgconn);
 debug_sql();
+#pg_close($pgconn);
 ?>

@@ -286,7 +286,7 @@ if ($s_access_user > 0) {
   echo "</div>\n"; #</center>
 }
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 footer();
 ?>

@@ -94,7 +94,7 @@ if ($err == 0) {
   geterror($m);
 }
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

@@ -32,6 +32,26 @@ include '../include/variables.inc.php';
 # Including language file
 include "../lang/${c_language}.php";
 
+####################
+# Default censor value
+####################
+# Retrieving cookie variables from $_COOKIE[SURFids]
+$allowed_cookie = array(
+            "int_dcensor"
+);
+$check = extractvars($_COOKIE[SURFids], $allowed_cookie);
+
+if (isset($clean['dcensor'])) {
+    $d_censor = $clean['dcensor'];
+} else {
+    $sql = "SELECT d_censor FROM login WHERE id = '$s_userid'";
+    $res = pg_query($pgconn, $sql);
+    $row = pg_fetch_assoc($res);
+    $d_censor = $row['d_censor'];
+}
+
+#####################
+
 # Setting headers
 #header("Content-type: text/pdf");
 #header("Cache-control: private");
@@ -400,7 +420,7 @@ if (isset($sensorid)) {
 
 
 if (isset($destination_ip)) {
-  $dst_txt = $l['ls_destip']. ": $destination_ip";
+  $dst_txt = $l['ls_destip']. ": " .censorip($destination_ip, $d_censor);
 } elseif (isset($dest_mac)) {
   $dst_txt = $ls['ls_destmac']. ": $dest_mac";
 }

@@ -132,7 +132,7 @@ echo "<div class='left'>\n";
   echo "</div>\n";
 echo "</div>\n";
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>

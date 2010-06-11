@@ -24,7 +24,7 @@ echo "<div class='all'>\n";
   echo "</div>\n"; #</leftmed>
 echo "</div>\n"; #</all>
 
-pg_close($pgconn);
 debug_sql();
+pg_close($pgconn);
 ?>
 <?php footer(); ?>
