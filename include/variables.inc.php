@@ -57,7 +57,9 @@ $v_attacktype_ar = array(
 		'20' => 'Module',
 		'22' => 'TCP Port',
 		'24' => 'UDP Port',
-		'30' => 'DHCP server identifier',
+		'30' => 'Server identifier',
+        '31' => 'OP',
+        '32' => 'Message type',
         '40' => 'Snort Message',
         '41' => 'Snort Sig Class Name',
         '42' => 'Snort Protocol',
@@ -428,6 +430,11 @@ $v_plotters_ar = array(
 $v_timestamp_format_ar = array(
 	0 => "Local time",
 	1 => "UTC time"
+);
+
+$v_userpref_censor_ar = array(
+    0 => "No censor",
+    1 => "Censor IP"
 );
 
 # Array with configurable pages
