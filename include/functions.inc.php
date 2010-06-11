@@ -1,8 +1,8 @@
 <?php
 ####################################
 # SURFids 3.00                     #
-# Changeset 012                    #
-# 07-01-2010                       #
+# Changeset 013                    #
+# 27-05-2010                       #
 # Jan van Lith & Kees Trippelvitz  #
 ####################################
 # Contributors:                    #
@@ -11,6 +11,7 @@
 
 #############################################
 # Changelog:
+# 013 Fixed formatEmu bug with urls
 # 012 Added formatEmu
 # 011 Fixed checkSID
 # 010 Fixed another bug in the printsort function
@@ -60,6 +61,7 @@
 # 3.21	    addcookie
 # 3.22	    delcookie
 # 3.23	    sensorstatus
+# 3.24      formatEmu
 #
 # 4 Debug Functions
 # 4.01	    printer
@@ -639,12 +641,14 @@ function getPortDescr($aPort) {
 # 3.13 censorip
 # Function to determine if a destination IP address has to be censored or not
 #function censorip($ip, $ranges_ar) {
-function censorip($ip) {
+function censorip($ip, $userpref = 0) {
   global $c_censor_ip;
   global $s_access_search;
   global $c_censor_word;
   global $orgranges_ar;
-  if ($c_censor_ip == 2) {
+  if ($userpref > 0) {
+    return $c_censor_word;
+  } elseif ($c_censor_ip == 2) {
     # Censor all destination IP's
     return $c_censor_word;
   } elseif ($c_censor_ip == 1) {
@@ -853,7 +857,6 @@ function sensorstatus($status, $lastupdate, $uptime, $perm = 0) {
 # properly
 function formatEmu($emuProfile) {
     $emuProfile = json_decode($emuProfile, TRUE);
-#    printer($emuProfile);
     foreach ($emuProfile as $key => $val) {
         $args = "";
         $line = $val["call"] ."(";
@@ -862,6 +865,10 @@ function formatEmu($emuProfile) {
             if (is_array($argval)) {
                 $escaped = str_replace("\n", "<br />", print_r($argval, TRUE));
                 $args .= "<a href='#' " .printOver($escaped). ">Array</a>";
+            } elseif (preg_match('/^http:/', $argval)) {
+                $unescaped = str_replace("\\/", "\\", $argval);
+                $unescaped = str_replace("http", "hxxp", $unescaped);
+                $args .= $unescaped;
             } else {
                 $args .= $argval;
             }
@@ -931,7 +938,6 @@ function debug_sql() {
   global $c_debug_sql;
   global $c_debug_sql_analyze;
   global $debuginfo;
-  global $pgconn;
   if ($c_debug_sql == 1) {
     echo "<div class='centerbig'>\n";
       echo "<div class='block'>\n";
@@ -947,7 +953,7 @@ function debug_sql() {
                     if (preg_match($pattern, $val)) {
                       echo str_repeat("-", 80) ."\n";
                       $sql = "EXPLAIN ANALYZE $val";
-                      $result = pg_query($pgconn, $sql);
+                      $result = pg_query($sql);
                       while ($row = pg_fetch_assoc($result)) {
                         $stuff = $row["QUERY PLAN"];
                         echo "$stuff\n";
