@@ -262,6 +262,14 @@ body {
 .block .blockFooter {
 }
 
+.headerTab {
+  float:                left;
+  font-size:            10pt;
+  margin-left:          5px;
+  padding:              0px 5px 5px 5px;
+}
+
+
 /*
  ********************
  * Selector

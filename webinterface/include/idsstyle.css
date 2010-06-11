@@ -832,25 +832,10 @@ option.starting {
   background-color:     red;
 }
 
-#adminmenu {
-  background-color:	lightgray;
-  border:		1px solid #FF7800;
-  width:                100px;
-  height:               30px;
-  position:		absolute;
-  display:		none;
-  padding:		5px;
-  font-size:		10px;
-}
-
 .headerTab {
-  float:                left;
-  font-size:            10pt;
   border-top:           1px solid white;
   border-left:          1px solid white;
   border-right:         1px solid white;
-  margin-left:          5px;
-  padding:              0px 5px 4px 5px;
 }
 
 .headerTabSel {
