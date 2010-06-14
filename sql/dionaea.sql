@@ -253,7 +253,7 @@ BEGIN
 END$_$
     LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION surfids3_type_from_name(character varying) RETURNS integer
+CREATE OR REPLACE FUNCTION surfids3_dhcp_add_by_id(character varying) RETURNS integer
     AS $_$DECLARE
         p_sensorid      ALIAS FOR $1;
         p_sourcemac     ALIAS FOR $2;
