@@ -276,7 +276,7 @@ sub logsys() {
 #      $args =~ s/\"/\"\"/g;
 
       $sql = "INSERT INTO syslog (source, error, args, level, keyname, device, pid, vlanid) VALUES ";
-      $sql .= " ('$source', '$msg', '$args', $level, '$sensor', '$tap', $pid, $g_vlanid)";
+      $sql .= " ('$source', '$msg', E'$args', $level, '$sensor', '$tap', $pid, $g_vlanid)";
       if ($dbh) {
        $er = $dbh->do($sql);
       }

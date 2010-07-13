@@ -948,17 +948,19 @@ while (@row = $email_query->fetchrow_array) {
                 }
               }
             }
-            if ($buffer{"id"} != "") {
-              # After the while loop there could still be 1 attack left in the buffer
-              # If so, print it here
-              $log_url = $buffer{"url"};
-              $log_md5 = $buffer{"md5"};
-              $log_source = $buffer{"source"};
-              $log_time = $buffer{"time"};
-              $log_sev = $buffer{"sev"};
-              $log_id = $buffer{"id"};
-              printmail("[$log_time] $log_source -> $log_url $log_md5");
-              $totalcount++;
+            if (exists $buffer{"id"}) {
+              if ($buffer{"id"} != "") {
+                # After the while loop there could still be 1 attack left in the buffer
+                # If so, print it here
+                $log_url = $buffer{"url"};
+                $log_md5 = $buffer{"md5"};
+                $log_source = $buffer{"source"};
+                $log_time = $buffer{"time"};
+                $log_sev = $buffer{"sev"};
+                $log_id = $buffer{"id"};
+                printmail("[$log_time] $log_source -> $log_url $log_md5");
+                $totalcount++;
+              }
             }
           }
         }
@@ -1155,7 +1157,8 @@ sub sendmail {
     $gpg = new GnuPG();
     eval { $gpg->clearsign(plaintext => "$mailfile", output => "$sigfile", armor => 1, passphrase => $c_passphrase); }
     or do {
-      logsys($f_log_error, "MAIL", "Failed to sign the mail with GPG: $@");
+      print "ERROR: $@\n";
+      logsys($f_log_error, "MAIL", "Failed to sign the mail with GPG");
       &cleanup($mailfile, $sigfile, $attachfile);
       return;
     };
@@ -1186,7 +1189,8 @@ sub sendmail {
       Data => $maildata
       # Filename => $final_maildata,
   ) or do {
-    logsys($f_log_error, "MAIL", "Error attaching mail data: $@");
+    print "ERROR: $@\n";
+    logsys($f_log_error, "MAIL", "Error attaching mail data");
     return;
   };
 
@@ -1198,7 +1202,8 @@ sub sendmail {
         Filename => "IDMEF-$id-$ts_now.xml",
         Disposition => 'attachment'
     ) or do {
-      logsys($f_log_error, "MAIL", "Error attachin XML data: $@");
+      print "ERROR: $@\n";
+      logsys($f_log_error, "MAIL", "Error attaching XML data");
       return;
     }
   }
@@ -1208,7 +1213,8 @@ sub sendmail {
   #MIME::Lite->send('sendmail');
   eval { $chk = $msg->send }
   or do {
-    logsys($f_log_error, "MAIL", "Failed to send mail: $@");
+    print "ERROR: $@\n";
+    logsys($f_log_error, "MAIL", "Failed to send mail");
     return;
   };
 
