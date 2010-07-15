@@ -31,7 +31,7 @@ $install_geoip = "true";
 #############################
 $targetdir = "/opt/surfnetids";
 $geoiploc = "http://www.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
-@version_ar = (10300, 10400, 20000, 20002, 20003, 30000);
+@version_ar = (10300, 10400, 20000, 20002, 20003, 30000, 30400);
 
 if ("$webuser" eq "") {
     print "Web user not configured!\n";
@@ -81,14 +81,26 @@ if ("$dbport" ne "5432") {
 }
 
 # Creating all the database stuff
-print "Creating database user: $webuser!\n";
-`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" "$webuser"`;
-print "Creating database user: nepenthes!\n";
-`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" nepenthes`;
-print "Creating database user: pofuser!\n";
-`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" pofuser`;
-print "Creating database user: argos!\n";
-`createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" argos`;
+$chkweb = `psql -c "SELECT * from pg_user;" | grep $webuser | wc -l`;
+if ($chkweb == 0) {
+    print "Creating database user: $webuser!\n";
+    `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" "$webuser"`;
+}
+$chkweb = `psql -c "SELECT * from pg_user;" | grep nepenthes | wc -l`;
+if ($chkweb == 0) {
+    print "Creating database user: nepenthes!\n";
+    `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" nepenthes`;
+}
+$chkweb = `psql -c "SELECT * from pg_user;" | grep pofuser | wc -l`;
+if ($chkweb == 0) {
+    print "Creating database user: pofuser!\n";
+    `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" pofuser`;
+}
+$chkweb = `psql -c "SELECT * from pg_user;" | grep argos | wc -l`;
+if ($chkweb == 0) {
+    print "Creating database user: argos!\n";
+    `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" argos`;
+}
 
 # Setting up passwords for created users
 open(PASS, "> $targetdir/.pass.sql");
