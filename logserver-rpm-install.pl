@@ -81,22 +81,22 @@ if ("$dbport" ne "5432") {
 }
 
 # Creating all the database stuff
-$chkweb = `psql -c "SELECT * from pg_user;" | grep $webuser | wc -l`;
+$chkweb = `psql -h $dbhost -p $dbport -U $adminuser -c "SELECT * from pg_user;" | grep $webuser | wc -l`;
 if ($chkweb == 0) {
     print "Creating database user: $webuser!\n";
     `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" "$webuser"`;
 }
-$chkweb = `psql -c "SELECT * from pg_user;" | grep nepenthes | wc -l`;
+$chkweb = `psql -h $dbhost -p $dbport -U $adminuser -c "SELECT * from pg_user;" | grep nepenthes | wc -l`;
 if ($chkweb == 0) {
     print "Creating database user: nepenthes!\n";
     `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" nepenthes`;
 }
-$chkweb = `psql -c "SELECT * from pg_user;" | grep pofuser | wc -l`;
+$chkweb = `psql -h $dbhost -p $dbport -U $adminuser -c "SELECT * from pg_user;" | grep pofuser | wc -l`;
 if ($chkweb == 0) {
     print "Creating database user: pofuser!\n";
     `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" pofuser`;
 }
-$chkweb = `psql -c "SELECT * from pg_user;" | grep argos | wc -l`;
+$chkweb = `psql -h $dbhost -p $dbport -U $adminuser -c "SELECT * from pg_user;" | grep argos | wc -l`;
 if ($chkweb == 0) {
     print "Creating database user: argos!\n";
     `createuser -h $dbhost -p $dbport -S -D -E -R -U "$adminuser" argos`;
