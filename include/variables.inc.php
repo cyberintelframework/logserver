@@ -33,7 +33,8 @@ $v_severity_atype_ar = array(
         5 => "Dionaea",
         6 => "SMTP",
         10 => "ARP Poisoning",
-        11 => "Rogue DHCP server"
+        11 => "Rogue DHCP server",
+        12 => "IPv6 MitM"
 );
 
 # Array with the type of detail info record.
@@ -60,6 +61,7 @@ $v_attacktype_ar = array(
 		'30' => 'Server identifier',
         '31' => 'OP',
         '32' => 'Message type',
+        '33' => 'Prefix',
         '40' => 'Snort Message',
         '41' => 'Snort Sig Class Name',
         '42' => 'Snort Protocol',
@@ -195,6 +197,7 @@ $v_errors = array(
 		9 => "Successfully retrieved data!",
 		10 => "Successfully stored defaults!",
         11 => "Successfully added %1% %2%",
+        12 => "Successfully cleared the detected protocols!",
 		100 => "Session expired, login again!",
 		101 => "You don't have sufficient rights to perform the requested action!",
 		102 => "Invalid or missing name!",
