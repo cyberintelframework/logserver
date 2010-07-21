@@ -77,7 +77,7 @@ if ($err == 0) {
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
 
-  $m = 4;
+  $m = 12;
 }
 # Close connection and redirect
 pg_close($pgconn);
