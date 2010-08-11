@@ -241,29 +241,3 @@ BEGIN
 END
 $_$
     LANGUAGE plpgsql;
-
-
-CREATE FUNCTION surfids3_dhcp_add_by_id(integer, macaddr, inet, integer, integer) RETURNS integer
-    AS $_$DECLARE
-        p_sensorid      ALIAS FOR $1;
-        p_sourcemac     ALIAS FOR $2;
-        p_sourceip      ALIAS FOR $3;
-        p_severity      ALIAS FOR $4;
-        p_atype         ALIAS FOR $5;
-        m_attackid      INTEGER;
-BEGIN
-        INSERT INTO attacks (sensorid, timestamp, src_mac, source, severity, atype) 
-        VALUES
-                (p_sensorid,
-                 extract(epoch from current_timestamp(0))::integer,
-                 p_sourcemac,
-                 p_sourceip,
-                 p_severity,
-                 p_atype
-        );
-
-        SELECT INTO m_attackid currval('attacks_id_seq');
-        return m_attackid;
-END$_$
-    LANGUAGE plpgsql;
-
