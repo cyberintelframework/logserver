@@ -73,7 +73,7 @@ CREATE OR REPLACE FUNCTION surfids3_ipv6_add_by_id(integer, inet, integer, integ
         p_atype         ALIAS FOR $4;
         m_attackid      INTEGER;
 BEGIN
-        INSERT INTO attacks (sensorid, timestamp, src_mac, source, severity, atype)
+        INSERT INTO attacks (sensorid, timestamp, source, severity, atype)
         VALUES
                 (p_sensorid,
                  extract(epoch from current_timestamp(0))::integer,
