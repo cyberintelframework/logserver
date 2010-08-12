@@ -10,6 +10,12 @@
 --
 
 --
+-- BINARIES_DETAIL
+--
+ALTER TABLE binaries_detail ADD COLUMN first_seen integer DEFAULT 0 NOT NULL;
+ALTER TABLE binaries_detail ADD COLUMN last_seen integer DEFAULT 0 NOT NULL;
+
+--
 -- SENSORS
 --
 ALTER TABLE sensors ALTER COLUMN arp DROP DEFAULT, ALTER COLUMN arp TYPE boolean USING arp::boolean, ALTER COLUMN arp SET DEFAULT false;
