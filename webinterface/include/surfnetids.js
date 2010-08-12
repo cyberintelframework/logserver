@@ -115,7 +115,7 @@ function sh_mailtemp(si) {
     $('#srepdetail').show();
     $('#sensor_time').show();
     $('#sensor_sev').show();
-  } else if (si == 5) {
+  } else if (si == 5 || si == 7 || si == 8) {
     $('#attack_sev').hide();
     $('#sensor_sev').hide();
     $('#sensor_time').hide();
@@ -123,15 +123,6 @@ function sh_mailtemp(si) {
     $('#repdetail').hide();
     $('#srepdetail').hide();
     $('#timestamps').hide();
-    $('#attack_time').show();
-  } else if (si == 7) {
-    $('#attack_sev').hide();
-    $('#sensor_sev').hide();
-    $('#timestamps').hide();
-    $('#sensor_time').hide();
-    $('#timeoptions').hide();
-    $('#repdetail').hide();
-    $('#srepdetail').hide();
 
     $('#attack_time').show();
   } else {
