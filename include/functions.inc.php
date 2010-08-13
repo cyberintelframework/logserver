@@ -234,6 +234,8 @@ function getepoch($stamp) {
 #   md5 - md5 regexp
 #   bool - boolean regexp
 #   ip - ip address regexp
+#   ipv6 - ipv6 address regexp
+#   ipv4v6 - matches both ipv4 and ipv6 addresses (with/without cidr)
 #   net - network range regexp
 #   inet - ip address with/without cidr
 #   mac - mac address regexp
@@ -266,6 +268,21 @@ function extractvars($source, $allowed, $ignore_unallowed = 0) {
     $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
     $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))';
     $ipregexp .= '\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$/';
+
+    $ipv6regexp = '/^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|';
+    $ipv6regexp .= '(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)';
+    $ipv6regexp .= '(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})';
+    $ipv6regexp .= '|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))';
+    $ipv6regexp .= '|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:';
+    $ipv6regexp .= '((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))';
+    $ipv6regexp .= '|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:';
+    $ipv6regexp .= '((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))';
+    $ipv6regexp .= '|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:';
+    $ipv6regexp .= '((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))';
+    $ipv6regexp .= '|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:';
+    $ipv6regexp .= '((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|';
+    $ipv6regexp .= '(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:';
+    $ipv6regexp .= '((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/';
 
     foreach ($source as $key => $var) {
       if (!is_array($var)) {
@@ -315,6 +332,29 @@ function extractvars($source, $allowed, $ignore_unallowed = 0) {
                     $tainted[$temp] = $var;
                   } else {
                     $clean[$temp] = $var;
+                  }
+                } elseif ($check == "ipv6") {
+                  if (!preg_match($ipv6regexp, $var)) {
+                    $tainted[$temp] = $var;
+                  } else {
+                    $clean[$temp] = $var;
+                  }
+                } elseif ($check == "ipv4v6") {
+                  $ar_test = explode("/", $var);
+                  $ip_test = $ar_test[0];
+                  $mask_test = intval($ar_test[1]);
+                  if ($mask_test >! 0 && $mask_test <! 64) {
+                    $tainted[$temp] = $var;
+                  } else {
+                    if (!preg_match($ipregexp, $ip_test)) {
+                      if (!preg_match($ipv6regexp, $ip_test)) {
+                        $tainted[$temp] = $var;
+                      } else {
+                        $clean[$temp] = $var;
+                      }
+                    } else {
+                      $clean[$temp] = $var;
+                    }
                   }
                 } elseif ($check == "net") {
                   $ar_test = explode("/", $var);
