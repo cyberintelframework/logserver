@@ -119,7 +119,11 @@ echo "<div class='block'>\n";
                 echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" class='warning' />$source</a>&nbsp;&nbsp;";
                 echo "<img src='images/ownranges.jpg' ".printover("IP from your own ranges!") ."></td>\n";
               } else {
-                echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$source</a>";
+                if (strpos($source, ":")) {
+                  echo "$source";
+                } else {
+                  echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$source</a>";
+                }
               }
             echo "</td>\n";
             echo "<td style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
