@@ -495,13 +495,13 @@ function sh_search_src(si) {
     $('#inet_ownsource').val('');
   } else if (si == 2) {
     $('#source').hide();
-    $('#inet_source').val('');
+    $('#ipv4v6_source').val('');
     $('#sourcemac').show();
     $('#ownrange').hide();
     $('#inet_ownsource').val('');
   } else if (si == 3) {
     $('#source').hide();
-    $('#inet_source').val('');
+    $('#ipv4v6_source').val('');
     $('#sourcemac').hide();
     $('#mac_sourcemac').val('');
     $('#ownrange').show();
@@ -562,13 +562,13 @@ function sh_search_charac_sevtype(si) {
 function searchSuggest(typesel) {
   var strdest = $('#inet_dest').val();
   var strdmac = $('#mac_destmac').val();
-  var strsource = $('#inet_source').val();
+  var strsource = $('#ipv4v6_source').val();
   var strsmac = $('#mac_sourcemac').val();
   var strvirus = $('#strip_html_escape_virustxt').val();
   var strfile = $('#strip_html_escape_filename').val();
   if (typesel == 1) { str = strdest; id = 'inet_dest'; }
   if (typesel == 2) { str = strdmac; id = 'mac_destmac'; }
-  if (typesel == 3) { str = strsource; id = 'inet_source'; }
+  if (typesel == 3) { str = strsource; id = 'ipv4v6_source'; }
   if (typesel == 4) { str = strsmac; id = 'mac_sourcemac'; }
   if (typesel == 5) { str = strvirus; id = 'strip_html_escape_virustxt'; }
   if (typesel == 6) { str = strfile; id = 'strip_html_escape_filename'; }

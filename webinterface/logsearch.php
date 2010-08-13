@@ -90,7 +90,7 @@ $allowed_get = array(
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
-		"inet_source",
+		"ipv4v6_source",
 		"inet_ownsource",
 		"int_sport",
 		"mac_destmac",
@@ -737,12 +737,12 @@ echo "<div class='leftmed'>";
               echo "<td id='source' style='display:none;'>";
             }
               if ($c_autocomplete == 1) { 
-                echo "<input type='text' id='inet_source' class='pers' name='inet_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' value='$source_ip' />";
+                echo "<input type='text' id='ipv4v6_source' class='pers' name='ipv4v6_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' value='$source_ip' />";
                 echo "<div id='search_suggest'>\n";
                   echo "<div id='search_suggest_3' class='search_suggest'></div>\n";
                 echo "</div>\n"; 
                } else { 
-                echo "<input type='text' id='inet_source' class='pers' name='inet_source' alt='" .$l['ls_sourceip']. "' maxlenght='18' value='$source_ip' />";
+                echo "<input type='text' id='ipv4v6_source' class='pers' name='ipv4v6_source' alt='" .$l['ls_sourceip']. "' maxlenght='18' value='$source_ip' />";
               }
             echo "</td>";
             if ($f_sourcechoice == 2) {
@@ -1116,8 +1116,8 @@ echo "<div class='centerbig'>\n";
 echo "<table class='datatable'>\n";
   echo "<tr>\n";
     echo "<th width='14%'>" .printsort($l['ls_timestamp'], "timestamp"). "</th>\n";
-    echo "<th width='23%'>" .printsort($l['ls_sev'], "severity"). "</th>\n";
-    echo "<th width='17%'>" .printsort($l['ls_source'], "source"). "</th>\n";
+    echo "<th width='21%'>" .printsort($l['ls_sev'], "severity"). "</th>\n";
+    echo "<th width='19%'>" .printsort($l['ls_source'], "source"). "</th>\n";
     echo "<th width='5%'>" .printsort($l['ls_port'], "sport"). "</th>\n";
     echo "<th width='12%'>" .printsort($l['ls_dest'], "dest"). "</th>\n";
     echo "<th width='5%'>" .printsort($l['ls_port'], "dport"). "</th>\n";
@@ -1198,6 +1198,8 @@ while ($row = pg_fetch_assoc($result)) {
     if ($sevtype == 10 || $sevtype == 11) {
       echo "$smac</td>\n";
       echo "<td>$sport</td>\n";
+    } elseif ($sevtype == 12) {
+      echo "$source</td><td></td>\n";
     } else {
       if (matchCIDR($source, $ranges_ar)) {
         if ($d_censor == 2) {
@@ -1213,7 +1215,7 @@ while ($row = pg_fetch_assoc($result)) {
         } else {
           $t_source = $source;
         }
-        echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$t_source</a>&nbsp;&nbsp;";
+        echo "<a onclick=\"popUp('" ."whois.php?ip_ip=$source". "', 800, 500);\" />$t_source</a>&nbsp;&nbsp;</td>";
       }
       echo "<td>$sport</td>\n";
     }

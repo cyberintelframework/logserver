@@ -87,7 +87,7 @@ if ($err == 0) {
 }
 
 if ($err == 0) {
-  $sql_bindetail = "SELECT fileinfo, filesize, last_scanned, upx FROM binaries_detail WHERE bin = $bin_id";
+  $sql_bindetail = "SELECT fileinfo, filesize, last_scanned, upx, first_seen, last_seen FROM binaries_detail WHERE bin = $bin_id";
   $result_bindetail = pg_query($pgconn, $sql_bindetail);
   $row_bindetail = pg_fetch_assoc($result_bindetail);
   $filesize = $row_bindetail['filesize'];
@@ -95,33 +95,14 @@ if ($err == 0) {
   $fileinfo = $row_bindetail['fileinfo'];
   $last_scanned = $row_bindetail['last_scanned'];
   $upx = $row_bindetail['upx'];
+  $first_seen = $row_bindetail['first_seen'];
+  $last_seen = $row_bindetail['last_seen'];
   if ("$last_scanned" == "") {
     $last_scanned = $l['mr_never'];
   } else {
     $last_scanned = date($c_date_format, $last_scanned);
   }
-
-  $sql_firstseen = "SELECT attacks.timestamp, details.* ";
-  $sql_firstseen .= "FROM attacks, details ";
-  $sql_firstseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin_name' ";
-  $sql_firstseen .= "ORDER BY attacks.timestamp ASC LIMIT 1";
-  $result_firstseen = pg_query($pgconn, $sql_firstseen);
-  $row_firstseen = pg_fetch_assoc($result_firstseen);
-  $first_seen = $row_firstseen['timestamp'];
-  $first_seen = date($c_date_format, $first_seen);
-
-  $sql_lastseen = "SELECT attacks.timestamp, details.* ";
-  $sql_lastseen .= "FROM attacks, details ";
-  $sql_lastseen .= "WHERE details.attackid = attacks.id AND details.type = 8 AND details.text = '$bin_name' ";
-  $sql_lastseen .= "ORDER BY attacks.timestamp DESC LIMIT 1";
-  $result_lastseen = pg_query($pgconn, $sql_lastseen);
-  $row_lastseen = pg_fetch_assoc($result_lastseen);
-  $last_seen = $row_lastseen['timestamp'];
-  $last_seen = date($c_date_format, $last_seen);
-
   $debuginfo[] = $sql_bindetail;
-  $debuginfo[] = $sql_firstseen;
-  $debuginfo[] = $sql_lastseen;
 
   echo "<div class='leftmed'>\n";
     echo "<div class='block'>\n";

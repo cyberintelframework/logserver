@@ -148,6 +148,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<link rel='stylesheet' href='${address}include/layout.css' />\n";
     echo "<link rel='stylesheet' href='${address}include/design.css' />\n";
     echo "<link rel='stylesheet' href='${address}include/jquery.jtip.css' />\n";
+#    echo "<link rel='stylesheet' href='${address}include/jquery.cluetip.css' />\n";
     echo "<style type='text/css'>@import url('${address}include/calendar.css');</style>\n";
     echo "<link rel='stylesheet' href='${address}include/idsstyle.css' />\n";
     echo "<script type='text/javascript' src='${address}include/overlib/overlib${min}.js'><!-- overLIB (c) Erik Bosrup --></script>\n";
@@ -156,6 +157,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
 #    echo "<script type='text/javascript' src='${address}include/jquery.ui.all${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.jgrowl${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.jtip${min}.js'></script>\n";
+#    echo "<script type='text/javascript' src='${address}include/jquery.cluetip${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/surfnetids${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-en${min}.js'></script>\n";
@@ -209,7 +211,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                     if ($s_admin == 1) { 
                       echo printMenuitem(2.5, "serverstats.php", $l['me_serverinfo'], $tab);
                     }
-                    if ($c_enable_arp == 1 && $s_access_sensor > 1) {
+                    if ($c_ethernet_module == 1 && $s_access_sensor > 1) {
                       echo printMenuitem(2.7, "detectedproto.php", $l['me_detprot'], $tab);
                     }
                     echo printMenuitem(2.8, "plotter.php", $l['me_graphs'], $tab);
@@ -234,7 +236,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
                     echo printMenumod(3.3, 8, $l['me_maloff'], $tab, "1,1");	
                     echo printMenumod(3.4, 13, $l['me_malhosts'], $tab, "1,1");	
                     echo printMenuitem(3.5, "maldownloaded.php", $l['me_maldown'], $tab);
-                    if ($c_enable_arp == 1 && $s_access_sensor > 1) {
+                    if ($c_ethernet_module == 1 && $s_access_sensor > 1) {
                       echo printMenuitem(3.6, "arp_cache.php", $l['ah_arp_cache'], $tab);
                     }
                     echo printMenuitem(3.7, "search.php", $l['me_search'], $tab);
@@ -253,7 +255,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
               }            
                   echo "<ul>\n";
                     echo printMenuitem(4.1, "sensorstatus.php", $l['me_sensorstatus'], $tab);
-                    if ($c_enable_arp == 1 && $s_access_sensor > 1) {
+                    if ($c_ethernet_module == 1 && $s_access_sensor > 1) {
                       echo printMenuitem(4.2, "arp_static.php", $l['me_arp'], $tab);
                     }
                     if ($s_access_user > 1) {

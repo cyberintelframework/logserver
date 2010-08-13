@@ -62,7 +62,7 @@ if ($err == 0) {
 }
 
 echo "<div class='all'>\n";
-echo "<div class='leftbig'>\n";
+echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
     echo "<div class='dataBlock'>\n";
       echo "<div class='blockHeader'>";
@@ -102,6 +102,7 @@ echo "<div class='leftbig'>\n";
         echo "<div class='blockSubHeader'>\n";
           echo "<div id='tabEthernet' class='selected' onClick='protoSwitch(\"Ethernet\");'>Ethernet</div>\n";
           echo "<div id='tabIPv4' onClick='protoSwitch(\"IPv4\");'>IPv4</div>\n";
+          echo "<div id='tabIPv6' onClick='protoSwitch(\"IPv6\");'>IPv6</div>\n";
           echo "<div id='tabICMP' onClick='protoSwitch(\"ICMP\");'>ICMP</div>\n";
           echo "<div id='tabIGMP' onClick='protoSwitch(\"IGMP\");'>IGMP</div>\n";
           echo "<div id='tabDHCP' onClick='protoSwitch(\"DHCP\");'>DHCP</div>\n";
@@ -134,7 +135,8 @@ echo "<div class='leftbig'>\n";
                 } else {
                   $proto = $v_protos_ethernet_ar[$number];
                 }
-              } elseif ($head == 1) {
+              } elseif ($head == 1 || $head == 34525) {
+                # IPv4 and IPv6 use the same protocol numbers
                 $proto = $v_protos_ipv4_ar[$number];
               } elseif ($head == 11) {
                 $proto = $v_protos_icmp_ar[$number]["desc"];
@@ -162,8 +164,8 @@ echo "<div class='leftbig'>\n";
               if ($head != 0) {
                 $visi = " style='display: none;'";
               }
-              if (array_key_exists($head, $v_proto_types)) {
-                $class = $v_proto_types[$head];
+              if (array_key_exists($head, $v_protos_main_ar)) {
+                $class = $v_protos_main_ar[$head];
               } else {
                 $class = "Other";
               }

@@ -170,9 +170,9 @@ echo "<div class='all'>\n";
                   echo "<td>\n";
                     echo printRadio("0 - $v_access_ar_sensor[0]", "int_asensor", 0, $access_sensor) . "<br />\n";
                     echo printRadio("1 - $v_access_ar_sensor[1]", "int_asensor", 1, $access_sensor) . "<br />\n";
-                    if ($c_enable_arp == 1 && $c_enable_argos == 1) {
+                    if ($c_ethernet_module == 1 && $c_enable_argos == 1) {
                       echo printRadio("2 - $v_access_ar_sensor[2]", "int_asensor", 2, $access_sensor) . "<br />\n";
-                    } elseif ($c_enable_arp == 1) {
+                    } elseif ($c_ethernet_module == 1) {
                       echo printRadio("2 - " .$l['ma_arpac'], "int_asensor", 2, $access_sensor) . "<br />\n";
                     } elseif ($c_enable_argos == 1) {
                       echo printRadio("2 - " .$l['ma_argosac'], "int_asensor", 2, $access_sensor) . "<br />\n";

@@ -41,10 +41,11 @@ $err = 0;
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_id",
-		"int_org",
-		"int_sid",
-		"md5_hash"
+        "int_id",
+        "int_org",
+        "int_sid",
+        "strip_html_type",
+        "md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
@@ -67,7 +68,7 @@ if ($s_access_sensor < 2) {
   $err = 1;
 } elseif ($s_access_sensor < 9 && $err == 0) {
   $sql_check = "SELECT organisation FROM sensors, arp_static WHERE arp_static.sensorid = sensors.id AND arp_static.id = $id AND sensors.organisation = $q_org";
-$debuginfo[] = $sql_check;
+  $debuginfo[] = $sql_check;
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
   if ($numrows_check == 0) {
@@ -83,13 +84,22 @@ if (isset($clean['sid'])) {
   $m = 110;
 }
 
+if (isset($clean['type'])) {
+  $type = $clean['type'];
+} else {
+  $err = 1;
+  $m = 118;
+}
+
 if ($err == 0) {
   # No errors found, delete record
-  $sql = "DELETE FROM arp_static WHERE id = $id";
-  $debuginfo[] = $sql;
-  $execute = pg_query($pgconn, $sql);
-
-  $sql = "DELETE FROM sniff_hosttypes WHERE staticid = $id";
+  if ($type == "arp") {
+    $sql = "DELETE FROM arp_static WHERE id = $id";
+  } elseif ($type == "dhcp") {
+    $sql = "DELETE FROM dhcp_static WHERE id = $id";
+  } elseif ($type == "ipv6") {
+    $sql = "DELETE FROM ipv6_static WHERE id = $id";
+  }
   $debuginfo[] = $sql;
   $execute = pg_query($pgconn, $sql);
 

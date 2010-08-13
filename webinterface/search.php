@@ -116,10 +116,10 @@ echo "<div class='left'>\n";
               echo "</td>\n"; 
               echo "<td id='source'> ";
                 if ($c_autocomplete == 1) { 
-                  echo "<input type='text' id='inet_source' name='inet_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' />";
+                  echo "<input type='text' id='ipv4v6_source' name='ipv4v6_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' />";
                   echo "<div id='search_suggest_3' class='search_suggest'></div>\n";
                 } else { 
-                  echo "<input type='text' id='inet_source' name='inet_source' alt='" .$l['ls_sourceip']. "' maxlenght=18 />";
+                  echo "<input type='text' id='ipv4v6_source' name='ipv4v6_source' alt='" .$l['ls_sourceip']. "' maxlenght=18 />";
                 } 
               echo "</td>";
               echo "<td id='sourcemac' style='display:none;'>";
@@ -208,7 +208,7 @@ echo "<div class='left'>\n";
                               foreach ( $v_severity_atype_ar as $index=>$sevtype ) {
                                 if ($sevtype == 1 && $c_enable_argos == 1) {
                                   echo printOption($index, $sevtype, $f_sevtype);
-                                } elseif (($sevtype == 10 || $sevtype == 11) && $c_enable_arp) {
+                                } elseif (($sevtype == 10 || $sevtype == 11) && $c_ethernet_module) {
                                   echo printOption($index, $sevtype, $f_sevtype);
                                 } elseif ($sevtype == 0) {
                                   echo printOption($index, $sevtype, $f_sevtype);

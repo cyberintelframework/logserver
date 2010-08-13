@@ -348,11 +348,6 @@ echo "<div class='centerbig'>\n";
                           echo printOption("DEACTIVATE", $l['ss_deactivate'], $action);
                         }
                       }
-                      if ($arp == 1 && $s_access_sensor > 1) {
-                        echo "" . printOption("DISABLEARP", $l['ss_disable_arp'], $action) . "\n";
-                      } else {
-                        echo "" . printOption("ENABLEARP", $l['ss_enable_arp'], $action) . "\n";
-                      }
                     echo "</select>\n";
                   echo "</form>\n";
                 echo "</td>\n";

@@ -201,7 +201,7 @@ if ($s_access_user > 0) {
                 } else {
                   $freqstring = "N/A";
                 }
-              } elseif ($template == 5 || $template == 7) {
+              } elseif ($template == 5 || $template == 7 || $template == 8) {
                 $freqstring = $l['mr_instant'];
               }              
               if ($active == "t") {

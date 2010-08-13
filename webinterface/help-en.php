@@ -87,19 +87,14 @@ if ($id == 1) {
     echo " always be categorized under this domain.<br /><br />";
     echo " <b>FAQ - L08</b> (Click the help link to go to the SURFids FAQ page)";
 } elseif ($id == 8) {
-    # arpadmin.php - DHCP add all
-    echo "This option will add a given IP address to all VLANs of the current sensor as a valid DHCP server. ";
-    echo "This is useful, for example, when you want to add your IP helper addresses to the table for all your VLANs.";
+    # arp_config.php - ARP
+    echo "This module enables the detection of ARP poisoning (an ethernet layer man-in-the-middle attack).";
 } elseif ($id == 9) {
-    # arpadmin.php - ARP Poisoning configuration
-    echo "To enable ARP Poisoning detection you will need to add the MAC/IP address pair of the host you want to monitor to this table. ";
-    echo "This is particularly useful for monitoring your gateways.";
+    # arp_config.php - DHCP
+    echo "This module enables the detection of unauthorized DHCP servers.";
 } elseif ($id == 10) {
-    # arpadmin.php - Single pair add
-    echo "To detect ARP poisoning, add the MAC/IP address pair for the host you want to monitor and tag it as a router/gateway.<br /><br />";
-    echo "To detect Rogue DHCP servers, add the MAC/IP address pair for the DHCP server (or DHCP helper) and tag it as a DHCP server.<br /><br />";
-    echo "The DHCP servers in this table don't need to have the correct MAC address as only the IP address is used in Rogue DHCP server ";
-    echo "detection.";
+    # arp_config.php - IPv6
+    echo "This module enables the detection of IPv6 man-in-the-middle attack.";
 } elseif ($id == 11) {
     # orgipadmin.php - IP exclusion
     echo "Here you can exclude certain IP and/or MAC addresses from being shown in the web interface. They will still be logged, but will ";
@@ -154,6 +149,18 @@ if ($id == 1) {
     # report_edit.php, report_new.php
     echo "A public RSS feed means it will not require any form of authentication to access this feed. <b>Be careful</b>!<br /><br />";
     echo "Destination IP addresses can be optionally censored.";
+} elseif ($id == 23) {
+    # arp_static.php - Add ARP to single vlan/sensor
+    echo "To detect ARP poisoning, add the MAC/IP address pair for the host you want to monitor.";
+} elseif ($id == 24) {
+    # arp_static.php - Add DHCP to single vlan/sensor
+    echo "To detect Rogue DHCP servers, add the IP address for DHCP servers of the network here.";
+} elseif ($id == 25) {
+    # arp_static.php - Add DHCP to single vlan/sensor
+    echo "To detect Rogue DHCP servers, add the IP address of a DHCP server to all VLANs of this sensor.<br />";
+} elseif ($id == 26) {
+    # arp_static.php - Add IPv6 to single vlan/sensor
+    echo "To detect IPv6 Man-in-the-Middle attacks, add the IPv6 address for the routers of this sensor here.";
 }
 
 ?>

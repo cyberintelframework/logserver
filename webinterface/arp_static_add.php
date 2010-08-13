@@ -34,14 +34,16 @@ $q_org = intval($_SESSION['q_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_sensor = intval($s_access{0});
 $s_hash = md5($_SESSION['s_hash']);
+$type = "none";
 
 # Retrieving posted variables from $_POST
 $allowed_post = array(
-                "mac_macaddr",
-                "ip_ipaddr",
+                "mac_mac",
+                "ip_ip",
+                "ipv6_ip",
                 "int_sid",
     	    	"md5_hash",
-	    	    "type",
+	    	    "strip_html_type",
                 "int_all"
 );
 $check = extractvars($_POST, $allowed_post);
@@ -63,15 +65,24 @@ if ($clean['hash'] != $s_hash) {
   $m = 116;
 }
 
-if (isset($clean['macaddr'])) {
-  $mac = $clean['macaddr'];
+if (isset($clean['type'])) {
+  $type = $clean['type'];
 } else {
   $err = 1;
-  $m = 120;
+  $m = 118;
 }
 
-if (isset($clean['ipaddr'])) {
-  $ip = $clean['ipaddr'];
+if ($err == 0 && $type == "arp") {
+  if (isset($clean['mac'])) {
+    $mac = $clean['mac'];
+  } else {
+    $err = 1;
+    $m = 120;
+  }
+}
+
+if (isset($clean['ip'])) {
+  $ip = $clean['ip'];
 } else {
   $err = 1;
   $m = 121;
@@ -88,15 +99,21 @@ if (isset($clean['sid'])) {
   $m = 110;
 }
 
-if ($err == 0) {
-  $sql = "SELECT mac FROM arp_static WHERE sensorid = $sid AND ip = '$ip'";
+if ($err == 0 && $type == "arp") {
+  # Checking for poisoned address
+  $sql = "SELECT mac FROM arp_cache WHERE sensorid = $sid AND ip = '$ip'";
   $debuginfo[] = $sql;
   $result_check = pg_query($pgconn, $sql);
   $rows = pg_num_rows($result_check);
   if ($rows == 1) {
-    $err = 1;
-    $m = 122;
-  } 
+    $row = pg_fetch_assoc($result_check);
+    $chkmac = $row['mac'];
+
+    if ($mac != $chkmac) {
+      $err = 1;
+      $m = 122;
+    }
+  }
 }
 if ($q_org != 0) {
   $sql = "SELECT keyname FROM sensors WHERE id = $sid AND organisation = $q_org";
@@ -109,7 +126,13 @@ if ($q_org != 0) {
   }
 }
 if ($err != 1) {
-  $sql_check = "SELECT mac FROM arp_static WHERE mac = '$mac' AND sensorid = '$sid' AND ip = '$ip' ";
+  if ($type == "arp") {
+    $sql_check = "SELECT id FROM arp_static WHERE mac = '$mac' AND sensorid = '$sid' AND ip = '$ip'";
+  } elseif ($type == "dhcp") {
+    $sql_check = "SELECT id FROM dhcp_static WHERE sensorid = '$sid' AND ip = '$ip'";
+  } elseif ($type == "ipv6") {
+    $sql_check = "SELECT id FROM ipv6_static WHERE sensorid = '$sid' AND ip = '$ip'";
+  }
   $debuginfo[] = $sql_check;
   $result_check = pg_query($pgconn, $sql_check);
   $numrows_check = pg_num_rows($result_check);
@@ -126,76 +149,40 @@ if (isset($clean['all'])) {
 }
 
 if ($err != 1) {
-  if ($all == 0) {
-    # No errors found, insert record (including the host type)
-    $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
-    $sql .= "VALUES ('$ip', '$mac', '$sid')";
+  if ($type == "arp") {
+    $sql = "INSERT INTO arp_static (ip, mac, sensorid) VALUES ('$ip', '$mac', '$sid')";
     $debuginfo[] = $sql;
     $execute = pg_query($pgconn, $sql);
-
-    if (isset($tainted['type'])) {
-      $type = $tainted['type'];
-      $sql = "SELECT id FROM arp_static WHERE ip = '$ip' AND mac = '$mac' AND sensorid = '$sid'";
-      $debuginfo[] = $sql;
-      $result = pg_query($pgconn, $sql);
+  } elseif ($type == "dhcp") {
+    if ($all == 1) {
+      $sql_getkey = "SELECT keyname FROM sensors WHERE id = '$sid'";
+      $debuginfo[] = $sql_getkey;
+      $result = pg_query($pgconn, $sql_getkey);
       $row = pg_fetch_assoc($result);
-      $id = $row['id'];
-
-      foreach ($type as $key => $val) {
-        $pattern = '/^(1|2|3|4)$/';
-        if (preg_match($pattern, $val)) {
-          $sql = "INSERT INTO sniff_hosttypes (staticid, type) VALUES ('$id', '$val')";
+      $keyname = $row['keyname'];
+      if ($keyname != "") {
+        # Get all the VLAN's of the specific keyname
+        $sql_vlan = "SELECT id FROM sensors WHERE keyname = '$keyname'";
+        $debuginfo[] = $sql_getvlan;
+        $result_vlan = pg_query($pgconn, $sql_vlan);
+        while ($row_vlan = pg_fetch_assoc($result_vlan)) {
+          $mysid = $row_vlan['id'];
+          # No errors found, insert record (including the host type)
+          $sql = "INSERT INTO dhcp_static (ip, sensorid) VALUES ('$ip', '$mysid')";
           $debuginfo[] = $sql;
           $execute = pg_query($pgconn, $sql);
         }
       }
+    } else {
+      $sql = "INSERT INTO dhcp_static (ip, sensorid) VALUES ('$ip', '$sid')";
+      $debuginfo[] = $sql;
+      $execute = pg_query($pgconn, $sql);
     }
-  } else {
-    $sql_getkey = "SELECT keyname FROM sensors WHERE id = '$sid'";
-    $debuginfo[] = $sql_getkey;
-    $result = pg_query($pgconn, $sql_getkey);
-    $row = pg_fetch_assoc($result);
-    $keyname = $row['keyname'];
-    if ($keyname != "") {
-      # Get all the VLAN's of the specific keyname
-      $sql_vlan = "SELECT id FROM sensors WHERE keyname = '$keyname'";
-      $debuginfo[] = $sql_getvlan;
-      $result_vlan = pg_query($pgconn, $sql_vlan);
-      while ($row_vlan = pg_fetch_assoc($result_vlan)) {
-        $mysid = $row_vlan['id'];
-
-        ###########################
-        # Do all the usual arp_static stuff
-        ###########################
-
-        # No errors found, insert record (including the host type)
-        $sql = "INSERT INTO arp_static (ip, mac, sensorid) ";
-        $sql .= "VALUES ('$ip', '$mac', '$mysid')";
-        $debuginfo[] = $sql;
-        $execute = pg_query($pgconn, $sql);
-
-        if (isset($tainted['type'])) {
-          $type = $tainted['type'];
-          $sql = "SELECT id FROM arp_static WHERE ip = '$ip' AND mac = '$mac' AND sensorid = '$mysid'";
-          $debuginfo[] = $sql;
-          $result = pg_query($pgconn, $sql);
-          $row = pg_fetch_assoc($result);
-          $id = $row['id'];
-
-          foreach ($type as $key => $val) {
-            $pattern = '/^(1|2|3|4)$/';
-            if (preg_match($pattern, $val)) {
-              $sql = "INSERT INTO sniff_hosttypes (staticid, type) VALUES ('$id', '$val')";
-              $debuginfo[] = $sql;
-              $execute = pg_query($pgconn, $sql);
-            }
-          }
-        }
-        ################ END #########
-      }
-    }
+  } elseif ($type == "ipv6") {
+    $sql = "INSERT INTO ipv6_static (ip, sensorid) VALUES ('$ip', '$sid')";
+    $debuginfo[] = $sql;
+    $execute = pg_query($pgconn, $sql);
   }
-
   $m = 1;
 }
 
