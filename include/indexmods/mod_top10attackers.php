@@ -123,7 +123,7 @@ echo "<div class='block'>\n";
               }
             echo "</td>\n";
             echo "<td style='background-color: $v_indexcolors[$dif];'>$ls</td>\n";
-            echo "<td>" .downlink("logsearch.php?inet_source=$source", $row[count]). "</td>\n";
+            echo "<td>" .downlink("logsearch.php?ipv4v6_source=$source", $row[count]). "</td>\n";
           echo "</tr>\n";
         }
       echo "</table>\n";
