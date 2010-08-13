@@ -35,7 +35,7 @@ echo "<div class='block'>\n";
 
         #### Get the data for todays attackers and display it.
         $query = "attacks.sensorid = sensors.id ";
-        $query .= "AND timestamp >= $from AND timestamp <= $to ";
+        $query .= "AND timestamp >= $from AND timestamp <= $to AND severity = 1 ";
         $query .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org) ";
 
         # MAC Exclusion stuff

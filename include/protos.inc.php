@@ -21,6 +21,7 @@ $v_protos_main_ar = array(
     12 => "IGMP",
     17 => "UDP",
     11768 => "DHCP",
+    34525 => "IPv6",
 );
 
 $v_protos_dhcp_ar = array(

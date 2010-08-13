@@ -90,7 +90,7 @@ $v_access_ar_search = array(
 $v_access_ar_sensor = array(
 		        '0'	=> 'Read only access',			# User can view all sensors of his domain.
                 '1'	=> 'Remote control access',		# User can view and control all sensors of his domain.
-                '2'	=> 'ARP & ARGOS access',		# User can add ARP monitoring + ARGOS redirecting.
+                '2'	=> 'Ethernet & ARGOS modules',  # User can access the Ethernet and Argos modules.
                 '9'	=> 'Total access (admin)'		# User can view and control all sensors.
 );
 
@@ -127,7 +127,8 @@ $v_mail_template_ar = array(
 		4 => "Sensor status",
 		5 => "ARP Alert",
 		6 => "Search",
-		7 => "DHCP servers"
+		7 => "DHCP servers",
+        8 => "IPv6 MitM"
 );
 
 # Array with the mailreporting priorities.
@@ -312,26 +313,17 @@ $v_host_types = array(
 	2 => "DHCP Server"
 );
 
-# Array with the different protocols detected by the sniffer.
-$v_proto_types = array(
-	0 => "Ethernet",
-	1 => "IPv4",
-	11 => "ICMP",
-	12 => "IGMP",
-	11768 => "DHCP"
-);
-
 # Array with the different timespans for the selector
 $v_selector_period = array(
         0 => "Last Hour",
-	1 => "Last 24 Hours",
-	2 => "Today",
-	3 => "Last 7 days",
-	4 => "This Week",
-	5 => "Last Week",
-	6 => "This Month",
-	7 => "Last Month",
-	8 => "This Year"
+        1 => "Last 24 Hours",
+        2 => "Today",
+        3 => "Last 7 days",
+        4 => "This Week",
+        5 => "Last Week",
+        6 => "This Month",
+        7 => "Last Month",
+        8 => "This Year"
 );
 
 # Array with the text messages and classes for the different status values of a sensor
