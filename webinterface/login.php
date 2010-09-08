@@ -77,7 +77,7 @@ if ($c_login_method == 2) {
         echo "<table class='datatable' border='1'>\n";
           echo "<tr>\n";
             echo "<td>" .$l['lo_username']. ":</td>\n";
-            echo "<td><input type='text' name='strip_html_user' class='loginput' /></td>\n";
+            echo "<td><input type='text' name='strip_html_user' class='loginput' id='username' /></td>\n";
           echo "</tr>\n";
           echo "<tr>\n";
             echo "<td colspan='2' class='acenter'><input type='submit' value='" .$l['lo_login']. "' class='button' /></td>\n";
@@ -103,7 +103,7 @@ if ($c_login_method == 2) {
       echo "<table class='datatable' border='1'>\n";
         echo "<tr>\n";
           echo "<td>" .$l['lo_username']. ":</td>\n";
-          echo "<td><input type='text' name='strip_html_escape_user' class='loginput' /></td>\n";
+          echo "<td><input type='text' name='strip_html_escape_user' class='loginput' id='username' /></td>\n";
         echo "</tr>\n";
   }
       echo "<tr>\n";
@@ -119,7 +119,7 @@ if ($c_login_method == 2) {
     echo "<table class='datatable'>\n";
       echo "<tr>\n";
         echo "<td>" .$l['lo_username']. ":</td>\n";
-        echo "<td><input type='text' name='strip_html_escape_user' class='loginput' /></td>\n";
+        echo "<td><input type='text' name='strip_html_escape_user' class='loginput' id='username' /></td>\n";
       echo "</tr>\n";
       echo "<tr>\n";
         echo "<td>" .$l['lo_pass']. ":</td>\n";
@@ -139,5 +139,6 @@ echo "<div class=blockFooter></div>\n";
 echo "</div>\n";
 echo "</div>\n";
 echo "</div>\n";
+echo "<script>$('#username').focus();</script>\n";
 ?>
 <?php footer(); ?>
