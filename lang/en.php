@@ -231,6 +231,9 @@ $l['lc_uniqsource']     = "Unique source addresses";
 ##########################
 $l['ld_aid_details']    = "Details of attack ID";
 $l['ld_popout']         = "Close this popup";
+$l['ld_sshversion']     = "SSH version";
+$l['ld_sshcommand']     = "Shell command";
+$l['ld_sshlogin']       = "SSH login";
 
 ##########################
 # login.php
