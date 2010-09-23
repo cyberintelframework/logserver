@@ -32,6 +32,7 @@ $v_severity_atype_ar = array(
         4 => "Amun",
         5 => "Dionaea",
         6 => "SMTP",
+		7 => "Kippo",
         10 => "ARP Poisoning",
         11 => "Rogue DHCP server",
         12 => "IPv6 MitM"
@@ -45,7 +46,8 @@ $v_severity_atype_ar = array(
 # 40-59 -> Snort
 # 60-69 -> Glastopf
 # 70-79 -> SMTP
-# 80-100 -> Dionaea
+# 80-99 -> Dionaea
+# 100-130 -> Kippo
 $v_attacktype_ar = array(
 		'1'	=> 'Exploit dialogue',
 		'2'	=> 'Shellcodehandler',
@@ -77,6 +79,11 @@ $v_attacktype_ar = array(
         '80' => 'Dialogue',
         '81' => 'Emulation Profile',
         '82' => 'Connectback',
+		'83' => 'UUID:opnum',
+		'84' => 'Exploit',
+		'100' => 'Login failed',
+		'101' => 'Login success',
+		'102' => 'SSH version',
 );
 
 # Array with the different types of access for the search engine.
@@ -265,7 +272,8 @@ $v_errors = array(
         163 => "Invalid or missing module page!",
         164 => "Invalid or missing orgsavetype!",
         165 => "Invalid or missing organisation name!",
-        166 => "Invalid or missing IP ranges!"
+        166 => "Invalid or missing IP ranges!",
+		167 => "Invalid or missing severity type!"
 );
 
 # Array for the different types of plots available.
