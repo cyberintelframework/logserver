@@ -1,13 +1,91 @@
 -- SURFids 3.10
 -- Database conversion 3.06+ -> 3.10
--- Changeset 001
--- 11-08-2010
+-- Changeset 002
+-- 23-09-2010
 --
 
 --
 -- Changelog
+-- 002 Added Kippo tables
 -- 001 Initial release
 --
+
+--
+-- SSH_COMMAND
+--
+CREATE TABLE ssh_command (
+    id integer NOT NULL,
+    attackid integer NOT NULL,
+    command character varying NOT NULL
+);
+
+CREATE SEQUENCE ssh_command_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ssh_command_id_seq OWNED BY ssh_command.id;
+
+ALTER TABLE ssh_command ALTER COLUMN id SET DEFAULT nextval('ssh_command_id_seq'::regclass);
+ALTER TABLE ONLY ssh_command
+    ADD CONSTRAINT ssh_command_pkey PRIMARY KEY (id);
+
+GRANT SELECT ON TABLE ssh_command TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ssh_command_id_seq TO nepenthes;
+
+--
+-- SSH_LOGINS
+--
+CREATE TABLE ssh_logins (
+    id integer NOT NULL,
+    attackid integer NOT NULL,
+    type boolean DEFAULT false NOT NULL,
+    sshuser character varying NOT NULL,
+    sshpass character varying NOT NULL
+);
+
+CREATE SEQUENCE ssh_logins_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ssh_logins_id_seq OWNED BY ssh_logins.id;
+
+ALTER TABLE ssh_logins ALTER COLUMN id SET DEFAULT nextval('ssh_logins_id_seq'::regclass);
+ALTER TABLE ONLY ssh_logins
+    ADD CONSTRAINT ssh_logins_pkey PRIMARY KEY (id);
+
+GRANT SELECT,INSERT ON TABLE ssh_logins TO nepenthes;
+GRANT SELECT ON TABLE ssh_logins TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ssh_logins_id_seq TO nepenthes;
+
+--
+-- SSH_VERSION
+--
+CREATE TABLE ssh_version (
+    id integer NOT NULL,
+    attackid integer NOT NULL,
+    version character varying NOT NULL
+);
+
+CREATE SEQUENCE ssh_version_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ssh_version_id_seq OWNED BY ssh_version.id;
+
+ALTER TABLE ssh_version ALTER COLUMN id SET DEFAULT nextval('ssh_version_id_seq'::regclass);
+ALTER TABLE ONLY ssh_version
+    ADD CONSTRAINT ssh_version_pkey PRIMARY KEY (id);
+
+GRANT SELECT,INSERT,UPDATE ON TABLE ssh_version TO nepenthes;
+GRANT SELECT ON TABLE ssh_version TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ssh_version_id_seq TO nepenthes;
 
 --
 -- BINARIES_DETAIL
@@ -20,8 +98,11 @@ ALTER TABLE binaries_detail ADD COLUMN last_seen integer DEFAULT 0 NOT NULL;
 --
 ALTER TABLE sensors ALTER COLUMN arp DROP DEFAULT, ALTER COLUMN arp TYPE boolean USING arp::boolean, ALTER COLUMN arp SET DEFAULT false;
 ALTER TABLE sensors ADD COLUMN dhcp boolean DEFAULT false NOT NULL;
+UPDATE sensors SET dhcp = arp;
 ALTER TABLE sensors ADD COLUMN ipv6 boolean DEFAULT false NOT NULL;
+UPDATE sensors SET ipv6 = arp;
 ALTER TABLE sensors ADD COLUMN protos boolean DEFAULT false NOT NULL;
+UPDATE sensors SET protos = arp;
 
 --
 -- DHCP_STATIC
