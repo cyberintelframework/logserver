@@ -1148,7 +1148,15 @@ while ($row = pg_fetch_assoc($result)) {
   $labelsensor = $row['label'];
   if ($vlanid != 0) { $sensorname = "$sensorname-$vlanid";}
 
-  $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
+  if ($sevtype == 7) {
+    $sql_details = "SELECT attacks.id FROM attacks ";
+	$sql_details .= " LEFT JOIN ssh_command ON attacks.id = ssh_command.attackid ";
+	$sql_details .= " LEFT JOIN ssh_logins ON attacks.id = ssh_logins.attackid ";
+	$sql_details .= " LEFT JOIN ssh_version ON attacks.id = ssh_version.attackid ";
+	$sql_details .= " WHERE attacks.id = $id";
+  } else {
+    $sql_details = "SELECT id, text, type FROM details WHERE attackid = " . $id;
+  }
   $result_details = pg_query($pgconn, $sql_details);
   $numrows_details = pg_num_rows($result_details);
   $debuginfo[] = $sql_details;
@@ -1169,7 +1177,7 @@ while ($row = pg_fetch_assoc($result)) {
   echo "<tr>\n";
     echo "<td>$ts</td>\n";
     if ($numrows_details != 0) {
-    	echo "<td><a onclick=\"popit('" ."logdetail.php?int_id=$id". "', 409, 700);\">$sevtext</a></td>\n";
+    	echo "<td><a onclick=\"popit('" ."logdetail.php?int_id=$id&int_atype=$sevtype". "', 409, 700);\">$sevtext</a></td>\n";
     } else {
       echo "<td>$sevtext</td>\n";
     }
@@ -1235,7 +1243,7 @@ while ($row = pg_fetch_assoc($result)) {
     if ($numrows_details != 0) {
       if ($sev == 1 && ($sevtype == 0 || $sevtype == 5)) {
         if ($sevtype == 5) {
-          $dia_ar = array('attackid' => $id, 'type' => 80);
+          $dia_ar = array('attackid' => $id, 'type' => 84);
           $dia_result_ar = pg_select($pgconn, 'details', $dia_ar);
           $text = $dia_result_ar[0]['text'];
         } else {
