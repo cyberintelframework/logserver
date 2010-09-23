@@ -42,7 +42,8 @@ $s_access_search = $s_access{1};
 $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-                "int_id"
+                "int_id",
+				"int_atype",
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -56,13 +57,38 @@ if (isset($clean['id'])) {
   $err = 1;
 }
 
+if (isset($clean['atype'])) {
+  $atype = $clean['atype'];
+} else {
+  $m = 167;
+  geterror($m);
+  $err = 1;
+}
+
 ### Admin check
 if ($err != 1) {
-  if ($s_access_search == 9) {
-    $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ORDER BY type ASC";
+  if ($atype == 7) {
+
+    $sql_details = "SELECT attacks.id FROM attacks ";
+    $sql_details .= " LEFT JOIN ssh_command ON attacks.id = ssh_command.attackid ";
+    $sql_details .= " LEFT JOIN ssh_logins ON attacks.id = ssh_logins.attackid ";
+    $sql_details .= " LEFT JOIN ssh_version ON attacks.id = ssh_version.attackid ";
+    $sql_details .= " WHERE attacks.id = $id";
+
+
+
+    if ($s_access_search == 9) {
+      $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ORDER BY type ASC";
+    } else {
+      $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors ";
+      $sql_details .= " WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. "' ORDER BY type ASC";
+    }
   } else {
-    $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors ";
-    $sql_details .= " WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. "' ORDER BY type ASC";
+    $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ";
+    if ($s_access_search != 9) {
+      $sql_details .= " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. " ";
+    }
+    $sql_details .= " ORDER BY type ASC ";
   }
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
@@ -81,6 +107,41 @@ if ($err != 1) {
               echo "<th width='80%'>" .$l['g_info']. "</th>\n";
             echo "</tr>\n";
 
+            if ($atype == 7) {
+                $sql_version = "SELECT version FROM ssh_version WHERE attackid = $id";
+                $result_version = pg_query($pgconn, $sql_version);
+                $num_version = pg_num_rows($result_version);
+                $debuginfo[] = $sql_version;
+                if ($num_version > 0) {
+                  $row = pg_fetch_assoc($result_version);
+                  echo "<tr>\n";
+                    echo "<td>" .$l['ld_sshversion']. "</td>";
+                    echo "<td>" .$row['version']. "</td>";
+                  echo "</tr>\n";
+                }
+
+                $sql_logins = "SELECT sshuser, sshpass FROM ssh_logins WHERE attackid = $id";
+                $result_logins = pg_query($pgconn, $sql_logins);
+                $num_logins = pg_num_rows($result_logins);
+                $debuginfo[] = $sql_logins;
+                $row = pg_fetch_assoc($result_logins);
+                echo "<tr>\n";
+                  echo "<td>" .$l['ld_sshlogin']. "</td>";
+                  echo "<td>" .$row['sshuser']. " / " .$row['sshpass']. "</td>";
+                echo "</tr>\n";
+
+                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+                $result_command = pg_query($pgconn, $sql_command);
+                $num_command = pg_num_rows($result_command);
+                $debuginfo[] = $sql_command;
+                while ($row = pg_fetch_assoc($result_command)) {
+                  echo "<tr>\n";
+                    echo "<td>" .$l['ld_sshcommand']. "</td>";
+                    echo "<td>" .$row['command']. "</td>";
+                  echo "</tr>\n";
+                }
+            } else {
+
             while ($row = pg_fetch_assoc($result_details)) {
               $attackid = $row['attackid'];
               $logging = pg_escape_string($row['text']);
@@ -93,6 +154,9 @@ if ($err != 1) {
               $count = $row['total'];
               $debuginfo[] = $sql_check;
 
+              if ($type == 83) {
+                continue;
+              }
               echo "<tr>\n";
                 echo "<td>$typetext</td>\n";
                 if ($count != 0) {
@@ -103,12 +167,24 @@ if ($err != 1) {
                     $logging = formatEmu($logging);
                     echo "$logging";
                     echo "</td>\n";
+#				  } elseif ($type == 84) {
+#					$sql = "SELECT service FROM dcerpc WHERE uuid = '$logging'";
+#		            $r = pg_query($pgconn, $sql);
+#        		    $rij = pg_fetch_assoc($r);
+#					echo "<td>" .$rij['service']. "</td>";
+#				  } elseif ($type == 85) {
+#					$sql = "SELECT opname FROM dcerpc WHERE opnum = $logging";
+#		            $r = pg_query($pgconn, $sql);
+#        		    $rij = pg_fetch_assoc($r);
+#					echo "<td>" .$rij['opname']. "</td>"
                   } else {
                     echo "<td>$logging</td>\n";
                   }
                 }
               echo "</tr>\n";
             }
+
+            } # atype if/else
           echo "</table>\n";
 #        echo "</div>\n"; #</blockContent>
 #        echo "<div class='blockFooter'></div>\n";
