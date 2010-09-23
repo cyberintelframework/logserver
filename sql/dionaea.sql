@@ -7,6 +7,7 @@
 
 --
 -- Version history
+-- 003 Added kippo functions
 -- 002 Moved honeypots table creation up
 -- 001 Initial release
 --
@@ -28,6 +29,8 @@ INSERT INTO honeypots VALUES (2, 'snort', '');
 INSERT INTO honeypots VALUES (3, 'glastopf', '');
 INSERT INTO honeypots VALUES (4, 'amun', '');
 INSERT INTO honeypots VALUES (5, 'dionaea', '');
+INSERT INTO honeypots VALUES (6, 'smtp', '');
+INSERT INTO honeypots VALUES (7, 'kippo', '');
 
 ALTER TABLE ONLY honeypots
     ADD CONSTRAINT honeypots_pkey PRIMARY KEY (id);
@@ -38,6 +41,62 @@ GRANT SELECT ON TABLE honeypots TO nepenthes;
 --
 -- FUNCTIONS
 --
+
+CREATE OR REPLACE FUNCTION surfids3_sshcommand_add(integer, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_command ALIAS FOR $2;
+
+    m_commandid INTEGER;
+BEGIN
+    INSERT INTO ssh_command 
+        (attackid,command)
+    VALUES
+        (p_attackid,p_command);
+
+    SELECT INTO m_commandid currval('ssh_command_id_seq');
+    return m_commandid;
+END$_$
+    LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION surfids3_sshversion_add(integer, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_version ALIAS FOR $2;
+
+    m_versionid INTEGER;
+BEGIN
+    INSERT INTO ssh_version
+        (attackid,version)
+    VALUES
+        (p_attackid,p_version);
+
+    SELECT INTO m_versionid currval('ssh_version_id_seq');
+    return m_versionid;
+END$_$
+    LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION surfids3_sshlogin_add(integer, boolean, character varying, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_type ALIAS FOR $2;
+    p_user ALIAS FOR $3;
+    p_pass ALIAS FOR $4;
+
+    m_loginid INTEGER;
+BEGIN
+    INSERT INTO ssh_logins
+        (attackid,type,sshuser,sshpass)
+    VALUES
+        (p_attackid,p_type,p_user,p_pass);
+
+    SELECT INTO m_loginid currval('ssh_logins_id_seq');
+    return m_loginid;
+END$_$
+    LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION surfids3_attack_add(integer, inet, integer, inet, integer, macaddr, integer) RETURNS integer
     AS $_$DECLARE
