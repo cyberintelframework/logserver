@@ -32,6 +32,7 @@ ALTER TABLE ONLY ssh_command
     ADD CONSTRAINT ssh_command_pkey PRIMARY KEY (id);
 
 GRANT SELECT ON TABLE ssh_command TO idslog;
+GRANT SELECT,INSERT ON TABLE ssh_command TO nepenthes;
 GRANT SELECT,UPDATE ON SEQUENCE ssh_command_id_seq TO nepenthes;
 
 --
