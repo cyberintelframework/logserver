@@ -67,28 +67,11 @@ if (isset($clean['atype'])) {
 
 ### Admin check
 if ($err != 1) {
-  if ($atype == 7) {
-
-    $sql_details = "SELECT attacks.id FROM attacks ";
-    $sql_details .= " LEFT JOIN ssh_command ON attacks.id = ssh_command.attackid ";
-    $sql_details .= " LEFT JOIN ssh_logins ON attacks.id = ssh_logins.attackid ";
-    $sql_details .= " LEFT JOIN ssh_version ON attacks.id = ssh_version.attackid ";
-    $sql_details .= " WHERE attacks.id = $id";
-
-
-
-    if ($s_access_search == 9) {
-      $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ORDER BY type ASC";
-    } else {
-      $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors ";
-      $sql_details .= " WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. "' ORDER BY type ASC";
-    }
+  if ($s_access_search == 9) {
+    $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ORDER BY type ASC";
   } else {
-    $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ";
-    if ($s_access_search != 9) {
-      $sql_details .= " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. "' ";
-    }
-    $sql_details .= " ORDER BY type ASC ";
+    $sql_details = "SELECT details.attackid, details.text, details.type FROM details, sensors ";
+    $sql_details .= " WHERE details.attackid = " .$id. " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. "' ORDER BY type ASC";
   }
   $result_details = pg_query($pgconn, $sql_details);
   $debuginfo[] = $sql_details;
@@ -108,7 +91,13 @@ if ($err != 1) {
             echo "</tr>\n";
 
             if ($atype == 7) {
-                $sql_version = "SELECT version FROM ssh_version WHERE attackid = $id";
+				if ($s_access_search == 9) {
+	                $sql_version = "SELECT version FROM ssh_version WHERE attackid = $id";
+				} else {
+	                $sql_version = "SELECT version FROM ssh_version, attacks, sensors WHERE attackid = $id";
+					$sql_version .= " AND ssh_version.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
+					$sql_version .= " sensors.organisation = '" .$q_org. "'";
+				}
                 $result_version = pg_query($pgconn, $sql_version);
                 $num_version = pg_num_rows($result_version);
                 $debuginfo[] = $sql_version;
@@ -120,7 +109,13 @@ if ($err != 1) {
                   echo "</tr>\n";
                 }
 
-                $sql_logins = "SELECT sshuser, sshpass FROM ssh_logins WHERE attackid = $id";
+				if ($s_access_search == 9) {
+	                $sql_logins = "SELECT sshuser, sshpass FROM ssh_logins WHERE attackid = $id";
+				} else {
+	                $sql_logins = "SELECT sshuser, sshpass FROM ssh_logins WHERE attackid = $id";
+					$sql_logins .= " AND ssh_logins.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
+					$sql_logins .= " sensors.organisation = '" .$q_org. "'";
+				}
                 $result_logins = pg_query($pgconn, $sql_logins);
                 $num_logins = pg_num_rows($result_logins);
                 $debuginfo[] = $sql_logins;
@@ -130,7 +125,13 @@ if ($err != 1) {
                   echo "<td>" .$row['sshuser']. " / " .$row['sshpass']. "</td>";
                 echo "</tr>\n";
 
-                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+				if ($s_access_search == 9) {
+	                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+				} else {
+	                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+					$sql_command .= " AND ssh_command.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
+					$sql_command .= " sensors.organisation = '" .$q_org. "'";
+				}
                 $result_command = pg_query($pgconn, $sql_command);
                 $num_command = pg_num_rows($result_command);
                 $debuginfo[] = $sql_command;
