@@ -86,7 +86,7 @@ if ($err != 1) {
   } else {
     $sql_details = "SELECT attackid, text, type FROM details WHERE attackid = " .$id. " ";
     if ($s_access_search != 9) {
-      $sql_details .= " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. " ";
+      $sql_details .= " AND details.sensorid = sensors.id AND sensors.organisation = '" .$q_org. "' ";
     }
     $sql_details .= " ORDER BY type ASC ";
   }
