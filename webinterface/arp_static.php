@@ -23,6 +23,7 @@ $allowed_get = array(
 	"bool_arp",
 	"bool_ipv6",
 	"bool_dhcp",
+	"bool_protos",
 	"int_sid",
 	"sort"
 );
