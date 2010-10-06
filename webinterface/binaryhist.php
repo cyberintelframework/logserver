@@ -24,7 +24,7 @@ $err = 0;
 $allowed_get = array(
                 "int_binid",
                 "md5_binname",
-		"show"
+				"show"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -143,6 +143,18 @@ if ($err == 0) {
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</leftmed>
+
+  echo "<div class='rightmed'>\n";
+    echo "<div class='block'>\n";
+      echo "<div class='actionBlock'>\n";
+        echo "<div class='blockHeader'>" .$l['bh_binary_info']. "</div>\n";
+        echo "<div class='blockContent'>\n";
+          echo "<a href='md5.php'>Hash whois @ Cymru</a>\n";
+        echo "</div>\n"; #</blockContent>
+        echo "<div class='blockFooter'></div>\n";
+      echo "</div>\n"; #</actionBlock>
+    echo "</div>\n"; #</block>
+  echo "</div>\n"; #</rightmed>
  
   $sql_norman = "SELECT result FROM norman WHERE binid = $bin_id";
   $result_norman = pg_query($pgconn, $sql_norman);
