@@ -462,7 +462,7 @@ prepare_sql();
 ####################
 # BUILDING COUNT QUERY
 ####################
-if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]) == 0) || ($clean['page'] == 0)) {
+if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]) == 0) || ($clean['page'] == 0) || $c_search_cache == 0) {
   ### Prepare count SQL query
   $sql_select = "COUNT(attacks.id) AS total";
   $sql_count = "SELECT $sql_select ";
@@ -479,7 +479,9 @@ if (!isset($_SESSION["search_num_rows"]) || (intval($_SESSION["search_num_rows"]
     $_SESSION["search_num_rows"] = $num_rows;
   }
 }
-$num_rows = intval($_SESSION["search_num_rows"]);
+if ($c_search_cache == 1) {
+  $num_rows = intval($_SESSION["search_num_rows"]);
+}
 
 ####################
 # HITS PER PAGE (SQL LIMIT)
