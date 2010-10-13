@@ -29,7 +29,7 @@ require "$c_surfidsdir/scripts/logfunctions.inc.pl";
 $chk = dbconnect();
 
 # Get the IP address configuration for the tap device from the database.
-$sth = dbquery("SELECT tap FROM sensors WHERE permanent = 1");
+$sth = dbquery("SELECT tap FROM sensors, sensor_details WHERE sensors.keyname = sensor_details.keyname AND permanent = 1");
 while (@row = $sth->fetchrow_array) {
     $if = $row[0];
 
