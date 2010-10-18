@@ -628,6 +628,10 @@ function matchCIDR($addr, $cidr) {
   //      or an array where each element is in the above format
   $output = false;
 
+  if ($cidr == "") {
+    return $output;
+  }
+
   if ( is_array($cidr) ) {
     foreach ( $cidr as $cidrlet ) {
       if ( matchCIDR( $addr, $cidrlet) ) {
