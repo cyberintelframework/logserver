@@ -669,6 +669,23 @@ function redirmap() {
   }
 }
 
+function sevmap() {
+  var sevmapper = $('#sevmapper').val();
+  var from = $('#int_from').val();
+  var to = $('#int_to').val();
+  if (sevmapper == 1) {
+    window.location='googlemap.php?int_sev=0';
+  } else if (sevmapper == 2) {
+    window.location='googlemap.php?int_sev=1';
+  } else if (sevmapper == 3) {
+    window.location='googlemap.php?int_sev=1&int_atype=5';
+  } else if (sevmapper == 4) {
+    window.location='googlemap.php?int_sev=1&int_atype=0';
+  } else if (sevmapper == 5) {
+    window.location='googlemap.php?int_sev=1&int_atype=7';
+  }
+}
+
 /***********************************
  * Plotter functions
  ***********************************/

@@ -47,7 +47,9 @@ $err = 0;
 $allowed_get = array(
                 "q_org",
                 "int_to",
-                "int_from"
+                "int_from",
+		"int_sev",
+		"int_atype"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -64,10 +66,25 @@ if (isset($clean['to']) && isset($clean['from'])) {
   $end = $clean['to'];
   $tsquery = "timestamp >= $start AND timestamp <= $end AND";
 }
- 
+
+if (isset($clean['sev'])) {
+    $sev = $clean['sev'];
+} else {
+    $sev = 1;
+}
+
+if (isset($clean['atype'])) {
+    $atype = $clean['atype'];
+} else {
+    $atype = 0;
+}
+
 if ( $err == 0) {
   $query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks ";
-  $query .= "WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = '1' ";
+  $query .= "WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = $sev ";
+  if ($sev != 0) {
+    $query .= " AND attacks.atype = $atype ";
+  }
   $query .= "AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC";
   $r_hit = pg_query($pgconn, $query);
   echo "<?xml version='1.0' encoding='ISO-8859-1'?>";

@@ -19,7 +19,38 @@ $s_org = intval($_SESSION['s_org']);
 $s_access = $_SESSION['s_access'];
 $s_access_search = intval($s_access{1});
 
-$xmlquery = "?int_from=$from&int_to=$to&int_org=$q_org";
+# Retrieving posted variables from $_GET
+$allowed_get = array(
+                "int_sev",
+                "int_atype"
+);
+$check = extractvars($_GET, $allowed_get);
+
+if (isset($clean['sev'])) {
+  $sev = $clean['sev'];
+} else {
+  $sev = 1;
+}
+
+if (isset($clean['atype'])) {
+  $atype = $clean['atype'];
+} else {
+  $atype = "false";
+}
+
+if ($sev == 0) {
+  $sevmap = 1;
+} elseif ($sev == 1 && $atype == "false") {
+  $sevmap = 2;
+} elseif ($sev == 1 && $atype == 5) {
+  $sevmap = 3;
+} elseif ($sev == 1 && $atype == 0) {
+  $sevmap = 4;
+} elseif ($sev == 1 && $atype ==7) {
+  $sevmap = 5;
+}
+
+$xmlquery = "?int_from=$from&int_to=$to&int_org=$q_org&int_sev=$sev&int_atype=$atype";
 
 echo "<div id='search_wait'><center>" .$l['gm_process']. "<br /><br />" .$l['gm_patient']. ".<br /></center></div>\n";
 echo "<div class='center'>\n";
@@ -28,6 +59,13 @@ echo "<div class='dataBlock'>\n";
 echo "<div class='blockHeader'>\n";
   echo "<div class='blockHeaderLeft'>" .$l['gm_attackmap']. "</div>\n";
   echo "<div class='blockHeaderRight'>\n";
+    echo "<select class='smallselect' id='sevmapper' name='sevmap' onChange='sevmap();'>\n";
+      echo printoption(1, "Possible malicious attack", $sevmap);
+      echo printoption(2, "Malicious attack", $sevmap);
+      echo printoption(3, "Malicious attack - Dionaea", $sevmap);
+      echo printoption(4, "Malicious attack - Nepenthes", $sevmap);
+      echo printoption(5, "Malicious attack - Kippo", $sevmap);
+    echo "</select>\n";
     echo "<select class='smallselect' id='redirmapper' name='redir' onChange='redirmap();'>\n";
       echo printoption(1, "Attacks", 1);
       echo printoption(2, "Sensors", 1);
