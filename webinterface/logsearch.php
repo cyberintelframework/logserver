@@ -86,7 +86,7 @@ if (isset($clean['dcensor'])) {
 ####################
 # Retrieving posted variables from $_GET
 $allowed_get = array(
-        "reptype",
+		"reptype",
 		"int_org",
 		"sensorid",
 		"mac_sourcemac",
@@ -114,7 +114,7 @@ $allowed_get = array(
 		"int_gid",
 		"int_macfilter",
 		"int_ipfilter",
-        "int_allexploits"
+		"int_allexploits"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -1075,10 +1075,22 @@ $url = str_replace("?int_page=" . $clean["page"], "", $url);
 $url = trim($url, "?");
 
 $nav = printNav($page_nr, $last_page, $url);
+echo "FREP: $f_reptype  $url<br />\n";
+
+if (strstr($url, "?")) {
+    $oper = "&";
+} else {
+    $oper = "?";
+}
+
+$url = str_replace("reptype=single&", "", $url);
+$url = str_replace("&reptype=single", "", $url);
+$url = str_replace("reptype=&", "", $url);
+$url = str_replace("&reptype=", "", $url);
 
 # Handling report types
-if ($rapport == "single") $nav .= "&nbsp;<a href='${url}${oper}reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
-if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
+if ($f_reptype == "single") $nav .= "&nbsp;<a href='${url}${oper}reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
+if ($f_reptype == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
 
 ####################
 # BUILDING SEARCH QUERY
@@ -1093,7 +1105,9 @@ $sql =  "SELECT $sql_select";
 $sql .= " FROM $sql_from ";
 $sql .= " $sql_where ";
 $sql .= " ORDER BY $sql_sort ";
-$sql .= " $sql_limit ";
+if ($f_reptype == "multi") {
+    $sql .= " $sql_limit ";
+}
 $debuginfo[] = $sql;
 $result = pg_query($sql);
 
