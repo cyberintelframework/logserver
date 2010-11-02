@@ -544,7 +544,7 @@ img {
   background-color:     #7FFFD4;
   color:                black;
 }
-.sensorstatus .outdated {
+.sensorstatus .dhcp {
   background-color:     orange;
 }
 .sensorstatus .keepalive {
@@ -594,7 +594,7 @@ option.permanent {
 option.ignored {
   background-color:	#7FFFD4;
 }
-option.outdated {
+option.dhcp {
   background-color:	orange;
 }
 option.config {
