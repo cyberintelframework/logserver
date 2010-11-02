@@ -149,7 +149,7 @@ if ($err == 0) {
       echo "<div class='actionBlock'>\n";
         echo "<div class='blockHeader'>" .$l['bh_binary_info']. "</div>\n";
         echo "<div class='blockContent'>\n";
-          echo "<a href='md5.php'>Hash whois @ Cymru</a>\n";
+          echo "<a onclick=\"popUp('" ."mwh.php?md5_bin=$bin_name". "', 500, 500);\" >hash whois @ Cymru</a>\n";
         echo "</div>\n"; #</blockContent>
         echo "<div class='blockFooter'></div>\n";
       echo "</div>\n"; #</actionBlock>
