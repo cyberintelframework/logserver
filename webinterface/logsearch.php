@@ -1075,7 +1075,6 @@ $url = str_replace("?int_page=" . $clean["page"], "", $url);
 $url = trim($url, "?");
 
 $nav = printNav($page_nr, $last_page, $url);
-echo "FREP: $f_reptype  $url<br />\n";
 
 if (strstr($url, "?")) {
     $oper = "&";
