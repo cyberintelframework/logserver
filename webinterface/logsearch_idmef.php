@@ -27,6 +27,8 @@ include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 
+$s_userid = $_SESSION['s_userid'];
+
 # Including language file
 include "../lang/${c_language}.php";
 
