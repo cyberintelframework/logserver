@@ -21,10 +21,34 @@ if ($c_geoip_enable == 1) {
   include_once '../include/' .$c_geoip_module;
   $gi = geoip_open("../include/" .$c_geoip_data, GEOIP_STANDARD);
 }
- 
+
+# Retrieving posted variables from $_GET
+$allowed_get = array(
+                "int_sev"
+);
+$check = extractvars($_GET, $allowed_get);
+debug_input();
+
+if (isset($clean['sev'])) {
+    $sev = $clean['sev'];
+} else {
+    $sev = 1;
+}
+
 echo "<div class='block'>\n";
   echo "<div class='dataBlock'>\n";
-    echo "<div class='blockHeader'>" .$l['in_attackers']. "</div>\n";
+    echo "<div class='blockHeader'>\n";
+      echo "<div class='blockHeaderLeft'>" .$l['in_attackers']. "</div>\n";
+      echo "<div class='blockHeaderRight'>";
+        echo "<form>\n";
+          echo "<select class='smallselect' name='int_sev' onChange='javascript: this.form.submit();'>\n";
+            foreach ($v_severity_ar as $key => $val) {
+              echo printOption($key, $val, $sev);
+            }
+          echo "</select>\n";
+        echo "</form>\n";
+      echo "</div>\n"; #</blockHeaderRight>
+    echo "</div>\n"; #</blockHeader>
     echo "<div class='blockContent'>\n";
       echo "<table class='datatable' width='100%'>\n";
         echo "<tr>\n";
@@ -35,7 +59,7 @@ echo "<div class='block'>\n";
 
         #### Get the data for todays attackers and display it.
         $query = "attacks.sensorid = sensors.id ";
-        $query .= "AND timestamp >= $from AND timestamp <= $to AND severity = 1 ";
+        $query .= "AND timestamp >= $from AND timestamp <= $to AND severity = $sev ";
         $query .= "AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org) ";
 
         # MAC Exclusion stuff
