@@ -48,8 +48,8 @@ $allowed_get = array(
                 "q_org",
                 "int_to",
                 "int_from",
-		"int_sev",
-		"int_atype"
+                "int_sev",
+                "int_atype"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -75,14 +75,12 @@ if (isset($clean['sev'])) {
 
 if (isset($clean['atype'])) {
     $atype = $clean['atype'];
-} else {
-    $atype = 0;
 }
 
 if ( $err == 0) {
   $query = "SELECT DISTINCT attacks.source, COUNT(attacks.source) as count FROM sensors, attacks ";
   $query .= "WHERE $orgquery attacks.sensorid = sensors.id AND $tsquery attacks.severity = $sev ";
-  if ($sev != 0) {
+  if ($sev != 0 && isset($clean['atype'])) {
     $query .= " AND attacks.atype = $atype ";
   }
   $query .= "AND sensors.id = attacks.sensorid GROUP BY attacks.source ORDER BY count DESC";

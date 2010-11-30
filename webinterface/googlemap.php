@@ -50,7 +50,10 @@ if ($sev == 0) {
   $sevmap = 5;
 }
 
-$xmlquery = "?int_from=$from&int_to=$to&int_org=$q_org&int_sev=$sev&int_atype=$atype";
+$xmlquery = "?int_from=$from&int_to=$to&int_org=$q_org&int_sev=$sev";
+if ($atype != "false") {
+    $xmlquery .= "&int_atype=$atype";
+}
 
 echo "<div id='search_wait'><center>" .$l['gm_process']. "<br /><br />" .$l['gm_patient']. ".<br /></center></div>\n";
 echo "<div class='center'>\n";
