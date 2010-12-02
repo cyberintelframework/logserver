@@ -28,7 +28,7 @@ add_to_sql("COUNT(details.*) as total", "select");
 add_to_sql("attacks", "table");
 add_to_sql("details", "table");
 add_to_sql("sensors", "table");
-add_to_sql("details.type = 1", "where");
+add_to_sql("details.type IN (1, 84)", "where");
 add_to_sql("sensors.id = attacks.sensorid", "where");
 add_to_sql("attacks.id = details.attackid", "where");
 add_to_sql("$tsquery", "where");
