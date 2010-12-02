@@ -68,6 +68,7 @@ if ($id == 1) {
     echo "&nbsp;&nbsp;&nbsp;<b>Nepenthes</b>: A low interaction honeypot detecting attacks using signatures.<br />";
     echo "&nbsp;&nbsp;&nbsp;<b>Dionaea</b>: A low interaction honeypot detecting attacks on the SMB protocol using emulation.<br />";
     echo "&nbsp;&nbsp;&nbsp;<b>Argos</b>: A high interaction honeypot detecting control flow diversions or buffer overflows.<br />";
+    echo "&nbsp;&nbsp;&nbsp;<b>Kippo</b>: A low interaction honeypot detecting SSH brute force scans / logins.<br />";
     echo "&nbsp;&nbsp;&nbsp;<b>ARP Poisoning</b>: ARP poisoning is an ethernet layer man-in-the-middle attack.<br />";
     echo "&nbsp;&nbsp;&nbsp;<b>Rogue DHCP server</b>: A Rogue DHCP server is an unauthorized DHCP server.<br />";
     echo "<b>Malware Offered</b>: A piece of malware is offered to the honeypot. The honeypot will try to download it.<br />";

@@ -114,7 +114,14 @@ $allowed_get = array(
 		"int_gid",
 		"int_macfilter",
 		"int_ipfilter",
-		"int_allexploits"
+		"int_allexploits",
+        "strip_html_escape_sshversion",
+        "strip_html_escape_sshuser",
+        "strip_html_escape_sshpass",
+        "int_sshhascommand",
+        "int_sshlogin",
+        "strip_html_escape_sshcommand",
+        "int_attackid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -134,137 +141,62 @@ if (isset($tainted['sort'])) {
   $sort = "timestampd";
 }
 
-###################
-# FILTERS
-###################
-if (isset($clean['macfilter'])) {
-  $filter_mac = $clean['macfilter'];
-} else {
-  $filter_mac = 1;
-}
+######################################
+# Setting up criteria array
+######################################
 
-if (isset($clean['ipfilter'])) {
-  $filter_ip = $clean['ipfilter'];
-} else {
-  $filter_ip = 1;
-}
-
-###################
-# INTERVAL
-###################
-if (isset($clean['interval'])) {
-  $int = $clean['interval'];
-  $to = date("U");
-  $from = $to - $int;
-  $_SESSION['s_to'] = $to;
-  $_SESSION['s_from'] = $from;
-}
-
-### Setting values from searchform
-if (@is_array($tainted["sensorid"])) {
-  if ($tainted['sensorid'][0] != 0) {
-    $sensorid = -1;
-    $ar_sensorid = array();
-    foreach ($tainted["sensorid"] as $sid) {
-      $ar_sensorid[] = intval($sid);
+foreach ($clean as $search => $searchval) {
+    if ($searchval != "-1") {
+        $crit[$search] = $searchval;
     }
-  } else {
-    $sensorid = 0;
-    $ar_sensorid[] = $sensorid;
-  }
-} else {
-  $sensorid = intval($tainted['sensorid']);
-  $ar_sensorid[] = $sensorid;
 }
 
-####################
-# Severity
-####################
-if (isset($clean['sev'])) {
-  $f_sev = $clean['sev'];
-  if (!array_key_exists($f_sev, $v_severity_ar)) {
-    unset($f_sev);
-  }
+if (isset($tainted['sensorid'])) {
+    if (is_array($tainted['sensorid'])) {
+        $sensorid = -1;
+    } elseif ($tainted['sensorid'] > 0) {
+        $sensorid = $tainted['sensorid'];
+    }
+    $crit['sensorid'] = $tainted['sensorid'];
 }
 
-####################
-# Severity Type
-####################
-if (isset($clean['sevtype'])) {
-  $f_sevtype = $clean['sevtype'];
-  if (!array_key_exists($f_sevtype, $v_severity_atype_ar)) {
-    unset($f_sevtype);
-  }
-}
-
-####################
-# Binary name
-####################
-$bin_pattern = '/^[a-zA-Z0-9%]{1,33}$/';
-if (preg_match($bin_pattern, $clean['binname'])) {
-  $f_binname = $clean['binname'];
-}
-
-####################
-# Binary ID
-####################
-$f_binid = $clean['binid'];
-
-####################
-# Attack type
-####################
-$f_attack = $clean['attack'];
-
-####################
-# Virus type
-####################
-$f_virus_txt = $clean['virustxt'];
-
-####################
-# Filename
-####################
-$f_filename = $clean['filename'];
-
-####################
-# Report type
-####################
-$f_reptype = $rapport;
-
-####################
-# Choice Types
-####################
-$f_destchoice = $clean['destchoice'];
-if (!isset($clean['destchoice'])) $f_destchoice = 1;
-$f_sourcechoice = $clean['sourcechoice'];
-if (!isset($clean['sourcechoice'])) $f_sourcechoice = 1;
+#echo "<pre>\n";
+#print_r($crit);
+#echo "</pre>\n";
 
 ####################
 # Sensor ID's
 ####################
 if ($sensorid > 0) {
   add_to_sql("sensors", "table");
-  add_to_sql("sensors.id = '$sensorid'", "where");
+  add_to_sql("sensors.id = '" .$crit['sensorid']. "'", "where");
 } elseif ($sensorid == -1) {
   # multiple sensors
   add_to_sql("sensors", "table");
-  $count = count($ar_sensorid);
-  $tmp_where = "sensors.id IN (";
-  for ($i = 0; $i < $count; $i++) {
-    if ($i != ($count - 1)) {
-      $tmp_where .= "$ar_sensorid[$i], ";
-    } else {
-      $tmp_where .= "$ar_sensorid[$i]";
+
+  # Removing 0 values
+  $crit['sensorid'] = array_diff($crit['sensorid'], array(0));
+
+  $count = count($crit['sensorid']);
+  if ($count != 0) {
+    $tmp_where = "sensors.id IN (";
+    for ($i = 0; $i < $count; $i++) {
+      if ($i != ($count - 1)) {
+        $tmp_where .= $crit['sensorid'][$i]. ", ";
+      } else {
+        $tmp_where .= $crit['sensorid'][$i];
+      }
     }
+    $tmp_where .= ")";
+    add_to_sql($tmp_where, "where");
   }
-  $tmp_where .= ")";
-  add_to_sql($tmp_where, "where");
 }
 
 ####################
 # Group
 ####################
-if (isset($clean['gid'])) {
-  $gid = $clean['gid'];
+if (isset($crit['gid'])) {
+  $gid = $crit['gid'];
   $sql_gid = "SELECT sensorid FROM groupmembers WHERE groupid = '$gid'";
   $result_gid = pg_query($pgconn, $sql_gid);
   $i = 0;
@@ -286,23 +218,23 @@ if (isset($clean['gid'])) {
 ####################
 # Source IP address
 ####################
-if (isset($clean['sourcemac'])) {
-  $source_mac = $clean['sourcemac'];
+if (isset($crit['sourcemac'])) {
+  $source_mac = $crit['sourcemac'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.src_mac = '$source_mac'", "where");
 }
-if (isset($clean['source'])) {
-  $source_ip = $clean['source'];
+if (isset($crit['source'])) {
+  $source_ip = $crit['source'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source <<= '$source_ip'", "where");
 }
-if (isset($clean['ownsource'])) {
-  $ownsource = $clean['ownsource'];
+if (isset($crit['ownsource'])) {
+  $ownsource = $crit['ownsource'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.source <<= '$ownsource'", "where");
 }
-if (isset($clean['sport'])) {
-  $sport = $clean['sport'];
+if (isset($crit['sport'])) {
+  $sport = $crit['sport'];
   if ($sport != 0) {
     add_to_sql("attacks", "table");
     add_to_sql("attacks.sport = '$sport'", "where");
@@ -312,18 +244,18 @@ if (isset($clean['sport'])) {
 ####################
 # Destination IP address
 ####################
-if (isset($clean['destmac'])) {
-  $dest_mac = $clean['destmac'];
+if (isset($crit['destmac'])) {
+  $dest_mac = $crit['destmac'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.dst_mac = '$dest_mac'", "where");
 }
-if (isset($clean['dest'])) {
-  $destination_ip = $clean['dest'];
+if (isset($crit['dest'])) {
+  $destination_ip = $crit['dest'];
   add_to_sql("attacks", "table");
   add_to_sql("attacks.dest <<= '$destination_ip'", "where");
 }
-if (isset($clean['dport'])) {
-  $dport = $clean['dport'];
+if (isset($crit['dport'])) {
+  $dport = $crit['dport'];
   if ($dport != 0) {
     add_to_sql("attacks", "table");
     add_to_sql("attacks.dport = '$dport'", "where");
@@ -334,34 +266,38 @@ if (isset($clean['dport'])) {
 # Start timestamp
 ####################
 add_to_sql("attacks", "table");
-add_to_sql("attacks.timestamp >= '$from'", "where");
+if (!isset($crit['attackid'])) {
+  add_to_sql("attacks.timestamp >= '$from'", "where");
+}
 
 ####################
 # End timestamp
 ####################
 add_to_sql("attacks", "table");
-add_to_sql("attacks.timestamp <= '$to'", "where");
+if (!isset($crit['attackid'])) {
+  add_to_sql("attacks.timestamp <= '$to'", "where");
+}
 
 ####################
 # Severity
 ####################
-if (isset($f_sev)) {
+if (isset($crit['sev'])) {
   add_to_sql("attacks", "table");
-  add_to_sql("attacks.severity = '$f_sev'", "where");
+  add_to_sql("attacks.severity = '" .$crit['sev']. "'", "where");
 }
 
 ####################
 # Severity type
 ####################
-if (isset($f_sevtype)) {
+if (isset($crit['sevtype'])) {
   add_to_sql("attacks", "table");
-  add_to_sql("attacks.atype = '$f_sevtype'", "where");
+  add_to_sql("attacks.atype = '" .$crit['sevtype']. "'", "where");
 }
 
 ####################
 # All exploits
 ####################
-if (isset($clean['allexploits'])) {
+if (isset($crit['allexploits'])) {
   add_to_sql("attacks", "table");
   add_to_sql("details", "table");
   add_to_sql("attacks.id = details.attackid", "where");
@@ -371,7 +307,7 @@ if (isset($clean['allexploits'])) {
 ####################
 # Type of attack
 ####################
-if ($f_attack > 0) {
+if ($crit['attack'] > 0) {
   add_to_sql("details", "table");
   add_to_sql("stats_dialogue", "table");
   add_to_sql("attacks.id = details.attackid", "where");
@@ -382,7 +318,7 @@ if ($f_attack > 0) {
 ####################
 # Type of virus
 ####################
-if (!empty($f_virus_txt)) {
+if (isset($crit['virustxt'])) {
   add_to_sql("binaries", "table");
   add_to_sql("details", "table");
   add_to_sql("stats_virus", "table");
@@ -392,54 +328,169 @@ if (!empty($f_virus_txt)) {
   add_to_sql("details.text = uniq_binaries.name", "where");
   add_to_sql("uniq_binaries.id = binaries.bin", "where");
   add_to_sql("binaries.info = stats_virus.id", "where");
-  add_to_sql("stats_virus.name LIKE '$f_virus_txt'", "where");
+  add_to_sql("stats_virus.name LIKE '" .$crit['virustxt']. "'", "where");
   add_to_sql("details.text", "select");
 }
 
 ####################
 # Filename
 ####################
-if ("$f_filename" != "") {
+if (isset($crit['filename'])) {
   add_to_sql("details", "table");
   add_to_sql("attacks.id = details.attackid", "where");
   add_to_sql("details.type = 4", "where");
-  add_to_sql("details.text LIKE '%$f_filename'", "where");
+  add_to_sql("details.text LIKE '%" .$crit['filename']. "'", "where");
   add_to_sql("details.text", "select");
 }
 
 ####################
 # Binary Name
 ####################
-if (!empty($f_binname)) {
+if (isset($crit['binname'])) {
   add_to_sql("details", "table");
   add_to_sql("details.type = 8", "where");
   add_to_sql("attacks.id = details.attackid", "where");
-  add_to_sql("details.text LIKE '$f_binname'", "where");
+  add_to_sql("details.text LIKE '" .$crit['binname']. "'", "where");
 }
 
 ####################
 # Binary ID
 ####################
-if (!empty($f_binid)) {
+if (isset($crit['binid'])) {
   add_to_sql("details", "table");
   add_to_sql("uniq_binaries", "table");
   add_to_sql("attacks.id = details.attackid", "where");
   add_to_sql("details.type = 8", "where");
   add_to_sql("details.text = uniq_binaries.name", "where");
-  add_to_sql("uniq_binaries.id = $f_binid", "where");
+  add_to_sql("uniq_binaries.id = " .$crit['binid'], "where");
 }
 
 ####################
 # Ranges
 ####################
-if (!isset($clean['gid'])) {
-  if ($f_sourcechoice == 3 && $ownsource == "") {
+if (!isset($crit['gid'])) {
+  if ($crit['sourcechoice'] == 3 && $crit['ownsource'] == "") {
     add_to_sql(gen_org_sql(1), "where");
   } else {
     add_to_sql(gen_org_sql(), "where");
   }
 }
 
+####################
+# SSH has command
+####################
+if (isset($crit['sshhascommand'])) {
+  $crit['sev'] = 1;
+  $crit['sevtype'] = 7;
+
+  # 2 = yes
+  # 1 = no
+  # 0 = both
+  $subquery = "SELECT DISTINCT attacks.id FROM attacks, ssh_command WHERE attacks.timestamp < $to AND attacks.timestamp > $from AND atype = 7";
+  $subquery .= " AND ssh_command.attackid = attacks.id";
+  if ($crit['sshhascommand'] == 2) {
+    add_to_sql("attacks.id IN ($subquery)", "where");
+  } elseif ($crit['sshhascommand'] == 1) {
+    add_to_sql("NOT attacks.id IN ($subquery)", "where");
+  }
+}
+
+####################
+# SSH successful login
+####################
+if (isset($crit['sshlogin'])) {
+  # 2 = yes
+  # 1 = no
+  # 0 = both
+  if ($crit['sshlogin'] == 2) {
+    $crit['sev'] = 1;
+    $crit['sevtype'] = 7;
+
+    add_to_sql("ssh_logins", "table");
+    add_to_sql("attacks.atype = 7", "where");
+    add_to_sql("attacks.id = ssh_logins.attackid", "where");
+    add_to_sql("ssh_logins.type = TRUE", "where");
+  } elseif ($crit['sshlogin'] == 1) {
+    $crit['sev'] = 1;
+    $crit['sevtype'] = 7;
+
+    add_to_sql("ssh_logins", "table");
+    add_to_sql("attacks.atype = 7", "where");
+    add_to_sql("attacks.id = ssh_logins.attackid", "where");
+    add_to_sql("ssh_logins.type = FALSE", "where");
+  }
+}
+
+####################
+# SSH version
+####################
+if (isset($crit['sshversion'])) {
+  $crit['sev'] = 1;
+  $crit['sevtype'] = 7;
+
+  add_to_sql("ssh_version", "table");
+  add_to_sql("attacks.atype = 7", "where");
+  add_to_sql("attacks.id = ssh_version.attackid", "where");
+  if (strpos($crit['sshversion'], "%") === true) {
+      add_to_sql("ssh_version.version LIKE '" .$crit['sshversion']. "'", "where");
+  } else {
+      add_to_sql("ssh_version.version = '" .$crit['sshversion']. "'", "where");
+  }
+}
+
+####################
+# SSH command
+####################
+if (isset($crit['sshcommand'])) {
+  $crit['sev'] = 1;
+  $crit['sevtype'] = 7;
+
+  add_to_sql("ssh_command", "table");
+  add_to_sql("attacks.atype = 7", "where");
+  add_to_sql("attacks.id = ssh_command.attackid", "where");
+  if (strpos($crit['sshcommand'], "%") === true) {
+      add_to_sql("ssh_command.command LIKE '" .$crit['sshcommand']. "'", "where");
+  } else {
+      add_to_sql("ssh_command.command = '" .$crit['sshcommand']. "'", "where");
+  }
+}
+
+####################
+# SSH user
+####################
+if (isset($crit['sshuser'])) {
+  $crit['sev'] = 1;
+  $crit['sevtype'] = 7;
+
+  add_to_sql("ssh_logins", "table");
+  add_to_sql("attacks.atype = 7", "where");
+  add_to_sql("attacks.id = ssh_logins.attackid", "where");
+  add_to_sql("ssh_logins.sshuser = '" .$crit['sshuser']. "'", "where");
+}
+
+####################
+# SSH pass
+####################
+if (isset($crit['sshpass'])) {
+  $crit['sev'] = 1;
+  $crit['sevtype'] = 7;
+
+  add_to_sql("ssh_logins", "table");
+  add_to_sql("attacks.atype = 7", "where");
+  add_to_sql("attacks.id = ssh_logins.attackid", "where");
+  add_to_sql("ssh_logins.sshpass = '" .$crit['sshpass']. "'", "where");
+}
+
+####################
+# Attack ID
+####################
+if (isset($crit['attackid'])) {
+  add_to_sql("attacks.id = ". $crit['attackid'], "where");
+}
+
+####################
+# General query stuff
+####################
 add_to_sql("attacks", "table");
 add_to_sql("attacks.*", "select");
 add_to_sql("sensors.keyname", "select");
@@ -515,445 +566,25 @@ $last_result = ($offset + $per_page);
 if ($last_result > $num_rows) $last_result = $num_rows;
 $last_result = number_format($last_result, 0, ".", ",");
 
-####################
-# SEARCH CRITERIA
-####################
-echo "<div class='leftmed'>";
-  echo "<div class='block'>";
-    echo "<div class='actionBlock'>\n";
-      echo "<div class='blockHeader'>\n";
-        echo "<div class='blockHeaderLeft'>" .$l['ls_crit']. "</div>\n";
-        echo "<div class='blockHeaderRight'>\n";
-          echo "<div class='searchheader'>&nbsp;<a href='logsearch.php'>" .$l['ls_clear']. "</a>&nbsp;</div>\n";
-        echo "</div>\n";
-      echo "</div>\n";
-      echo "<div class='blockContent'>\n";
-        echo "<form method='get' action='logsearch.php' name='searchform' id='searchform'>\n";
-          echo "<table class='actiontable'>\n";
-            echo "<tr>\n";
-              echo "<td width='18%'>" .$l['ls_dest']. ":</td>\n";
-              echo "<th width='65%'>\n";
-                if (!isset($destination_ip) && !isset($dest_mac) && $sensorid == 0) echo $l['ls_all'];
-                if (isset($sensorid)) {
-                  if ($sensorid == 0) {} 
-                  elseif ($sensorid > 0) {
-                    echo "$sensorid";
-                    $graph[] = "sensorid=$sensorid";
-                  } else {
-                    foreach ($ar_sensorid as $key=>$sid) {
-                      if ($q_org == 0) {
-                        $sensor_where = " ";
-                      } else {
-                        $sensor_where = " AND sensors.organisation = '$q_org'";
-                      }
-                      $sql = "SELECT sensors.keyname, sensors.vlanid, sensors.label, organisations.organisation FROM sensors, organisations ";
-                      $sql .= "WHERE organisations.id = sensors.organisation AND sensors.id = $sid $sensor_where ORDER BY sensors.keyname";
-                      $debuginfo[] = $sql;
-                      $query = pg_query($sql);
-                      while ($sensor_data = pg_fetch_assoc($query)) {
-                        $keyname = $sensor_data["keyname"];
-                        $vlanid = $sensor_data["vlanid"];
-                        $label = $sensor_data["label"];
-                        $org = $sensor_data["organisation"];
-                        if ($label != "") { 
-                          if ($q_org == 0) {
-                            $label .= " (" .$org. ")";
-                          }
-                          $name = $label;
-                        } else {  
-                          $name = sensorname($keyname, $vlanid);
-                        }
-                        echo "$name<br />\n";
-                      }
-                      $sensorstring .= $sid . ",";
-                    }
-                    $sensorstring = trim($sensorstring, ",");
-                    $graph[] = "sensorid=$sensorstring";
-                  }
-                }
-                if (isset($destination_ip)) echo "$destination_ip";
-                if (isset($dest_mac)) echo "$dest_mac";
-                if (isset($dport)) {
-                  echo ":$dport";
-                  $graph[] = "strip_html_escape_ports=$dport";
-                }
-              echo "</th>\n";
-              echo "<td width='17%' class='aright'><a onclick='\$(\"#search_dest\").toggle();'>" .$l['ls_change']. "</a></td>\n";
-            echo "</tr>\n";
-          echo "</table>\n";
-          echo "<table class='searchtable' id='search_dest' style='display: none;'>";
-            echo "<tr>";
-              echo "<td>Address:</td>";
-              echo "<td>";
-                echo "<select name='int_destchoice' onchange='javascript: sh_search_dest(this.value);' class='pers'>\n";
-                  foreach ($v_search_dest_ar as $key=>$val) {
-                    echo printOption($key, $val, $f_destchoice);
-                  }
-                echo "</select>\n";
-              echo "</td>";
-              if ($f_destchoice == 1) {
-                echo "<td id='dest' style=''>";
-              } else {
-                echo "<td id='dest' style='display:none;'>";
-              }
-                if ($c_autocomplete == 1) { 
-                  echo "<input type='text' id='inet_dest' class='pers' name='inet_dest' alt='" .$l['ls_destip']. "' onkeyup='searchSuggest(1);' autocomplete='off' value='$destination_ip' />";
-                  echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_1' class='search_suggest'></div>\n";
-                  echo "</div>\n";
-                } else {
-                  echo "<input type='text' id='inet_dest' class='pers' name='inet_dest' alt='" .$l['ls_destip']. "' maxlenght=18  value='$destination_ip'/>";
-                } 
-              echo "</td>";
-              $select_size = 5;
-              if ($q_org == 0) {
-                $sensor_where = " ";
-              } else {
-                $sensor_where = " AND sensors.organisation = '$q_org'";
-              }
-              $sql = "SELECT COUNT(id) FROM sensors WHERE 1=1 $sensor_where";
-              $debuginfo[] = $sql;
-              $query = pg_query($sql);
-              $nr_rows = intval(@pg_result($query, 0));
-              if ($nr_rows < $select_size) {
-                $select_size = ($nr_rows + 1);
-              }
-              if ($nr_rows > 1) {
-                if ($f_destchoice == 3) {
-                  echo "<td id='sensor' style='' >\n";
-                } else {
-                  echo "<td id='sensor' style='display:none;' >\n";
-                }
-                  echo "<select name='sensorid[]' size='$select_size' multiple='true' id='sensorid' class='pers'>\n";
-                    echo printOption(0, "All sensors", $ar_sensorid);
-                    $sql = "SELECT sensors.id, sensors.keyname, sensors.vlanid, sensors.label, organisations.organisation FROM sensors, organisations ";
-                    $sql .= "WHERE organisations.id = sensors.organisation $sensor_where ORDER BY sensors.keyname";
-                    $debuginfo[] = $sql;
-                    $query = pg_query($sql);
-                    while ($sensor_data = pg_fetch_assoc($query)) {
-                      $sid = $sensor_data['id'];
-                      $keyname = $sensor_data["keyname"];
-                      $vlanid = $sensor_data["vlanid"];
-                      $label = $sensor_data["label"];
-                      $org = $sensor_data["organisation"];
-                      if ($label != "") { 
-                        if ($q_org == 0) {
-                          $label .= " (" .$org. ")";
-                        }
-                        $name = $label;
-                      } else {  
-                        $name = sensorname($keyname, $vlanid);
-                      }
-                      echo printOption($sid, $name, $ar_sensorid);
-                    }
-                  echo "</select>\n";
-                echo "</td>\n";
-              }
-              if ($f_destchoice == 2) {
-                echo "<td id='destmac' style=''>";
-              } else {
-                echo "<td id='destmac' style='display:none;'>";
-              }
-              if ($c_autocomplete == 1) {
-                echo "<input type='text' id='mac_destmac' class='pers' name='mac_destmac' alt='" .$l['ls_destmac']. "' onkeyup='searchSuggest(2);' autocomplete='off' value='$dest_mac' />";
-                echo "<div id='search_suggest'>\n";
-                  echo "<div id='search_suggest_2' class='search_suggest'></div>\n";
-                echo "</div>\n"; 
-              } else {
-                echo "<input type='text' id='mac_destmac' class='pers' name='mac_destmac' alt='" .$l['ls_destmac']. "' value='$dest_mac' />";
-              }
-            echo "</td>";
-          echo "</tr>\n";
-          echo "<tr>\n";
-            echo "<td>" .$l['ls_port']. ":</td>\n";
-            echo "<td><input type='text' class='pers' name='int_dport' size='5' value='$dport' /></td>";
-          echo "</tr>";
-          echo "<tr>\n";
-            echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
-          echo "</tr>";
-        echo "</table>"; 
-        echo "<hr>\n";
-        echo "<table class='actiontable'>\n";
-          $orgipadmin_link = $s_access_user > 1 ? "orgipadmin.php" : "#";
-          if ($filter_ip == 1) {
-            $sql_exclusion = "SELECT exclusion FROM org_excl WHERE orgid = $q_org";
-            $debuginfo[] = $sql_exclusion;
-            $result_exclusion = pg_query($pgconn, $sql_exclusion);
-            $ip_exclusionrows = pg_num_rows($result_exclusion);
-            while ($row_ip = pg_fetch_assoc($result_exclusion)) {
-              $ip_excl_text .= $row_ip['exclusion'] ."<br />";
-            }
-            if ($ip_exclusionrows > 0) {
-              $ip_excl = "<a href='$orgipadmin_link' " .printover($ip_excl_text). ">" .$l['ls_ipex_on']. "</a>";
-            } else { 
-              $ip_excl = "<a href='$orgipadmin_link'>" .$l['ls_ipex_off']. "</a>"; 
-            } 
-          } else {
-            $ip_excl = "<a href='$orgipadmin_link'>" .$l['ls_ipex_off']. "</a>"; 
-          }
+############################
+# SEARCH CRITERIA INCLUDE
+############################
 
-          if ($filter_mac == 1) {
-            $sql_exclusion = "SELECT mac FROM arp_excl";
-            $debuginfo[] = $sql_exclusion;
-            $result_exclusion = pg_query($pgconn, $sql_exclusion);
-            $mac_exclusionrows = pg_num_rows($result_exclusion);
-            while ($row_mac = pg_fetch_assoc($result_exclusion)) {
-              $mac_excl_text .= $row_mac['mac'] ."<br />";
-            }
-            if ($mac_exclusionrows > 0) {
-              $mac_excl = "<a href='#' " .printover($mac_excl_text). ">" .$l['ls_macex_on']. "</a>";
-            } else { 
-              $mac_excl = $l['ls_macex_off'];
-            }
-          } else {
-            $mac_excl = $l['ls_macex_off'];
-          }
+# Setting up search include stuff
+$search_dest = 'display: none;';
+$search_src = 'display: none;';
+$search_char = 'display: none;';
+$info_dest = '';
+$info_src = '';
+$info_char = '';
+$show_change = 1;
+$single_submit = 0;
 
-          echo "<tr>\n";
-            echo "<td width='18%'>" .$l['ls_source']. ":</td>\n";
-            echo "<th width='52%'>\n";
-              if (!isset($source_ip) && !isset($source_mac) && !isset($ownsource)) echo $l['ls_all']. " ";
-              if ($f_sourcechoice == 3 && !isset($ownsource)) echo $l['ls_own'];
-              if (isset($source_ip)) echo "$source_ip";
-              if (isset($ownsource)) echo "$ownsource";
-              if (isset($source_mac)) echo "$source_mac";
-              if (isset($sport)) echo ":$sport";
-            echo "</th>\n";
-            echo "<td width='30%' class='aright'>$ip_excl<br />$mac_excl<br />";
-            echo "<a onclick='\$(\"#search_source\").toggle();'>" .$l['ls_change']. "</a></td>\n";
-          echo "</tr>\n";
-        echo "</table>\n";
-        echo "<table class='searchtable' id='search_source' style='display: none;'>";
-          echo "<tr>\n";
-            echo "<td>" .$l['ls_address']. ":</td>";
-            echo "<td>";
-              echo "<select name='int_sourcechoice' onchange='javascript: sh_search_src(this.value);' class='pers'>\n";
-                foreach ($v_search_src_ar as $key=>$val) {
-                  echo printOption($key, $val, $f_sourcechoice);
-                }
-              echo "</select>\n";
-            echo "</td>\n"; 
-            if ($f_sourcechoice == 1) {
-              echo "<td id='source' style=''>";
-            } else {
-              echo "<td id='source' style='display:none;'>";
-            }
-              if ($c_autocomplete == 1) { 
-                echo "<input type='text' id='ipv4v6_source' class='pers' name='ipv4v6_source' alt='" .$l['ls_sourceip']. "' onkeyup='searchSuggest(3);' autocomplete='off' value='$source_ip' />";
-                echo "<div id='search_suggest'>\n";
-                  echo "<div id='search_suggest_3' class='search_suggest'></div>\n";
-                echo "</div>\n"; 
-               } else { 
-                echo "<input type='text' id='ipv4v6_source' class='pers' name='ipv4v6_source' alt='" .$l['ls_sourceip']. "' maxlenght='18' value='$source_ip' />";
-              }
-            echo "</td>";
-            if ($f_sourcechoice == 2) {
-              echo "<td id='sourcemac' style=''>";
-            } else {
-              echo "<td id='sourcemac' style='display:none;'>";
-            }
-              if ($c_autocomplete == 1) {
-                echo "<input type='text' id='mac_sourcemac' class='pers' name='mac_sourcemac' alt='" .$l['ls_sourcemac']. "' onkeyup='searchSuggest(4);' autocomplete='off' value='$source_mac' />";
-                echo "<div id='search_suggest'>\n";
-                  echo "<div id='search_suggest_4' class='search_suggest'></div>\n";
-                echo "</div>\n"; 
-              } else { 
-                echo "<input type='text' id='mac_sourcemac' class='pers' name='mac_sourcemac' alt='" .$l['ls_sourcemac']. "' value='$source_mac' />";
-              }
-            echo "</td>\n";
-            if ($f_sourcechoice == 3) {
-              echo "<td id='ownrange' style=''>";
-            } else {
-              echo "<td id='ownrange' style='display:none;'>";
-            }
-              $sql_ranges = "SELECT ranges FROM organisations WHERE id = $q_org";
-              $debuginfo[] = $sql_ranges;
-              $result_ranges = pg_query($pgconn, $sql_ranges);
-              $row = pg_fetch_assoc($result_ranges);
-              if ($row['ranges'] == "") {
-                echo "<input type='text' class='pers' value='" .$l['ls_noranges']. "' />";
-              } else {
-                echo "<select name='inet_ownsource' id='inet_ownsource' class='pers'>\n";
-                  $ranges_ar = explode(";", $row['ranges']);
-                  sort($ranges_ar);
-                  echo printOption("", $l['ls_allranges'], "" );
-                  foreach ($ranges_ar as $range) {
-                    if (trim($range) != "") {
-                      echo printOption("$range", "$range", "$ownsource" );
-                    }
-                  }
-                echo "</select>\n"; 
-              }
-            echo "</td>\n";
-          echo "</tr>\n";
-          echo "<tr>\n";
-            echo "<td>" .$l['ls_port']. ":</td>\n";
-            echo "<td><input type='text' class='pers' name='int_sport' size='5' value='$sport' /></td>\n";
-          echo "</tr>\n";
-          echo "<tr>\n";
-            echo "<td>" .$l['ls_ipfilter']. ":</td>\n";
-            echo "<td>" .printradio($l['g_on'], "int_ipfilter", 1, $filter_ip). "&nbsp;&nbsp;" .printradio($l['g_off'], "int_ipfilter", 0, $filter_ip). "</td>\n";
-          echo "</tr>\n";
-          echo "<tr>\n";
-            echo "<td>" .$l['ls_macfilter']. ":</td>\n";
-            echo "<td>" .printradio($l['g_on'], "int_macfilter", 1, $filter_mac). "&nbsp;&nbsp;" .printradio($l['g_off'], "int_macfilter", 0, $filter_mac). "</td>\n";
-          echo "</tr>\n";
-          echo "<tr>\n";
-            echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
-          echo "</tr>\n";
-        echo "</table>"; 
-        echo "<hr>\n";
-        echo "<table class='actiontable'>\n";
-          echo "<tr>\n";
-            echo "<td width='18%'>" .$l['ls_chars']. ":</td>";
-            echo "<td width='65%'></td>\n";
-            echo "<td width='17%' class='aright'><a onclick='\$(\"#search_charac\").toggle();'>" .$l['ls_change']. "</a></td>\n";
-          echo "</tr>\n";
-        echo "</table>\n";
-        echo "<table class='actiontable'>\n";
-          echo "<tr>";
-            echo "<td width='18%'></td>";
-            echo "<td width='80%'>";
-              if (isset($f_sev)) {
-                echo $l['ls_sev']. ": <font class='btext'>$v_severity_ar[$f_sev]</font><br />";
-                if (isset($f_sevtype)) {
-                  if ($f_sevtype != 0) {
-                    $graph[] = "severity=$f_sev";
-                  }
-                } else {
-                  $graph[] = "severity=$f_sev";
-                }
-              }
-              if (isset($f_sevtype) && $f_sev == 1) {
-                echo $l['ls_sevtype']. ": <font class='btext'>$v_severity_atype_ar[$f_sevtype]</font><br />";
-                if ($f_sevtype == 0) {
-                  $graph[] = "attack=-1";
-                } else {
-                  $graph[] = "sevtype=$f_sevtype";
-                }
-              } elseif ($f_sev == 1) {
-                $graph[] = "sevtype=-1&int_totalmal1=1";
-              }
-              if (isset($f_attack) && $f_sev == 1) {
-                $sql_g = "SELECT name FROM stats_dialogue WHERE id = '$f_attack'";
-                $result_g = pg_query($pgconn, $sql_g);
-                $row_g = pg_fetch_assoc($result_g);
-                $expl = $row_g['name'];
-                $expl = str_replace("Dialogue", "", $expl);
-                $graph[] = "attack=$f_attack";
-                if ($expl != "") echo $l['ls_exp']. ": <font class='btext'>$expl</font><br />";
-              }
-              if (isset($f_binname) && $f_sev == 32) echo $l['ls_binname']. ": <font class='btext'>$f_binname</font><br />";
-              if (isset($f_virus_txt) && $f_sev == 32) echo $l['ls_virus']. ": <font class='btext'>$f_virus_txt</font><br />";
-              if (isset($f_filename) && ($f_sev == 16 || $f_sev == 16)) echo $l['ls_filename']. ": <font class='btext'>$f_filename</font><br />";
-            echo "</td>\n";
-            echo "<td width='2%'></td>\n";
-          echo "</tr>\n";
-        echo "</table>\n";
-        echo "<table class='searchtable' id='search_charac' style='display: none;'>\n";
-          echo "<tr id='sev' style=''>\n";
-            echo "<td>" .$l['ls_sev']. ":</td>\n";
-            echo "<td>\n";
-              echo "<select id='int_sev' name='int_sev' class='pers' onchange='javascript: sh_search_charac(this.value);'>\n";
-                if(!isset($f_sev)) $f_sev=-1;
-                  echo printOption(-1, "", $f_sev);
-                  foreach ($v_severity_ar as $index=>$severity) {
-                    echo printOption($index, $severity, $f_sev);
-                  }
-                echo "</select>\n";
-              echo "</td>";
-            echo "</tr>";
-          echo "<div id='charac_details' style='display: none;'>\n";
-            if ($f_sev == 1) {
-              echo "<tr id='sevtype' style=''>\n";
-            } else {
-              echo "<tr id='sevtype' style='display: none;'>\n";
-            }
-              echo "<td>" .$l['ls_att_type']. ": </td>";
-              echo "<td>";
-                echo "<select id='int_sevtype' name='int_sevtype' onchange='javascript: sh_search_charac_sevtype(this.value);' class='pers'>\n";
-                  if(!isset($f_sevtype)) $f_sevtype=-1;
-                  if ($f_sev != 1) $f_sevtype=-1;
-                  echo printOption(-1, $l['g_all'], $f_sevtype);
-                  foreach ($v_severity_atype_ar as $index=>$sevtype) {
-                    echo printOption($index, $sevtype, $f_sevtype);
-                  }
-                echo "</select>\n";
-              echo "</td>";
-            echo "</tr>\n";
-            if ($f_sevtype == 0 && $f_sev == 1) {
-              echo "<tr id='attacktype' style=''>\n";
-            } else {
-              echo "<tr id='attacktype' style='display:none;'>\n";
-            }
-              echo "<td>" .$l['ls_exp']. ":</td>";
-              echo "<td>";
-                echo "<select name='int_attack' id='int_attack' class='pers'>";
-                  if ($f_sevtype != 0) $f_attack=-1;
-                  echo printOption(-1, "All exploits", $f_attack);
-                  $sql = "SELECT * FROM stats_dialogue ORDER BY name";
-                  $debuginfo[] = $sql;
-                  $query = pg_query($sql);
-                  while ($row = pg_fetch_assoc($query)) {
-                    $name = str_replace("Dialogue", "", $row["name"]);
-                    echo printOption($row["id"], $name, $f_attack);
-                  }
-                echo "</select>";
-              echo "</td>\n";
-            echo "</tr>\n";
-            if ($f_sev == 32) {
-              echo "<tr id='virus' style=''>\n";
-            } else {
-              echo "<tr id='virus' style='display:none;'>\n";
-            }
-              echo "<td>" .$l['ls_virus']. ":</td>";
-              echo "<td>\n";
-                if ($c_autocomplete == 1) { 
-                  echo "<input type='text' id='strip_html_escape_virustxt' class='pers' name='strip_html_escape_virustxt' onkeyup='searchSuggest(5);' autocomplete='off' value='$f_virus_txt' />" .$l['ls_wildcard']. " %";
-                  echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_5' class='search_suggest'></div>\n";
-                  echo "</div>\n"; 
-                } else {
-                  echo "<input type='text' class='pers' name='strip_html_escape_virustxt' id='strip_html_escape_virustxt' value='$f_virus_txt' />" .$l['ls_wildcard']. " %\n";
-                }
-              echo "</td>\n";
-            echo "</tr>\n";
-            if ($f_sev == 32 || $f_sev == 16) {
-              echo "<tr id='filename' style=''>\n";
-            } else {
-              echo "<tr id='filename' style='display:none;'>\n";
-            }
-              echo "<td>" .$l['ls_filename']. ":</td>";
-              echo "<td>\n";
-                if ($c_autocomplete == 1) { 
-                  echo "<input type='text' class='pers' id='strip_html_escape_filename' name='strip_html_escape_filename' onkeyup='searchSuggest(6);' autocomplete='off' value='$f_filename' />" .$l['ls_wildcard']. " %";
-                  echo "<div id='search_suggest'>\n";
-                    echo "<div id='search_suggest_6' class='search_suggest'></div>\n";
-                  echo "</div>\n"; 
-                } else {
-                  echo "<input type='text' class='pers' id='strip_html_escape_filename' name='strip_html_escape_filename' value='$f_filename' />" .$l['ls_wildcard']. " %\n";
-                }
-              echo "</td>\n";
-            echo "</tr>\n";
-            if ($f_sev == 32) {
-              echo "<tr id='binary' style=''>\n";
-            } else {
-              echo "<tr id='binary' style='display:none;'>\n";
-            }
-              echo "<td>Binary:</td>";
-              echo "<td><input type='text' class='pers' id='strip_html_escape_binname' name='strip_html_escape_binname' value='$f_binname' />" .$l['ls_wildcard']. " %</td>";
-            echo "</tr>";
-          echo "</div>";
-        echo "<tr>\n";
-          echo "<td><input type='submit' value='" .$l['g_submit']. "' class='sbutton' /></td>";
-        echo "</tr>\n";
-        echo "</table>";
-        echo "</form>";
-      echo "</div>\n"; #</blockContent>
-      echo "<div class='blockFooter'></div>\n";
-    echo "</div>\n"; #</actionBlock>
-  echo "</div>\n"; #</block>
-echo "</div>\n"; #</leftsmall>
+echo "<script type='text/javascript' src='${address}include/surfids_search${min}.js'></script>\n";
+echo "<div class='leftmed'>\n";
+include_once 'sinclude.php';
+echo "</div>\n";
+
 
 if (count($graph) != 0) {
   foreach ($graph as $key=>$val) {
@@ -1104,7 +735,7 @@ $sql =  "SELECT $sql_select";
 $sql .= " FROM $sql_from ";
 $sql .= " $sql_where ";
 $sql .= " ORDER BY $sql_sort ";
-if ($f_reptype == "multi") {
+if ($rapport == "multi") {
     $sql .= " $sql_limit ";
 }
 $debuginfo[] = $sql;

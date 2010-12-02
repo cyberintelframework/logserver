@@ -491,9 +491,9 @@ img {
 .searchtable {
   font-size:            8pt;
 }
-.searchtable td {
-  text-align:           left;
-}
+#.searchtable td {
+#  text-align:           left;
+#}
 .searchtable input {
   font-size:            8pt;
 }

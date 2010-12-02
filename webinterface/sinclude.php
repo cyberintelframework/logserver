@@ -307,8 +307,21 @@ if ($filter_mac == 1) {
                 if (isset($crit['binname']) && $crit['sev'] == 32) echo $l['ls_binname']. ": <font class='btext'>" .$crit['binname']. "</font><br />";
                 if (isset($crit['virustxt']) && $crit['sev'] == 32) echo $l['ls_virus']. ": <font class='btext'>" .$crit['virustxt']. "</font><br />";
                 if (isset($crit['filename']) && ($crit['sev'] == 16 || $crit['sev'] == 16)) echo $l['ls_filename']. ": <font class='btext'>" .$crit['filename']. "</font><br />";
+                if (isset($crit['sshhascommand'])) {
+                    if ($crit['sshhascommand'] == 2) $shcval = $l['g_yes'];
+                    elseif ($crit['sshhascommand'] == 1) $shcval = $l['g_no'];
+                    if ($crit['sshhascommand'] != 0) {
+                        echo $l['ls_sshhascommand']. ": <font class='btext'>$shcval</font><br />";
+                    }
+                }
+                if (isset($crit['sshlogin'])) {
+                    if ($crit['sshlogin'] == 2) $shcval = $l['g_yes'];
+                    elseif ($crit['sshlogin'] == 1) $shcval = $l['g_no'];
+                    if ($crit['sshlogin'] != 0) {
+                        echo $l['ls_sshlogin']. ": <font class='btext'>$shcval</font><br />";
+                    }
+                }
               echo "</td>\n";
-#              echo "<td width='2%'></td>\n";
             echo "</tr>\n";
             ### CHARACTERISTICS SEARCH BLOCK
             echo "<tr class='search_char' style='" .$search_char. "'>\n";
