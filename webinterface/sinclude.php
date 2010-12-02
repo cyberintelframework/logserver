@@ -45,7 +45,7 @@ if ($filter_mac == 1) {
         echo "</div>\n";
       echo "</div>\n";
       echo "<div class='blockContent'>\n";
-        echo "<form method='get' action='logsearchnew.php' name='searchform' id='searchform'>\n";
+        echo "<form method='get' action='logsearch.php' name='searchform' id='searchform'>\n";
           echo "<table class='searchtable'>\n";
             ### DESTINATION INFO BLOCK
             echo "<tr class='info_dest' style='$info_dest'>\n";
