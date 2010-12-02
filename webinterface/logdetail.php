@@ -110,9 +110,9 @@ if ($err != 1) {
                 }
 
 				if ($s_access_search == 9) {
-	                $sql_logins = "SELECT sshuser, sshpass FROM ssh_logins WHERE attackid = $id";
+	                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
 				} else {
-	                $sql_logins = "SELECT sshuser, sshpass FROM ssh_logins WHERE attackid = $id";
+	                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
 					$sql_logins .= " AND ssh_logins.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
 					$sql_logins .= " sensors.organisation = '" .$q_org. "'";
 				}
@@ -120,9 +120,14 @@ if ($err != 1) {
                 $num_logins = pg_num_rows($result_logins);
                 $debuginfo[] = $sql_logins;
                 $row = pg_fetch_assoc($result_logins);
+                if ($row['type'] == "false") {
+                    $sshtype = $l['g_failed'];
+                } else {
+                    $sshtype = $l['g_success'];
+                }
                 echo "<tr>\n";
                   echo "<td>" .$l['ld_sshlogin']. "</td>";
-                  echo "<td>" .$row['sshuser']. " / " .$row['sshpass']. "</td>";
+                  echo "<td>" .$row['sshuser']. " / " .$row['sshpass']. " (" .$sshtype. ")</td>";
                 echo "</tr>\n";
 
 				if ($s_access_search == 9) {
