@@ -23,6 +23,7 @@
 ##########################
 # Global (Uppercase first letter)
 ##########################
+$l['g_both']            = "Both";
 $l['g_add']             = "Add";
 $l['g_update']          = "Update";
 $l['g_delete']          = "Delete";
@@ -61,6 +62,8 @@ $l['g_vlan']            = "VLAN";
 $l['g_country']         = "Country";
 $l['g_host']            = "Host";
 $l['g_hourly']          = "Hourly";
+$l['g_yes']             = "Yes";
+$l['g_no']              = "No";
 
 ##########################
 # Global (Lowercase first letter)
@@ -263,8 +266,8 @@ $l['ls_ipex_on']        = "IP filter ON";
 $l['ls_ipex_off']       = "IP filter OFF";
 $l['ls_macex_on']       = "MAC filter ON";
 $l['ls_macex_off']      = "MAC filter OFF";
-$l['ls_ipfilter']	= "IP filter";
-$l['ls_macfilter']	= "MAC filter";
+$l['ls_ipfilter']       = "IP filter";
+$l['ls_macfilter']      = "MAC filter";
 $l['ls_own']            = "Own ranges";
 $l['ls_address']        = "Address";
 $l['ls_sourceip']       = "Source IP";
@@ -275,7 +278,7 @@ $l['ls_chars']          = "Characteristics";
 $l['ls_sev']            = "Severity";
 $l['ls_sevtype']        = "Severity type";
 $l['ls_exp']            = "Exploit";
-$l['ls_binname']        = "Binary name";
+$l['ls_binname']        = "Binary";
 $l['ls_virus']          = "Virus";
 $l['ls_filename']       = "Filename";
 $l['ls_att_type']       = "Attack type";
@@ -298,6 +301,12 @@ $l['ls_fo']             = "file-offered";
 $l['ls_at']             = "attack-type";
 $l['ls_timestamp']      = "Timestamp";
 $l['ls_graphit']        = "Graph it!";
+$l['ls_sshversion']     = "Version";
+$l['ls_sshhascommand']  = "Has entered commands";
+$l['ls_sshlogin']       = "Successful login";
+$l['ls_sshcommand']     = "Command";
+$l['ls_sshuser']        = "User";
+$l['ls_sshpass']        = "Password";
 
 ##########################
 # logsys.php
@@ -683,6 +692,7 @@ $l['wh_query']          = "Whois query";
 $l['wh_enterip']        = "Enter whois IP";
 $l['wh_q']              = "Query";
 $l['wh_wquery']         = "WHOIS Query at";
+$l['wh_mwhquery']       = "MWH Query at";
 $l['wh_for']            = "for";
 $l['wh_connect']        = "Connecting to";
 $l['wh_connto']         = "Connection to";
@@ -699,4 +709,5 @@ $l['mod_virusscan']     = "Virus scanner";
 $l['mod_version']       = "Version";
 $l['mod_countries']     = "Top 10 malicious countries";
 $l['mod_geo_dis']       = "GeoIP module is disabled!";
+$l['mod_sshversion']    = "SSH Versions";
 ?>

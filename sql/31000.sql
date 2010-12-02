@@ -106,6 +106,17 @@ ALTER TABLE sensors ADD COLUMN protos boolean DEFAULT false NOT NULL;
 UPDATE sensors SET protos = arp;
 
 --
+-- DEACTIVATED_SENSORS
+--
+ALTER TABLE deactivated_sensors ALTER COLUMN arp DROP DEFAULT, ALTER COLUMN arp TYPE boolean USING arp::boolean, ALTER COLUMN arp SET DEFAULT false;
+ALTER TABLE deactivated_sensors ADD COLUMN dhcp boolean DEFAULT false NOT NULL;
+UPDATE deactivated_sensors SET dhcp = arp;
+ALTER TABLE deactivated_sensors ADD COLUMN ipv6 boolean DEFAULT false NOT NULL;
+UPDATE deactivated_sensors SET ipv6 = arp;
+ALTER TABLE deactivated_sensors ADD COLUMN protos boolean DEFAULT false NOT NULL;
+UPDATE deactivated_sensors SET protos = arp;
+
+--
 -- DHCP_STATIC
 --
 CREATE TABLE dhcp_static (

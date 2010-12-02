@@ -32,7 +32,7 @@ $v_severity_atype_ar = array(
         4 => "Amun",
         5 => "Dionaea",
         6 => "SMTP",
-		7 => "Kippo",
+        7 => "Kippo",
         10 => "ARP Poisoning",
         11 => "Rogue DHCP server",
         12 => "IPv6 MitM"
@@ -365,8 +365,8 @@ $v_sensorstatus_ar = array(
 		'text' => "Starting up"
 	),
 	7 => array(
-		'class' => "outdated",
-		'text' => "Out of date"
+		'class' => "dhcp",
+		'text' => "DHCP failed"
 	)
 );
 
@@ -479,7 +479,8 @@ $v_indexmod_ar = array(
     10 => "Ports",
     11 => "Top 10 sensors",
     12 => "Top 10 malicious countries",
-    13 => "Malware hosts"
+    13 => "Malware hosts",
+    14 => "SSH Versions",
 );
 
 ?>

@@ -639,6 +639,9 @@ function matchCIDR($addr, $cidr) {
       }
     }
   } else {
+    if (strpos($cidr, '/') === false) {
+      return $output;
+    }
     list($ip, $mask) = explode('/', $cidr);
     $mask = 0xffffffff << (32 - $mask);
     $output = ((ip2long($addr) & $mask) == (ip2long($ip) & $mask));
