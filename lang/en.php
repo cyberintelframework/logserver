@@ -64,6 +64,8 @@ $l['g_host']            = "Host";
 $l['g_hourly']          = "Hourly";
 $l['g_yes']             = "Yes";
 $l['g_no']              = "No";
+$l['g_success']         = "Success";
+$l['g_failed']          = "Failed";
 
 ##########################
 # Global (Lowercase first letter)
