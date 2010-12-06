@@ -34,7 +34,7 @@
 ####################
 # Variables used
 ####################
-do '/etc/surfnetids/surfnetids-log.conf';
+require '/etc/surfnetids/surfnetids-log.conf';
 our $source = 'mailreporter.pl';
 our $sensor = 'unkown';
 our $tap = 'unknown';
@@ -48,6 +48,7 @@ our $g_vlanid = 0;
 BEGIN {
   $warn_cymru = 0;
   unless (eval "require Net::Abuse::Utils") {
+    do '/etc/surfnetids/surfnetids-log.conf';
     if ($c_enable_cymru == 1) {
       warn "Could not load module -> Net::Abuse::Utils\n";
     }
@@ -641,7 +642,6 @@ while (@row = $email_query->fetchrow_array) {
           $sendit = 0;
         }
       }
-      print "SENDIT: $sendit\n";
     } elsif ($template == 2) {  
       ################################
       # OWN RANGES TEMPLATE
