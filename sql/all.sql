@@ -49,9 +49,12 @@ CREATE TABLE sensors (
     mac macaddr,
     organisation integer DEFAULT 0 NOT NULL,
     vlanid integer DEFAULT 0,
-    arp integer DEFAULT 0 NOT NULL,
     label character varying,
-    networkconfig character varying
+    networkconfig character varying,
+    arp boolean DEFAULT false NOT NULL,
+    dhcp boolean DEFAULT false NOT NULL,
+    ipv6 boolean DEFAULT false NOT NULL,
+    protos boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE sensors_id_seq
@@ -393,7 +396,9 @@ CREATE TABLE binaries_detail (
     fileinfo character varying,
     filesize integer,
     last_scanned integer,
-    upx character varying
+    upx character varying,
+    first_seen integer DEFAULT 0 NOT NULL,
+    last_seen integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE binaries_detail_id_seq
@@ -501,9 +506,12 @@ CREATE TABLE deactivated_sensors (
     mac macaddr,
     organisation integer DEFAULT 0 NOT NULL,
     vlanid integer DEFAULT 0,
-    arp integer DEFAULT 0 NOT NULL,
     label character varying,
-    networkconfig character varying
+    networkconfig character varying,
+    arp boolean DEFAULT false NOT NULL,
+    dhcp boolean DEFAULT false NOT NULL,
+    ipv6 boolean DEFAULT false NOT NULL,
+    protos boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE deactivated_sensors_id_seq
@@ -669,6 +677,29 @@ INSERT INTO indexmods VALUES (10, 'mod_top10ports.php');
 INSERT INTO indexmods VALUES (11, 'mod_top10sensors.php');
 INSERT INTO indexmods VALUES (12, 'mod_topcountries.php');
 INSERT INTO indexmods VALUES (13, 'mod_malhosts.php');
+
+--
+-- IPV6_STATIC
+--
+CREATE TABLE ipv6_static (
+    id integer NOT NULL,
+    ip inet NOT NULL,
+    sensorid integer NOT NULL
+);
+
+CREATE SEQUENCE ipv6_static_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ipv6_static_id_seq OWNED BY ipv6_static.id;
+
+ALTER TABLE ipv6_static ALTER COLUMN id SET DEFAULT nextval('ipv6_static_id_seq'::regclass);
+ALTER TABLE ONLY ipv6_static ADD CONSTRAINT ipv6_static_pkey PRIMARY KEY (id);
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE ipv6_static TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ipv6_static_id_seq TO idslog;
 
 --
 -- LOGIN 
@@ -1005,7 +1036,8 @@ CREATE TABLE sensor_details (
     osversion character varying,
     dns1 inet,
     dns2 inet,
-    permanent integer DEFAULT 0 NOT NULL
+    permanent integer DEFAULT 0 NOT NULL,
+    firstattack integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE sensor_details_id_seq
@@ -1187,6 +1219,84 @@ ALTER TABLE ONLY sniff_protos
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE sniff_protos TO idslog;
 
 GRANT SELECT,UPDATE ON SEQUENCE sniff_protos_id_seq TO idslog;
+
+--
+-- SSH_COMMAND
+--
+CREATE TABLE ssh_command (
+    id integer NOT NULL,
+    attackid integer NOT NULL,
+    command character varying NOT NULL
+);
+
+CREATE SEQUENCE ssh_command_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ssh_command_id_seq OWNED BY ssh_command.id;
+
+ALTER TABLE ssh_command ALTER COLUMN id SET DEFAULT nextval('ssh_command_id_seq'::regclass);
+ALTER TABLE ONLY ssh_command
+    ADD CONSTRAINT ssh_command_pkey PRIMARY KEY (id);
+
+GRANT SELECT ON TABLE ssh_command TO idslog;
+GRANT SELECT,INSERT ON TABLE ssh_command TO nepenthes;
+GRANT SELECT,UPDATE ON SEQUENCE ssh_command_id_seq TO nepenthes;
+
+--
+-- SSH_LOGINS
+--
+CREATE TABLE ssh_logins (
+    id integer NOT NULL,
+    attackid integer NOT NULL,
+    type boolean DEFAULT false NOT NULL,
+    sshuser character varying NOT NULL,
+    sshpass character varying NOT NULL
+);
+
+CREATE SEQUENCE ssh_logins_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ssh_logins_id_seq OWNED BY ssh_logins.id;
+
+ALTER TABLE ssh_logins ALTER COLUMN id SET DEFAULT nextval('ssh_logins_id_seq'::regclass);
+ALTER TABLE ONLY ssh_logins
+    ADD CONSTRAINT ssh_logins_pkey PRIMARY KEY (id);
+
+GRANT SELECT,INSERT ON TABLE ssh_logins TO nepenthes;
+GRANT SELECT ON TABLE ssh_logins TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ssh_logins_id_seq TO nepenthes;
+
+--
+-- SSH_VERSION
+--
+CREATE TABLE ssh_version (
+    id integer NOT NULL,
+    attackid integer NOT NULL,
+    version character varying NOT NULL
+);
+
+CREATE SEQUENCE ssh_version_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ssh_version_id_seq OWNED BY ssh_version.id;
+
+ALTER TABLE ssh_version ALTER COLUMN id SET DEFAULT nextval('ssh_version_id_seq'::regclass);
+ALTER TABLE ONLY ssh_version
+    ADD CONSTRAINT ssh_version_pkey PRIMARY KEY (id);
+
+GRANT SELECT,INSERT,UPDATE ON TABLE ssh_version TO nepenthes;
+GRANT SELECT ON TABLE ssh_version TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE ssh_version_id_seq TO nepenthes;
 
 --
 -- STATS_DIALOGUE
@@ -1705,6 +1815,69 @@ BEGIN
                  p_severity,
                  p_atype
         );
+
+        SELECT INTO m_attackid currval('attacks_id_seq');
+        return m_attackid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_ipv6_add_by_id
+--
+CREATE OR REPLACE FUNCTION surfids3_ipv6_add_by_id(integer, inet, integer, integer) RETURNS integer
+    AS $_$DECLARE
+        p_sensorid      ALIAS FOR $1;
+        p_sourceip      ALIAS FOR $2;
+        p_severity      ALIAS FOR $3;
+        p_atype         ALIAS FOR $4;
+        m_attackid      INTEGER;
+BEGIN
+        INSERT INTO attacks (sensorid, timestamp, source, severity, atype)
+        VALUES
+                (p_sensorid,
+                 extract(epoch from current_timestamp(0))::integer,
+                 p_sourceip,
+                 p_severity,
+                 p_atype
+        );
+
+        SELECT INTO m_attackid currval('attacks_id_seq');
+        return m_attackid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_arp_add_by_id
+--
+CREATE OR REPLACE FUNCTION surfids3_arp_add_by_id(integer, macaddr, macaddr, inet, inet, integer, integer) RETURNS integer
+    AS $_$DECLARE
+        p_severity      ALIAS FOR $1;
+        p_dstmac        ALIAS FOR $2;
+        p_srcmac        ALIAS FOR $3;
+        p_dstip         ALIAS FOR $4;
+        p_srcip         ALIAS FOR $5;
+        p_sensorid      ALIAS FOR $6;
+        p_atype         ALIAS FOR $7;
+        m_attackid      INTEGER;
+BEGIN
+        INSERT INTO attacks
+                (severity,
+                 timestamp,
+                 src_mac,
+                 dst_mac,
+                 source,
+                 dest,
+                 sensorid,
+                 atype)
+        VALUES
+                (p_severity,
+                 extract(epoch from current_timestamp(0))::integer,
+                 p_srcmac,
+                 p_dstmac,
+                 p_dstip,
+                 p_srcip,
+                 p_sensorid,
+                 p_atype);
 
         SELECT INTO m_attackid currval('attacks_id_seq');
         return m_attackid;

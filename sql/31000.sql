@@ -106,6 +106,11 @@ ALTER TABLE sensors ADD COLUMN protos boolean DEFAULT false NOT NULL;
 UPDATE sensors SET protos = arp;
 
 --
+-- SENSOR_DETAILS
+--
+ALTER TABLE sensor_details ADD COLUMN firstattack integer DEFAULT 0 NOT NULL;
+
+--
 -- DEACTIVATED_SENSORS
 --
 ALTER TABLE deactivated_sensors ALTER COLUMN arp DROP DEFAULT, ALTER COLUMN arp TYPE boolean USING arp::boolean, ALTER COLUMN arp SET DEFAULT false;
