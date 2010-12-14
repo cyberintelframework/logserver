@@ -680,6 +680,7 @@ function getPortDescr($aPort) {
       case  465: return "smtps"; break;
       case  993: return "imap4s"; break;
       case  995: return "pop3s"; break;
+      case  1433: return "mssqld"; break;
       case 5000: return "UPnP"; break;
       default  : return "No description"; break;
   }
