@@ -312,7 +312,7 @@ if ($crit['attack'] > 0) {
   add_to_sql("stats_dialogue", "table");
   add_to_sql("attacks.id = details.attackid", "where");
   add_to_sql("details.text = stats_dialogue.name", "where");
-  add_to_sql("stats_dialogue.id = '$f_attack'", "where");
+  add_to_sql("stats_dialogue.id = '" .$crit['attack']. "'", "where");
 }
 
 ####################
@@ -719,8 +719,8 @@ $url = str_replace("reptype=&", "", $url);
 $url = str_replace("&reptype=", "", $url);
 
 # Handling report types
-if ($f_reptype == "single") $nav .= "&nbsp;<a href='${url}${oper}reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
-if ($f_reptype == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
+if ($rapport == "single") $nav .= "&nbsp;<a href='${url}${oper}reptype='>" .$l['ls_multi']. "</a>&nbsp;\n";
+if ($rapport == "multi") $nav .= "&nbsp;<a href='${url}${oper}reptype=single'>" .$l['g_all']. "</a>&nbsp;\n";
 
 ####################
 # BUILDING SEARCH QUERY

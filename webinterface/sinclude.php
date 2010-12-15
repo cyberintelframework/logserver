@@ -351,11 +351,11 @@ if ($filter_mac == 1) {
             echo "</tr>\n";
             echo "<tr class='search_char' id='attacktype' style='display:none;'>\n";
               echo "<td>" .$l['ls_exp']. ":</td>";
-              echo "<td colspan=2>";
+              echo "<td colspan=2>"; 
+                if ($crit['sevtype'] != 0 && $crit['sevtype'] != 5) $crit['attack'] = -1;
                 echo "<select name='int_attack' id='int_attack' class='pers'>";
-                  if ($crit['sevtype'] != 0) $crit['attack'] = -1;
                   echo printOption(-1, "All exploits", $crit['attack']);
-                  $sql = "SELECT * FROM stats_dialogue ORDER BY name";
+                  $sql = "SELECT name, id FROM stats_dialogue ORDER BY name";
                   $debuginfo[] = $sql;
                   $query = pg_query($sql);
                   while ($row = pg_fetch_assoc($query)) {

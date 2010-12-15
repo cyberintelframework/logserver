@@ -58,7 +58,7 @@ function surfids_search_severity(si) {
   $('#charac_details').hide();
 
   $('#int_sevtype')[0].selectedIndex = 0;
-  $('#int_attack')[0].selectedIndex = 0;
+//  $('#int_attack')[0].selectedIndex = 0;
   $('#strip_html_escape_virustxt').val('');
   $('#strip_html_escape_filename').val('');
   $('#strip_html_escape_binname').val('');
