@@ -33,7 +33,7 @@ if ($c_logsys_flexi == 1) {
   $address = getaddress();
   echo "<link rel='stylesheet' href='${address}include/flexi/flexigrid.css' />\n";
   echo "<script type='text/javascript' src='${address}include/flexi/flexigrid${min}.js'></script>\n";
-  echo "<script type='text/javascript' src='${address}include/surfnetids.logsys${min}.js'></script>\n";
+  echo "<script type='text/javascript' src='${address}include/surfids.logsys${min}.js'></script>\n";
 } else {  # START_NO_FLEXI
 
 # Retrieving default values from $_COOKIE
