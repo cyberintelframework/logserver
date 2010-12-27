@@ -121,7 +121,7 @@ $sql_email = "SELECT login.email, login.organisation, report_content.id, report_
 $sql_email .= " report_content.template, report_content.last_sent, report_content.sensor_id, ";
 $sql_email .= " report_content.frequency, report_content.interval, report_content.priority, ";
 $sql_email .= " report_content.subject, report_content.operator, report_content.threshold, ";
-$sql_email .= " report_content.severity, report_content.detail, login.gpg, report_content.always, report_content.utc ";
+$sql_email .= " report_content.severity, report_content.detail, login.gpg, report_content.always, report_content.utc, report_content.subject ";
 $sql_email .= " FROM login, report_content ";
 $sql_email .= " WHERE report_content.user_id = login.id AND report_content.active = TRUE AND NOT login.email = ''";
 $sql_email .= " AND report_content.detail < 10 ";
@@ -152,6 +152,13 @@ while (@row = $email_query->fetchrow_array) {
   $gpg_enabled = $row[15];
   $always = $row[16];
   $enable_utc = $row[17];
+  $subject = $row[18];
+
+#  print "EMAIL: $email\n";
+#  print "TEMP: $template\n";
+#  print "DETAIL: $detail\n";
+#  print "SUB: $subject\n";
+#  print "\n";
 
   # The maill will be sent per default
   $sendit = 1;
@@ -376,11 +383,12 @@ while (@row = $email_query->fetchrow_array) {
         $sql .= " ON severity.val = attacks.severity ";
         $sql .= " LEFT JOIN details ";
         $sql .= " ON attacks.id = details.attackid ";
-        $sql .= " WHERE (details.type IN (1,4,8) OR details.type IS NULL) ";
+        $sql .= " WHERE (details.type IN (1,4,8,84) OR details.type IS NULL) ";
         $sql .= " AND attacks.timestamp >= '$ts_start' AND attacks.timestamp <= '$ts_end' ";
         $sql .= " AND NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $org) ";
         $sql .= " $andorg $andsensor $andsev";
         $sql .= " ORDER BY timestamp ASC";
+        #print "SQL: $sql\n";
         $ipview_query = $dbh->prepare($sql);
         $ec = $ipview_query->execute();
 
