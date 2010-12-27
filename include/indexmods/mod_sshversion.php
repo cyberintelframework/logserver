@@ -18,15 +18,19 @@ $tsquery = "timestamp >= $from AND timestamp <= $to";
 
 add_to_sql("attacks", "table");
 add_to_sql("ssh_version", "table");
+add_to_sql("uniq_sshversion", "table");
 add_to_sql("$tsquery", "where");
+add_to_Sql("uniq_sshversion.id = ssh_version.version", "where");
 if ($q_org != 0) {
   add_to_sql("sensors", "table");
   add_to_sql("sensors.id = attacks.sensorid", "where");
   add_to_sql(gen_org_sql(), "where");
 }
-add_to_sql("DISTINCT ssh_version.version", "select");
+add_to_sql("DISTINCT ssh_version.version as versionid", "select");
+add_to_sql("uniq_sshversion.version", "select");
 add_to_sql("COUNT(ssh_version.attackid) as total", "select");
-add_to_sql("ssh_version.version", "group");
+add_to_sql("versionid", "group");
+add_to_sql("uniq_sshversion.version", "group");
 add_to_sql("ssh_version.attackid = attacks.id", "where");
 
 # IP Exclusion stuff
@@ -57,11 +61,12 @@ echo "<div class='block'>\n";
           echo "</tr>\n";
 
           while($row = pg_fetch_assoc($result_severity)) {
+            $versionid = $row['versionid'];
             $version = $row['version'];
             $count = $row['total'];
             echo "<tr>\n";
               echo "<td>$version</td>\n";
-              echo "<td><a href='logsearch.php?strip_html_escape_sshversion=$version'>$count</a></td>\n";
+              echo "<td><a href='logsearch.php?int_sshversionid=$versionid'>$count</a></td>\n";
             echo "</tr>\n";
           }
         echo "</table>\n";

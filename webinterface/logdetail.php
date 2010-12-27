@@ -18,6 +18,12 @@ include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';
 
+if ($c_minified_enable == 1) {
+  $min = "-min";
+} else {
+  $min = "";
+}
+
 # Starting the session
 session_start();
 header("Cache-control: private");
@@ -29,7 +35,7 @@ include "../lang/${c_language}.php";
 if (!isset($_SESSION['s_admin'])) {
   $address = getaddress();
   pg_close($pgconn);
-  echo "<script src='include/surfnetids.js'>\n";
+  echo "<script src='${address}include/surfids${min}.js'>\n";
     echo "popout();";
   echo "</script>\n";
 }
@@ -92,7 +98,7 @@ if ($err != 1) {
 
             if ($atype == 7) {
 				if ($s_access_search == 9) {
-	                $sql_version = "SELECT version FROM ssh_version WHERE attackid = $id";
+	                $sql_version = "SELECT uniq_sshversion.version FROM ssh_version, uniq_sshversion WHERE attackid = $id AND uniq_sshversion.id = ssh_version.version";
 				} else {
 	                $sql_version = "SELECT version FROM ssh_version, attacks, sensors WHERE attackid = $id";
 					$sql_version .= " AND ssh_version.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
