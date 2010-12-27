@@ -121,7 +121,8 @@ $allowed_get = array(
         "int_sshhascommand",
         "int_sshlogin",
         "strip_html_escape_sshcommand",
-        "int_attackid"
+        "int_attackid",
+        "int_sshversionid"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -429,13 +430,23 @@ if (isset($crit['sshversion'])) {
   $crit['sevtype'] = 7;
 
   add_to_sql("ssh_version", "table");
+  add_to_sql("uniq_sshversion", "table");
   add_to_sql("attacks.atype = 7", "where");
   add_to_sql("attacks.id = ssh_version.attackid", "where");
   if (strpos($crit['sshversion'], "%") === true) {
-      add_to_sql("ssh_version.version LIKE '" .$crit['sshversion']. "'", "where");
+      add_to_sql("uniq_sshversion.version LIKE '" .$crit['sshversion']. "'", "where");
   } else {
-      add_to_sql("ssh_version.version = '" .$crit['sshversion']. "'", "where");
+      add_to_sql("uniq_sshversion.version = '" .$crit['sshversion']. "'", "where");
   }
+  add_to_sql("uniq_sshversion.id = ssh_version.version", "where");
+} elseif (isset($crit['sshversionid'])) {
+  $crit['sev'] = 1;
+  $crit['sevtype'] = 7;
+
+  add_to_sql("ssh_version", "table");
+  add_to_sql("attacks.atype = 7", "where");
+  add_to_sql("attacks.id = ssh_version.attackid", "where");
+  add_to_sql("ssh_version.version = '" .$crit['sshversionid']. "'", "where");
 }
 
 ####################
@@ -571,16 +582,15 @@ $last_result = number_format($last_result, 0, ".", ",");
 ############################
 
 # Setting up search include stuff
-$search_dest = 'display: none;';
-$search_src = 'display: none;';
-$search_char = 'display: none;';
-$info_dest = '';
-$info_src = '';
-$info_char = '';
-$show_change = 1;
-$single_submit = 0;
+$search_dest = 'display: none;';    # If empty, show search input fields, else show search info summary
+$search_src = 'display: none;';     # If empty, show search input fields, else show search info summary
+$search_char = 'display: none;';    # If empty, show search input fields, else show search info summary
+$info_dest = '';                    # If empty, show search info summary, else show search input fields
+$info_src = '';                     # If empty, show search info summary, else show search input fields
+$info_char = '';                    # If empty, show search info summary, else show search input fields
+$show_change = 1;                   # Show the change links, used for the results page
+$single_submit = 0;                 # Only show a single submit button in the bottom right corner of the criteria div
 
-echo "<script type='text/javascript' src='${address}include/surfids_search${min}.js'></script>\n";
 echo "<div class='leftmed'>\n";
 include_once 'sinclude.php';
 echo "</div>\n";
@@ -685,6 +695,7 @@ if ($num_rows == 0) {
     echo "</div>\n";
   echo "</div>\n";
   debug_sql();
+  echo "<script type='text/javascript' src='${address}include/surfids.search${min}.js'></script>\n";
   ?>
   <script language="javascript" type="text/javascript">
   document.getElementById('search_wait').style.display='none';
@@ -1007,6 +1018,7 @@ if ($c_searchtime == 1) {
 
 debug_sql();
 pg_close($pgconn);
+echo "<script type='text/javascript' src='${address}include/surfids.search${min}.js'></script>\n";
 ?>
 <script language="javascript" type="text/javascript">
 document.getElementById('search_wait').style.display='none';

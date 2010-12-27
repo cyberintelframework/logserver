@@ -321,6 +321,16 @@ if ($filter_mac == 1) {
                         echo $l['ls_sshlogin']. ": <font class='btext'>$shcval</font><br />";
                     }
                 }
+                if (isset($crit['sshversion'])) {
+                    $sel_sshversion = $crit['sshversion'];
+                    echo $l['ls_sshversion']. ": <font class='btext'>" .$crit['sshversion']. "</font><br />";
+                } elseif (isset($crit['sshversionid'])) {
+                    $sql_s = "SELECT version FROM uniq_sshversion WHERE id = '" .$crit['sshversionid']. "'";
+                    $result_s = pg_query($pgconn, $sql_s);
+                    $row_s = pg_fetch_assoc($result_s);
+                    $sel_sshversion = $row_s['version'];
+                    echo $l['ls_sshversion']. ": <font class='btext'>$sel_sshversion</font><br />";
+                }
               echo "</td>\n";
             echo "</tr>\n";
             ### CHARACTERISTICS SEARCH BLOCK
@@ -387,7 +397,7 @@ if ($filter_mac == 1) {
             ### SSH VERSION
             echo "<tr class='search_char' id='sshversion' style='display:none;'>\n";
               echo "<td>" .$l['ls_sshversion']. ":</td>";
-              echo "<td colspan=2><input type='text' class='pers' id='strip_html_escape_sshversion' name='strip_html_escape_sshversion' value='" .$crit['sshversion']. "' /></td>\n";
+              echo "<td colspan=2><input type='text' class='pers' id='strip_html_escape_sshversion' name='strip_html_escape_sshversion' value='" .$sel_sshversion. "' /></td>\n";
             echo "</tr>";
             ### SSH USER
             echo "<tr class='search_char' id='sshuser' style='display:none;'>\n";
