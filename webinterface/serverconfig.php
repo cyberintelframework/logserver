@@ -161,10 +161,6 @@ echo "<div class='leftmed'>\n";
             echo "<td>c_autocomplete</td>\n";
             echo "<td>" .printled($c_autocomplete). "</td>\n";
           echo "</tr>\n";
-          echo "<tr>\n";
-            echo "<td>c_suggest_limit</td>\n";
-            echo "<td>" .$c_suggest_limit. "</td>\n";
-          echo "</tr>\n";
         echo "</table>\n";
 
         echo "<table class='multipletable'>\n";
