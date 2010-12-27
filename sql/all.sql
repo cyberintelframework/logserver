@@ -1884,3 +1884,81 @@ BEGIN
 END$_$
     LANGUAGE plpgsql;
 
+--
+-- surfids3_sshversion_add
+--
+CREATE OR REPLACE FUNCTION surfids3_sshversion_add(integer, integer) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_versionid ALIAS FOR $2;
+BEGIN
+    INSERT INTO ssh_version
+        (attackid,version)
+    VALUES
+        (p_attackid,p_versionid);
+    return p_versionid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshversionstring_add
+--
+CREATE OR REPLACE FUNCTION surfids3_sshversionstring_add(integer, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_version ALIAS FOR $2;
+
+    m_versionid INTEGER;
+BEGIN
+    SELECT INTO m_versionid id FROM uniq_sshversion WHERE version = p_version;
+
+    INSERT INTO ssh_version
+        (attackid,version)
+    VALUES
+        (p_attackid,m_versionid);
+    return m_versionid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshcommand_add
+--
+CREATE OR REPLACE FUNCTION surfids3_sshcommand_add(integer, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_command ALIAS FOR $2;
+
+    m_commandid INTEGER;
+BEGIN
+    INSERT INTO ssh_command
+        (attackid,command)
+    VALUES
+        (p_attackid,p_command);
+
+    SELECT INTO m_commandid currval('ssh_command_id_seq');
+    return m_commandid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshlogin_add
+--
+CREATE OR REPLACE FUNCTION surfids3_sshlogin_add(integer, boolean, character varying, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_type ALIAS FOR $2;
+    p_user ALIAS FOR $3;
+    p_pass ALIAS FOR $4;
+
+    m_loginid INTEGER;
+BEGIN
+    INSERT INTO ssh_logins
+        (attackid,type,sshuser,sshpass)
+    VALUES
+        (p_attackid,p_type,p_user,p_pass);
+
+    SELECT INTO m_loginid currval('ssh_logins_id_seq');
+    return m_loginid;
+END$_$
+    LANGUAGE plpgsql;
+

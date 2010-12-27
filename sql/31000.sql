@@ -1,11 +1,10 @@
 -- SURFids 3.10
 -- Database conversion 3.06+ -> 3.10
--- Changeset 002
--- 23-09-2010
 --
 
 --
 -- Changelog
+-- 003 Added Kippo functions
 -- 002 Added Kippo tables
 -- 001 Initial release
 --
@@ -13,12 +12,14 @@
 --
 -- SSH_COMMAND
 --
+DROP TABLE IF EXISTS ssh_command;
 CREATE TABLE ssh_command (
     id integer NOT NULL,
     attackid integer NOT NULL,
     command character varying NOT NULL
 );
 
+DROP SEQUENCE IF EXISTS ssh_command_id_seq;
 CREATE SEQUENCE ssh_command_id_seq
     INCREMENT BY 1
     NO MAXVALUE
@@ -38,6 +39,7 @@ GRANT SELECT,UPDATE ON SEQUENCE ssh_command_id_seq TO nepenthes;
 --
 -- SSH_LOGINS
 --
+DROP TABLE IF EXISTS ssh_logins;
 CREATE TABLE ssh_logins (
     id integer NOT NULL,
     attackid integer NOT NULL,
@@ -46,6 +48,7 @@ CREATE TABLE ssh_logins (
     sshpass character varying NOT NULL
 );
 
+DROP SEQUENCE IF EXISTS ssh_logins_id_seq;
 CREATE SEQUENCE ssh_logins_id_seq
     INCREMENT BY 1
     NO MAXVALUE
@@ -65,12 +68,14 @@ GRANT SELECT,UPDATE ON SEQUENCE ssh_logins_id_seq TO nepenthes;
 --
 -- SSH_VERSION
 --
+DROP TABLE IF EXISTS ssh_version;
 CREATE TABLE ssh_version (
     id integer NOT NULL,
     attackid integer NOT NULL,
-    version character varying NOT NULL
+    version integer NOT NULL
 );
 
+DROP SEQUENCE IF EXISTS ssh_version_id_seq;
 CREATE SEQUENCE ssh_version_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -87,6 +92,34 @@ ALTER TABLE ONLY ssh_version
 GRANT SELECT,INSERT,UPDATE ON TABLE ssh_version TO nepenthes;
 GRANT SELECT ON TABLE ssh_version TO idslog;
 GRANT SELECT,UPDATE ON SEQUENCE ssh_version_id_seq TO nepenthes;
+
+--
+-- UNIQ_SSHVERSION
+--
+DROP TABLE IF EXISTS uniq_sshversion;
+CREATE TABLE uniq_sshversion (
+    id integer NOT NULL,
+    version character varying
+);
+
+DROP SEQUENCE IF EXISTS uniq_sshversion_id_seq;
+CREATE SEQUENCE uniq_sshversion_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE uniq_sshversion_id_seq OWNED BY uniq_sshversion.id;
+ALTER TABLE uniq_sshversion ALTER COLUMN id SET DEFAULT nextval('uniq_sshversion_id_seq'::regclass);
+ALTER TABLE ONLY uniq_sshversion
+    ADD CONSTRAINT uniq_sshversion_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY uniq_sshversion
+    ADD CONSTRAINT uniq_sshversion_version_key UNIQUE (version);
+
+GRANT SELECT ON TABLE uniq_sshversion TO idslog;
+GRANT SELECT,INSERT ON TABLE uniq_sshversion TO nepenthes;
+GRANT SELECT ON SEQUENCE uniq_sshversion_id_seq TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE uniq_sshversion_id_seq TO nepenthes;
 
 --
 -- BINARIES_DETAIL
@@ -169,6 +202,7 @@ GRANT SELECT,UPDATE ON SEQUENCE ipv6_static_id_seq TO idslog;
 --
 -- surfids3_ipv6_add_by_id
 --
+DROP FUNCTION IF EXISTS surfids3_ipv6_add_by_id;
 CREATE OR REPLACE FUNCTION surfids3_ipv6_add_by_id(integer, inet, integer, integer) RETURNS integer
     AS $_$DECLARE
         p_sensorid      ALIAS FOR $1;
@@ -194,6 +228,7 @@ END$_$
 --
 -- surfids3_arp_add_by_id
 --
+DROP FUNCTION IF EXISTS surfids3_arp_add_by_id;
 CREATE OR REPLACE FUNCTION surfids3_arp_add_by_id(integer, macaddr, macaddr, inet, inet, integer, integer) RETURNS integer
     AS $_$DECLARE
         p_severity      ALIAS FOR $1;
@@ -226,6 +261,86 @@ BEGIN
 
         SELECT INTO m_attackid currval('attacks_id_seq');
         return m_attackid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshversion_add
+--
+DROP FUNCTION IF EXISTS surfids3_sshversion_add;
+CREATE OR REPLACE FUNCTION surfids3_sshversion_add(integer, integer) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_versionid ALIAS FOR $2;
+BEGIN
+    INSERT INTO ssh_version
+        (attackid,version)
+    VALUES
+        (p_attackid,p_versionid);
+    return p_versionid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshversionstring_add
+--
+DROP FUNCTION IF EXISTS surfids3_sshversionstring_add;
+CREATE OR REPLACE FUNCTION surfids3_sshversionstring_add(integer, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_version ALIAS FOR $2;
+
+    m_versionid INTEGER;
+BEGIN
+    SELECT INTO m_versionid id FROM uniq_sshversion WHERE version = p_version;
+
+    INSERT INTO ssh_version
+        (attackid,version)
+    VALUES
+        (p_attackid,m_versionid);
+    return m_versionid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshcommand_add
+--
+CREATE OR REPLACE FUNCTION surfids3_sshcommand_add(integer, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_command ALIAS FOR $2;
+
+    m_commandid INTEGER;
+BEGIN
+    INSERT INTO ssh_command
+        (attackid,command)
+    VALUES
+        (p_attackid,p_command);
+
+    SELECT INTO m_commandid currval('ssh_command_id_seq');
+    return m_commandid;
+END$_$
+    LANGUAGE plpgsql;
+
+--
+-- surfids3_sshlogin_add
+--
+CREATE OR REPLACE FUNCTION surfids3_sshlogin_add(integer, boolean, character varying, character varying) RETURNS integer
+    AS $_$DECLARE
+    p_attackid ALIAS FOR $1;
+    p_type ALIAS FOR $2;
+    p_user ALIAS FOR $3;
+    p_pass ALIAS FOR $4;
+
+    m_loginid INTEGER;
+BEGIN
+    INSERT INTO ssh_logins
+        (attackid,type,sshuser,sshpass)
+    VALUES
+        (p_attackid,p_type,p_user,p_pass);
+
+    SELECT INTO m_loginid currval('ssh_logins_id_seq');
+    return m_loginid;
 END$_$
     LANGUAGE plpgsql;
 
