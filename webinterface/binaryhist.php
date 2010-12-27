@@ -96,7 +96,9 @@ if ($err == 0) {
   $last_scanned = $row_bindetail['last_scanned'];
   $upx = $row_bindetail['upx'];
   $first_seen = $row_bindetail['first_seen'];
+  $first_seen = date($c_date_format, $first_seen);
   $last_seen = $row_bindetail['last_seen'];
+  $last_seen = date($c_date_format, $last_seen);
   if ("$last_scanned" == "") {
     $last_scanned = $l['mr_never'];
   } else {
@@ -209,8 +211,8 @@ if ($err == 0) {
         echo "<div class='blockContent'>\n";
           echo "<table class='datatable'>\n";
             echo "<tr>\n";
-              echo "<th width='15%'>Timestamp</a></th>\n";
-              $sql_getscanners = "SELECT id, name FROM scanners";
+              echo "<th width='15%'>" .$l['ls_timestamp']. "</a></th>\n";
+              $sql_getscanners = "SELECT id, name FROM scanners WHERE status = 1";
               $debuginfo[] = $sql_getscanners;
               $result_getscanners = pg_query($pgconn, $sql_getscanners);
               while ($row_scanners = pg_fetch_assoc($result_getscanners)) {
@@ -233,6 +235,7 @@ if ($err == 0) {
                   $result_getvirus = pg_query($pgconn, $sql_getvirus);
                   $virus = pg_result($result_getvirus, "name");
                   $debuginfo[] = $sql_getvirus;
+                  
 
                   if (!isset($vir_ar[$scanner_id])) {
                     if ($virus == "") {
@@ -269,6 +272,7 @@ if ($err == 0) {
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</centerbig>
 
+/*
   if ($show == "all") {
     $sql_filename = "SELECT DISTINCT text ";
     $sql_filename .= "FROM details ";
@@ -316,6 +320,7 @@ if ($err == 0) {
       echo "</div>\n"; #</dataBlock>
     echo "</div>\n"; #</block>
   echo "</div>\n"; #</leftsmall>
+*/
 }
 
 debug_sql();
