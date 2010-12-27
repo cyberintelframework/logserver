@@ -22,7 +22,8 @@ $s_access_search = intval($s_access{1});
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_sev",
-                "int_atype"
+                "int_atype",
+                "int_own"
 );
 $check = extractvars($_GET, $allowed_get);
 
@@ -38,6 +39,12 @@ if (isset($clean['atype'])) {
   $atype = "false";
 }
 
+if (isset($clean['own'])) {
+  $ownmap = $clean['own'];
+} else {
+  $ownmap = 0;
+}
+
 if ($sev == 0) {
   $sevmap = 1;
 } elseif ($sev == 1 && $atype == "false") {
@@ -46,7 +53,7 @@ if ($sev == 0) {
   $sevmap = 3;
 } elseif ($sev == 1 && $atype == 0) {
   $sevmap = 4;
-} elseif ($sev == 1 && $atype ==7) {
+} elseif ($sev == 1 && $atype == 7) {
   $sevmap = 5;
 }
 
@@ -62,6 +69,10 @@ echo "<div class='dataBlock'>\n";
 echo "<div class='blockHeader'>\n";
   echo "<div class='blockHeaderLeft'>" .$l['gm_attackmap']. "</div>\n";
   echo "<div class='blockHeaderRight'>\n";
+    echo "<select class='smallselect' id='ownmapper' name='int_own' onChange='sevmap();'>\n";
+      echo printoption(0, "All", $ownmap);
+      echo printoption(1, "Own ranges", $ownmap);
+    echo "</select>\n";
     echo "<select class='smallselect' id='sevmapper' name='sevmap' onChange='sevmap();'>\n";
       echo printoption(1, "Possible malicious attack", $sevmap);
       echo printoption(2, "Malicious attack", $sevmap);
@@ -79,6 +90,7 @@ echo "<div class='blockContent'>\n";
 echo "<div id='map' style='width: 890px; height: 400px'></div>\n";
 echo "<script src='include/jquery.jmap.js' type='text/javascript'></script>";
 echo "<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=$c_googlemap_key' type='text/javascript'></script>";
+echo "<script type='text/javascript' src='${address}include/surfids.maps${min}.js'></script>\n";
 ?>
 <script type="text/javascript">
 $('#search_wait').html("<?php echo "<center>" .$l['gm_setting']. "<br /><br />" .$l['gm_patient']. ".<br /></center>" ?>");
