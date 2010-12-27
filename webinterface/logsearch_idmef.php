@@ -65,7 +65,15 @@ $allowed_get = array(
 		"int_page",
     	"int_binid",
         "int_sourcechoice",
-        "int_destchoice"
+        "int_destchoice",
+        "strip_html_escape_sshversion",
+        "strip_html_escape_sshuser",
+        "strip_html_escape_sshpass",
+        "int_sshhascommand",
+        "int_sshlogin",
+        "strip_html_escape_sshcommand",
+        "int_attackid",
+        "int_sshversionid"
 );
 $check = extractvars($_GET, $allowed_get);
 

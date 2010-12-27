@@ -35,10 +35,10 @@ $info_char = 'display: none;';
 $show_change = 0;
 $single_submit = 1;
 
-echo "<script type='text/javascript' src='${address}include/surfids_search${min}.js'></script>\n";
 echo "<div class='left'>\n";
 include_once 'sinclude.php';
 echo "</div>\n";
+echo "<script type='text/javascript' src='${address}include/surfids.search${min}.js'></script>\n";
 
 debug_sql();
 ?>

@@ -158,7 +158,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.jgrowl${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/jquery.jtip${min}.js'></script>\n";
 #    echo "<script type='text/javascript' src='${address}include/jquery.cluetip${min}.js'></script>\n";
-    echo "<script type='text/javascript' src='${address}include/surfnetids${min}.js'></script>\n";
+    echo "<script type='text/javascript' src='${address}include/surfids${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-en${min}.js'></script>\n";
     echo "<script type='text/javascript' src='${address}include/calendar-setup${min}.js'></script>\n";
