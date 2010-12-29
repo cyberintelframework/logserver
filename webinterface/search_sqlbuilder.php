@@ -361,6 +361,7 @@ if (isset($crit['attackid'])) {
 # General query stuff
 ####################
 add_to_sql("attacks", "table");
+add_to_sql("DISTINCT attacks.id as daid", "select");
 add_to_sql("attacks.*", "select");
 add_to_sql("sensors.keyname", "select");
 add_to_sql("sensors.vlanid", "select");
@@ -380,3 +381,4 @@ if ($filter_mac == 1) {
 prepare_sql();
 
 ?>
+
