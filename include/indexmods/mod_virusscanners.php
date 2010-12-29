@@ -53,7 +53,7 @@ echo "<div class='block'>\n";
       $numrows_down = pg_num_rows($result_down);
 
       if ($numrows_down > 0) {
-        $sql_scanners = "SELECT * FROM scanners";
+        $sql_scanners = "SELECT name, version, id FROM scanners WHERE status = 1";
         $result_scanners = pg_query($pgconn, $sql_scanners);
         $numrows_scanners = pg_num_rows($result_scanners);
 
