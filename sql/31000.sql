@@ -127,6 +127,8 @@ GRANT SELECT,UPDATE ON SEQUENCE uniq_sshversion_id_seq TO nepenthes;
 ALTER TABLE binaries_detail ADD COLUMN first_seen integer DEFAULT 0 NOT NULL;
 ALTER TABLE binaries_detail ADD COLUMN last_seen integer DEFAULT 0 NOT NULL;
 
+GRANT SELECT,INSERT,UPDATE ON TABLE binaries_detail TO nepenthes;
+
 --
 -- SENSORS
 --

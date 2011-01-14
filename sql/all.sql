@@ -414,6 +414,7 @@ CREATE UNIQUE INDEX index_binaries_detail_id ON binaries_detail USING btree (id)
 ALTER TABLE binaries_detail CLUSTER ON index_binaries_detail_id;
 
 GRANT SELECT,INSERT,UPDATE ON TABLE binaries_detail TO idslog;
+GRANT SELECT,INSERT,UPDATE ON TABLE binaries_detail TO nepenthes;
 
 GRANT SELECT,UPDATE ON SEQUENCE binaries_detail_id_seq TO idslog;
 

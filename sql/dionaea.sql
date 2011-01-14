@@ -112,11 +112,13 @@ CREATE OR REPLACE FUNCTION surfids3_attack_add(integer, inet, integer, inet, int
 BEGIN
 
     SELECT INTO m_sensorid surfids3_sensorid_get(p_decoyip);
-    SELECT INTO m_attackid surfids3_attack_add_by_id(p_severity,
-        p_attackerip, p_attackerport, p_decoyip,
-        p_decoyport, p_hwa, m_sensorid, p_atype);
-
-    return m_attackid;
+    IF NOT m_sensorid IS NULL THEN
+        SELECT INTO m_attackid surfids3_attack_add_by_id(p_severity,
+            p_attackerip, p_attackerport, p_decoyip,
+            p_decoyport, p_hwa, m_sensorid, p_atype);
+        return m_attackid;
+    END IF;
+    return 0;
 END$_$
     LANGUAGE plpgsql;
 
@@ -155,7 +157,11 @@ BEGIN
                  p_atype);
 
         SELECT INTO m_attackid currval('attacks_id_seq');
-        return m_attackid;
+        IF NOT m_attackid IS NULL THEN
+            return m_attackid;
+        ELSE
+            return 0;
+        END IF;
 END$_$
     LANGUAGE plpgsql;
 
@@ -262,6 +268,9 @@ BEGIN
         IF m_check = 0 THEN
           INSERT INTO uniq_binaries (name) VALUES (p_hash);
         END IF;
+
+    SELECT id INTO m_hashid FROM uniq_binaries WHERE name = p_hash;
+    UPDATE binaries_detail SET last_seen = round(EXTRACT(epoch FROM now())) WHERE bin = m_hashid;
 
     PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,4,p_url);
     PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,8,p_hash);
