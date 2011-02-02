@@ -39,12 +39,23 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
         "savetype",
-        "int_orgid"
+        "int_orgid",
+	"md5_hash"
 );
 $check = extractvars($_GET, $allowed_get);
 #debug_input();
 
+if (isset($clean['orgid'])) {
+    $orgid = $clean['orgid'];
+}
 $type = $tainted['savetype'];
+
+if (isset($clean['hash'])) {
+    if ($clean['hash'] != $s_hash) {
+        $err = 1;
+        $m = 116;
+    }
+}
 
 # Retrieving posted variables from $_POST
 $allowed_post = array(
@@ -58,9 +69,15 @@ $allowed_post = array(
 $check = extractvars($_POST, $allowed_post);
 #debug_input();
 
-if ($clean['hash'] != $s_hash) {
-  $err = 1;
-  $m = 116;
+if (isset($clean['orgid'])) {
+    $orgid = $clean['orgid'];
+}
+
+if (isset($clean['hash'])) {
+    if ($clean['hash'] != $s_hash) {
+        $err = 1;
+        $m = 116;
+    }
 }
 
 # Get the type of update
@@ -78,7 +95,6 @@ if ($s_admin != 1) {
 
 if ($type == "ident") {
   # Save type is ident (orgedit.php)
-  $orgid = $clean['orgid'];
   $orgname = $clean['orgname'];
   $ranges = $clean['ranges'];
   $identtype = $clean['identtype'];
@@ -137,14 +153,13 @@ if ($type == "ident") {
   }
 } elseif ($type == "md5") {
   # Save type is md5 (RIS)
-  if (isset($clean['orgid'])) {
-    $orgid = $clean['orgid'];
+  if (empty($orgid)) {
+    $err = 1;
+    $m = 107;
+  } else {
     $ident = genpass(32);
     $ident = md5($ident);
     $identtype = 1;
-  } else {
-    $err = 1;
-    $m = 107;
   }
 }
 
