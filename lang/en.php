@@ -613,6 +613,7 @@ $l['ss_arpconf']        = "Ethernet Modules";
 $l['ss_detprotos']      = "Detected Protocols";
 $l['ss_sdetails']       = "Sensor Details";
 $l['ss_quicknav']       = "Quick Nav";
+$l['ss_aptupdate']      = "Update";
 
 ##########################
 # serverconfig.php
