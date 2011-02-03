@@ -348,6 +348,9 @@ echo "<div class='centerbig'>\n";
                           echo printOption("DEACTIVATE", $l['ss_deactivate'], $action);
                         }
                       }
+                      if ($s_access_sensor == 9) {
+                        echo printOption("APTUPDATE", $l['ss_aptupdate'], $action);
+                      }
                     echo "</select>\n";
                   echo "</form>\n";
                 echo "</td>\n";
