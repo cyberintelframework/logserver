@@ -277,19 +277,6 @@ $v_errors = array(
 );
 
 # Array for the different types of plots available.
-/*
-$v_plottertypes = array(
-				1 => "bars",
-				2 => "lines",
-				3 => "linepoints",
-				4 => "area",
-				5 => "points",
-				6 => "pie",
-				7 => "thinbarline",
-				8 => "squared"
-);
-*/
-
 $v_plottertypes = array(
 			1 => "bars",
 			2 => "lines",
