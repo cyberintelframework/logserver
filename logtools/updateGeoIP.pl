@@ -1,62 +1,96 @@
 #!/usr/bin/perl
 
-#####################################
-# SURFids 3.02                      #
-# Changeset 001                     #
-# 20-10-2009                        #
-# Kees Trippelvitz                  #
-#####################################
-
-#####################
-# Changelog:
-# 001 Initial version
-#####################
+##################
+# Modules used
+##################
+use DBI;
+use Time::localtime qw(localtime);
 
 ##################
 # Variables used
 ##################
 do '/etc/surfnetids/surfnetids-log.conf';
-$geoiploc = "http://www.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
-$quiet = 1;
+require "$c_surfidsdir/scripts/logfunctions.inc.pl";
+
+$csvfile = "http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip";
+$datfile = "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
 
 ##################
 # Main script
 ##################
+dbconnect();
+%countries = ();
+$i = 0;
 
-# Downloading
-if ($quiet == 1) {
-    print "Downloading new GeoIP database...";
-    `wget -q -O "/tmp/GeoLiteCity.dat.gz" $geoiploc`;
-} else {
-    print "Downloading new GeoIP database...\n";
-    `wget -O "/tmp/GeoLiteCity.dat.gz" $geoiploc`;
+##################
+# UPDATE DAT FILE
+##################
+chdir("/tmp/");
+`wget -q -O /tmp/GeoLiteCity.dat.gz $datfile`;
+if ($? != 0) {
+    print "Failed to fetch new GeoIP DAT file\n";
+    exit;
 }
-if ($? == 0) {
-    print "OK\n";
+`gunzip /tmp/GeoLiteCity.dat.gz`;
+`mv /tmp/GeoLiteCity.dat $c_surfidsdir/include/`;
 
-    # Unpacking
-    if ($quiet == 1) {
-        print "Unpacking new GeoIP database...";
-        `gunzip /tmp/GeoLiteCity.dat.gz`;
-    } else {
-        print "Unpacking new GeoIP database...\n";
-        `gunzip -v /tmp/GeoLiteCity.dat.gz`;
-    }
-    if ($? == 0) {
-        print "OK\n";
-    } else {
-        print "Failed\n";
-    }
+##################
+# UPDATE CSV FILE
+##################
+`wget -q -O /tmp/GeoIPCountryCSV.zip $csvfile`;
 
-    # Copying
-    print "Installing new GeoIP database...";
-    `mv /tmp/GeoLiteCity.dat $c_surfidsdir/include/`;
-    if ($? == 0) {
-        print "OK\n";
-    } else {
-        print "Failed\n";
-    }
-} else {
-    print "Failed\n";
+if ($? != 0) {
+    print "Failed to fetch new GeoIP CSV file\n";
+    exit;
 }
 
+# Unzip
+chdir("/tmp/");
+`unzip GeoIPCountryCSV.zip`;
+
+# Truncate geo tables
+`sudo -u postgres psql -d $c_pgsql_dbname -c "TRUNCATE geolocations"`;
+`sudo -u postgres psql -d $c_pgsql_dbname -c "TRUNCATE geoblocks"`;
+
+open(GEOIP, "< GeoIPCountryWhois.csv");
+while (<GEOIP>) {
+    $line = $_;
+    chomp($line);
+    @tempar = split(/\"/,$line);
+    $ipstart = $tempar[1];
+    $ipend = $tempar[3];
+    $abbr = $tempar[9];
+    $country = $tempar[11];
+
+    # Check Country for geolocations
+    if (exists $countries{$abbr}) {
+        $cid = $countries{$abbr};
+    } else {
+        $i++;
+
+        # Add new country
+        $sql = "INSERT INTO geolocations (locid, country, abbr) VALUES (?, ?, ?)";
+        $sth = $dbh->prepare($sql);
+        $er = $sth->execute($i, $country, $abbr);
+
+        $countries{$abbr} = $i;
+        $cid = $i;
+    }
+
+    # Check block
+    $sql = "INSERT INTO geoblocks (locid, ipstart, ipend) VALUES ($cid, '$ipstart', '$ipend')";
+    $sth = $dbh->prepare($sql);
+    $er = $sth->execute();
+}
+close(GEOIP);
+
+# Cleanup
+if (-e "/tmp/GeoIPCountryCSV.zip") {
+    `rm /tmp/GeoIPCountryCSV.zip`;
+}
+if (-e "/tmp/GeoLiteCity.dat.gz") {
+    `rm /tmp/GeoLiteCity.dat.gz`;
+}
+if (-e "/tmp/GeoIPCountryWhois.csv") {
+    `rm /tmp/GeoIPCountryWhois.csv`;
+}
