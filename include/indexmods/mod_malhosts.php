@@ -77,18 +77,19 @@ echo "<div class='block'>\n";
             }
 
             # GEO IP stuff
-            $record = geoip_record_by_addr($gi, $host);
-            $countrycode = strtolower($record->country_code);
-            $country = $record->country_name;
-            $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+#            $record = geoip_record_by_addr($gi, $host);
+#            $countrycode = strtolower($record->country_code);
+#            $country = $record->country_name;
+#            $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
 
             echo "<tr>\n";
               echo "<td>\n";
-                if (file_exists($cimg)) {
-                  echo printflagimg($country, $countrycode). " $host";
-                } else {
-                  echo printflagimg("none", $countrycode). " $host";
-                }
+                printflagimg($host);
+#                if (file_exists($cimg)) {
+#                  echo printflagimg($country, $countrycode). " $host";
+#                } else {
+#                  echo printflagimg("none", $countrycode). " $host";
+#                }
               echo "</td>\n";
               echo "<td>$count</td>\n";
             echo "</tr>\n";

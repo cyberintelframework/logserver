@@ -123,17 +123,18 @@ echo "<div class='block'>\n";
               } else {
                 echo printosimg("Blank", "No info"). "&nbsp;";
               }
-              if ($c_geoip_enable == 1) {
-                $record = geoip_record_by_addr($gi, $source);
-                $countrycode = strtolower($record->country_code);
-                $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
-                if (file_exists($cimg)) {
-                  $country = $record->country_name;
-                  echo printflagimg($country, $countrycode);
-                } else {
-                  echo printflagimg("none", "");
-                }
-              }
+#              if ($c_geoip_enable == 1) {
+#                $record = geoip_record_by_addr($gi, $source);
+#                $countrycode = strtolower($record->country_code);
+#                $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+#                if (file_exists($cimg)) {
+#                  $country = $record->country_name;
+#                  echo printflagimg($country, $countrycode);
+#                } else {
+#                  echo printflagimg("none", "");
+#                }
+#              }
+              printflagimg($source);
               $sql_ranges = "SELECT ranges FROM organisations WHERE id = $q_org";
               $debuginfo[] = $sql_ranges;
               $result_ranges = pg_query($pgconn, $sql_ranges);
