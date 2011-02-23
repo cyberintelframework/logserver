@@ -10,6 +10,31 @@
 --
 
 --
+-- GEOBLOCKS
+--
+CREATE TABLE geoblocks (
+    locid integer NOT NULL,
+    ipstart inet,
+    ipend inet
+);
+
+CREATE INDEX ipend_btree ON geoblocks USING btree (ipend);
+CREATE INDEX ipstart_btree ON geoblocks USING btree (ipstart);
+GRANT SELECT,INSERT,UPDATE ON TABLE geoblocks TO idslog;
+
+--
+-- GEOLOCATIONS
+--
+CREATE TABLE geolocations (
+    locid integer,
+    country character varying,
+    abbr character varying
+);
+
+CREATE INDEX locid_btree ON geolocations USING btree (locid);
+GRANT SELECT,INSERT,UPDATE ON TABLE geolocations TO idslog;
+
+--
 -- SSH_COMMAND
 --
 DROP TABLE IF EXISTS ssh_command;
