@@ -14,16 +14,19 @@
 
 $tsquery = " timestamp >= $from AND timestamp <= $to";
 
-$sql_topproto = "SELECT DISTINCT sub.proto, COUNT(sub.proto) as total FROM ";
-  $sql_topproto .= "(SELECT split_part(details.text, '/', 1) as proto ";
+$sql_topproto .= "SELECT DISTINCT split_part(details.text, '/', 1) as proto, COUNT(attacks.id) as total ";
+if ($q_org != 0) {
   $sql_topproto .= "FROM details, attacks, sensors WHERE 1 = 1 ";
-  if ($tsquery != "") {
-    $sql_topproto .= " AND $tsquery ";
-  }
-  if ($q_org != 0 ) $sql_topproto .= " AND sensors.id = details.sensorid AND " .gen_org_sql();
-  $sql_topproto .= " AND type = 4  AND details.attackid = attacks.id AND ";
-  $sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org)) as sub ";
-$sql_topproto .= "GROUP BY sub.proto ORDER BY total DESC LIMIT 10";
+} else {
+  $sql_topproto .= "FROM details, attacks WHERE 1 = 1 ";
+}
+if ($tsquery != "") {
+  $sql_topproto .= " AND $tsquery ";
+}
+if ($q_org != 0 ) $sql_topproto .= " AND sensors.id = details.sensorid AND " .gen_org_sql();
+$sql_topproto .= " AND type = 4  AND details.attackid = attacks.id AND ";
+$sql_topproto .= "NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid=$q_org) ";
+$sql_topproto .= "GROUP BY proto ORDER BY total DESC LIMIT 10";
 $debuginfo[] = $sql_topproto;
 
 echo "<div class='block'>\n";
