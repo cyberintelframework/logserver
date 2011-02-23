@@ -1163,13 +1163,21 @@ function printosimg($os, $fingerprint) {
 
 # 5.09 printflagimg
 # Function to print an OS image
-function printflagimg($country, $countrycode) {
-  if ($country != "none") {
-    $s = "<img class='flag' src='images/worldflags/flag_" .$countrycode. ".gif' " .printover($country). " />";
-  } else {
-    $s = "<img class='flag' src='images/worldflags/flag.gif' " .printover("No Country Info"). " />";
-  }
-  return $s;
+function printflagimg($ip) {
+    global $c_geoip_enable;
+    global $c_surfidsdir;
+    if ($c_geoip_enable == 1) {
+        global $gi;
+        $record = geoip_record_by_addr($gi, $ip);
+        $countrycode = strtolower($record->country_code);
+        $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+        if (file_exists($cimg)) {
+            $country = $record->country_name;
+            echo "<img class='flag' src='images/worldflags/flag_" .$countrycode. ".gif' " .printover($country). " />";
+        } else {
+            echo "<img class='flag' src='images/worldflags/flag.gif' " .printover("No Country Info"). " />";
+        }
+    }
 }
 
 # 5.10 printradio
