@@ -943,17 +943,18 @@ echo "<div class='all'>\n";
                     } else {
                       echo printosimg("Blank", $l['ls_noinfo']);
                     }
-                    if ($c_geoip_enable == 1) {
-                      $record = geoip_record_by_addr($gi, $key);
-                      $countrycode = strtolower($record->country_code);
-                      $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
-                      if (file_exists($cimg)) {
-                        $country = $record->country_name;
-                        echo printflagimg($country, $countrycode);
-                      } else {
-                        echo printflagimg("none", "");
-                      }
-                    }
+                    printflagimg($ip);
+#                    if ($c_geoip_enable == 1) {
+#                      $record = geoip_record_by_addr($gi, $key);
+#                      $countrycode = strtolower($record->country_code);
+#                      $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
+#                      if (file_exists($cimg)) {
+#                        $country = $record->country_name;
+#                        echo printflagimg($country, $countrycode);
+#                      } else {
+#                        echo printflagimg("none", "");
+#                      }
+#                    }
                     $sql_ranges = "SELECT ranges FROM organisations WHERE id = $q_org";
                     $debuginfo[] = $sql_ranges;
                     $result_ranges = pg_query($pgconn, $sql_ranges);
