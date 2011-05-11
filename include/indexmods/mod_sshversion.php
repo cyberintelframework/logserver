@@ -62,7 +62,7 @@ echo "<div class='block'>\n";
 
           while($row = pg_fetch_assoc($result_severity)) {
             $versionid = $row['versionid'];
-            $version = $row['version'];
+            $version = pg_escape_string(htmlentities(strip_tags($row['version'])));
             $count = $row['total'];
             echo "<tr>\n";
               echo "<td>$version</td>\n";
