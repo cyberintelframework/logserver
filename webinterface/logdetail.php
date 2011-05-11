@@ -49,7 +49,7 @@ $err = 0;
 # Retrieving posted variables from $_GET
 $allowed_get = array(
                 "int_id",
-				"int_atype",
+                "int_atype",
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
@@ -97,66 +97,68 @@ if ($err != 1) {
             echo "</tr>\n";
 
             if ($atype == 7) {
-				if ($s_access_search == 9) {
-	                $sql_version = "SELECT uniq_sshversion.version FROM ssh_version, uniq_sshversion WHERE attackid = $id AND uniq_sshversion.id = ssh_version.version";
-				} else {
-	                $sql_version = "SELECT version FROM ssh_version, attacks, sensors WHERE attackid = $id";
-					$sql_version .= " AND ssh_version.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
-					$sql_version .= " sensors.organisation = '" .$q_org. "'";
-				}
-                $result_version = pg_query($pgconn, $sql_version);
-                $num_version = pg_num_rows($result_version);
-                $debuginfo[] = $sql_version;
-                if ($num_version > 0) {
-                  $row = pg_fetch_assoc($result_version);
-                  echo "<tr>\n";
-                    echo "<td>" .$l['ld_sshversion']. "</td>";
-                    echo "<td>" .$row['version']. "</td>";
-                  echo "</tr>\n";
-                }
-
-				if ($s_access_search == 9) {
-	                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
-				} else {
-	                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
-					$sql_logins .= " AND ssh_logins.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
-					$sql_logins .= " sensors.organisation = '" .$q_org. "'";
-				}
-                $result_logins = pg_query($pgconn, $sql_logins);
-                $num_logins = pg_num_rows($result_logins);
-                $debuginfo[] = $sql_logins;
-                $row = pg_fetch_assoc($result_logins);
-                if ($row['type'] == "false") {
-                    $sshtype = $l['g_failed'];
-                } else {
-                    $sshtype = $l['g_success'];
-                }
+              if ($s_access_search == 9) {
+                $sql_version = "SELECT uniq_sshversion.version FROM ssh_version, uniq_sshversion WHERE attackid = $id AND uniq_sshversion.id = ssh_version.version";
+              } else {
+                $sql_version = "SELECT version FROM ssh_version, attacks, sensors WHERE attackid = $id";
+                $sql_version .= " AND ssh_version.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
+                $sql_version .= " sensors.organisation = '" .$q_org. "'";
+              }
+              $result_version = pg_query($pgconn, $sql_version);
+              $num_version = pg_num_rows($result_version);
+              $debuginfo[] = $sql_version;
+              if ($num_version > 0) {
+                $row = pg_fetch_assoc($result_version);
                 echo "<tr>\n";
-                  echo "<td>" .$l['ld_sshlogin']. "</td>";
-                  echo "<td>" .$row['sshuser']. " / " .$row['sshpass']. " (" .$sshtype. ")</td>";
+                  echo "<td>" .$l['ld_sshversion']. "</td>";
+                  echo "<td>" .pg_escape_string(htmlentities(strip_tags($row['version']))). "</td>";
                 echo "</tr>\n";
+              }
 
-				if ($s_access_search == 9) {
-	                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
-				} else {
-	                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
-					$sql_command .= " AND ssh_command.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
-					$sql_command .= " sensors.organisation = '" .$q_org. "'";
-				}
-                $result_command = pg_query($pgconn, $sql_command);
-                $num_command = pg_num_rows($result_command);
-                $debuginfo[] = $sql_command;
-                while ($row = pg_fetch_assoc($result_command)) {
-                  echo "<tr>\n";
-                    echo "<td>" .$l['ld_sshcommand']. "</td>";
-                    echo "<td>" .$row['command']. "</td>";
-                  echo "</tr>\n";
-                }
+              if ($s_access_search == 9) {
+                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
+              } else {
+                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
+                $sql_logins .= " AND ssh_logins.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
+                $sql_logins .= " sensors.organisation = '" .$q_org. "'";
+              }
+              $result_logins = pg_query($pgconn, $sql_logins);
+              $num_logins = pg_num_rows($result_logins);
+              $debuginfo[] = $sql_logins;
+              $row = pg_fetch_assoc($result_logins);
+              $sshuser = pg_escape_string(strip_tags(htmlentities($row['sshuser'])));
+              $sshpass = pg_escape_string(strip_tags(htmlentities($row['sshpass'])));
+              if ($row['type'] == "false") {
+                $sshtype = $l['g_failed'];
+              } else {
+                $sshtype = $l['g_success'];
+              }
+              echo "<tr>\n";
+                echo "<td>" .$l['ld_sshlogin']. "</td>";
+                echo "<td>" .$sshuser. " / " .$sshpass. " (" .$sshtype. ")</td>";
+              echo "</tr>\n";
+
+              if ($s_access_search == 9) {
+                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+              } else {
+                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+                $sql_command .= " AND ssh_command.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
+                $sql_command .= " sensors.organisation = '" .$q_org. "'";
+              }
+              $result_command = pg_query($pgconn, $sql_command);
+              $num_command = pg_num_rows($result_command);
+              $debuginfo[] = $sql_command;
+              while ($row = pg_fetch_assoc($result_command)) {
+                echo "<tr>\n";
+                  echo "<td>" .$l['ld_sshcommand']. "</td>";
+                  echo "<td>" .pg_escape_string(strip_tags(htmlentities($row['command']))). "</td>";
+                echo "</tr>\n";
+              }
             } else {
 
             while ($row = pg_fetch_assoc($result_details)) {
               $attackid = $row['attackid'];
-              $logging = pg_escape_string($row['text']);
+              $logging = pg_escape_string(strip_tags(htmlentities($row['text'])));
               $type = $row['type'];
               $typetext = $v_attacktype_ar[$type];
 
@@ -179,16 +181,6 @@ if ($err != 1) {
                     $logging = formatEmu($logging);
                     echo "$logging";
                     echo "</td>\n";
-#				  } elseif ($type == 84) {
-#					$sql = "SELECT service FROM dcerpc WHERE uuid = '$logging'";
-#		            $r = pg_query($pgconn, $sql);
-#        		    $rij = pg_fetch_assoc($r);
-#					echo "<td>" .$rij['service']. "</td>";
-#				  } elseif ($type == 85) {
-#					$sql = "SELECT opname FROM dcerpc WHERE opnum = $logging";
-#		            $r = pg_query($pgconn, $sql);
-#        		    $rij = pg_fetch_assoc($r);
-#					echo "<td>" .$rij['opname']. "</td>"
                   } else {
                     echo "<td>$logging</td>\n";
                   }
