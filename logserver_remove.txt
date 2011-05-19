@@ -1,3 +1,4 @@
+webinterface/purge.php
 webinterface/logattacks.php
 webinterface/loghistory.php
 webinterface/searchtemplate.php
