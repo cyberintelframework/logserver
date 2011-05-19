@@ -566,7 +566,7 @@ $l['sd_sensorside']     = "Sensor side";
 $l['sd_rip']            = "Remote IP";
 $l['sd_lip']            = "Local IP";
 $l['sd_sensormac']      = "MAC address";
-$l['sd_smac']  	 	    = "Sensor MAC";
+$l['sd_smac']           = "Sensor MAC";
 $l['sd_serverside']     = "Server side";
 $l['sd_device']         = "Device";
 $l['sd_devmac']         = "Device MAC";
@@ -583,11 +583,13 @@ $l['sd_total']          = "Total log time";
 $l['sd_events']         = "Events";
 $l['sd_totalevents']    = "Total number of events";
 $l['sd_members']        = "Member of groups";
-$l['sd_sensortype']	    = "Sensor type";
+$l['sd_sensortype']     = "Sensor type";
 $l['sd_networkconfig']  = "Network configuration";
 $l['sd_networkrev']     = "Revision";
 $l['sd_configtype']     = "Type";
 $l['sd_note']           = "Note";
+$l['sd_updates']        = "Available updates";
+$l['sd_updates_short']  = "Updates";
 
 ##########################
 # sensorstatus.php
@@ -613,7 +615,10 @@ $l['ss_arpconf']        = "Ethernet Modules";
 $l['ss_detprotos']      = "Detected Protocols";
 $l['ss_sdetails']       = "Sensor Details";
 $l['ss_quicknav']       = "Quick Nav";
-$l['ss_aptupdate']      = "Update";
+$l['ss_sensorupgrade']  = "Sensor Upgrade";
+$l['ss_depupgrade']     = "Dep Upgrade";
+$l['ss_aptupgrade']     = "APT Upgrade";
+$l['ss_aptcount']       = "APT Count";
 
 ##########################
 # serverconfig.php

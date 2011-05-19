@@ -76,7 +76,7 @@ if ($err == 0) {
     }
   }
   $sql_details = "SELECT sensors.keyname, vlanid, label, remoteip, localip, tap, tapip, mac, laststart, laststop, lastupdate, uptime, status, ";
-  $sql_details .= " organisations.organisation, rev, sensormac, sensortype, mainconf, sensortype, permanent, firstattack ";
+  $sql_details .= " organisations.organisation, rev, sensormac, sensortype, mainconf, sensortype, permanent, firstattack, updates ";
   $sql_details .= " FROM sensors, organisations, sensor_details WHERE sensors.id = '$sid' AND sensors.organisation = organisations.id ";
   $sql_details .= " AND sensors.keyname = sensor_details.keyname ";
   $result_details = pg_query($pgconn, $sql_details);
@@ -145,6 +145,7 @@ if ($err != 1) {
   $update_text = date($c_date_format, $update);
   $status = $row['status'];
   $permanent = $row['permanent'];
+  $updates = $row['updates'];
   if ($permanent == 1) {
     $sensortype = "Permanent";
   }
@@ -161,7 +162,7 @@ if ($err != 1) {
   # Find first attack
   $first_attack = $row['firstattack'];
   if ($first_attack > 0) {
-    $first_attack = date($c_date_format, $row_attack["firstattack"]);
+    $first_attack = date($c_date_format, $first_attack);
   } else {
     # Cast timestamp to BIGINT to force postgresql to use the sensorid index instead of the timestamp index
     $sql_attack = "SELECT timestamp::BIGINT FROM attacks WHERE sensorid = '$sid' ORDER BY timestamp ASC LIMIT 1";
@@ -290,6 +291,10 @@ if ($err != 1) {
             echo "<tr>\n";
               echo "<td>" .$l['sd_updated']. ":</td>\n";
               echo "<td>$update_text</td>\n";
+            echo "</tr>\n";
+            echo "<tr>\n";
+              echo "<td>" .$l['sd_updates']. ":</td>\n";
+              echo "<td>$updates</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
               echo "<td>" .$l['sd_status']. ":</td>\n";

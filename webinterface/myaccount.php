@@ -360,6 +360,7 @@ if ($err == 0) {
                   echo printCheckBox($l['ss_config'], "mods[]", 3, $sensorstatus[3]) . "<br />\n";
                   echo printCheckBox($l['sd_status'], "mods[]", 4, $sensorstatus[4]) . "<br />\n";
                   echo printCheckBox($l['sd_uptime'], "mods[]", 5, $sensorstatus[5]) . "<br />\n";
+                  echo printCheckBox($l['sd_updates_short'], "mods[]", 12, $sensorstatus[12]) . "<br />\n";
                   echo "<br /><b>" .$l['sd_sensorside']. "</b><br />\n";
                   echo printCheckBox($l['sd_rip'], "mods[]", 6, $sensorstatus[6]) . "<br />\n";
                   echo printCheckBox($l['sd_lip'], "mods[]", 7, $sensorstatus[7]) . "<br />\n";

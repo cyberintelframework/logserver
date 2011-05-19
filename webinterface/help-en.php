@@ -35,6 +35,8 @@ if (!isset($_SESSION['s_admin'])) {
 
 # Retrieving some session variables
 $s_hash = md5($_SESSION['s_hash']);
+$s_access = $_SESSION['s_access'];
+$s_access_sensor = intval($s_access{0});
 
 # Retrieving posted variables from $_GET
 $allowed_get = array(
@@ -54,7 +56,12 @@ if ($id == 1) {
     # sensorstatus.php - Action
     echo "<b>Ignore</b>: A sensor can be ignored when its currently not in use.<br />";
     echo "<b>Deactivate</b>: A sensor can be deactivated when the sensor is never expected to be used again. ";
-    echo "Both the sensor and attached attack records are stored in an archive table.";
+    echo "Both the sensor and attached attack records are stored in an archive table.<br />";
+    if ($s_access_sensor == 9) {
+        echo "<b>Sensor Upgrade</b>: The sensor will upgrade itself to a newer version if available.<br />";
+        echo "<b>Dep Upgrade</b>: The sensor will upgrade it's dependencies to newer versions if available.<br />";
+        echo "<b>APT Upgrade</b>: The sensor will do an upgrade of all outdated packages if available.";
+    }
 } elseif ($id == 2) {
     # binaryhist.php - UPX
     echo "UPX is a well-known compression often used for malicious files. This shows the result of the UPX check.";

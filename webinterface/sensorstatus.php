@@ -99,7 +99,7 @@ if ($selview == 9) {
   # Adding all necessary sensor_details fields
   add_to_sql("remoteip, localip, sensortype, action, sensormac, lastupdate", "select");
   # Adding all necessary sensors fields
-  add_to_sql("tap, tapip, mac, laststart, laststop, uptime, label, permanent, status, networkconfig", "select");
+  add_to_sql("tap, tapip, mac, laststart, laststop, uptime, label, permanent, status, networkconfig, updates", "select");
   if ($selview == "1") {
     add_to_sql("status = 0", "where");
   } elseif ($selview == "2") {
@@ -158,6 +158,7 @@ foreach ($pageconf as $key => $val) {
 # 09: Tap
 # 10: Tap MAC
 # 11: Tap IP
+# 12: Updates
 
 echo "<div class='centerbig'>\n";
   echo "<div class='block'>\n";
@@ -220,6 +221,12 @@ echo "<div class='centerbig'>\n";
               echo "<th>" .printsort($l['sd_devip'], "tapip"). "</th>\n";
             }
 
+            if ($s_access_sensor == 9) {
+              if (array_key_exists("12", $pconf)) {
+                echo "<th>" .printsort($l['sd_updates_short'], "updates"). "</th>\n";
+              }
+            }
+
 
             if ($s_access_sensor == 9) {
               echo "<th>" .printsort($l['g_domain'], "org"). "</th>\n";
@@ -266,6 +273,7 @@ echo "<div class='centerbig'>\n";
               $orgid = $row['orgid'];
             }
             $permanent = $row['permanent'];
+            $updates = $row['updates'];
 
             $cstatus = sensorstatus($status, $lastupdate, $uptime, $permanent);
 
@@ -324,6 +332,13 @@ echo "<div class='centerbig'>\n";
                   echo "<td>$tapip</td>\n";
                 }
               }
+
+              if ($s_access_sensor == 9) {
+                if (array_key_exists("12", $pconf)) {
+                  echo "<td>$updates</td>\n";
+                }
+              }
+
               if ($s_access_sensor == 9) {
                 echo "<td><a href='getcontact.php?int_sid=$sid&int_orgid=$orgid' class='jTip' name='$org' id='contact${sid}'>$org</a></td>\n";
               }
@@ -349,7 +364,10 @@ echo "<div class='centerbig'>\n";
                         }
                       }
                       if ($s_access_sensor == 9) {
-                        echo printOption("APTUPDATE", $l['ss_aptupdate'], $action);
+                        echo printOption("SENSORUPGRADE", $l['ss_sensorupgrade'], $action);
+                        echo printOption("APTUPGRADE", $l['ss_aptupgrade'], $action);
+                        echo printOption("DEPUPGRADE", $l['ss_depupgrade'], $action);
+                        echo printOption("APTCOUNT", $l['ss_aptcount'], $action);
                       }
                     echo "</select>\n";
                   echo "</form>\n";
