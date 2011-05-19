@@ -122,7 +122,8 @@ $allowed_get = array(
         "int_sshlogin",
         "strip_html_escape_sshcommand",
         "int_attackid",
-        "int_sshversionid"
+        "int_sshversionid",
+	"cc_country"
 );
 $check = extractvars($_GET, $allowed_get);
 debug_input();
