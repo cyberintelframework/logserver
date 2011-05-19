@@ -205,6 +205,10 @@ echo "<div class='leftmed'>\n";
             echo "<td>c_date_format_noyear</td>\n";
             echo "<td>$c_date_format_noyear</td>\n";
           echo "</tr>\n";
+          echo "<tr>\n";
+            echo "<td>c_default_period</td>\n";
+            echo "<td>$c_default_period</td>\n";
+          echo "</tr>\n";
         echo "</table>\n";
 
       echo "</div>\n"; #</blockContent>

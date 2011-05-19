@@ -323,7 +323,7 @@ echo "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
 function insert_selector($o_show = 1, $t_show = 1) {
   global $s_org, $pgconn, $s_access_search, $s_access_sensor, $s_access_user, $v_selector_period, $c_startdayofweek, $_GET, $_POST;
   global $clean, $tainted, $to, $from, $to_date, $from_date, $q_org, $q_org_name, $c_debug_sql, $c_debug_input, $c_allow_global_debug, $l;
-  global $c_date_format_short;
+  global $c_date_format_short, $c_default_period;
   # Retrieving URL
   $url = $_SERVER['PHP_SELF'];
   $qs = urldecode($_SERVER['QUERY_STRING']);
@@ -348,8 +348,19 @@ function insert_selector($o_show = 1, $t_show = 1) {
   }
 
   # Setting default values
-  $from = date("U", mktime(0, 0, 0, date("n"), date("j"), date("Y")));
-  $to = date("U", mktime(0, 0, 0, date("n"), date("j")+1, date("Y")));
+  if ($c_default_period == 1) {
+    $from = date("U", mktime(0, 0, 0, date("n"), date("j"), date("Y")));
+    $to = date("U", mktime(0, 0, 0, date("n"), date("j")+1, date("Y")));
+  } elseif ($c_default_period == 2) {
+    $from = date("U", mktime(date("H")-1, date("i"), date("s"), date("n"), date("j"), date("Y")));
+    $to = date("U", mktime(date("H"), date("i"), date("s"), date("n"), date("j"), date("Y")));
+  } elseif ($c_default_period == 3) {
+    $from = date("U", mktime(date("H")-2, date("i"), date("s"), date("n"), date("j"), date("Y")));
+    $to = date("U", mktime(date("H"), date("i"), date("s"), date("n"), date("j"), date("Y")));
+  } elseif ($c_default_period == 4) {
+    $from = date("U", mktime(date("H")-3, date("i"), date("s"), date("n"), date("j"), date("Y")));
+    $to = date("U", mktime(date("H"), date("i"), date("s"), date("n"), date("j"), date("Y")));
+  }
   $selperiod = -1;
 
   # Checking access
