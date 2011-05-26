@@ -203,19 +203,23 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add(integer, inet, integer, character
 BEGIN
     SELECT INTO m_sensorid surfids3_sensorid_get(p_localhost);
 
-        IF p_type = 1 OR p_type = 80 THEN
-          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = p_data;
-          IF m_check = 0 THEN
-            INSERT INTO stats_dialogue (name) VALUES (p_data);
-          END IF;
-        END IF;
+    IF p_type = 1 OR p_type = 80 OR p_type = 84 THEN
+      SELECT COUNT(id) INTO m_check FROM stats_dialogue WHERE name = p_data;
+      IF m_check = 0 THEN
+        INSERT INTO stats_dialogue (name) VALUES (p_data);
+      END IF;
+    END IF;
 
-    INSERT INTO details
+    IF NOT m_sensorid IS NULL THEN
+      INSERT INTO details
         (attackid,sensorid,type,text)
-    VALUES
+      VALUES
         (p_attackid,m_sensorid,p_type,p_data);
+      SELECT INTO m_detailid currval('details_id_seq');
+    ELSE
+      m_detailid = 0;
+    END IF;
 
-    SELECT INTO m_detailid currval('details_id_seq');
     return m_detailid;
 END$_$
     LANGUAGE plpgsql;
@@ -230,12 +234,12 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add_by_id(integer, integer, integer, 
     m_check INTEGER;
     m_detailid INTEGER;
 BEGIN
-        IF p_type = 1 OR p_type = 80 THEN
-          SELECT COUNT(name) INTO m_check FROM stats_dialogue WHERE name = p_data;
-          IF m_check = 0 THEN
-            INSERT INTO stats_dialogue (name) VALUES (p_data);
-          END IF;
-        END IF;
+    IF p_type = 1 OR p_type = 80 OR p_type = 84 THEN
+      SELECT COUNT(id) INTO m_check FROM stats_dialogue WHERE name = p_data;
+      IF m_check = 0 THEN
+        INSERT INTO stats_dialogue (name) VALUES (p_data);
+      END IF;
+    END IF;
 
     INSERT INTO details
         (attackid,sensorid,type,text)
@@ -261,19 +265,20 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add_download(inet, inet, character va
     m_check INTEGER;
 BEGIN
     SELECT INTO m_sensorid surfids3_sensorid_get(p_localhost);
-    SELECT INTO m_attackid surfids3_attack_add_by_id(32, p_remotehost, 0, p_localhost, 0, NULL, m_sensorid, p_atype);
 
-        SELECT COUNT(name) INTO m_check FROM uniq_binaries WHERE name = p_hash;
-
-        IF m_check = 0 THEN
-          INSERT INTO uniq_binaries (name) VALUES (p_hash);
-        END IF;
+    SELECT COUNT(bin) INTO m_check FROM uniq_binaries WHERE name = p_hash;
+    IF m_check = 0 THEN
+      INSERT INTO uniq_binaries (name) VALUES (p_hash);
+    END IF;
 
     SELECT id INTO m_hashid FROM uniq_binaries WHERE name = p_hash;
     UPDATE binaries_detail SET last_seen = round(EXTRACT(epoch FROM now())) WHERE bin = m_hashid;
 
-    PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,4,p_url);
-    PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,8,p_hash);
+    IF NOT m_sensorid IS NULL THEN
+      SELECT INTO m_attackid surfids3_attack_add_by_id(32, p_remotehost, 0, p_localhost, 0, NULL, m_sensorid, p_atype);
+      PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,4,p_url);
+      PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,8,p_hash);
+    END IF;
 
     return;
 END;    $_$
@@ -291,9 +296,12 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add_offer(inet, inet, character varyi
     m_attackid INTEGER;
 BEGIN
     SELECT INTO m_sensorid surfids3_sensorid_get(p_localhost);
-    SELECT INTO m_attackid surfids3_attack_add_by_id(16, p_remotehost, 0, p_localhost, 0, NULL, m_sensorid, p_atype);
 
-    PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,4,p_url);
+    IF NOT m_sensorid IS NULL THEN
+      SELECT INTO m_attackid surfids3_attack_add_by_id(16, p_remotehost, 0, p_localhost, 0, NULL, m_sensorid, p_atype);
+      PERFORM surfids3_detail_add_by_id(m_attackid,m_sensorid,4,p_url);
+    END IF;
+
     return;
 END;    $_$
     LANGUAGE plpgsql;

@@ -1063,7 +1063,8 @@ CREATE TABLE sensor_details (
     dns1 inet,
     dns2 inet,
     permanent integer DEFAULT 0 NOT NULL,
-    firstattack integer DEFAULT 0 NOT NULL
+    firstattack integer DEFAULT 0 NOT NULL,
+    updates integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE sensor_details_id_seq
@@ -1304,7 +1305,7 @@ GRANT SELECT,UPDATE ON SEQUENCE ssh_logins_id_seq TO nepenthes;
 CREATE TABLE ssh_version (
     id integer NOT NULL,
     attackid integer NOT NULL,
-    version character varying NOT NULL
+    version integer NOT NULL
 );
 
 CREATE SEQUENCE ssh_version_id_seq
@@ -1519,6 +1520,32 @@ GRANT SELECT,INSERT ON TABLE uniq_binaries TO nepenthes;
 
 GRANT SELECT,UPDATE ON SEQUENCE uniq_binaries_id_seq TO idslog;
 GRANT SELECT,UPDATE ON SEQUENCE uniq_binaries_id_seq TO nepenthes;
+
+--
+-- UNIQ_SSHVERSION
+--
+CREATE TABLE uniq_sshversion (
+    id integer NOT NULL,
+    version character varying
+);
+
+CREATE SEQUENCE uniq_sshversion_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE uniq_sshversion_id_seq OWNED BY uniq_sshversion.id;
+ALTER TABLE uniq_sshversion ALTER COLUMN id SET DEFAULT nextval('uniq_sshversion_id_seq'::regclass);
+ALTER TABLE ONLY uniq_sshversion
+    ADD CONSTRAINT uniq_sshversion_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY uniq_sshversion
+    ADD CONSTRAINT uniq_sshversion_version_key UNIQUE (version);
+
+GRANT SELECT ON TABLE uniq_sshversion TO idslog;
+GRANT SELECT,INSERT ON TABLE uniq_sshversion TO nepenthes;
+GRANT SELECT ON SEQUENCE uniq_sshversion_id_seq TO idslog;
+GRANT SELECT,UPDATE ON SEQUENCE uniq_sshversion_id_seq TO nepenthes;
 
 --
 -- FUNCTION first_attack(sensorid)

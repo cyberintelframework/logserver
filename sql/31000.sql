@@ -169,6 +169,7 @@ UPDATE sensors SET protos = arp;
 -- SENSOR_DETAILS
 --
 ALTER TABLE sensor_details ADD COLUMN firstattack integer DEFAULT 0 NOT NULL;
+ALTER TABLE sensor_details ADD COLUMN updates integer DEFAULT 0 NOT NULL;
 
 --
 -- DEACTIVATED_SENSORS
