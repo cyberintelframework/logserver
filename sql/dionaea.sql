@@ -263,6 +263,7 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add_download(inet, inet, character va
     m_sensorid INTEGER;
     m_attackid INTEGER;
     m_check INTEGER;
+    m_hashid INTEGER;
 BEGIN
     SELECT INTO m_sensorid surfids3_sensorid_get(p_localhost);
 
