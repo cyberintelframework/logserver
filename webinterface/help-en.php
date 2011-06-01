@@ -61,6 +61,7 @@ if ($id == 1) {
         echo "<b>Sensor Upgrade</b>: The sensor will upgrade itself to a newer version if available.<br />";
         echo "<b>Dep Upgrade</b>: The sensor will upgrade it's dependencies to newer versions if available.<br />";
         echo "<b>APT Upgrade</b>: The sensor will do an upgrade of all outdated packages if available.";
+        echo "<b>APT Count</b>: Queries the sensor for the amount of updates currently available.";
     }
 } elseif ($id == 2) {
     # binaryhist.php - UPX
