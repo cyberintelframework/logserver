@@ -232,7 +232,6 @@ GRANT SELECT,UPDATE ON SEQUENCE ipv6_static_id_seq TO idslog;
 --
 -- surfids3_ipv6_add_by_id
 --
-DROP FUNCTION IF EXISTS surfids3_ipv6_add_by_id;
 CREATE OR REPLACE FUNCTION surfids3_ipv6_add_by_id(integer, inet, integer, integer) RETURNS integer
     AS $_$DECLARE
         p_sensorid      ALIAS FOR $1;
@@ -258,7 +257,6 @@ END$_$
 --
 -- surfids3_arp_add_by_id
 --
-DROP FUNCTION IF EXISTS surfids3_arp_add_by_id;
 CREATE OR REPLACE FUNCTION surfids3_arp_add_by_id(integer, macaddr, macaddr, inet, inet, integer, integer) RETURNS integer
     AS $_$DECLARE
         p_severity      ALIAS FOR $1;
@@ -297,7 +295,6 @@ END$_$
 --
 -- surfids3_sshversion_add
 --
-DROP FUNCTION IF EXISTS surfids3_sshversion_add;
 CREATE OR REPLACE FUNCTION surfids3_sshversion_add(integer, integer) RETURNS integer
     AS $_$DECLARE
     p_attackid ALIAS FOR $1;
@@ -314,7 +311,6 @@ END$_$
 --
 -- surfids3_sshversionstring_add
 --
-DROP FUNCTION IF EXISTS surfids3_sshversionstring_add;
 CREATE OR REPLACE FUNCTION surfids3_sshversionstring_add(integer, character varying) RETURNS integer
     AS $_$DECLARE
     p_attackid ALIAS FOR $1;
