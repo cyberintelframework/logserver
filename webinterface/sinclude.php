@@ -321,6 +321,12 @@ if ($filter_mac == 1) {
                         echo $l['ls_sshlogin']. ": <font class='btext'>$shcval</font><br />";
                     }
                 }
+                if (isset($crit['sshuser'])) {
+                    echo $l['ls_sshuser']. ": <font class='btext'>" .$crit['sshuser']. "</font><br />";
+                }
+                if (isset($crit['sshpass'])) {
+                    echo $l['ls_sshpass']. ": <font class='btext'>" .$crit['sshpass']. "</font><br />";
+                }
                 if (isset($crit['sshversion'])) {
                     $sel_sshversion = $crit['sshversion'];
                     echo $l['ls_sshversion']. ": <font class='btext'>" .$crit['sshversion']. "</font><br />";
