@@ -10,6 +10,11 @@
 --
 
 --
+-- LOGIN
+--
+ALTER TABLE login ADD COLUMN d_censor integer DEFAULT 0 NOT NULL;
+
+--
 -- GEOBLOCKS
 --
 CREATE TABLE geoblocks (

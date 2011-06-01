@@ -721,7 +721,8 @@ CREATE TABLE login (
     gpg integer DEFAULT 0,
     d_plotter integer DEFAULT 0 NOT NULL,
     d_plottype integer DEFAULT 1 NOT NULL,
-    d_utc integer DEFAULT 0 NOT NULL
+    d_utc integer DEFAULT 0 NOT NULL,
+    d_censor integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE login_id_seq
