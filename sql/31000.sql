@@ -164,6 +164,8 @@ ALTER TABLE sensors ADD COLUMN ipv6 boolean DEFAULT false NOT NULL;
 UPDATE sensors SET ipv6 = arp;
 ALTER TABLE sensors ADD COLUMN protos boolean DEFAULT false NOT NULL;
 UPDATE sensors SET protos = arp;
+ALTER TABLE sensors ALTER COLUMN status SET DEFAULT 0;
+ALTER TABLE sensors ALTER COLUMN uptime SET DEFAULT 0;
 
 --
 -- SENSOR_DETAILS

@@ -127,26 +127,6 @@ GRANT SELECT,UPDATE ON SEQUENCE attacks_id_seq TO nepenthes;
 GRANT SELECT,UPDATE ON SEQUENCE attacks_id_seq TO argos;
 
 --
--- ARGOS_CSI
---
-
-CREATE TABLE argos_csi (
-    id integer NOT NULL,
-    attacks_id integer,
-    csi bit varying
-);
-
-CREATE SEQUENCE argos_csi_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-ALTER SEQUENCE argos_csi_id_seq OWNED BY argos_csi.id;
-ALTER TABLE argos_csi ALTER COLUMN id SET DEFAULT nextval('argos_csi_id_seq'::regclass);
-
---
 -- ARGOS 
 --
 
@@ -166,8 +146,6 @@ CREATE SEQUENCE argos_id_seq
 
 ALTER SEQUENCE argos_id_seq OWNED BY argos.id;
 ALTER TABLE argos ALTER COLUMN id SET DEFAULT nextval('argos_id_seq'::regclass);
-ALTER TABLE ONLY argos_csi
-    ADD CONSTRAINT argos_csi_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY argos
     ADD CONSTRAINT primary_argos PRIMARY KEY (id);
 ALTER TABLE ONLY argos
