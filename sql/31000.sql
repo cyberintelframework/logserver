@@ -10,6 +10,12 @@
 --
 
 --
+-- INDEXMODS
+--
+ALTER TABLE ONLY indexmods ADD CONSTRAINT uniq_indexmods UNIQUE (id, phppage);
+INSERT INTO indexmods VALUES (14, 'mod_sshversion.php');
+
+--
 -- LOGIN
 --
 ALTER TABLE login ADD COLUMN d_censor integer DEFAULT 0 NOT NULL;
