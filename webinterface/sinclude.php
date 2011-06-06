@@ -307,6 +307,22 @@ if ($filter_mac == 1) {
                 if (isset($crit['binname']) && $crit['sev'] == 32) echo $l['ls_binname']. ": <font class='btext'>" .$crit['binname']. "</font><br />";
                 if (isset($crit['virustxt']) && $crit['sev'] == 32) echo $l['ls_virus']. ": <font class='btext'>" .$crit['virustxt']. "</font><br />";
                 if (isset($crit['filename']) && ($crit['sev'] == 16 || $crit['sev'] == 16)) echo $l['ls_filename']. ": <font class='btext'>" .$crit['filename']. "</font><br />";
+                if (isset($crit['sshversion'])) {
+                    $sel_sshversion = $crit['sshversion'];
+                    echo $l['ls_sshversion']. ": <font class='btext'>" .$crit['sshversion']. "</font><br />";
+                } elseif (isset($crit['sshversionid'])) {
+                    $sql_s = "SELECT version FROM uniq_sshversion WHERE id = '" .$crit['sshversionid']. "'";
+                    $result_s = pg_query($pgconn, $sql_s);
+                    $row_s = pg_fetch_assoc($result_s);
+                    $sel_sshversion = $row_s['version'];
+                    echo $l['ls_sshversion']. ": <font class='btext'>$sel_sshversion</font><br />";
+                }
+                if (isset($crit['sshuser'])) {
+                    echo $l['ls_sshuser']. ": <font class='btext'>" .$crit['sshuser']. "</font><br />";
+                }
+                if (isset($crit['sshpass'])) {
+                    echo $l['ls_sshpass']. ": <font class='btext'>" .$crit['sshpass']. "</font><br />";
+                }
                 if (isset($crit['sshhascommand'])) {
                     if ($crit['sshhascommand'] == 2) $shcval = $l['g_yes'];
                     elseif ($crit['sshhascommand'] == 1) $shcval = $l['g_no'];
@@ -321,21 +337,8 @@ if ($filter_mac == 1) {
                         echo $l['ls_sshlogin']. ": <font class='btext'>$shcval</font><br />";
                     }
                 }
-                if (isset($crit['sshuser'])) {
-                    echo $l['ls_sshuser']. ": <font class='btext'>" .$crit['sshuser']. "</font><br />";
-                }
-                if (isset($crit['sshpass'])) {
-                    echo $l['ls_sshpass']. ": <font class='btext'>" .$crit['sshpass']. "</font><br />";
-                }
-                if (isset($crit['sshversion'])) {
-                    $sel_sshversion = $crit['sshversion'];
-                    echo $l['ls_sshversion']. ": <font class='btext'>" .$crit['sshversion']. "</font><br />";
-                } elseif (isset($crit['sshversionid'])) {
-                    $sql_s = "SELECT version FROM uniq_sshversion WHERE id = '" .$crit['sshversionid']. "'";
-                    $result_s = pg_query($pgconn, $sql_s);
-                    $row_s = pg_fetch_assoc($result_s);
-                    $sel_sshversion = $row_s['version'];
-                    echo $l['ls_sshversion']. ": <font class='btext'>$sel_sshversion</font><br />";
+                if (isset($crit['sshcommand'])) {
+                    echo $l['ls_sshcommand']. ": <font class='btext'>" .$crit['sshcommand']. "</font><br />";
                 }
               echo "</td>\n";
             echo "</tr>\n";
