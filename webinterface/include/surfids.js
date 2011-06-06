@@ -105,13 +105,13 @@ function sh_mailtemp(si) {
   $('#int_sdetail').selectOptions("0");
   $('#filter').hide();
   $('#timeandthresh').show();
+  $('#timestamps').hide();
   if (si == 4) {
     $('#attack_sev').hide();
     $('#attack_time').hide();
     $('#thresh_freq').hide();
     $('#timeoptions').hide();
     $('#repdetail').hide();
-    $('#timestamps').hide();
     $('#srepdetail').show();
     $('#sensor_time').show();
     $('#sensor_sev').show();
@@ -122,7 +122,6 @@ function sh_mailtemp(si) {
     $('#timeoptions').hide();
     $('#repdetail').hide();
     $('#srepdetail').hide();
-    $('#timestamps').hide();
 
     $('#attack_time').show();
   } else {

@@ -185,7 +185,7 @@ echo "<div class='leftmed'>\n";
               echo "</select>\n";
             echo "</td>\n";
           echo "</tr>\n";
-          echo "<tr style='display:;' id='timestamps' name='timestamps'>";
+          echo "<tr style='display: none;' id='timestamps' name='timestamps'>";
             echo "<td>" .$l['re_timeformat']. "</td>\n";
             echo "<td>";
               echo "<select name='int_utc'>\n";
