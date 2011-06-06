@@ -134,7 +134,7 @@ function sh_mailtemp(si) {
     $('#attack_time').show();
     $('#timeoptions').show();
     $('#repdetail').show();
-    $('#timestamps').show();
+//    $('#timestamps').show();
   }
 }
 
