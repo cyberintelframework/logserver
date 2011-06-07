@@ -30,8 +30,8 @@ $install_geoip = "true";
 # DO NOT EDIT BELOW
 #############################
 $targetdir = "/opt/surfnetids";
-$geoiploc = "http://www.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
-@version_ar = (10300, 10400, 20000, 20002, 20003, 30000, 30400);
+$geoiploc = "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
+@version_ar = (10300, 10400, 20000, 20002, 20003, 30000, 30400, 31000);
 
 if ("$webuser" eq "") {
     print "Web user not configured!\n";
@@ -231,3 +231,4 @@ if ("$install_geoip" eq "true") {
     print "Finished installing new GeoIP database!\n";
 }
 
+print "[Notice] Default webinterface user/pass: admin/admin\n";
