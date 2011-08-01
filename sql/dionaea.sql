@@ -267,7 +267,7 @@ CREATE OR REPLACE FUNCTION surfids3_detail_add_download(inet, inet, character va
 BEGIN
     SELECT INTO m_sensorid surfids3_sensorid_get(p_localhost);
 
-    SELECT COUNT(bin) INTO m_check FROM uniq_binaries WHERE name = p_hash;
+    SELECT COUNT(id) INTO m_check FROM uniq_binaries WHERE name = p_hash;
     IF m_check = 0 THEN
       INSERT INTO uniq_binaries (name) VALUES (p_hash);
     END IF;
