@@ -85,11 +85,7 @@ echo "<div class='block'>\n";
             echo "<tr>\n";
               echo "<td>\n";
                 printflagimg($host);
-#                if (file_exists($cimg)) {
-#                  echo printflagimg($country, $countrycode). " $host";
-#                } else {
-#                  echo printflagimg("none", $countrycode). " $host";
-#                }
+                echo "&nbsp;$host";
               echo "</td>\n";
               echo "<td>$count</td>\n";
             echo "</tr>\n";
