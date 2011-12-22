@@ -1994,3 +1994,12 @@ BEGIN
 END$_$
     LANGUAGE plpgsql;
 
+CREATE FUNCTION surfids3_type_from_name(character varying) RETURNS integer
+    AS $_$DECLARE
+        p_name ALIAS FOR $1;
+        p_type INTEGER;
+BEGIN
+        SELECT INTO p_type id FROM honeypots WHERE name = p_name;
+        return p_type;
+END$_$
+    LANGUAGE plpgsql;
