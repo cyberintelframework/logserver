@@ -26,6 +26,7 @@ if ($q_org != 0) {
 add_to_sql("DISTINCT attacks.severity", "select");
 add_to_sql("COUNT(attacks.severity) as total", "select");
 add_to_sql("attacks.severity", "group");
+add_to_sql("attacks.severity", "order");
 
 # IP Exclusion stuff
 add_to_sql("NOT attacks.source IN (SELECT exclusion FROM org_excl WHERE orgid = $q_org)", "where");
@@ -38,6 +39,7 @@ $sql_severity = "SELECT $sql_select ";
 $sql_severity .= " FROM $sql_from ";
 $sql_severity .= " $sql_where ";
 $sql_severity .= " GROUP BY $sql_group ";
+$sql_severity .= " ORDER BY $sql_order ";
 $debuginfo[] = $sql_severity;
 $result_severity = pg_query($pgconn, $sql_severity);
 $num = pg_num_rows($result_severity);
