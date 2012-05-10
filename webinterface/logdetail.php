@@ -118,7 +118,7 @@ if ($err != 1) {
               if ($s_access_search == 9) {
                 $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
               } else {
-                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins WHERE attackid = $id";
+                $sql_logins = "SELECT sshuser, sshpass, type FROM ssh_logins, attacks, sensors WHERE attackid = $id";
                 $sql_logins .= " AND ssh_logins.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
                 $sql_logins .= " sensors.organisation = '" .$q_org. "'";
               }
@@ -128,7 +128,7 @@ if ($err != 1) {
               $row = pg_fetch_assoc($result_logins);
               $sshuser = pg_escape_string(strip_tags(htmlentities($row['sshuser'])));
               $sshpass = pg_escape_string(strip_tags(htmlentities($row['sshpass'])));
-              if ($row['type'] == "false") {
+              if (strtolower($row['type']) == "f" || strtolower($row['type']) == "false") {
                 $sshtype = $l['g_failed'];
               } else {
                 $sshtype = $l['g_success'];
@@ -141,7 +141,7 @@ if ($err != 1) {
               if ($s_access_search == 9) {
                 $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
               } else {
-                $sql_command = "SELECT command FROM ssh_command WHERE attackid = $id";
+                $sql_command = "SELECT command FROM ssh_command, sensors, attacks WHERE attackid = $id";
                 $sql_command .= " AND ssh_command.attackid = attacks.id AND attacks.sensorid = sensors.id AND ";
                 $sql_command .= " sensors.organisation = '" .$q_org. "'";
               }

@@ -73,7 +73,8 @@ img {
 
 
 #page #pageHeader {
-  background-image: 	url('../images/header_logo.gif');
+  background-image: 	url('../images/ids_banner.png');
+  margin-top: 8px;
 }
 #page #pageHeader ul#globalNav {
   background-image:     url('../images/global_nav_black.gif');

@@ -1941,7 +1941,14 @@ CREATE OR REPLACE FUNCTION surfids3_sshversionstring_add(integer, character vary
     p_version ALIAS FOR $2;
 
     m_versionid INTEGER;
+    m_check INTEGER;
 BEGIN
+    SELECT COUNT(version) INTO m_check FROM uniq_sshversion WHERE version = p_version;
+
+    IF m_check = 0 THEN
+        INSERT INTO uniq_sshversion (version) VALUES (p_version);
+    END IF;
+
     SELECT INTO m_versionid id FROM uniq_sshversion WHERE version = p_version;
 
     INSERT INTO ssh_version

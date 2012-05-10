@@ -474,15 +474,7 @@ while ($row = pg_fetch_assoc($result)) {
     }
 
     if ($c_geoip_enable == 1) {
-      $record = geoip_record_by_addr($gi, $source);
-      $countrycode = strtolower($record->country_code);
-      $cimg = "$c_surfidsdir/webinterface/images/worldflags/flag_" .$countrycode. ".gif";
-      if (file_exists($cimg)) {
-        $country = $record->country_name;
-        echo printflagimg($country, $countrycode);
-      } else {
-        echo printflagimg("none", "");
-      }
+      printflagimg($source);
     }
     if ($sport == 0) {
       $sport = "";
