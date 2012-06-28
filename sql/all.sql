@@ -33,6 +33,8 @@ CREATE TABLE version (
 );
 INSERT INTO version VALUES (31000);
 
+GRANT SELECT ON TABLE version TO idslog;
+
 --
 -- SENSORS 
 --
@@ -2001,6 +2003,9 @@ BEGIN
 END$_$
     LANGUAGE plpgsql;
 
+--
+-- surfids3_type_from_name
+--
 CREATE FUNCTION surfids3_type_from_name(character varying) RETURNS integer
     AS $_$DECLARE
         p_name ALIAS FOR $1;
