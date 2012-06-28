@@ -161,7 +161,11 @@ function prepare_sql() {
     if (@count($db_table > 0)) {
       $sql_select = $select[0];
       for ($i = 1; $i < count($select); $i++) {
-        $sql_select .= ", " . $select[$i];
+        if (preg_match('/^DISTINCT.*/', $select[$i])) {
+          $sql_select = $select[$i] . ", " . $sql_select;
+        } else {
+          $sql_select .= ", " . $select[$i];
+        }
       }
     }
   } else {
@@ -904,7 +908,7 @@ function sensorstatus($status, $lastupdate, $uptime, $perm = 0) {
 # Function to format the emulation profiles of Dionaea
 # properly
 function formatEmu($emuProfile) {
-    $emuProfile = json_decode($emuProfile, TRUE);
+    $emuProfile = json_decode(html_entity_decode($emuProfile), TRUE);
     foreach ($emuProfile as $key => $val) {
         $args = "";
         $line = $val["call"] ."(";

@@ -38,6 +38,9 @@ ini_set("session.bug_compat_42", "off");
 ini_set("session.bug_compat_warn", "off");
 
 include '../include/config.inc.php';
+if ($c_maintenance == 1) {
+    header('Location: maintenance.php');
+}
 include '../include/connect.inc.php';
 include '../include/functions.inc.php';
 include '../include/variables.inc.php';

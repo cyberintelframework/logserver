@@ -1162,7 +1162,7 @@ sub sendmail {
 
   if ($gpg_enabled == 1) {
     # Encrypt the mail with gnupg 
-    $gpg = new GnuPG();
+    $gpg = new GnuPG(homedir => $c_gpg_homedir);
     eval { $gpg->clearsign(plaintext => "$mailfile", output => "$sigfile", armor => 1, passphrase => $c_passphrase); }
     or do {
       print "ERROR: $@\n";

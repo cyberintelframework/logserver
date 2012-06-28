@@ -285,7 +285,7 @@ if ($filter_mac == 1) {
                     $graph[] = "severity=" .$crit['sev'];
                   }
                 }
-                if (isset($crit['sevtype']) && $crit['sev'] == 1) {
+                if (isset($crit['sevtype']) && $crit['sev'] == 1 && $crit['sevtype'] != 7) {
                   echo $l['ls_sevtype']. ": <font class='btext'>" .$v_severity_atype_ar[$crit['sevtype']]. "</font><br />";
                   if ($crit['sevtype'] == 0) {
                     $graph[] = "attack=-1";
@@ -307,37 +307,37 @@ if ($filter_mac == 1) {
                 if (isset($crit['binname']) && $crit['sev'] == 32) echo $l['ls_binname']. ": <font class='btext'>" .$crit['binname']. "</font><br />";
                 if (isset($crit['virustxt']) && $crit['sev'] == 32) echo $l['ls_virus']. ": <font class='btext'>" .$crit['virustxt']. "</font><br />";
                 if (isset($crit['filename']) && ($crit['sev'] == 16 || $crit['sev'] == 16)) echo $l['ls_filename']. ": <font class='btext'>" .$crit['filename']. "</font><br />";
-                if (isset($crit['sshversion'])) {
+                if (isset($crit['sshversion']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     $sel_sshversion = $crit['sshversion'];
                     echo $l['ls_sshversion']. ": <font class='btext'>" .$crit['sshversion']. "</font><br />";
-                } elseif (isset($crit['sshversionid'])) {
+                } elseif (isset($crit['sshversionid']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     $sql_s = "SELECT version FROM uniq_sshversion WHERE id = '" .$crit['sshversionid']. "'";
                     $result_s = pg_query($pgconn, $sql_s);
                     $row_s = pg_fetch_assoc($result_s);
                     $sel_sshversion = $row_s['version'];
                     echo $l['ls_sshversion']. ": <font class='btext'>$sel_sshversion</font><br />";
                 }
-                if (isset($crit['sshuser'])) {
+                if (isset($crit['sshuser']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     echo $l['ls_sshuser']. ": <font class='btext'>" .$crit['sshuser']. "</font><br />";
                 }
-                if (isset($crit['sshpass'])) {
+                if (isset($crit['sshpass']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     echo $l['ls_sshpass']. ": <font class='btext'>" .$crit['sshpass']. "</font><br />";
                 }
-                if (isset($crit['sshhascommand'])) {
+                if (isset($crit['sshhascommand']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     if ($crit['sshhascommand'] == 2) $shcval = $l['g_yes'];
                     elseif ($crit['sshhascommand'] == 1) $shcval = $l['g_no'];
                     if ($crit['sshhascommand'] != 0) {
                         echo $l['ls_sshhascommand']. ": <font class='btext'>$shcval</font><br />";
                     }
                 }
-                if (isset($crit['sshlogin'])) {
+                if (isset($crit['sshlogin']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     if ($crit['sshlogin'] == 2) $shcval = $l['g_yes'];
                     elseif ($crit['sshlogin'] == 1) $shcval = $l['g_no'];
                     if ($crit['sshlogin'] != 0) {
                         echo $l['ls_sshlogin']. ": <font class='btext'>$shcval</font><br />";
                     }
                 }
-                if (isset($crit['sshcommand'])) {
+                if (isset($crit['sshcommand']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
                     echo $l['ls_sshcommand']. ": <font class='btext'>" .$crit['sshcommand']. "</font><br />";
                 }
               echo "</td>\n";

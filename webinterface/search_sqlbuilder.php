@@ -238,9 +238,9 @@ if (!isset($crit['gid'])) {
 ####################
 # SSH has command
 ####################
-if (isset($crit['sshhascommand'])) {
-  $crit['sev'] = 1;
-  $crit['sevtype'] = 7;
+if (isset($crit['sshhascommand']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
+#  $crit['sev'] = 1;
+#  $crit['sevtype'] = 7;
 
   # 2 = yes
   # 1 = no
@@ -257,21 +257,21 @@ if (isset($crit['sshhascommand'])) {
 ####################
 # SSH successful login
 ####################
-if (isset($crit['sshlogin'])) {
+if (isset($crit['sshlogin']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
   # 2 = yes
   # 1 = no
   # 0 = both
   if ($crit['sshlogin'] == 2) {
-    $crit['sev'] = 1;
-    $crit['sevtype'] = 7;
+#    $crit['sev'] = 1;
+#    $crit['sevtype'] = 7;
 
     add_to_sql("ssh_logins", "table");
     add_to_sql("attacks.atype = 7", "where");
     add_to_sql("attacks.id = ssh_logins.attackid", "where");
     add_to_sql("ssh_logins.type = TRUE", "where");
   } elseif ($crit['sshlogin'] == 1) {
-    $crit['sev'] = 1;
-    $crit['sevtype'] = 7;
+#    $crit['sev'] = 1;
+#    $crit['sevtype'] = 7;
 
     add_to_sql("ssh_logins", "table");
     add_to_sql("attacks.atype = 7", "where");
@@ -283,9 +283,9 @@ if (isset($crit['sshlogin'])) {
 ####################
 # SSH version
 ####################
-if (isset($crit['sshversion'])) {
-  $crit['sev'] = 1;
-  $crit['sevtype'] = 7;
+if (isset($crit['sshversion']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
+#  $crit['sev'] = 1;
+#  $crit['sevtype'] = 7;
 
   add_to_sql("ssh_version", "table");
   add_to_sql("uniq_sshversion", "table");
@@ -310,9 +310,9 @@ if (isset($crit['sshversion'])) {
 ####################
 # SSH command
 ####################
-if (isset($crit['sshcommand'])) {
-  $crit['sev'] = 1;
-  $crit['sevtype'] = 7;
+if (isset($crit['sshcommand']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
+#  $crit['sev'] = 1;
+#  $crit['sevtype'] = 7;
 
   add_to_sql("ssh_command", "table");
   add_to_sql("attacks.atype = 7", "where");
@@ -327,9 +327,9 @@ if (isset($crit['sshcommand'])) {
 ####################
 # SSH user
 ####################
-if (isset($crit['sshuser'])) {
-  $crit['sev'] = 1;
-  $crit['sevtype'] = 7;
+if (isset($crit['sshuser']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
+#  $crit['sev'] = 1;
+#  $crit['sevtype'] = 7;
 
   add_to_sql("ssh_logins", "table");
   add_to_sql("attacks.atype = 7", "where");
@@ -340,9 +340,9 @@ if (isset($crit['sshuser'])) {
 ####################
 # SSH pass
 ####################
-if (isset($crit['sshpass'])) {
-  $crit['sev'] = 1;
-  $crit['sevtype'] = 7;
+if (isset($crit['sshpass']) && $crit['sev'] == 1 && $crit['sevtype'] == 7) {
+#  $crit['sev'] = 1;
+#  $crit['sevtype'] = 7;
 
   add_to_sql("ssh_logins", "table");
   add_to_sql("attacks.atype = 7", "where");
