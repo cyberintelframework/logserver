@@ -101,4 +101,6 @@ $file = $c_surfidsdir . "/include/GeoLiteCity.dat";
 if (-e $file) {
 	$age = getAge($file, $posix);
 	print "[GeoIP] Age data file: \t\t\t $age days\n";
+} else {
+	print "[GeoIP] Data file: \t\t\t Missing!\n";
 }
