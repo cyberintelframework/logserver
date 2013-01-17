@@ -131,11 +131,6 @@ $sql = "UPDATE attacks SET sensorid = $new_id WHERE sensorid = $old_id";
 $sth = $dbh->prepare($sql);
 $er = $sth->execute();
 
-# Updating details
-$sql = "UPDATE details SET sensorid = $new_id WHERE sensorid = $old_id";
-$sth = $dbh->prepare($sql);
-$er = $sth->execute();
-
 # Updating deactivated_attacks
 $sql = "UPDATE deactivated_attacks SET sensorid = $new_id WHERE sensorid = $old_id";
 $sth = $dbh->prepare($sql);

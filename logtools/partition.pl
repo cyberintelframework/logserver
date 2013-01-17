@@ -74,25 +74,6 @@ if ($tempattacks > 0) {
 	}
 }
 
-$sql = "SELECT * FROM pg_tables WHERE tablename = 'temp_attacks'";
-$sth = $dbh->prepare($sql);
-$sth->execute();
-$tempdetails = $sth->rows;
-
-if ($tempdetails > 0) {
-	$sql = "SELECT * FROM temp_details";
-	$sth = $dbh->prepare($sql);
-	$sth->execute();
-	$countdetails = $sth->rows;
-	if ($countdetails == 0) {
-		$tempdetails = 0;
-		print "Dropping table: temp_details\n";
-		$sql = "DROP TABLE temp_details";
-		$sth = $dbh->prepare($sql);
-		$sth->execute();
-	}
-}
-
 ##############################
 # Create temporary tables
 ##############################
@@ -104,13 +85,6 @@ if ($tempattacks == 0) {
 	$sth = $dbh->prepare($sql);
 	$sth->execute();
 }
-# DETAILS
-if ($tempdetails == 0) {
-	print "Creating temporary table: temp_details\n";
-	$sql = "create table temp_details as select * from details";
-	$sth = $dbh->prepare($sql);
-	$sth->execute();
-}
 
 ################
 # MAIN LOOP
@@ -119,11 +93,6 @@ eval {
 	##############################
 	# Truncate tables
 	##############################
-	# DETAILS
-	print "Truncating table: details\n";
-	$sql = "truncate details";
-	$sth = $dbh->prepare($sql);
-	$sth->execute();
 	# ATTACKS
 	print "Truncating table: attacks\n";
 	$sql = "truncate attacks cascade";
@@ -135,10 +104,6 @@ eval {
 	##############################
 	# ATTACKS
 	$sql = "ALTER SEQUENCE attacks_id_seq RESTART WITH 1";
-	$sth = $dbh->prepare($sql);
-	$sth->execute();
-	# DETAILS
-	$sql = "ALTER SEQUENCE details_id_seq RESTART WITH 1";
 	$sth = $dbh->prepare($sql);
 	$sth->execute();
 
@@ -169,19 +134,6 @@ eval {
 		@aidrow = $attack_sth->fetchrow_array;
 		$aid = $aidrow[0];
 		print  "New attack ID: $aid\n";
-
-		# Copy detail records
-		$sql = "SELECT type, text FROM temp_details WHERE attackid = ?";
-		$detail_sth = $dbh->prepare($sql);
-		$detail_sth->execute($row[0]);
-		while (@detrow = $detail_sth->fetchrow_array) {
-			$d_type = $detrow[0];
-			$d_text = $detrow[1];
-			print "Moving detail record\n";
-			$sql = "INSERT INTO details (attackid, sensorid, type, text) VALUES (?, ?, ?, ?)";
-			$insert_sth = $dbh->prepare($sql);
-			$insert_sth->execute($aid, $sid, $d_type, $d_text);
-		}
 		print "\n";
 	}
 
@@ -200,11 +152,6 @@ if ($@) {
 ##############################
 # Delete temporary tables
 ##############################
-
-$sql = "DROP TABLE temp_details";
-$sth = $dbh->prepare($sql);
-$sth->execute();
-$dbh->commit;
 
 $sql = "DROP TABLE temp_attacks";
 $sth = $dbh->prepare($sql);
